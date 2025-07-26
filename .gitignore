@@ -2,3 +2,8 @@
 /.dist
 /.env
 /API_TEST_GUIDE.md
+/frontend/build
+/frontend/node_modules
+/.env.example
+/.vscode
+README.md

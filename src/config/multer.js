@@ -20,9 +20,9 @@ const fileFilter = (req, file, cb) => {
     const allowedTypes = /pdf|doc|docx/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype) || 
-                     file.mimetype === 'application/pdf' ||
-                     file.mimetype === 'application/msword' ||
-                     file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                    file.mimetype === 'application/pdf' ||
+                    file.mimetype === 'application/msword' ||
+                    file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
     if (mimetype && extname) {
         return cb(null, true);

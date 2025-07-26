@@ -90,4 +90,34 @@ const careerInquery = async (req, res) => {
     }
 };
 
-export default careerInquery;
+const getAllCareerApplications = async (req, res) => {
+    try {
+        // Check if database is connected
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({
+                status: 'error',
+                message: 'Database connection not available. Please check server logs.',
+                hint: 'Make sure your IP is whitelisted in MongoDB Atlas'
+            });
+        }
+
+        const applications = await Career.find().sort({ createdAt: -1 });
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Career applications retrieved successfully',
+            count: applications.length,
+            data: applications
+        });
+
+    } catch (error) {
+        console.error('Error fetching career applications:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch career applications',
+            error: error.message
+        });
+    }
+};
+
+export { careerInquery as default, getAllCareerApplications };

@@ -1,7 +1,8 @@
 import express from 'express';
 import multer from 'multer';
-import careerInquiry from '../controllers/careerController.js';
+import careerInquiry, { getAllCareerApplications } from '../controllers/careerController.js';
 import upload from '../config/multer.js';
+import verifyCaptcha from '../middlewares/verifyCaptcha.js';
 
 const router = express.Router();
 
@@ -21,18 +22,27 @@ const handleMulterError = (err, req, res, next) => {
             });
         }
     }
-    
+
     if (err.message && err.message.includes('Only PDF, DOC, and DOCX')) {
         return res.status(400).json({
             status: 'error',
             message: err.message
         });
     }
-    
+
     next(err);
 };
 
 // Career inquiry route with file upload
-router.post('/career-inquiry', upload.single('resume'), handleMulterError, careerInquiry);
+router.post(
+    '/career-inquiry',
+    verifyCaptcha,
+    upload.single('resume'),
+    handleMulterError,
+    careerInquiry
+);
+
+// Get all career applications (admin route)
+router.get('/applications', getAllCareerApplications);
 
 export default router;
