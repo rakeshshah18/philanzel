@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { homePageAPI } from '../services/api';
+import Alert from '../components/Alert';
 
 const HomePageForm = () => {
     const [formData, setFormData] = useState({
@@ -84,9 +85,11 @@ const HomePageForm = () => {
                         </div>
                         <div className="card-body">
                             {message && (
-                                <div className={`alert ${message.includes('success') ? 'alert-success' : 'alert-danger'}`}>
-                                    {message}
-                                </div>
+                                <Alert
+                                    message={message}
+                                    type={message.includes('success') ? 'success' : 'danger'}
+                                    onClose={() => setMessage('')}
+                                />
                             )}
 
                             <form onSubmit={handleSubmit}>

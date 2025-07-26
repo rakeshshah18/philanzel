@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useProtectedAdminOperations } from '../hooks/useProtectedAdminOperations';
 import ProtectedRoute from '../components/ProtectedRoute';
+import Alert from '../components/Alert';
 
 const AdminDashboardExample = () => {
     const {
@@ -119,9 +120,12 @@ const AdminDashboardExample = () => {
                 </div>
 
                 {message && (
-                    <div className={`alert ${message.includes('Error') ? 'alert-danger' : 'alert-success'} mt-3`}>
-                        {message}
-                    </div>
+                    <Alert
+                        message={message}
+                        type={message.includes('Error') ? 'danger' : 'success'}
+                        onClose={() => setMessage('')}
+                        className="mt-3"
+                    />
                 )}
             </div>
         </ProtectedRoute>

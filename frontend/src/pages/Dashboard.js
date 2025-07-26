@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { inquiryAPI, careerAPI } from '../services/api';
 import { LoginForm, RegisterForm, AdminNavbar } from '../components/admin-forms';
 import { useAuth } from '../contexts/AuthContext';
+import Alert from '../components/Alert';
 
 const Dashboard = () => {
     const { admin, isAuthenticated, login, register, logout } = useAuth();
@@ -134,14 +135,11 @@ const Dashboard = () => {
             {/* Success/Error Messages */}
             {authMessage && (
                 <div className="container-fluid px-4 pt-3">
-                    <div className={`alert ${authMessage.includes('✅') ? 'alert-success' : 'alert-danger'} alert-dismissible fade show`}>
-                        {authMessage}
-                        <button
-                            type="button"
-                            className="btn-close"
-                            onClick={() => setAuthMessage('')}
-                        ></button>
-                    </div>
+                    <Alert
+                        message={authMessage}
+                        type={authMessage.includes('✅') ? 'success' : 'danger'}
+                        onClose={() => setAuthMessage('')}
+                    />
                 </div>
             )}
 

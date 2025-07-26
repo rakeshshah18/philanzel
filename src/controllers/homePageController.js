@@ -50,7 +50,7 @@ const createHomePage = async (req, res) => {
             imageData.path = req.file.path;
             imageData.size = req.file.size;
             imageData.mimetype = req.file.mimetype;
-            imageData.url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+            imageData.url = `${req.protocol}://${req.get('host')}/uploads/images/${req.file.filename}`;
         } else if (image.url) {
             imageData.url = image.url;
         } else {
@@ -81,7 +81,7 @@ const createHomePage = async (req, res) => {
                 heading: newHomePage.heading,
                 description: newHomePage.description,
                 button: newHomePage.button,
-                image: newHomePage.image,
+                image: newHomePage.ijmage,
                 createdAt: newHomePage.createdAt
             }
         });
@@ -237,7 +237,7 @@ const updateHomePage = async (req, res) => {
                 imageData.path = req.file.path;
                 imageData.size = req.file.size;
                 imageData.mimetype = req.file.mimetype;
-                imageData.url = `/uploads/images/${req.file.filename}`;
+                imageData.url = `${req.protocol}://${req.get('host')}/uploads/images/${req.file.filename}`;
             } else {
                 // Keep existing file data if no new file uploaded
                 imageData.originalName = existingHomePage.image?.originalName;

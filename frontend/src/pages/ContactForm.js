@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { inquiryAPI } from '../services/api';
+import Alert from '../components/Alert';
 
 const ContactForm = () => {
     const [formData, setFormData] = useState({
@@ -100,10 +101,11 @@ const ContactForm = () => {
                         </div>
                         <div className="card-body">
                             {error && (
-                                <div className="alert alert-danger" role="alert">
-                                    <i className="fas fa-exclamation-triangle me-2"></i>
-                                    {error}
-                                </div>
+                                <Alert
+                                    message={<><i className="fas fa-exclamation-triangle me-2"></i>{error}</>}
+                                    type="danger"
+                                    onClose={() => setError('')}
+                                />
                             )}
 
                             <form onSubmit={handleSubmit}>

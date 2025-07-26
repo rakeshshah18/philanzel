@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Alert from '../components/Alert';
 import { homePageAPI } from '../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -11,6 +12,23 @@ const Home = () => {
     const [showForm, setShowForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
+
+    // Helper function to get full image URL
+    const getImageUrl = (imageUrl) => {
+        if (!imageUrl) return null;
+
+        // If it's already a full URL, return as is
+        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+            return imageUrl;
+        }
+
+        // If it's a relative URL, prepend the base URL
+        const baseUrl = process.env.NODE_ENV === 'production'
+            ? ''
+            : 'http://localhost:8000';
+
+        return `${baseUrl}${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
+    };
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -231,9 +249,12 @@ const Home = () => {
 
                 {/* Success/Error Messages */}
                 {message && (
-                    <div className={`alert ${message.includes('✅') ? 'alert-success' : 'alert-danger'} mb-3`}>
-                        {message}
-                    </div>
+                    <Alert
+                        message={message}
+                        type={message.includes('✅') ? 'success' : 'danger'}
+                        onClose={() => setMessage('')}
+                        className="mb-3"
+                    />
                 )}
 
                 {/* Create/Edit Form */}
@@ -491,7 +512,7 @@ const Home = () => {
                                                     <td style={{ padding: '8px' }}>
                                                         {page.image?.url ? (
                                                             <img
-                                                                src={page.image.url}
+                                                                src={getImageUrl(page.image.url)}
                                                                 alt={page.image.altText}
                                                                 style={{
                                                                     width: '80px',
@@ -499,24 +520,28 @@ const Home = () => {
                                                                     objectFit: 'cover',
                                                                     borderRadius: '4px'
                                                                 }}
-                                                            />
-                                                        ) : (
-                                                            <div
-                                                                style={{
-                                                                    width: '80px',
-                                                                    height: '60px',
-                                                                    backgroundColor: '#6c757d',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center',
-                                                                    fontSize: '12px',
-                                                                    color: 'white',
-                                                                    borderRadius: '4px'
+                                                                onError={(e) => {
+                                                                    console.error('Image failed to load:', page.image.url);
+                                                                    e.target.style.display = 'none';
+                                                                    e.target.nextSibling.style.display = 'flex';
                                                                 }}
-                                                            >
-                                                                No Image
-                                                            </div>
-                                                        )}
+                                                            />
+                                                        ) : null}
+                                                        <div
+                                                            style={{
+                                                                width: '80px',
+                                                                height: '60px',
+                                                                backgroundColor: '#6c757d',
+                                                                display: page.image?.url ? 'none' : 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                fontSize: '12px',
+                                                                color: 'white',
+                                                                borderRadius: '4px'
+                                                            }}
+                                                        >
+                                                            No Image
+                                                        </div>
                                                     </td>
                                                     <td style={{
                                                         color: '#adb5bd',
