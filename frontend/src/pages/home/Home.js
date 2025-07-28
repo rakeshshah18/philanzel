@@ -1,14 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { homePageAPI } from '../services/api';
+import Alert from '../../components/Alert';
+import { homePageAPI, ourTrackAPI } from '../../services/api';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const Home = () => {
     const [homePages, setHomePages] = useState([]);
     const [fetchLoading, setFetchLoading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [trackMessage, setTrackMessage] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
+
+    // Helper function to get full image URL
+    const getImageUrl = (imageUrl) => {
+        if (!imageUrl) return null;
+
+        // If it's already a full URL, return as is
+        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+            return imageUrl;
+        }
+
+        // If it's a relative URL, prepend the base URL
+        const baseUrl = process.env.NODE_ENV === 'production'
+            ? ''
+            : 'http://localhost:8000';
+
+        return `${baseUrl}${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
+    };
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -22,20 +43,54 @@ const Home = () => {
         image: { file: null, altText: '' }
     });
 
-    useEffect(() => {
-        fetchHomePages();
-    }, []);
+    // OurTrack state
+    const [trackData, setTrackData] = useState(null);
+    const [trackLoading, setTrackLoading] = useState(false);
+    const [showTrackForm, setShowTrackForm] = useState(false);
+    const [isTrackEditing, setIsTrackEditing] = useState(false);
+    const [trackFormData, setTrackFormData] = useState({
+        yearExp: '',
+        totalExpert: '',
+        planningDone: '',
+        happyCustomers: ''
+    });
 
-    const fetchHomePages = async () => {
+    useEffect(() => {
+        // Add a small delay to ensure backend is ready and DOM is mounted
+        const initializeData = async () => {
+            try {
+                // Wait for component to mount properly
+                await new Promise(resolve => setTimeout(resolve, 100));
+                await fetchHomePages();
+                // Wait a bit before fetching track data to avoid overwhelming the API
+                setTimeout(() => {
+                    fetchTrackData();
+                }, 300);
+            } catch (error) {
+                console.error('Error initializing data:', error);
+            }
+        };
+
+        initializeData();
+    }, []); const fetchHomePages = async () => {
         setFetchLoading(true);
         try {
+            console.log('Fetching homepage data...');
             const response = await homePageAPI.getAll();
+            console.log('Homepage API response:', response);
             if (response.data && response.data.data) {
                 setHomePages(response.data.data);
+                console.log('Homepage data loaded successfully:', response.data.data.length, 'items');
             }
         } catch (error) {
             console.error('Error fetching homepage content:', error);
-            setMessage('❌ Failed to fetch homepage content.');
+            console.error('Error details:', {
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                data: error.response?.data,
+                message: error.message
+            });
+            setMessage(`❌ Failed to fetch homepage content. ${error.response?.data?.message || error.message}`);
         } finally {
             setFetchLoading(false);
         }
@@ -164,6 +219,104 @@ const Home = () => {
         alert(`Title: ${page.heading}\nDescription: ${page.description}\nButton: ${page.button?.text || 'No button'} -> ${page.button?.link || 'No link'}\nAlt Text: ${page.image?.altText || 'No alt text'}`);
     };
 
+    // OurTrack functions
+    const fetchTrackData = async () => {
+        setTrackLoading(true);
+        try {
+            const response = await ourTrackAPI.get();
+            if (response.data && response.data.data) {
+                setTrackData(response.data.data);
+                setIsTrackEditing(true);
+            } else {
+                setIsTrackEditing(false);
+            }
+        } catch (error) {
+            console.error('Error fetching track data:', error);
+            // Only show error message if it's not a 404 (no data found) and not network related
+            if (error.response?.status !== 404 && error.response?.status !== 0) {
+                setTrackMessage('❌ Failed to fetch track record.');
+            }
+            setIsTrackEditing(false);
+        } finally {
+            setTrackLoading(false);
+        }
+    };
+
+    const handleTrackChange = (e) => {
+        const { name, value } = e.target;
+        setTrackFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleTrackSubmit = async (e) => {
+        e.preventDefault();
+        setTrackLoading(true);
+        setMessage('');
+
+        try {
+            const submitData = {
+                yearExp: parseInt(trackFormData.yearExp),
+                totalExpert: parseInt(trackFormData.totalExpert),
+                planningDone: parseInt(trackFormData.planningDone),
+                happyCustomers: parseInt(trackFormData.happyCustomers)
+            };
+
+            for (const [key, value] of Object.entries(submitData)) {
+                if (isNaN(value) || value < 0) {
+                    setMessage(`❌ ${key} must be a valid positive number.`);
+                    setTrackLoading(false);
+                    return;
+                }
+            }
+
+            let response;
+            if (isTrackEditing) {
+                response = await ourTrackAPI.update(submitData);
+                setTrackMessage('✅ Track record updated successfully!');
+            } else {
+                response = await ourTrackAPI.create(submitData);
+                setTrackMessage('✅ Track record created successfully!');
+                setIsTrackEditing(true);
+            }
+
+            setTrackData(response.data.data);
+            setShowTrackForm(false);
+            resetTrackForm();
+
+        } catch (error) {
+            console.error('Error saving track data:', error);
+            setTrackMessage(error.response?.data?.message || '❌ Failed to save track record.');
+        } finally {
+            setTrackLoading(false);
+        }
+    };
+
+    const handleTrackEdit = () => {
+        if (trackData) {
+            setTrackFormData({
+                yearExp: trackData.yearExp.toString(),
+                totalExpert: trackData.totalExpert.toString(),
+                planningDone: trackData.planningDone.toString(),
+                happyCustomers: trackData.happyCustomers.toString()
+            });
+        }
+        setShowTrackForm(true);
+        setTrackMessage('');
+    };
+
+    const resetTrackForm = () => {
+        setTrackFormData({
+            yearExp: '',
+            totalExpert: '',
+            planningDone: '',
+            happyCustomers: ''
+        });
+        setShowTrackForm(false);
+        setTrackMessage('');
+    };
+
     // Filter and pagination logic
     const filteredItems = homePages.filter(page =>
         page.heading.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -229,9 +382,12 @@ const Home = () => {
 
                 {/* Success/Error Messages */}
                 {message && (
-                    <div className={`alert ${message.includes('✅') ? 'alert-success' : 'alert-danger'} mb-3`}>
-                        {message}
-                    </div>
+                    <Alert
+                        message={message}
+                        type={message.includes('✅') ? 'success' : 'danger'}
+                        onClose={() => setMessage('')}
+                        className="mb-3"
+                    />
                 )}
 
                 {/* Create/Edit Form */}
@@ -273,16 +429,34 @@ const Home = () => {
                                 <div className="row">
                                     <div className="col-md-12 mb-3">
                                         <label htmlFor="description" className="form-label">Description *</label>
-                                        <textarea
-                                            className="form-control"
-                                            id="description"
-                                            name="description"
-                                            rows="3"
+                                        <ReactQuill
+                                            theme="snow"
                                             value={formData.description}
-                                            onChange={handleChange}
+                                            onChange={(value) => setFormData({ ...formData, description: value })}
                                             placeholder="Enter description"
-                                            required
-                                        ></textarea>
+                                            modules={{
+                                                toolbar: [
+                                                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                                                    ['bold', 'italic', 'underline', 'strike'],
+                                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                    [{ 'script': 'sub' }, { 'script': 'super' }],
+                                                    [{ 'indent': '-1' }, { 'indent': '+1' }],
+                                                    [{ 'direction': 'rtl' }],
+                                                    [{ 'color': [] }, { 'background': [] }],
+                                                    [{ 'align': [] }],
+                                                    ['link', 'image'],
+                                                    ['clean']
+                                                ]
+                                            }}
+                                            formats={[
+                                                'header', 'bold', 'italic', 'underline', 'strike', 'blockquote',
+                                                'list', 'bullet', 'indent', 'link', 'image', 'color', 'background',
+                                                'align', 'script'
+                                            ]}
+                                            style={{
+                                                minHeight: '150px'
+                                            }}
+                                        />
                                     </div>
                                 </div>
                                 <div className="row">
@@ -326,13 +500,23 @@ const Home = () => {
                                         />
                                     </div>
                                 </div>
-                                <button
-                                    type="submit"
-                                    className="btn btn-primary"
-                                    disabled={loading}
-                                >
-                                    {loading ? 'Saving...' : (isEditing ? 'Update' : 'Create')}
-                                </button>
+                                <div className="d-flex gap-2">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary"
+                                        disabled={loading}
+                                    >
+                                        {loading ? 'Saving...' : (isEditing ? 'Update' : 'Create')}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={handleCancelEdit}
+                                        disabled={loading}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -343,7 +527,7 @@ const Home = () => {
                     <div className="card-body" style={{ padding: '20px' }}>
                         {/* Section Title */}
                         <h5 className="mb-3" style={{ color: '#6c757d', fontSize: '14px', fontWeight: 'normal' }}>
-                            HOME LIST
+                            HOME SLIDER
                         </h5>
 
                         {/* Controls */}
@@ -461,7 +645,7 @@ const Home = () => {
                                                     <td style={{ padding: '8px' }}>
                                                         {page.image?.url ? (
                                                             <img
-                                                                src={page.image.url}
+                                                                src={getImageUrl(page.image.url)}
                                                                 alt={page.image.altText}
                                                                 style={{
                                                                     width: '80px',
@@ -469,24 +653,28 @@ const Home = () => {
                                                                     objectFit: 'cover',
                                                                     borderRadius: '4px'
                                                                 }}
-                                                            />
-                                                        ) : (
-                                                            <div
-                                                                style={{
-                                                                    width: '80px',
-                                                                    height: '60px',
-                                                                    backgroundColor: '#6c757d',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center',
-                                                                    fontSize: '12px',
-                                                                    color: 'white',
-                                                                    borderRadius: '4px'
+                                                                onError={(e) => {
+                                                                    console.error('Image failed to load:', page.image.url);
+                                                                    e.target.style.display = 'none';
+                                                                    e.target.nextSibling.style.display = 'flex';
                                                                 }}
-                                                            >
-                                                                No Image
-                                                            </div>
-                                                        )}
+                                                            />
+                                                        ) : null}
+                                                        <div
+                                                            style={{
+                                                                width: '80px',
+                                                                height: '60px',
+                                                                backgroundColor: '#6c757d',
+                                                                display: page.image?.url ? 'none' : 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                fontSize: '12px',
+                                                                color: 'white',
+                                                                borderRadius: '4px'
+                                                            }}
+                                                        >
+                                                            No Image
+                                                        </div>
                                                     </td>
                                                     <td style={{
                                                         color: '#adb5bd',
@@ -626,6 +814,241 @@ const Home = () => {
                             </>
                         )}
                     </div>
+                </div>
+
+                {/* OurTrack Section */}
+                <div className="container-fluid py-4">
+                    <div className="row mb-4">
+                        <div className="col-12">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h2 className="h3 mb-0">
+                                    <i className="fas fa-chart-line me-2"></i>
+                                    Our Track Record
+                                </h2>
+                                {!showTrackForm && (
+                                    <div className="btn-group">
+                                        <button
+                                            className="btn btn-primary btn-sm"
+                                            onClick={isTrackEditing ? handleTrackEdit : () => setShowTrackForm(true)}
+                                        >
+                                            <i className="fas fa-plus me-2"></i>
+                                            {isTrackEditing ? 'Edit Record' : 'Add Record'}
+                                        </button>
+                                    </div>
+                                )}
+                                {showTrackForm && (
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        onClick={resetTrackForm}
+                                    >
+                                        <i className="fas fa-times me-2"></i>
+                                        Cancel
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {trackMessage && (
+                        <div className="row mb-4">
+                            <div className="col-12">
+                                <Alert
+                                    message={trackMessage}
+                                    type={trackMessage.includes('✅') ? 'success' : 'danger'}
+                                    onClose={() => setTrackMessage('')}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {trackLoading && (
+                        <div className="row mb-4">
+                            <div className="col-12 text-center">
+                                <div className="spinner-border text-primary" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Track Record Display */}
+                    {!showTrackForm && trackData && (
+                        <div className="row">
+                            <div className="col-md-3 mb-3">
+                                <div className="card border-success h-100">
+                                    <div className="card-body text-center">
+                                        <div className="display-4 text-success mb-2">
+                                            <i className="fas fa-calendar-alt"></i>
+                                        </div>
+                                        <h3 className="display-6 fw-bold text-success">
+                                            {trackData.yearExp ? trackData.yearExp.toLocaleString() : '0'}
+                                        </h3>
+                                        <p className="card-text text-muted">Years of Experience</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-3 mb-3">
+                                <div className="card border-info h-100">
+                                    <div className="card-body text-center">
+                                        <div className="display-4 text-info mb-2">
+                                            <i className="fas fa-users"></i>
+                                        </div>
+                                        <h3 className="display-6 fw-bold text-info">
+                                            {trackData.totalExpert ? trackData.totalExpert.toLocaleString() : '0'}
+                                        </h3>
+                                        <p className="card-text text-muted">Total Experts</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-3 mb-3">
+                                <div className="card border-warning h-100">
+                                    <div className="card-body text-center">
+                                        <div className="display-4 text-warning mb-2">
+                                            <i className="fas fa-tasks"></i>
+                                        </div>
+                                        <h3 className="display-6 fw-bold text-warning">
+                                            {trackData.planningDone ? trackData.planningDone.toLocaleString() : '0'}
+                                        </h3>
+                                        <p className="card-text text-muted">Projects Completed</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-3 mb-3">
+                                <div className="card border-danger h-100">
+                                    <div className="card-body text-center">
+                                        <div className="display-4 text-danger mb-2">
+                                            <i className="fas fa-smile"></i>
+                                        </div>
+                                        <h3 className="display-6 fw-bold text-danger">
+                                            {trackData.happyCustomers ? trackData.happyCustomers.toLocaleString() : '0'}
+                                        </h3>
+                                        <p className="card-text text-muted">Happy Customers</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Form for Creating/Editing Track Record */}
+                    {showTrackForm && (
+                        <div className="row">
+                            <div className="col-lg-8 mx-auto">
+                                <div className="card">
+                                    <div className="card-header">
+                                        <h4 className="card-title mb-0">
+                                            <i className="fas fa-chart-line me-2"></i>
+                                            {isTrackEditing ? 'Edit Track Record' : 'Add Track Record'}
+                                        </h4>
+                                    </div>
+                                    <div className="card-body">
+                                        <form onSubmit={handleTrackSubmit}>
+                                            <div className="row">
+                                                <div className="col-md-6 mb-3">
+                                                    <label htmlFor="yearExp" className="form-label">
+                                                        <i className="fas fa-calendar-alt me-2"></i>
+                                                        Years of Experience *
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        id="yearExp"
+                                                        name="yearExp"
+                                                        value={trackFormData.yearExp}
+                                                        onChange={handleTrackChange}
+                                                        min="0"
+                                                        required
+                                                        placeholder="Enter years of experience"
+                                                    />
+                                                </div>
+
+                                                <div className="col-md-6 mb-3">
+                                                    <label htmlFor="totalExpert" className="form-label">
+                                                        <i className="fas fa-users me-2"></i>
+                                                        Total Experts *
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        id="totalExpert"
+                                                        name="totalExpert"
+                                                        value={trackFormData.totalExpert}
+                                                        onChange={handleTrackChange}
+                                                        min="0"
+                                                        required
+                                                        placeholder="Enter total number of experts"
+                                                    />
+                                                </div>
+
+                                                <div className="col-md-6 mb-3">
+                                                    <label htmlFor="planningDone" className="form-label">
+                                                        <i className="fas fa-tasks me-2"></i>
+                                                        Financial Planning Done
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        id="planningDone"
+                                                        name="planningDone"
+                                                        value={trackFormData.planningDone}
+                                                        onChange={handleTrackChange}
+                                                        min="0"
+                                                        required
+                                                        placeholder="Enter projects completed"
+                                                    />
+                                                </div>
+
+                                                <div className="col-md-6 mb-3">
+                                                    <label htmlFor="happyCustomers" className="form-label">
+                                                        <i className="fas fa-smile me-2"></i>
+                                                        Happy Customers *
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        id="happyCustomers"
+                                                        name="happyCustomers"
+                                                        value={trackFormData.happyCustomers}
+                                                        onChange={handleTrackChange}
+                                                        min="0"
+                                                        required
+                                                        placeholder="Enter number of happy customers"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="d-flex justify-content-end gap-2">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-secondary"
+                                                    onClick={resetTrackForm}
+                                                >
+                                                    <i className="fas fa-times me-2"></i>
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    className="btn btn-primary"
+                                                    disabled={trackLoading}
+                                                >
+                                                    {trackLoading ? (
+                                                        <>
+                                                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                                            Saving...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <i className="fas fa-save me-2"></i>
+                                                            {isTrackEditing ? 'Update' : 'Create'}
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,10 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
     const location = useLocation();
+    const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
+    const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
 
     const isActive = (path) => location.pathname === path;
+
+    // Check if any page route is active
+    const isPagesActive = () => {
+        return isActive('/home') || isActive('/about-us');
+    };
+
+    // Check if any service route is active
+    const isServicesActive = () => {
+        return isActive('/services-overview') || isActive('/service-1') || isActive('/service-2') || isActive('/service-3') ||
+            isActive('/service-4') || isActive('/service-5') || isActive('/service-6') ||
+            isActive('/service-7') || isActive('/service-8');
+    };
+
+    const togglePagesDropdown = () => {
+        setIsPagesDropdownOpen(!isPagesDropdownOpen);
+    };
+
+    const toggleServicesDropdown = () => {
+        setIsServicesDropdownOpen(!isServicesDropdownOpen);
+    };
 
     return (
         <div className="app-sidebar">
@@ -24,57 +46,238 @@ const Sidebar = () => {
                     Dashboard
                 </Link>
 
-                <Link
-                    to="/home"
-                    className={`nav-link ${isActive('/home') ? 'active' : ''}`}
-                >
-                    <i className="fas fa-home me-2"></i>
-                    Home
-                </Link>
+                {/* Pages Dropdown */}
+                <div className="nav-item">
+                    <div
+                        className={`nav-link ${isPagesActive() ? 'active' : ''}`}
+                        onClick={togglePagesDropdown}
+                        style={{
+                            cursor: 'pointer',
+                            userSelect: 'none'
+                        }}
+                    >
+                        <i className="fas fa-file-alt me-2"></i>
+                        Pages
+                        <i className={`fas fa-chevron-${isPagesDropdownOpen ? 'down' : 'right'} float-end mt-1`}></i>
+                    </div>
 
-                {/* <Link
-                    to="/about"
-                    className={`nav-link ${isActive('/about') ? 'active' : ''}`}
-                >
-                    <i className="fas fa-info-circle me-2"></i>
-                    About Us
-                </Link> */}
+                    {isPagesDropdownOpen && (
+                        <div className="dropdown-submenu" style={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                            borderLeft: '3px solid rgba(255, 255, 255, 0.1)',
+                            marginLeft: '0.5rem',
+                            marginRight: '0.5rem',
+                            borderRadius: '4px',
+                            paddingTop: '0.25rem',
+                            paddingBottom: '0.25rem'
+                        }}>
+                            <Link
+                                to="/home"
+                                className={`nav-link ${isActive('/home') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/home') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-home me-2"></i>
+                                Home
+                            </Link>
 
-                {/* <Link
-                    to="/services"
-                    className={`nav-link ${isActive('/services') ? 'active' : ''}`}
-                >
-                    <i className="fas fa-cogs me-2"></i>
-                    Services
-                </Link> */}
+                            <Link
+                                to="/about-us"
+                                className={`nav-link ${isActive('/about-us') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/about-us') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-info-circle me-2"></i>
+                                About Us
+                            </Link>
+                        </div>
+                    )}
+                </div>
 
-                {/* <Link
-                    to="/careers"
-                    className={`nav-link ${isActive('/careers') ? 'active' : ''}`}
-                >
-                    <i className="fas fa-briefcase me-2"></i>
-                    Career Application
-                </Link> */}
+                {/* Services Dropdown */}
+                <div className="nav-item">
+                    <div
+                        className={`nav-link ${isServicesActive() ? 'active' : ''}`}
+                        onClick={toggleServicesDropdown}
+                        style={{
+                            cursor: 'pointer',
+                            userSelect: 'none'
+                        }}
+                    >
+                        <i className="fas fa-cogs me-2"></i>
+                        Services
+                        <i className={`fas fa-chevron-${isServicesDropdownOpen ? 'down' : 'right'} float-end mt-1`}></i>
+                    </div>
 
-                {/* <hr className="my-3" /> */}
+                    {isServicesDropdownOpen && (
+                        <div className="dropdown-submenu" style={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                            borderLeft: '3px solid rgba(255, 255, 255, 0.1)',
+                            marginLeft: '0.5rem',
+                            marginRight: '0.5rem',
+                            borderRadius: '4px',
+                            paddingTop: '0.25rem',
+                            paddingBottom: '0.25rem'
+                        }}>
+                            <Link
+                                to="/services-overview"
+                                className={`nav-link ${isActive('/services-overview') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/services-overview') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-eye me-2"></i>
+                                Overview
+                            </Link>
 
-                {/* <div className="text-muted small px-3 mb-2">ADMIN PANEL</div> */}
+                            <Link
+                                to="/service-1"
+                                className={`nav-link ${isActive('/service-1') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/service-1') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-wrench me-2"></i>
+                                Service 1
+                            </Link>
 
-                {/* <Link
-                    to="/admin/inquiries"
-                    className={`nav-link ${isActive('/admin/inquiries') ? 'active' : ''}`}
-                >
-                    <i className="fas fa-list me-2"></i>
-                    Manage Inquiries
-                </Link> */}
+                            <Link
+                                to="/service-2"
+                                className={`nav-link ${isActive('/service-2') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/service-2') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-tools me-2"></i>
+                                Service 2
+                            </Link>
 
-                {/* <Link
-                    to="/admin/applications"
-                    className={`nav-link ${isActive('/admin/applications') ? 'active' : ''}`}
-                >
-                    <i className="fas fa-users me-2"></i>
-                    Manage Applications
-                </Link> */}
+                            <Link
+                                to="/service-3"
+                                className={`nav-link ${isActive('/service-3') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/service-3') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-laptop-code me-2"></i>
+                                Service 3
+                            </Link>
+
+                            <Link
+                                to="/service-4"
+                                className={`nav-link ${isActive('/service-4') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/service-4') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-mobile-alt me-2"></i>
+                                Service 4
+                            </Link>
+
+                            <Link
+                                to="/service-5"
+                                className={`nav-link ${isActive('/service-5') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/service-5') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-database me-2"></i>
+                                Service 5
+                            </Link>
+
+                            <Link
+                                to="/service-6"
+                                className={`nav-link ${isActive('/service-6') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/service-6') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-cloud me-2"></i>
+                                Service 6
+                            </Link>
+
+                            <Link
+                                to="/service-7"
+                                className={`nav-link ${isActive('/service-7') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/service-7') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-shield-alt me-2"></i>
+                                Service 7
+                            </Link>
+
+                            <Link
+                                to="/service-8"
+                                className={`nav-link ${isActive('/service-8') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/service-8') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-chart-line me-2"></i>
+                                Service 8
+                            </Link>
+                        </div>
+                    )}
+                </div>
+
             </nav>
         </div>
     );

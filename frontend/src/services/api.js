@@ -196,4 +196,19 @@ export const adminAuthAPI = {
     getAllAdmins: (params = {}) => API.get('/admin/auth/all', { params })
 };
 
+// OurTrack API
+export const ourTrackAPI = {
+    // Get track record
+    get: () => API.get('/admin/our-track'),
+
+    // Create new track record
+    create: (data) => API.post('/admin/our-track', data),
+
+    // Update track record
+    update: (data) => API.put('/admin/our-track', data),
+
+    // Delete track record
+    delete: () => API.delete('/admin/our-track')
+};
+
 export default API;

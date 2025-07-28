@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { homePageAPI } from '../services/api';
-import Alert from '../components/Alert';
+import { homePageAPI } from '../../services/api';
+import Alert from '../../components/Alert';
 
 const HomePageForm = () => {
     const [formData, setFormData] = useState({

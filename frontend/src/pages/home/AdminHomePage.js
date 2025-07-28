@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { homePageAPI } from '../services/api';
+import { homePageAPI } from '../../services/api';
 
 const AdminHomePage = () => {
     const [homePages, setHomePages] = useState([]);
