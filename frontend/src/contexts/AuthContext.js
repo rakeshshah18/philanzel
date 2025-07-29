@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { adminAuthAPI } from '../services/api';
+import Alert from '../components/Alert';
 
 const AuthContext = createContext();
 
@@ -15,6 +16,7 @@ export const AuthProvider = ({ children }) => {
     const [admin, setAdmin] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [alert, setAlert] = useState({ show: false, message: '', type: 'info' });
 
     // Check for existing token on mount
     useEffect(() => {
@@ -164,6 +166,19 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Alert functionality
+    const showAlert = (message, type = 'info') => {
+        setAlert({ show: true, message, type });
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+            setAlert({ show: false, message: '', type: 'info' });
+        }, 3000);
+    };
+
+    const hideAlert = () => {
+        setAlert({ show: false, message: '', type: 'info' });
+    };
+
     const value = {
         admin,
         isAuthenticated,
@@ -177,11 +192,31 @@ export const AuthProvider = ({ children }) => {
         hasRole,
         requireAuth,
         requirePermission,
-        protectedOperation
+        protectedOperation,
+        showAlert,
+        hideAlert,
+        alert
     };
 
     return (
         <AuthContext.Provider value={value}>
+            {/* Global Alert */}
+            {alert.show && (
+                <div style={{
+                    position: 'fixed',
+                    top: '20px',
+                    right: '20px',
+                    zIndex: 9999,
+                    minWidth: '300px'
+                }}>
+                    <Alert
+                        message={alert.message}
+                        type={alert.type}
+                        onClose={hideAlert}
+                        dismissible={true}
+                    />
+                </div>
+            )}
             {children}
         </AuthContext.Provider>
     );

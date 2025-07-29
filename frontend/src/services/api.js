@@ -211,4 +211,19 @@ export const ourTrackAPI = {
     delete: () => API.delete('/admin/our-track')
 };
 
+// Services API
+export const servicesAPI = {
+    // Get all services
+    getAll: () => API.get('/admin/services'),
+
+    // Create new service
+    create: (data) => API.post('/admin/services', data),
+
+    // Update service
+    update: (id, data) => API.put(`/admin/services/${id}`, data),
+
+    // Delete service
+    delete: (id) => API.delete(`/admin/services/${id}`)
+};
+
 export default API;
