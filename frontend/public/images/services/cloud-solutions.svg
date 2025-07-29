@@ -1,0 +1,11 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="15" fill="#e1f5fe" stroke="#03a9f4" stroke-width="2"/>
+  <g stroke="#03a9f4" stroke-width="3" fill="none">
+    <ellipse cx="100" cy="80" rx="40" ry="15"/>
+    <ellipse cx="100" cy="100" rx="35" ry="12"/>
+    <ellipse cx="100" cy="120" rx="30" ry="10"/>
+    <path d="M60 80c0 20 40 20 40 40M140 80c0 20-40 20-40 40"/>
+    <circle cx="100" cy="50" r="8" fill="#03a9f4"/>
+  </g>
+  <text x="100" y="180" text-anchor="middle" font-family="Arial" font-size="14" fill="#0288d1" font-weight="bold">Cloud</text>
+</svg>

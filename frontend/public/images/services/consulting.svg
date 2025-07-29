@@ -1,0 +1,9 @@
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <rect width="60" height="60" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="1"/>
+  <g stroke="#ff9800" stroke-width="2" fill="none">
+    <rect x="15" y="20" width="30" height="20" rx="2"/>
+    <path d="M20 30h20M20 35h15"/>
+    <circle cx="45" cy="15" r="5"/>
+  </g>
+  <text x="30" y="52" text-anchor="middle" font-family="Arial" font-size="6" fill="#f57c00">Consulting</text>
+</svg>

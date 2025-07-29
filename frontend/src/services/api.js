@@ -222,6 +222,24 @@ export const servicesAPI = {
     // Update service
     update: (id, data) => API.put(`/admin/services/${id}`, data),
 
+    // Update service with form data (for file uploads)
+    updateWithFile: (id, formData) => {
+        return API.put(`/admin/services/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+
+    // Create service with form data (for file uploads)
+    createWithFile: (formData) => {
+        return API.post('/admin/services', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+
     // Delete service
     delete: (id) => API.delete(`/admin/services/${id}`)
 };

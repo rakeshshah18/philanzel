@@ -1,0 +1,8 @@
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <rect width="60" height="60" rx="8" fill="#e3f2fd" stroke="#2196f3" stroke-width="1"/>
+  <g stroke="#2196f3" stroke-width="2" fill="none">
+    <circle cx="30" cy="20" r="6"/>
+    <path d="M18 45c0-6 5-12 12-12s12 6 12 12"/>
+  </g>
+  <text x="30" y="52" text-anchor="middle" font-family="Arial" font-size="8" fill="#1976d2">HR</text>
+</svg>

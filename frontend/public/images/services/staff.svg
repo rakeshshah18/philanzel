@@ -1,0 +1,8 @@
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <rect width="60" height="60" rx="8" fill="#f3e5f5" stroke="#9c27b0" stroke-width="1"/>
+  <g stroke="#9c27b0" stroke-width="2" fill="none">
+    <rect x="10" y="15" width="40" height="25" rx="3"/>
+    <path d="M15 25h30M15 30h25M15 35h20"/>
+  </g>
+  <text x="30" y="52" text-anchor="middle" font-family="Arial" font-size="7" fill="#7b1fa2">Staff</text>
+</svg>

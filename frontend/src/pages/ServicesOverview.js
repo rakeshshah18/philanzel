@@ -6,14 +6,14 @@ import './ServicesOverview.css';
 
 const ServicesOverview = () => {
     const [services, setServices] = useState([
-        { id: 'service-1', name: 'Service 1', icon: 'fas fa-wrench', color: 'primary', description: 'Technical maintenance and support solutions' },
-        { id: 'service-2', name: 'Service 2', icon: 'fas fa-tools', color: 'success', description: 'Advanced tooling and equipment services' },
-        { id: 'service-3', name: 'Service 3', icon: 'fas fa-laptop-code', color: 'info', description: 'Software development and coding solutions' },
-        { id: 'service-4', name: 'Service 4', icon: 'fas fa-mobile-alt', color: 'warning', description: 'Mobile application development services' },
-        { id: 'service-5', name: 'Service 5', icon: 'fas fa-database', color: 'secondary', description: 'Database management and optimization' },
-        { id: 'service-6', name: 'Service 6', icon: 'fas fa-cloud', color: 'dark', description: 'Cloud infrastructure and deployment' },
-        { id: 'service-7', name: 'Service 7', icon: 'fas fa-shield-alt', color: 'danger', description: 'Security and protection solutions' },
-        { id: 'service-8', name: 'Service 8', icon: 'fas fa-chart-line', color: 'primary', description: 'Analytics and business intelligence' }
+        { id: 'service-1', name: 'Human Resources', image: '/images/services/hr.svg', color: 'primary', description: 'Complete HR solutions for your business' },
+        { id: 'service-2', name: 'Staff Augmentation', image: '/images/services/staff.svg', color: 'success', description: 'Skilled professionals to enhance your team' },
+        { id: 'service-3', name: 'Quality Assurance', image: '/images/services/quality.svg', color: 'info', description: 'Ensuring excellence in all deliverables' },
+        { id: 'service-4', name: 'Business Consulting', image: '/images/services/consulting.svg', color: 'warning', description: 'Strategic guidance for business growth' },
+        { id: 'service-5', name: 'Business Development', image: '/images/services/business.svg', color: 'secondary', description: 'Expanding your business opportunities' },
+        { id: 'service-6', name: 'Finance & Accounting', image: '/images/services/finance.svg', color: 'dark', description: 'Professional financial management services' },
+        { id: 'service-7', name: 'Customer Support', image: '/images/services/support.svg', color: 'danger', description: 'Excellence in customer service delivery' },
+        { id: 'service-8', name: 'Digital Marketing', image: '/images/services/default-service.svg', color: 'primary', description: 'Comprehensive digital marketing solutions' }
     ]);
     const [loading, setLoading] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
@@ -22,18 +22,20 @@ const ServicesOverview = () => {
     const [isEdit, setIsEdit] = useState(false);
     const [editingInlineId, setEditingInlineId] = useState(null);
     const [editingValues, setEditingValues] = useState({});
+    const [imagePreview, setImagePreview] = useState(null);
+    const [selectedImageFile, setSelectedImageFile] = useState(null);
     const { showAlert } = useAuth();
 
     // Default static services for display
     const staticServices = [
-        { id: 'static-1', name: 'Service 1', icon: 'fas fa-wrench', color: 'primary', description: 'Technical maintenance and support solutions' },
-        { id: 'static-2', name: 'Service 2', icon: 'fas fa-tools', color: 'success', description: 'Advanced tooling and equipment services' },
-        { id: 'static-3', name: 'Service 3', icon: 'fas fa-laptop-code', color: 'info', description: 'Software development and coding solutions' },
-        { id: 'static-4', name: 'Service 4', icon: 'fas fa-mobile-alt', color: 'warning', description: 'Mobile application development services' },
-        { id: 'static-5', name: 'Service 5', icon: 'fas fa-database', color: 'secondary', description: 'Database management and optimization' },
-        { id: 'static-6', name: 'Service 6', icon: 'fas fa-cloud', color: 'dark', description: 'Cloud infrastructure and deployment' },
-        { id: 'static-7', name: 'Service 7', icon: 'fas fa-shield-alt', color: 'danger', description: 'Security and protection solutions' },
-        { id: 'static-8', name: 'Service 8', icon: 'fas fa-chart-line', color: 'primary', description: 'Analytics and business intelligence' }
+        { id: 'static-1', name: 'Human Resources', image: '/images/services/hr.svg', color: 'primary', description: 'Complete HR solutions for your business' },
+        { id: 'static-2', name: 'Staff Augmentation', image: '/images/services/staff.svg', color: 'success', description: 'Skilled professionals to enhance your team' },
+        { id: 'static-3', name: 'Quality Assurance', image: '/images/services/quality.svg', color: 'info', description: 'Ensuring excellence in all deliverables' },
+        { id: 'static-4', name: 'Business Consulting', image: '/images/services/consulting.svg', color: 'warning', description: 'Strategic guidance for business growth' },
+        { id: 'static-5', name: 'Business Development', image: '/images/services/business.svg', color: 'secondary', description: 'Expanding your business opportunities' },
+        { id: 'static-6', name: 'Finance & Accounting', image: '/images/services/finance.svg', color: 'dark', description: 'Professional financial management services' },
+        { id: 'static-7', name: 'Customer Support', image: '/images/services/support.svg', color: 'danger', description: 'Excellence in customer service delivery' },
+        { id: 'static-8', name: 'Digital Marketing', image: '/images/services/default-service.svg', color: 'primary', description: 'Comprehensive digital marketing solutions' }
     ];
 
     useEffect(() => {
@@ -70,8 +72,11 @@ const ServicesOverview = () => {
         setEditingInlineId(service.id || service._id);
         setEditingValues({
             name: service.name,
-            description: service.description
+            description: service.description,
+            image: service.image
         });
+        setImagePreview(null);
+        setSelectedImageFile(null);
         showAlert(`Editing "${service.name || `Service ${index + 1}`}" inline`, 'info');
     };
 
@@ -80,7 +85,8 @@ const ServicesOverview = () => {
             const updatedService = {
                 ...service,
                 name: editingValues.name,
-                description: editingValues.description
+                description: editingValues.description,
+                image: imagePreview || editingValues.image || service.image
             };
 
             // Update the services array
@@ -91,10 +97,21 @@ const ServicesOverview = () => {
             // If it's a backend service, update via API
             if (service._id && !service._id.includes('-')) {
                 try {
-                    await servicesAPI.update(service._id, {
-                        name: editingValues.name,
-                        description: editingValues.description
-                    });
+                    // If there's a selected image file, create FormData for file upload
+                    if (selectedImageFile) {
+                        const formData = new FormData();
+                        formData.append('name', editingValues.name);
+                        formData.append('description', editingValues.description);
+                        formData.append('image', selectedImageFile);
+
+                        await servicesAPI.updateWithFile(service._id, formData);
+                    } else {
+                        // No image upload, use regular update
+                        await servicesAPI.update(service._id, {
+                            name: editingValues.name,
+                            description: editingValues.description
+                        });
+                    }
                     showAlert(`Service "${editingValues.name}" updated successfully!`, 'success');
                 } catch (error) {
                     console.error('API update failed:', error);
@@ -106,6 +123,8 @@ const ServicesOverview = () => {
 
             setEditingInlineId(null);
             setEditingValues({});
+            setImagePreview(null);
+            setSelectedImageFile(null);
         } catch (error) {
             console.error('Error saving service:', error);
             showAlert('Failed to save changes', 'danger');
@@ -115,6 +134,8 @@ const ServicesOverview = () => {
     const handleCancelInlineEdit = () => {
         setEditingInlineId(null);
         setEditingValues({});
+        setImagePreview(null);
+        setSelectedImageFile(null);
         showAlert('Editing cancelled', 'info');
     };
 
@@ -123,6 +144,34 @@ const ServicesOverview = () => {
             ...prev,
             [field]: value
         }));
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/svg+xml'];
+            if (!validTypes.includes(file.type)) {
+                showAlert('Please select a valid image file (JPG, PNG, or SVG)', 'error');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('Image file size should be less than 5MB', 'error');
+                return;
+            }
+
+            setSelectedImageFile(file);
+
+            // Create preview URL
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setImagePreview(e.target.result);
+                handleInputChange('image', e.target.result); // Update editing values with preview
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleDeleteConfirmation = (service, index) => {
@@ -184,7 +233,7 @@ const ServicesOverview = () => {
             const newServiceWithDisplay = {
                 id: `service-${services.length + 1}`,
                 name: newService.name,
-                icon: getServiceIcon(services.length),
+                image: getServiceImage(services.length),
                 color: getServiceColor(services.length),
                 description: 'Custom service solution',
                 _id: newService._id
@@ -194,12 +243,18 @@ const ServicesOverview = () => {
         }
     };
 
-    const getServiceIcon = (index) => {
-        const icons = [
-            'fas fa-cog', 'fas fa-gear', 'fas fa-server', 'fas fa-code',
-            'fas fa-paint-brush', 'fas fa-bullhorn', 'fas fa-users', 'fas fa-handshake'
+    const getServiceImage = (index) => {
+        const images = [
+            '/images/services/service-1.jpg',
+            '/images/services/service-2.jpg',
+            '/images/services/service-3.jpg',
+            '/images/services/service-4.jpg',
+            '/images/services/service-5.jpg',
+            '/images/services/service-6.jpg',
+            '/images/services/service-7.jpg',
+            '/images/services/service-8.jpg'
         ];
-        return icons[index % icons.length];
+        return images[index % images.length];
     };
 
     const getServiceColor = (index) => {
@@ -255,7 +310,7 @@ const ServicesOverview = () => {
                                 <thead className="table-dark">
                                     <tr>
                                         <th scope="col" style={{ width: '5%' }}>#</th>
-                                        <th scope="col" style={{ width: '10%' }}>Icon</th>
+                                        <th scope="col" style={{ width: '10%' }}>Image</th>
                                         <th scope="col" style={{ width: '25%' }}>Service Name</th>
                                         <th scope="col" style={{ width: '35%' }}>Description</th>
                                         <th scope="col" style={{ width: '15%' }}>Read More</th>
@@ -269,9 +324,42 @@ const ServicesOverview = () => {
                                             <tr key={service.id} className={isEditing ? 'table-warning' : ''}>
                                                 <th scope="row">{index + 1}</th>
                                                 <td className="text-center">
-                                                    <div className={`text-${service.color}`}>
-                                                        <i className={`${service.icon} fa-2x`}></i>
-                                                    </div>
+                                                    {isEditing ? (
+                                                        <div className="image-upload-container">
+                                                            <div className="current-image mb-2">
+                                                                <img
+                                                                    src={imagePreview || editingValues.image || service.image}
+                                                                    alt={service.name}
+                                                                    className="service-image"
+                                                                    onError={(e) => {
+                                                                        e.target.src = '/images/services/default-service.svg';
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <div className="file-input-wrapper">
+                                                                <input
+                                                                    type="file"
+                                                                    id={`imageUpload-${service.id}`}
+                                                                    className="form-control form-control-sm"
+                                                                    accept="image/*"
+                                                                    onChange={handleImageChange}
+                                                                    style={{ fontSize: '12px' }}
+                                                                />
+                                                                <small className="text-muted d-block mt-1">
+                                                                    JPG, PNG, SVG (max 5MB)
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <img
+                                                            src={service.image}
+                                                            alt={service.name}
+                                                            className="service-image"
+                                                            onError={(e) => {
+                                                                e.target.src = '/images/services/default-service.svg';
+                                                            }}
+                                                        />
+                                                    )}
                                                 </td>
 
                                                 {/* Service Name - Editable */}

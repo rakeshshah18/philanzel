@@ -1050,6 +1050,266 @@ const Home = () => {
                         </div>
                     )}
                 </div>
+
+                {/* Home Services Section */}
+                <div className="container-fluid py-4">
+                    <div className="row mb-4">
+                        <div className="col-12">
+                            <div className="card shadow-sm">
+                                <div className="card-header bg-primary text-white">
+                                    <h3 className="card-title mb-0">
+                                        <i className="fas fa-home me-2"></i>
+                                        Home Services
+                                    </h3>
+                                </div>
+                                <div className="card-body">
+                                    <div className="table-responsive">
+                                        <table className="table table-striped table-hover">
+                                            <thead className="table-dark">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">Service Name</th>
+                                                    <th scope="col">Description</th>
+                                                    <th scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td><strong>What We Offer</strong></td>
+                                                    <td>Discover personalized financial solutions crafted to help you achieve
+                                                        both personal and business success.</td>
+                                                    <td>
+                                                        <button className="btn btn-sm btn-outline-primary me-2">
+                                                            <i className="fas fa-edit"></i> Edit
+                                                        </button>
+                                                        <button className="btn btn-sm btn-outline-danger">
+                                                            <i className="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {/* <tr>
+                                                    <td>2</td>
+                                                    <td><strong>Support Services</strong></td>
+                                                    <td>24/7 customer support and technical assistance for all your queries</td>
+                                                    <td>
+                                                        <button className="btn btn-sm btn-outline-primary me-2">
+                                                            <i className="fas fa-edit"></i> Edit
+                                                        </button>
+                                                        <button className="btn btn-sm btn-outline-danger">
+                                                            <i className="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>3</td>
+                                                    <td><strong>Maintenance Services</strong></td>
+                                                    <td>Regular maintenance and upkeep services to ensure optimal performance</td>
+                                                    <td>
+                                                        <button className="btn btn-sm btn-outline-primary me-2">
+                                                            <i className="fas fa-edit"></i> Edit
+                                                        </button>
+                                                        <button className="btn btn-sm btn-outline-danger">
+                                                            <i className="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </td>
+                                                </tr> */}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="mt-3">
+                                        <button className="btn btn-success">
+                                            <i className="fas fa-plus me-2"></i>
+                                            Add New Service
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Tabbing Services Section */}
+                <TabbingServices />
+            </div>
+        </div>
+    );
+};
+
+// Tabbing Services Component
+const TabbingServices = () => {
+    const [activeTab, setActiveTab] = useState(0);
+
+    const tabbingServices = [
+        {
+            id: 1,
+            tabTitle: "Retirement Solutions",
+            contentTitle: "Plan today. Relax tomorrow.",
+            description: "Secure your golden years with a customized retirement plan that ensures financial independence and peace of mind. We help you estimate future needs, optimize savings, and choose the right investment options for a stress-free retirement.",
+            image: "/images/services/web-development.svg",
+            buttonText: "Read More",
+            color: "primary"
+        },
+        {
+            id: 2,
+            tabTitle: "Mutual Fund Distribution",
+            contentTitle: "Smart investing made simple.",
+            description: "We help you invest in top-rated mutual funds that align with your financial goals and risk appetite. From SIPs to lump-sum investments, we offer expert guidance and portfolio tracking.",
+            image: "/images/services/mobile-development.svg",
+            buttonText: "Get Started",
+            color: "success"
+        },
+        {
+            id: 3,
+            tabTitle: "Cloud",
+            contentTitle: "Cloud Computing Solutions",
+            description: "Leverage the power of cloud computing to scale your business operations efficiently and securely.",
+            image: "/images/services/cloud-solutions.svg",
+            buttonText: "Explore Cloud",
+            color: "info"
+        },
+        {
+            id: 4,
+            tabTitle: "Marketing",
+            contentTitle: "Digital Marketing Strategy",
+            description: "Boost your online presence with our comprehensive digital marketing strategies and campaigns.",
+            image: "/images/services/digital-marketing.svg",
+            buttonText: "Start Marketing",
+            color: "warning"
+        },
+        {
+            id: 5,
+            tabTitle: "Analytics",
+            contentTitle: "Data Analytics & Intelligence",
+            description: "Transform your raw data into actionable insights with our advanced analytics and visualization tools.",
+            image: "/images/services/data-analytics.svg",
+            buttonText: "Analyze Data",
+            color: "dark"
+        },
+        {
+            id: 6,
+            tabTitle: "Security",
+            contentTitle: "Cybersecurity Protection",
+            description: "Protect your digital assets with our comprehensive cybersecurity solutions and monitoring services.",
+            image: "/images/services/cybersecurity.svg",
+            buttonText: "Secure Now",
+            color: "danger"
+        },
+        {
+            id: 7,
+            tabTitle: "AI & ML",
+            contentTitle: "Artificial Intelligence & Machine Learning",
+            description: "Harness the power of artificial intelligence to automate processes and gain competitive advantages.",
+            image: "/images/services/ai-ml.svg",
+            buttonText: "Discover AI",
+            color: "secondary"
+        },
+        {
+            id: 8,
+            tabTitle: "E-commerce",
+            contentTitle: "E-commerce Solutions & Optimization",
+            description: "Build and optimize online stores that convert visitors into customers with seamless shopping experiences.",
+            image: "/images/services/ecommerce.svg",
+            buttonText: "Build Store",
+            color: "primary"
+        },
+        {
+            id: 9,
+            tabTitle: "IT Consulting",
+            contentTitle: "Professional IT Consulting Services",
+            description: "Get expert guidance on technology strategies, system architecture, and digital transformation initiatives.",
+            image: "/images/services/it-consulting.svg",
+            buttonText: "Get Advice",
+            color: "info"
+        }
+    ];
+
+    return (
+        <div className="container-fluid py-4">
+            <div className="row">
+                <div className="col-12">
+                    <div className="card shadow-sm">
+                        <div className="card-header bg-success text-white">
+                            <h3 className="card-title mb-0">
+                                <i className="fas fa-layer-group me-2"></i>
+                                Tabbing Services
+                            </h3>
+                        </div>
+                        <div className="card-body">
+                            {/* Tab Navigation */}
+                            <div className="row mb-4">
+                                <div className="col-12">
+                                    <div className="btn-group flex-wrap" role="group" aria-label="Service tabs">
+                                        {tabbingServices.map((service, index) => (
+                                            <button
+                                                key={service.id}
+                                                type="button"
+                                                className={`btn btn-outline-${service.color} ${activeTab === index ? 'active' : ''} mb-2`}
+                                                onClick={() => setActiveTab(index)}
+                                                style={{
+                                                    margin: '2px',
+                                                    fontSize: '14px',
+                                                    minWidth: '120px'
+                                                }}
+                                            >
+                                                {service.tabTitle}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Active Tab Content */}
+                            {tabbingServices[activeTab] && (
+                                <div className="row">
+                                    <div className="col-lg-4 col-md-6 mb-4">
+                                        <div className="text-center">
+                                            <img
+                                                src={tabbingServices[activeTab].image}
+                                                alt={tabbingServices[activeTab].contentTitle}
+                                                className="img-fluid mb-3"
+                                                style={{
+                                                    maxWidth: '200px',
+                                                    height: '200px',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '15px',
+                                                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                                                }}
+                                                onError={(e) => {
+                                                    e.target.src = '/images/services/default-service.svg';
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-8 col-md-6">
+                                        <div className="h-100 d-flex flex-column justify-content-center">
+                                            <h4 className={`text-${tabbingServices[activeTab].color} mb-3`}>
+                                                <i className="fas fa-star me-2"></i>
+                                                {tabbingServices[activeTab].contentTitle}
+                                            </h4>
+                                            <p className="lead text-muted mb-4" style={{ fontSize: '16px', lineHeight: '1.6' }}>
+                                                {tabbingServices[activeTab].description}
+                                            </p>
+                                            <div>
+                                                <button
+                                                    className={`btn btn-${tabbingServices[activeTab].color} btn-lg px-4 py-2`}
+                                                    style={{
+                                                        borderRadius: '25px',
+                                                        fontWeight: '600',
+                                                        boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+                                                    }}
+                                                >
+                                                    <i className="fas fa-arrow-right me-2"></i>
+                                                    {tabbingServices[activeTab].buttonText}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

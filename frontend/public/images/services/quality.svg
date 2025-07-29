@@ -1,0 +1,8 @@
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <rect width="60" height="60" rx="8" fill="#e8f5e8" stroke="#4caf50" stroke-width="1"/>
+  <g stroke="#4caf50" stroke-width="2" fill="none">
+    <circle cx="30" cy="25" r="8"/>
+    <path d="M22 25l4 4 8-8"/>
+  </g>
+  <text x="30" y="50" text-anchor="middle" font-family="Arial" font-size="6" fill="#388e3c">Quality</text>
+</svg>

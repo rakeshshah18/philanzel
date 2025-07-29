@@ -1,0 +1,9 @@
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <rect width="60" height="60" rx="8" fill="#fce4ec" stroke="#e91e63" stroke-width="1"/>
+  <g stroke="#e91e63" stroke-width="2" fill="none">
+    <path d="M15 30l10-10 10 10 10-10"/>
+    <circle cx="25" cy="35" r="3"/>
+    <circle cx="35" cy="35" r="3"/>
+  </g>
+  <text x="30" y="52" text-anchor="middle" font-family="Arial" font-size="6" fill="#c2185b">Business</text>
+</svg>

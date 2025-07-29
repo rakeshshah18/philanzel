@@ -8,12 +8,15 @@ const connectDB = async () => {
         mongoose.set('strictQuery', false);
 
         const connectionInstance = await mongoose.connect(`${config.MONGODB_URI}/${DB_NAME}`, {
-            serverSelectionTimeoutMS: 10000, // Timeout after 10s for server selection
-            socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
-            connectTimeoutMS: 10000, // Give up initial connection after 10s
-            maxPoolSize: 10, // Maintain up to 10 socket connections
-            minPoolSize: 5, // Maintain a minimum of 5 socket connections
-            maxIdleTimeMS: 30000, // Close connections after 30s of inactivity
+            serverSelectionTimeoutMS: 15000, // Timeout after 15s for server selection
+            socketTimeoutMS: 60000, // Close sockets after 60s of inactivity
+            connectTimeoutMS: 15000, // Give up initial connection after 15s
+            maxPoolSize: 5, // Reduce max pool size to 5 connections
+            minPoolSize: 2, // Reduce minimum pool size to 2 connections
+            maxIdleTimeMS: 60000, // Increase idle time to 60s
+            heartbeatFrequencyMS: 30000, // Send heartbeat every 30s
+            retryWrites: true, // Enable retryable writes
+            retryReads: true, // Enable retryable reads
         });
 
         console.log(`\n✅ MongoDB connected successfully!`);
@@ -22,7 +25,7 @@ const connectDB = async () => {
 
         // Handle connection events
         mongoose.connection.on('error', (err) => {
-            console.error('❌ MongoDB connection error:', err);
+            console.error('❌ MongoDB connection error:', err.message);
         });
 
         mongoose.connection.on('disconnected', () => {
@@ -31,6 +34,22 @@ const connectDB = async () => {
 
         mongoose.connection.on('reconnected', () => {
             console.log('✅ MongoDB reconnected');
+        });
+
+        mongoose.connection.on('connecting', () => {
+            console.log('🔄 MongoDB connecting...');
+        });
+
+        mongoose.connection.on('close', () => {
+            console.log('🔒 MongoDB connection closed');
+        });
+
+        // Graceful shutdown
+        process.on('SIGINT', async () => {
+            console.log('\n🛑 Received SIGINT. Gracefully shutting down...');
+            await mongoose.connection.close();
+            console.log('✅ MongoDB connection closed through app termination');
+            process.exit(0);
         });
 
     } catch (error) {

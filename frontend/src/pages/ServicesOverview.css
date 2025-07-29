@@ -1,5 +1,81 @@
 /* Services Overview Styles */
 
+/* Service Image Styles */
+.service-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.service-image:hover {
+    transform: scale(1.05);
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Image Upload Container */
+.image-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.image-upload-container .current-image {
+    position: relative;
+}
+
+.file-input-wrapper {
+    width: 100%;
+    max-width: 200px;
+}
+
+.file-input-wrapper input[type="file"] {
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    padding: 4px;
+    background-color: #f8f9fa;
+}
+
+.file-input-wrapper input[type="file"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Responsive image adjustments */
+@media (max-width: 768px) {
+    .service-image {
+        width: 45px;
+        height: 45px;
+        border-radius: 6px;
+    }
+
+    .file-input-wrapper {
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 576px) {
+    .service-image {
+        width: 35px;
+        height: 35px;
+        border-radius: 4px;
+    }
+
+    .file-input-wrapper {
+        max-width: 120px;
+    }
+
+    .file-input-wrapper input[type="file"] {
+        font-size: 10px !important;
+        padding: 2px;
+    }
+}
+
 /* Inline editing styles */
 .table tbody tr.table-warning {
     background-color: rgba(255, 193, 7, 0.1);

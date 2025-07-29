@@ -1,0 +1,8 @@
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <rect width="60" height="60" rx="8" fill="#e1f5fe" stroke="#03a9f4" stroke-width="1"/>
+  <g stroke="#03a9f4" stroke-width="2" fill="none">
+    <rect x="12" y="18" width="36" height="24" rx="3"/>
+    <path d="M12 26h36M18 18v-3a3 3 0 016 0v3M36 18v-3a3 3 0 016 0v3"/>
+  </g>
+  <text x="30" y="52" text-anchor="middle" font-family="Arial" font-size="6" fill="#0288d1">Finance</text>
+</svg>

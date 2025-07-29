@@ -2,25 +2,35 @@ import OurServices from '../models/service.js';
 
 const createServices = async (req, res) => {
     try {
-        const {name} = req.body;
-        const existingServices = await OurServices.find({ name: name.trim() });
+        const { name, description } = req.body;
+        const existingServices = await OurServices.findOne({ name: name.trim() });
         if (existingServices) {
             return res.status(400).json({
                 status: 'error',
                 message: 'Service with this name already exists'
             });
         }
-        //Add new service
+
+        // Handle image upload
+        let imagePath = '';
+        if (req.file) {
+            imagePath = `/images/${req.file.filename}`;
+        }
+
+        // Add new service
         const newServices = new OurServices({
-            name: name.trim()
+            name: name.trim(),
+            description: description ? description.trim() : '',
+            image: imagePath
         });
+
         await newServices.save();
         return res.status(201).json({
             status: 'success',
             message: 'Service created successfully',
             data: newServices
         });
-    }catch (error) {
+    } catch (error) {
         console.error('Error creating service:', error);
         if (error.name === 'ValidationError') {
             return res.status(400).json({
@@ -60,7 +70,7 @@ const getAllServices = async (req, res) => {
 const updateServices = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name } = req.body;
+        const { name, description } = req.body;
         const existingServices = await OurServices.findById(id);
         if (!existingServices) {
             return res.status(404).json({
@@ -68,7 +78,16 @@ const updateServices = async (req, res) => {
                 message: 'Service not found'
             });
         }
-        existingServices.name = name.trim();
+
+        // Update basic fields
+        if (name) existingServices.name = name.trim();
+        if (description !== undefined) existingServices.description = description.trim();
+
+        // Handle image upload
+        if (req.file) {
+            existingServices.image = `/images/${req.file.filename}`;
+        }
+
         await existingServices.save();
         return res.status(200).json({
             status: 'success',
