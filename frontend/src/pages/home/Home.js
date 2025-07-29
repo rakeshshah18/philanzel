@@ -1139,8 +1139,16 @@ const Home = () => {
 // Tabbing Services Component
 const TabbingServices = () => {
     const [activeTab, setActiveTab] = useState(0);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingIndex, setEditingIndex] = useState(null);
+    const [editFormData, setEditFormData] = useState({
+        tabTitle: '',
+        contentTitle: '',
+        description: '',
+        buttonText: ''
+    });
 
-    const tabbingServices = [
+    const [tabbingServices, setTabbingServices] = useState([
         {
             id: 1,
             tabTitle: "Retirement Solutions",
@@ -1222,20 +1230,144 @@ const TabbingServices = () => {
             buttonText: "Get Advice",
             color: "info"
         }
-    ];
+    ]);
+
+    // Handle editing functions
+    const handleEditClick = (index) => {
+        setEditingIndex(index);
+        const service = tabbingServices[index];
+        setEditFormData({
+            tabTitle: service.tabTitle,
+            contentTitle: service.contentTitle,
+            description: service.description,
+            buttonText: service.buttonText
+        });
+        setIsEditing(true);
+    };
+
+    const handleSaveEdit = () => {
+        const updatedServices = [...tabbingServices];
+        updatedServices[editingIndex] = {
+            ...updatedServices[editingIndex],
+            ...editFormData
+        };
+        setTabbingServices(updatedServices);
+        handleCancelEdit();
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditingIndex(null);
+        setEditFormData({
+            tabTitle: '',
+            contentTitle: '',
+            description: '',
+            buttonText: ''
+        });
+    };
+
+    const handleInputChange = (field, value) => {
+        setEditFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
 
     return (
         <div className="container-fluid py-4">
             <div className="row">
                 <div className="col-12">
                     <div className="card shadow-sm">
-                        <div className="card-header bg-success text-white">
+                        <div className="card-header bg-success text-white d-flex justify-content-between align-items-center">
                             <h3 className="card-title mb-0">
                                 <i className="fas fa-layer-group me-2"></i>
                                 Tabbing Services
                             </h3>
+                            <div>
+                                {!isEditing ? (
+                                    <button
+                                        className="btn btn-light btn-sm"
+                                        onClick={() => handleEditClick(activeTab)}
+                                        title="Edit current tab"
+                                    >
+                                        <i className="fas fa-edit me-1"></i>
+                                        Edit Tab
+                                    </button>
+                                ) : (
+                                    <div className="btn-group">
+                                        <button
+                                            className="btn btn-light btn-sm"
+                                            onClick={handleSaveEdit}
+                                            title="Save changes"
+                                        >
+                                            <i className="fas fa-save me-1"></i>
+                                            Save
+                                        </button>
+                                        <button
+                                            className="btn btn-outline-light btn-sm"
+                                            onClick={handleCancelEdit}
+                                            title="Cancel editing"
+                                        >
+                                            <i className="fas fa-times me-1"></i>
+                                            Cancel
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className="card-body">
+                            {/* Editing Form */}
+                            {isEditing && (
+                                <div className="mb-4 p-3 bg-light rounded">
+                                    <h5 className="text-primary mb-3">
+                                        <i className="fas fa-edit me-2"></i>
+                                        Editing: {tabbingServices[editingIndex]?.tabTitle}
+                                    </h5>
+                                    <div className="row">
+                                        <div className="col-md-6 mb-3">
+                                            <label className="form-label">Tab Title (Short)</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                value={editFormData.tabTitle}
+                                                onChange={(e) => handleInputChange('tabTitle', e.target.value)}
+                                                placeholder="Short title for tab button"
+                                            />
+                                        </div>
+                                        <div className="col-md-6 mb-3">
+                                            <label className="form-label">Content Title (Full)</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                value={editFormData.contentTitle}
+                                                onChange={(e) => handleInputChange('contentTitle', e.target.value)}
+                                                placeholder="Full descriptive title"
+                                            />
+                                        </div>
+                                        <div className="col-12 mb-3">
+                                            <label className="form-label">Description</label>
+                                            <textarea
+                                                className="form-control"
+                                                rows="3"
+                                                value={editFormData.description}
+                                                onChange={(e) => handleInputChange('description', e.target.value)}
+                                                placeholder="Service description"
+                                            />
+                                        </div>
+                                        <div className="col-md-6 mb-3">
+                                            <label className="form-label">Button Text</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                value={editFormData.buttonText}
+                                                onChange={(e) => handleInputChange('buttonText', e.target.value)}
+                                                placeholder="Action button text"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Tab Navigation */}
                             <div className="row mb-4">
                                 <div className="col-12">
@@ -1245,14 +1377,19 @@ const TabbingServices = () => {
                                                 key={service.id}
                                                 type="button"
                                                 className={`btn btn-outline-${service.color} ${activeTab === index ? 'active' : ''} mb-2`}
-                                                onClick={() => setActiveTab(index)}
+                                                onClick={() => !isEditing && setActiveTab(index)}
+                                                disabled={isEditing}
                                                 style={{
                                                     margin: '2px',
                                                     fontSize: '14px',
-                                                    minWidth: '120px'
+                                                    minWidth: '120px',
+                                                    opacity: isEditing && index !== activeTab ? 0.5 : 1
                                                 }}
                                             >
-                                                {service.tabTitle}
+                                                {isEditing && editingIndex === index ? editFormData.tabTitle : service.tabTitle}
+                                                {isEditing && editingIndex === index && (
+                                                    <small className="ms-1">*</small>
+                                                )}
                                             </button>
                                         ))}
                                     </div>
@@ -1261,7 +1398,15 @@ const TabbingServices = () => {
 
                             {/* Active Tab Content */}
                             {tabbingServices[activeTab] && (
-                                <div className="row">
+                                <div className={`row ${isEditing ? 'border border-warning rounded p-3' : ''}`}>
+                                    {isEditing && (
+                                        <div className="col-12 mb-3">
+                                            <div className="alert alert-warning mb-0">
+                                                <i className="fas fa-edit me-2"></i>
+                                                <strong>Editing Mode:</strong> You are currently editing this tab content. Use the form above to make changes.
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="col-lg-4 col-md-6 mb-4">
                                         <div className="text-center">
                                             <img
@@ -1285,10 +1430,13 @@ const TabbingServices = () => {
                                         <div className="h-100 d-flex flex-column justify-content-center">
                                             <h4 className={`text-${tabbingServices[activeTab].color} mb-3`}>
                                                 <i className="fas fa-star me-2"></i>
-                                                {tabbingServices[activeTab].contentTitle}
+                                                {isEditing && editingIndex === activeTab ? editFormData.contentTitle : tabbingServices[activeTab].contentTitle}
+                                                {isEditing && editingIndex === activeTab && (
+                                                    <small className="text-muted ms-2">(Preview)</small>
+                                                )}
                                             </h4>
                                             <p className="lead text-muted mb-4" style={{ fontSize: '16px', lineHeight: '1.6' }}>
-                                                {tabbingServices[activeTab].description}
+                                                {isEditing && editingIndex === activeTab ? editFormData.description : tabbingServices[activeTab].description}
                                             </p>
                                             <div>
                                                 <button
@@ -1298,9 +1446,10 @@ const TabbingServices = () => {
                                                         fontWeight: '600',
                                                         boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
                                                     }}
+                                                    disabled={isEditing}
                                                 >
                                                     <i className="fas fa-arrow-right me-2"></i>
-                                                    {tabbingServices[activeTab].buttonText}
+                                                    {isEditing && editingIndex === activeTab ? editFormData.buttonText : tabbingServices[activeTab].buttonText}
                                                 </button>
                                             </div>
                                         </div>
