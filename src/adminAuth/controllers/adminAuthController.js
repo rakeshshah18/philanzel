@@ -64,6 +64,16 @@ class AdminAuthController {
 
         } catch (error) {
             console.error('Registration error:', error);
+
+            // Handle specific MongoDB connection errors
+            if (error.name === 'MongooseError' && error.message.includes('buffering timed out')) {
+                return res.status(503).json({
+                    success: false,
+                    message: 'Database connection timeout. Please try again later.',
+                    error: 'Database temporarily unavailable'
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 message: 'Internal server error',
@@ -140,6 +150,16 @@ class AdminAuthController {
 
         } catch (error) {
             console.error('Login error:', error);
+
+            // Handle specific MongoDB connection errors
+            if (error.name === 'MongooseError' && error.message.includes('buffering timed out')) {
+                return res.status(503).json({
+                    success: false,
+                    message: 'Database connection timeout. Please try again later.',
+                    error: 'Database temporarily unavailable'
+                });
+            }
+
             res.status(500).json({
                 success: false,
                 message: 'Internal server error',
