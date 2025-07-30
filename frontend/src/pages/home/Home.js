@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Alert from '../../components/Alert';
-import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI, helpedIndustriesAPI } from '../../services/api';
+import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI, helpedIndustriesAPI, whyChooseUsAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -1253,6 +1253,9 @@ const Home = () => {
 
                 {/* Helped Industries Section */}
                 <HelpedIndustries />
+
+                {/* Why Choose Us Section */}
+                <WhyChooseUs />
             </div>
         </div>
     );
@@ -2825,6 +2828,430 @@ const HelpedIndustries = () => {
                                                                     </div>
                                                                 ))}
                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Why Choose Us Component
+const WhyChooseUs = () => {
+    const [whyChooseUs, setWhyChooseUs] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [showForm, setShowForm] = useState(false);
+    const [message, setMessage] = useState('');
+    const [formData, setFormData] = useState({
+        heading: '',
+        description: '',
+        points: [{ text: '', icon: 'fas fa-check' }],
+        button: { text: 'Get Started', link: '#' },
+        image: null
+    });
+
+    useEffect(() => {
+        fetchWhyChooseUs();
+    }, []);
+
+    const fetchWhyChooseUs = async () => {
+        try {
+            setLoading(true);
+            const response = await whyChooseUsAPI.getAll();
+            setWhyChooseUs(response.data.data || []);
+        } catch (error) {
+            console.error('Error fetching why choose us:', error);
+            setMessage(`❌ Failed to fetch why choose us entries. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!formData.heading.trim() || !formData.description.trim()) {
+            setMessage('❌ Please fill in all required fields');
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const submitFormData = new FormData();
+            submitFormData.append('heading', formData.heading);
+            submitFormData.append('description', formData.description);
+            submitFormData.append('points', JSON.stringify(formData.points));
+            submitFormData.append('button', JSON.stringify(formData.button));
+
+            if (formData.image) {
+                submitFormData.append('image', formData.image);
+            }
+
+            if (isEditing) {
+                await whyChooseUsAPI.update(editingId, submitFormData);
+                setMessage('✅ Why choose us entry updated successfully!');
+            } else {
+                await whyChooseUsAPI.create(submitFormData);
+                setMessage('✅ Why choose us entry created successfully!');
+            }
+
+            resetForm();
+            await fetchWhyChooseUs();
+        } catch (error) {
+            console.error('Error saving why choose us entry:', error);
+            setMessage(`❌ Failed to save why choose us entry. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleEdit = (item) => {
+        setFormData({
+            heading: item.heading,
+            description: item.description,
+            points: item.points,
+            button: item.button,
+            image: null
+        });
+        setIsEditing(true);
+        setEditingId(item._id);
+        setShowForm(true);
+        setMessage('');
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this why choose us entry?')) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await whyChooseUsAPI.delete(id);
+            setMessage('✅ Why choose us entry deleted successfully!');
+            await fetchWhyChooseUs();
+        } catch (error) {
+            console.error('Error deleting why choose us entry:', error);
+            setMessage(`❌ Failed to delete why choose us entry. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const addPoint = () => {
+        setFormData({
+            ...formData,
+            points: [...formData.points, { text: '', icon: 'fas fa-check' }]
+        });
+    };
+
+    const removePoint = (index) => {
+        if (formData.points.length > 1) {
+            setFormData({
+                ...formData,
+                points: formData.points.filter((_, i) => i !== index)
+            });
+        }
+    };
+
+    const updatePoint = (index, field, value) => {
+        const updatedPoints = [...formData.points];
+        updatedPoints[index][field] = value;
+        setFormData({
+            ...formData,
+            points: updatedPoints
+        });
+    };
+
+    const resetForm = () => {
+        setFormData({
+            heading: '',
+            description: '',
+            points: [{ text: '', icon: 'fas fa-check' }],
+            button: { text: 'Get Started', link: '#' },
+            image: null
+        });
+        setIsEditing(false);
+        setEditingId(null);
+        setShowForm(false);
+        setMessage('');
+    };
+
+    return (
+        <div className="container-fluid py-4">
+            <div className="row">
+                <div className="col-12">
+                    <div className="card shadow-sm">
+                        <div className="card-header bg-gradient bg-info text-white">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h4 className="mb-0">
+                                    <i className="fas fa-star me-2"></i>
+                                    Why Choose Us Management
+                                </h4>
+                                <button
+                                    className="btn btn-light btn-sm"
+                                    onClick={() => setShowForm(!showForm)}
+                                >
+                                    <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'} me-1`}></i>
+                                    {showForm ? 'Cancel' : 'Add New'}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="card-body">
+                            {/* Alert Messages */}
+                            {message && (
+                                <Alert
+                                    type={message.includes('✅') ? 'success' : 'danger'}
+                                    message={message}
+                                    onClose={() => setMessage('')}
+                                />
+                            )}
+
+                            {/* Add/Edit Form */}
+                            {showForm && (
+                                <div className="card border-info mb-4">
+                                    <div className="card-header bg-light">
+                                        <h5 className="mb-0">
+                                            {isEditing ? 'Edit Why Choose Us Entry' : 'Add New Why Choose Us Entry'}
+                                        </h5>
+                                    </div>
+                                    <div className="card-body">
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <label className="form-label">Heading *</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={formData.heading}
+                                                            onChange={(e) => setFormData({ ...formData, heading: e.target.value })}
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <label className="form-label">Image</label>
+                                                        <input
+                                                            type="file"
+                                                            className="form-control"
+                                                            accept="image/*"
+                                                            onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-3">
+                                                <label className="form-label">Description *</label>
+                                                <ReactQuill
+                                                    value={formData.description}
+                                                    onChange={(value) => setFormData({ ...formData, description: value })}
+                                                    modules={{
+                                                        toolbar: [
+                                                            [{ 'header': [1, 2, 3, false] }],
+                                                            ['bold', 'italic', 'underline', 'strike'],
+                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                            ['link'],
+                                                            ['clean']
+                                                        ],
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <div className="mb-3">
+                                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                                    <label className="form-label mb-0">Key Points</label>
+                                                    <button type="button" className="btn btn-success btn-sm" onClick={addPoint}>
+                                                        <i className="fas fa-plus"></i> Add Point
+                                                    </button>
+                                                </div>
+                                                {formData.points.map((point, index) => (
+                                                    <div key={index} className="row mb-2">
+                                                        <div className="col-md-8">
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                placeholder="Point text"
+                                                                value={point.text}
+                                                                onChange={(e) => updatePoint(index, 'text', e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                placeholder="Icon class"
+                                                                value={point.icon}
+                                                                onChange={(e) => updatePoint(index, 'icon', e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className="col-md-1">
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-danger btn-sm"
+                                                                onClick={() => removePoint(index)}
+                                                                disabled={formData.points.length === 1}
+                                                            >
+                                                                <i className="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <label className="form-label">Button Text</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={formData.button.text}
+                                                            onChange={(e) => setFormData({
+                                                                ...formData,
+                                                                button: { ...formData.button, text: e.target.value }
+                                                            })}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <label className="form-label">Button Link</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={formData.button.link}
+                                                            onChange={(e) => setFormData({
+                                                                ...formData,
+                                                                button: { ...formData.button, link: e.target.value }
+                                                            })}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="d-flex gap-2">
+                                                <button
+                                                    type="submit"
+                                                    className="btn btn-primary"
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? (
+                                                        <>
+                                                            <span className="spinner-border spinner-border-sm me-1"></span>
+                                                            Saving...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <i className="fas fa-save me-1"></i>
+                                                            {isEditing ? 'Update' : 'Create'}
+                                                        </>
+                                                    )}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-secondary"
+                                                    onClick={resetForm}
+                                                >
+                                                    <i className="fas fa-times me-1"></i>
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Data Display */}
+                            {loading ? (
+                                <div className="text-center py-4">
+                                    <div className="spinner-border text-info" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            ) : whyChooseUs.length === 0 ? (
+                                <div className="text-center py-4">
+                                    <p className="text-muted">No why choose us entries found. Click "Add New" to create one.</p>
+                                </div>
+                            ) : (
+                                <div className="row">
+                                    {whyChooseUs.map((item) => (
+                                        <div key={item._id} className="col-12 mb-4">
+                                            <div className="card border-info">
+                                                <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                                    <h5 className="mb-0">{item.heading}</h5>
+                                                    <div>
+                                                        <button
+                                                            className="btn btn-outline-primary btn-sm me-2"
+                                                            onClick={() => handleEdit(item)}
+                                                        >
+                                                            <i className="fas fa-edit"></i> Edit
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-outline-danger btn-sm"
+                                                            onClick={() => handleDelete(item._id)}
+                                                        >
+                                                            <i className="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="card-body">
+                                                    <div className="row">
+                                                        {/* Left side - Image and Description */}
+                                                        <div className="col-md-6">
+                                                            {item.image && item.image.url && (
+                                                                <div className="mb-3">
+                                                                    <img
+                                                                        src={getImageUrl(item.image.url)}
+                                                                        alt={item.heading}
+                                                                        className="img-fluid rounded"
+                                                                        style={{ maxHeight: '200px', width: '100%', objectFit: 'cover' }}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                            <div className="mb-3">
+                                                                <h6 className="text-muted">Description:</h6>
+                                                                <div dangerouslySetInnerHTML={{ __html: item.description }} />
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Right side - Points and Button */}
+                                                        <div className="col-md-6">
+                                                            <h6 className="text-muted mb-3">Key Points:</h6>
+                                                            <div className="mb-3">
+                                                                {item.points.map((point, index) => (
+                                                                    <div key={index} className="d-flex align-items-center mb-2">
+                                                                        <i className={`${point.icon} text-success me-2`}></i>
+                                                                        <span>{point.text}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+
+                                                            {item.button && item.button.text && (
+                                                                <div className="mt-3">
+                                                                    <a
+                                                                        href={item.button.link}
+                                                                        className="btn btn-primary"
+                                                                        target={item.button.link.startsWith('http') ? '_blank' : '_self'}
+                                                                        rel={item.button.link.startsWith('http') ? 'noopener noreferrer' : ''}
+                                                                    >
+                                                                        {item.button.text}
+                                                                    </a>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>

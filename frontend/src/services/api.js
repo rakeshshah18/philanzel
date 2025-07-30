@@ -283,4 +283,34 @@ export const helpedIndustriesAPI = {
     delete: (id) => API.delete(`/admin/helped-industries/${id}`)
 };
 
+// Why Choose Us API endpoints
+export const whyChooseUsAPI = {
+    // Get all why choose us entries
+    getAll: () => API.get('/admin/why-choose-us'),
+
+    // Get single why choose us entry by ID
+    getById: (id) => API.get(`/admin/why-choose-us/${id}`),
+
+    // Create new why choose us entry
+    create: (formData) => {
+        return API.post('/admin/why-choose-us', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+
+    // Update why choose us entry
+    update: (id, formData) => {
+        return API.put(`/admin/why-choose-us/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+
+    // Delete why choose us entry
+    delete: (id) => API.delete(`/admin/why-choose-us/${id}`)
+};
+
 export default API;
