@@ -66,6 +66,20 @@ const Home = () => {
         happyCustomers: ''
     });
 
+    // Home Services state
+    const [homeServices, setHomeServices] = useState([
+        {
+            id: 1,
+            serviceName: 'What We Offer',
+            description: 'Discover personalized financial solutions crafted to help you achieve both personal and business success.'
+        }
+    ]);
+    const [editingHomeService, setEditingHomeService] = useState(null);
+    const [homeServiceFormData, setHomeServiceFormData] = useState({
+        serviceName: '',
+        description: ''
+    });
+
     useEffect(() => {
         // Add a small delay to ensure backend is ready and DOM is mounted
         const initializeData = async () => {
@@ -326,6 +340,53 @@ const Home = () => {
         });
         setShowTrackForm(false);
         setTrackMessage('');
+    };
+
+    // Home Services functions
+    const handleEditHomeService = (service) => {
+        setHomeServiceFormData({
+            serviceName: service.serviceName,
+            description: service.description
+        });
+        setEditingHomeService(service.id);
+    };
+
+    const handleSaveHomeService = () => {
+        setHomeServices(prev => 
+            prev.map(service => 
+                service.id === editingHomeService 
+                    ? { ...service, ...homeServiceFormData }
+                    : service
+            )
+        );
+        setEditingHomeService(null);
+        setHomeServiceFormData({ serviceName: '', description: '' });
+    };
+
+    const handleCancelHomeServiceEdit = () => {
+        setEditingHomeService(null);
+        setHomeServiceFormData({ serviceName: '', description: '' });
+    };
+
+    const handleDeleteHomeService = (id) => {
+        if (window.confirm('Are you sure you want to delete this service?')) {
+            setHomeServices(prev => prev.filter(service => service.id !== id));
+        }
+    };
+
+    const handleAddHomeService = () => {
+        const newId = Math.max(...homeServices.map(s => s.id)) + 1;
+        const newService = {
+            id: newId,
+            serviceName: 'New Service',
+            description: 'Enter service description here...'
+        };
+        setHomeServices(prev => [...prev, newService]);
+        setEditingHomeService(newId);
+        setHomeServiceFormData({
+            serviceName: newService.serviceName,
+            description: newService.description
+        });
     };
 
     // Filter and pagination logic
@@ -1085,51 +1146,98 @@ const Home = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td><strong>What We Offer</strong></td>
-                                                    <td>Discover personalized financial solutions crafted to help you achieve
-                                                        both personal and business success.</td>
-                                                    <td>
-                                                        <button className="btn btn-sm btn-outline-primary me-2">
-                                                            <i className="fas fa-edit"></i> Edit
-                                                        </button>
-                                                        <button className="btn btn-sm btn-outline-danger">
-                                                            <i className="fas fa-trash"></i> Delete
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                                {/* <tr>
-                                                    <td>2</td>
-                                                    <td><strong>Support Services</strong></td>
-                                                    <td>24/7 customer support and technical assistance for all your queries</td>
-                                                    <td>
-                                                        <button className="btn btn-sm btn-outline-primary me-2">
-                                                            <i className="fas fa-edit"></i> Edit
-                                                        </button>
-                                                        <button className="btn btn-sm btn-outline-danger">
-                                                            <i className="fas fa-trash"></i> Delete
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>3</td>
-                                                    <td><strong>Maintenance Services</strong></td>
-                                                    <td>Regular maintenance and upkeep services to ensure optimal performance</td>
-                                                    <td>
-                                                        <button className="btn btn-sm btn-outline-primary me-2">
-                                                            <i className="fas fa-edit"></i> Edit
-                                                        </button>
-                                                        <button className="btn btn-sm btn-outline-danger">
-                                                            <i className="fas fa-trash"></i> Delete
-                                                        </button>
-                                                    </td>
-                                                </tr> */}
+                                                {homeServices.map((service, index) => (
+                                                    <tr key={service.id}>
+                                                        <td>{index + 1}</td>
+                                                        <td>
+                                                            {editingHomeService === service.id ? (
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    value={homeServiceFormData.serviceName}
+                                                                    onChange={(e) => setHomeServiceFormData(prev => ({
+                                                                        ...prev,
+                                                                        serviceName: e.target.value
+                                                                    }))}
+                                                                />
+                                                            ) : (
+                                                                <strong>{service.serviceName}</strong>
+                                                            )}
+                                                        </td>
+                                                        <td>
+                                                            {editingHomeService === service.id ? (
+                                                                <div style={{ minHeight: '150px' }}>
+                                                                    <ReactQuill
+                                                                        theme="snow"
+                                                                        value={homeServiceFormData.description}
+                                                                        onChange={(value) => setHomeServiceFormData(prev => ({
+                                                                            ...prev,
+                                                                            description: value
+                                                                        }))}
+                                                                        modules={{
+                                                                            toolbar: [
+                                                                                [{ 'header': [1, 2, false] }],
+                                                                                ['bold', 'italic', 'underline'],
+                                                                                ['link'],
+                                                                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                                                                ['clean']
+                                                                            ]
+                                                                        }}
+                                                                        formats={[
+                                                                            'header',
+                                                                            'bold', 'italic', 'underline',
+                                                                            'link',
+                                                                            'list', 'bullet'
+                                                                        ]}
+                                                                    />
+                                                                </div>
+                                                            ) : (
+                                                                <div dangerouslySetInnerHTML={{ __html: service.description }} />
+                                                            )}
+                                                        </td>
+                                                        <td>
+                                                            {editingHomeService === service.id ? (
+                                                                <>
+                                                                    <button 
+                                                                        className="btn btn-sm btn-success me-2"
+                                                                        onClick={handleSaveHomeService}
+                                                                    >
+                                                                        <i className="fas fa-save"></i> Save
+                                                                    </button>
+                                                                    <button 
+                                                                        className="btn btn-sm btn-secondary"
+                                                                        onClick={handleCancelHomeServiceEdit}
+                                                                    >
+                                                                        <i className="fas fa-times"></i> Cancel
+                                                                    </button>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <button 
+                                                                        className="btn btn-sm btn-outline-primary me-2"
+                                                                        onClick={() => handleEditHomeService(service)}
+                                                                    >
+                                                                        <i className="fas fa-edit"></i> Edit
+                                                                    </button>
+                                                                    <button 
+                                                                        className="btn btn-sm btn-outline-danger"
+                                                                        onClick={() => handleDeleteHomeService(service.id)}
+                                                                    >
+                                                                        <i className="fas fa-trash"></i> Delete
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
                                             </tbody>
                                         </table>
                                     </div>
                                     <div className="mt-3">
-                                        <button className="btn btn-success">
+                                        <button 
+                                            className="btn btn-success"
+                                            onClick={handleAddHomeService}
+                                        >
                                             <i className="fas fa-plus me-2"></i>
                                             Add New Service
                                         </button>
@@ -1786,7 +1894,7 @@ const TabbingServices = () => {
                                             <div className="mb-2">
                                                 <small className="text-muted">Description:</small>
                                                 <div className="p-2 bg-light rounded">
-                                                    {commonImageDescription}
+                                                    <div dangerouslySetInnerHTML={{ __html: commonImageDescription }} />
                                                 </div>
                                             </div>
                                         </div>
@@ -1805,12 +1913,27 @@ const TabbingServices = () => {
                                         <div className="row mb-3">
                                             <div className="col-md-8">
                                                 <label className="form-label small">Description</label>
-                                                <textarea
-                                                    className="form-control form-control-sm"
-                                                    rows="3"
+                                                <ReactQuill
+                                                    theme="snow"
                                                     value={commonImageDescription}
-                                                    onChange={(e) => setCommonImageDescription(e.target.value)}
+                                                    onChange={(value) => setCommonImageDescription(value)}
                                                     placeholder="Enter description for the common section"
+                                                    modules={{
+                                                        toolbar: [
+                                                            [{ 'header': [1, 2, false] }],
+                                                            ['bold', 'italic', 'underline'],
+                                                            ['link'],
+                                                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                                            ['clean']
+                                                        ]
+                                                    }}
+                                                    formats={[
+                                                        'header',
+                                                        'bold', 'italic', 'underline',
+                                                        'link',
+                                                        'list', 'bullet'
+                                                    ]}
+                                                    style={{ minHeight: '120px' }}
                                                 />
                                             </div>
                                             <div className="col-md-4">
@@ -1925,12 +2048,27 @@ const TabbingServices = () => {
                                         </div>
                                         <div className="col-12 mb-3">
                                             <label className="form-label">Description</label>
-                                            <textarea
-                                                className="form-control"
-                                                rows="3"
+                                            <ReactQuill
+                                                theme="snow"
                                                 value={editFormData.description}
-                                                onChange={(e) => handleInputChange('description', e.target.value)}
+                                                onChange={(value) => handleInputChange('description', value)}
                                                 placeholder="Service description"
+                                                modules={{
+                                                    toolbar: [
+                                                        [{ 'header': [1, 2, false] }],
+                                                        ['bold', 'italic', 'underline'],
+                                                        ['link'],
+                                                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                                        ['clean']
+                                                    ]
+                                                }}
+                                                formats={[
+                                                    'header',
+                                                    'bold', 'italic', 'underline',
+                                                    'link',
+                                                    'list', 'bullet'
+                                                ]}
+                                                style={{ minHeight: '120px' }}
                                             />
                                         </div>
                                         <div className="col-md-6 mb-3">
@@ -2122,7 +2260,11 @@ const TabbingServices = () => {
                                                 )}
                                             </h4>
                                             <p className="lead text-muted mb-4" style={{ fontSize: '16px', lineHeight: '1.6' }}>
-                                                {isEditing && editingIndex === activeTab ? editFormData.description : tabbingServices[activeTab].description}
+                                                {isEditing && editingIndex === activeTab ? (
+                                                    <div dangerouslySetInnerHTML={{ __html: editFormData.description }} />
+                                                ) : (
+                                                    <div dangerouslySetInnerHTML={{ __html: tabbingServices[activeTab].description }} />
+                                                )}
                                             </p>
                                             <div>
                                                 <button
