@@ -62,6 +62,11 @@ adminSchema.methods.comparePassword = async function (candidatePassword) {
 
 // Generate JWT token
 adminSchema.methods.generateAccessToken = function () {
+    const secret = process.env.JWT_ACCESS_SECRET;
+    if (!secret) {
+        throw new Error('JWT_ACCESS_SECRET environment variable is required');
+    }
+
     return jwt.sign(
         {
             id: this._id,
@@ -69,7 +74,7 @@ adminSchema.methods.generateAccessToken = function () {
             name: this.name,
             role: this.role
         },
-        process.env.JWT_ACCESS_SECRET || 'your-access-secret-key',
+        secret,
         {
             expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m'
         }
@@ -78,11 +83,16 @@ adminSchema.methods.generateAccessToken = function () {
 
 // Generate refresh token
 adminSchema.methods.generateRefreshToken = function () {
+    const secret = process.env.JWT_REFRESH_SECRET;
+    if (!secret) {
+        throw new Error('JWT_REFRESH_SECRET environment variable is required');
+    }
+
     return jwt.sign(
         {
             id: this._id
         },
-        process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
+        secret,
         {
             expiresIn: process.env.JWT_REFRESH_EXPIRES || '7d'
         }

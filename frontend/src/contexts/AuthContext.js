@@ -67,7 +67,9 @@ export const AuthProvider = ({ children }) => {
             const errorMessage = error.response?.data?.message || 'Login failed';
             return { success: false, error: errorMessage };
         }
-    }; const register = async (registerData) => {
+    };
+
+    const register = async (registerData) => {
         try {
             console.log('Registration attempt:', registerData);
             const response = await adminAuthAPI.register(registerData);

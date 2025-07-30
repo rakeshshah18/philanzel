@@ -5,12 +5,14 @@ import newsRoutes from './newsRoutes.js';
 import { routes as adminAuthRoutes } from '../adminAuth/index.js';
 import ourTrackRoutes from './ourTrackRoutes.js';
 import servicesRoutes from './servicesRoutes.js';
+import tabbingServicesSettingsRoutes from './tabbingServicesSettingsRoutes.js';
 import express from 'express';
 const router = express.Router();
 
 router.use('/user', newInquiryRoute);
 router.use('/user', careerInquery);
 router.use('/admin/services', servicesRoutes);
+router.use('/admin/tabbing-services', tabbingServicesSettingsRoutes);
 
 router.use('/admin', homePageRoutes);
 router.use('/admin', newsRoutes);

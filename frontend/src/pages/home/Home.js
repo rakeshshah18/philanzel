@@ -1,8 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import Alert from '../../components/Alert';
-import { homePageAPI, ourTrackAPI } from '../../services/api';
+import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+
+// Helper function to get full image URL
+const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return null;
+
+    // If it's already a full URL, return as is
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        return imageUrl;
+    }
+
+    // If it's a relative URL from backend, prepend the base URL
+    const baseUrl = process.env.NODE_ENV === 'production'
+        ? ''
+        : 'http://localhost:8000';
+
+    // Handle backend upload paths correctly
+    if (imageUrl.startsWith('/uploads/')) {
+        return `${baseUrl}${imageUrl}`;
+    }
+
+    // Handle legacy paths
+    if (imageUrl.startsWith('/images/')) {
+        return `${baseUrl}${imageUrl}`;
+    }
+
+    // Default case - add uploads prefix if missing
+    return `${baseUrl}/uploads/images/${imageUrl}`;
+};
 
 const Home = () => {
     const [homePages, setHomePages] = useState([]);
@@ -13,23 +41,6 @@ const Home = () => {
     const [showForm, setShowForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
-
-    // Helper function to get full image URL
-    const getImageUrl = (imageUrl) => {
-        if (!imageUrl) return null;
-
-        // If it's already a full URL, return as is
-        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-            return imageUrl;
-        }
-
-        // If it's a relative URL, prepend the base URL
-        const baseUrl = process.env.NODE_ENV === 'production'
-            ? ''
-            : 'http://localhost:8000';
-
-        return `${baseUrl}${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
-    };
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -1141,96 +1152,84 @@ const TabbingServices = () => {
     const [activeTab, setActiveTab] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
     const [editingIndex, setEditingIndex] = useState(null);
+    const [commonImage, setCommonImage] = useState('/images/services/default-service.svg');
     const [editFormData, setEditFormData] = useState({
         tabTitle: '',
         contentTitle: '',
         description: '',
-        buttonText: ''
+        buttonText: '',
+        icon: ''
     });
+    const [imagePreview, setImagePreview] = useState(null);
+    const [commonImagePreview, setCommonImagePreview] = useState(null);
+    const [selectedImageFile, setSelectedImageFile] = useState(null);
+    const [selectedCommonImageFile, setSelectedCommonImageFile] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [fetchingServices, setFetchingServices] = useState(true);
 
-    const [tabbingServices, setTabbingServices] = useState([
-        {
-            id: 1,
-            tabTitle: "Retirement Solutions",
-            contentTitle: "Plan today. Relax tomorrow.",
-            description: "Secure your golden years with a customized retirement plan that ensures financial independence and peace of mind. We help you estimate future needs, optimize savings, and choose the right investment options for a stress-free retirement.",
-            image: "/images/services/web-development.svg",
-            buttonText: "Read More",
-            color: "primary"
-        },
-        {
-            id: 2,
-            tabTitle: "Mutual Fund Distribution",
-            contentTitle: "Smart investing made simple.",
-            description: "We help you invest in top-rated mutual funds that align with your financial goals and risk appetite. From SIPs to lump-sum investments, we offer expert guidance and portfolio tracking.",
-            image: "/images/services/mobile-development.svg",
-            buttonText: "Get Started",
-            color: "success"
-        },
-        {
-            id: 3,
-            tabTitle: "Cloud",
-            contentTitle: "Cloud Computing Solutions",
-            description: "Leverage the power of cloud computing to scale your business operations efficiently and securely.",
-            image: "/images/services/cloud-solutions.svg",
-            buttonText: "Explore Cloud",
-            color: "info"
-        },
-        {
-            id: 4,
-            tabTitle: "Marketing",
-            contentTitle: "Digital Marketing Strategy",
-            description: "Boost your online presence with our comprehensive digital marketing strategies and campaigns.",
-            image: "/images/services/digital-marketing.svg",
-            buttonText: "Start Marketing",
-            color: "warning"
-        },
-        {
-            id: 5,
-            tabTitle: "Analytics",
-            contentTitle: "Data Analytics & Intelligence",
-            description: "Transform your raw data into actionable insights with our advanced analytics and visualization tools.",
-            image: "/images/services/data-analytics.svg",
-            buttonText: "Analyze Data",
-            color: "dark"
-        },
-        {
-            id: 6,
-            tabTitle: "Security",
-            contentTitle: "Cybersecurity Protection",
-            description: "Protect your digital assets with our comprehensive cybersecurity solutions and monitoring services.",
-            image: "/images/services/cybersecurity.svg",
-            buttonText: "Secure Now",
-            color: "danger"
-        },
-        {
-            id: 7,
-            tabTitle: "AI & ML",
-            contentTitle: "Artificial Intelligence & Machine Learning",
-            description: "Harness the power of artificial intelligence to automate processes and gain competitive advantages.",
-            image: "/images/services/ai-ml.svg",
-            buttonText: "Discover AI",
-            color: "secondary"
-        },
-        {
-            id: 8,
-            tabTitle: "E-commerce",
-            contentTitle: "E-commerce Solutions & Optimization",
-            description: "Build and optimize online stores that convert visitors into customers with seamless shopping experiences.",
-            image: "/images/services/ecommerce.svg",
-            buttonText: "Build Store",
-            color: "primary"
-        },
-        {
-            id: 9,
-            tabTitle: "IT Consulting",
-            contentTitle: "Professional IT Consulting Services",
-            description: "Get expert guidance on technology strategies, system architecture, and digital transformation initiatives.",
-            image: "/images/services/it-consulting.svg",
-            buttonText: "Get Advice",
-            color: "info"
+    const [tabbingServices, setTabbingServices] = useState([]);
+
+    // Fetch services from database
+    const fetchTabbingServices = async () => {
+        try {
+            setFetchingServices(true);
+
+            // Fetch services and settings in parallel
+            const [servicesResponse, settingsResponse] = await Promise.all([
+                servicesAPI.getAll(),
+                tabbingServicesSettingsAPI.getSettings().catch(err => {
+                    console.warn('Could not load settings:', err);
+                    return null;
+                })
+            ]);
+
+            // Load services
+            if (servicesResponse.data && servicesResponse.data.data) {
+                // Transform backend data to match frontend structure
+                const transformedServices = servicesResponse.data.data.map((service, index) => ({
+                    id: service._id || service.id,
+                    tabTitle: service.tabTitle || service.title || `Service ${index + 1}`,
+                    contentTitle: service.contentTitle || service.title || `Service ${index + 1}`,
+                    description: service.description || '',
+                    icon: service.image ? getImageUrl(service.image) : '/images/services/default-service.svg',
+                    buttonText: service.buttonText || 'Learn More',
+                    color: service.color || ['primary', 'success', 'info', 'warning', 'dark', 'danger', 'secondary'][index % 7]
+                }));
+                setTabbingServices(transformedServices);
+                console.log('Loaded services from database:', transformedServices);
+            }
+
+            // Load common background image settings
+            if (settingsResponse && settingsResponse.data && settingsResponse.data.data) {
+                const settings = settingsResponse.data.data;
+                if (settings.commonBackgroundImage && settings.commonBackgroundImage.url) {
+                    setCommonImage(getImageUrl(settings.commonBackgroundImage.url));
+                    console.log('Loaded common background image:', settings.commonBackgroundImage.url);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching services:', error);
+            // Fallback to default services if database fetch fails
+            setTabbingServices([
+                {
+                    id: 'temp-1',
+                    tabTitle: "Retirement Solutions",
+                    contentTitle: "Plan today. Relax tomorrow.",
+                    description: "Secure your golden years with a customized retirement plan that ensures financial independence and peace of mind.",
+                    icon: "/images/services/web-development.svg",
+                    buttonText: "Read More",
+                    color: "primary"
+                }
+            ]);
+        } finally {
+            setFetchingServices(false);
         }
-    ]);
+    };
+
+    // Load services on component mount
+    useEffect(() => {
+        fetchTabbingServices();
+    }, []);
 
     // Handle editing functions
     const handleEditClick = (index) => {
@@ -1240,19 +1239,64 @@ const TabbingServices = () => {
             tabTitle: service.tabTitle,
             contentTitle: service.contentTitle,
             description: service.description,
-            buttonText: service.buttonText
+            buttonText: service.buttonText,
+            icon: service.icon || service.image // Use icon if available, fallback to image
         });
+        setImagePreview(null);
+        setSelectedImageFile(null);
         setIsEditing(true);
     };
 
-    const handleSaveEdit = () => {
-        const updatedServices = [...tabbingServices];
-        updatedServices[editingIndex] = {
-            ...updatedServices[editingIndex],
-            ...editFormData
-        };
-        setTabbingServices(updatedServices);
-        handleCancelEdit();
+    const handleSaveEdit = async () => {
+        try {
+            setLoading(true);
+            const service = tabbingServices[editingIndex];
+
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append('title', editFormData.contentTitle); // Use contentTitle as main title
+            formData.append('tabTitle', editFormData.tabTitle);
+            formData.append('contentTitle', editFormData.contentTitle);
+            formData.append('description', editFormData.description);
+            formData.append('buttonText', editFormData.buttonText);
+
+            // Add image if selected
+            if (selectedImageFile) {
+                formData.append('image', selectedImageFile);
+            }
+
+            console.log('Sending form data:', {
+                title: editFormData.contentTitle,
+                tabTitle: editFormData.tabTitle,
+                contentTitle: editFormData.contentTitle,
+                description: editFormData.description,
+                buttonText: editFormData.buttonText,
+                hasImage: !!selectedImageFile
+            });
+
+            let response;
+            if (service.id && !service.id.toString().startsWith('temp-')) {
+                // Update existing service
+                response = await servicesAPI.updateWithFile(service.id, formData);
+            } else {
+                // Create new service
+                response = await servicesAPI.createWithFile(formData);
+            }
+
+            if (response.data && response.data.data) {
+                // Refresh services from database
+                await fetchTabbingServices();
+                console.log('Service saved successfully:', response.data.data);
+                alert('Service updated successfully!');
+            }
+
+            handleCancelEdit();
+        } catch (error) {
+            console.error('Error saving service:', error);
+            alert(`Error saving service: ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleCancelEdit = () => {
@@ -1262,8 +1306,13 @@ const TabbingServices = () => {
             tabTitle: '',
             contentTitle: '',
             description: '',
-            buttonText: ''
+            buttonText: '',
+            icon: ''
         });
+        setImagePreview(null);
+        setCommonImagePreview(null);
+        setSelectedImageFile(null);
+        setSelectedCommonImageFile(null);
     };
 
     const handleInputChange = (field, value) => {
@@ -1271,6 +1320,131 @@ const TabbingServices = () => {
             ...prev,
             [field]: value
         }));
+    };
+
+    // Handle individual tab image change
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/svg+xml'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please select a valid image file (JPG, PNG, or SVG)');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image file size should be less than 5MB');
+                return;
+            }
+
+            setSelectedImageFile(file);
+
+            // Create preview URL
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setImagePreview(e.target.result);
+                // Update form data with preview for immediate display
+                handleInputChange('icon', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Handle common image change
+    const handleCommonImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/svg+xml'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please select a valid image file (JPG, PNG, or SVG)');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image file size should be less than 5MB');
+                return;
+            }
+
+            setSelectedCommonImageFile(file);
+
+            // Create preview URL
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setCommonImagePreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Save common image
+    const handleSaveCommonImage = async () => {
+        if (!selectedCommonImageFile) {
+            alert('Please select an image first');
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            // Create FormData
+            const formData = new FormData();
+            formData.append('commonBackgroundImage', selectedCommonImageFile);
+
+            // Upload to server
+            const response = await tabbingServicesSettingsAPI.updateCommonBackgroundImage(formData);
+
+            if (response.data.success) {
+                // Update local state with the new image URL from server
+                const newImageUrl = getImageUrl(response.data.data.commonBackgroundImage.url);
+                setCommonImage(newImageUrl);
+                setCommonImagePreview(null);
+                setSelectedCommonImageFile(null);
+
+                console.log('Common image updated successfully:', response.data.data);
+                alert('Common background image updated successfully!');
+            } else {
+                throw new Error(response.data.message || 'Failed to update image');
+            }
+        } catch (error) {
+            console.error('Error saving common image:', error);
+            alert('Failed to save common background image. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Reset common background image to default
+    const handleResetCommonImage = async () => {
+        if (!window.confirm('Are you sure you want to reset the common background image to default?')) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const response = await tabbingServicesSettingsAPI.resetCommonBackgroundImage();
+
+            if (response.data.success) {
+                // Update local state with the default image
+                setCommonImage('/images/services/default-service.svg');
+                setCommonImagePreview(null);
+                setSelectedCommonImageFile(null);
+
+                console.log('Common image reset to default');
+                alert('Common background image reset to default successfully!');
+            } else {
+                throw new Error(response.data.message || 'Failed to reset image');
+            }
+        } catch (error) {
+            console.error('Error resetting common image:', error);
+            alert('Failed to reset common background image. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -1282,31 +1456,59 @@ const TabbingServices = () => {
                             <h3 className="card-title mb-0">
                                 <i className="fas fa-layer-group me-2"></i>
                                 Tabbing Services
+                                {fetchingServices && (
+                                    <span className="spinner-border spinner-border-sm ms-2" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </span>
+                                )}
                             </h3>
                             <div>
                                 {!isEditing ? (
-                                    <button
-                                        className="btn btn-light btn-sm"
-                                        onClick={() => handleEditClick(activeTab)}
-                                        title="Edit current tab"
-                                    >
-                                        <i className="fas fa-edit me-1"></i>
-                                        Edit Tab
-                                    </button>
+                                    <div className="btn-group">
+                                        <button
+                                            className="btn btn-light btn-sm me-2"
+                                            onClick={() => fetchTabbingServices()}
+                                            disabled={fetchingServices}
+                                            title="Refresh services from database"
+                                        >
+                                            <i className="fas fa-sync-alt me-1"></i>
+                                            Refresh
+                                        </button>
+                                        <button
+                                            className="btn btn-light btn-sm"
+                                            onClick={() => handleEditClick(activeTab)}
+                                            title="Edit current tab"
+                                            disabled={fetchingServices || tabbingServices.length === 0}
+                                        >
+                                            <i className="fas fa-edit me-1"></i>
+                                            Edit Tab
+                                        </button>
+                                    </div>
                                 ) : (
                                     <div className="btn-group">
                                         <button
                                             className="btn btn-light btn-sm"
                                             onClick={handleSaveEdit}
                                             title="Save changes"
+                                            disabled={loading}
                                         >
-                                            <i className="fas fa-save me-1"></i>
-                                            Save
+                                            {loading ? (
+                                                <>
+                                                    <span className="spinner-border spinner-border-sm me-1" role="status"></span>
+                                                    Saving...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="fas fa-save me-1"></i>
+                                                    Save Changes
+                                                </>
+                                            )}
                                         </button>
                                         <button
                                             className="btn btn-outline-light btn-sm"
                                             onClick={handleCancelEdit}
                                             title="Cancel editing"
+                                            disabled={loading}
                                         >
                                             <i className="fas fa-times me-1"></i>
                                             Cancel
@@ -1316,6 +1518,102 @@ const TabbingServices = () => {
                             </div>
                         </div>
                         <div className="card-body">
+                            {/* Common Image Section */}
+                            <div className="mb-4 p-3 border rounded">
+                                <div className="row align-items-center">
+                                    <div className="col-md-4">
+                                        <h6 className="mb-2">
+                                            <i className="fas fa-image me-2"></i>
+                                            Common Background Image
+                                        </h6>
+                                        <div className="text-center">
+                                            <img
+                                                src={commonImagePreview || commonImage}
+                                                alt="Common Background"
+                                                className="img-fluid rounded"
+                                                style={{
+                                                    maxWidth: '120px',
+                                                    height: '80px',
+                                                    objectFit: 'cover',
+                                                    border: '2px solid #e9ecef'
+                                                }}
+                                                onError={(e) => {
+                                                    e.target.src = '/images/services/default-service.svg';
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-8">
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <label className="form-label small">Upload New Common Image</label>
+                                                <input
+                                                    type="file"
+                                                    className="form-control form-control-sm"
+                                                    accept="image/*"
+                                                    onChange={handleCommonImageChange}
+                                                />
+                                                <small className="text-muted">JPG, PNG, SVG (max 5MB)</small>
+                                            </div>
+                                            <div className="col-md-6 d-flex align-items-end">
+                                                {commonImagePreview && (
+                                                    <div>
+                                                        <button
+                                                            className="btn btn-success btn-sm me-2"
+                                                            onClick={handleSaveCommonImage}
+                                                            disabled={loading}
+                                                        >
+                                                            {loading ? (
+                                                                <>
+                                                                    <span className="spinner-border spinner-border-sm me-1"></span>
+                                                                    Saving...
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <i className="fas fa-check me-1"></i>
+                                                                    Apply
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-secondary btn-sm"
+                                                            onClick={() => {
+                                                                setCommonImagePreview(null);
+                                                                setSelectedCommonImageFile(null);
+                                                            }}
+                                                            disabled={loading}
+                                                        >
+                                                            <i className="fas fa-times me-1"></i>
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                )}
+                                                {!commonImagePreview && (
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={handleResetCommonImage}
+                                                        disabled={loading}
+                                                        title="Reset to default image"
+                                                    >
+                                                        {loading ? (
+                                                            <>
+                                                                <span className="spinner-border spinner-border-sm me-1"></span>
+                                                                Resetting...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <i className="fas fa-undo me-1"></i>
+                                                                Reset to Default
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Editing Form */}
                             {isEditing && (
                                 <div className="mb-4 p-3 bg-light rounded">
@@ -1345,6 +1643,38 @@ const TabbingServices = () => {
                                             />
                                         </div>
                                         <div className="col-12 mb-3">
+                                            <label className="form-label">Tab Icon/Image</label>
+                                            <div className="row align-items-center">
+                                                <div className="col-md-2">
+                                                    <div className="text-center">
+                                                        <img
+                                                            src={imagePreview || editFormData.icon || '/images/services/default-service.svg'}
+                                                            alt="Tab Icon"
+                                                            className="img-fluid rounded"
+                                                            style={{
+                                                                maxWidth: '50px',
+                                                                height: '50px',
+                                                                objectFit: 'cover',
+                                                                border: '1px solid #dee2e6'
+                                                            }}
+                                                            onError={(e) => {
+                                                                e.target.src = '/images/services/default-service.svg';
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-10">
+                                                    <input
+                                                        type="file"
+                                                        className="form-control"
+                                                        accept="image/*"
+                                                        onChange={handleImageChange}
+                                                    />
+                                                    <small className="text-muted">JPG, PNG, SVG (max 5MB) - Used as tab icon and in content area</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-12 mb-3">
                                             <label className="form-label">Description</label>
                                             <textarea
                                                 className="form-control"
@@ -1368,36 +1698,78 @@ const TabbingServices = () => {
                                 </div>
                             )}
 
+                            {/* Loading State */}
+                            {fetchingServices && (
+                                <div className="text-center py-5">
+                                    <div className="spinner-border text-success" role="status">
+                                        <span className="visually-hidden">Loading services...</span>
+                                    </div>
+                                    <p className="mt-3 text-muted">Loading services from database...</p>
+                                </div>
+                            )}
+
+                            {/* Empty State */}
+                            {!fetchingServices && tabbingServices.length === 0 && (
+                                <div className="text-center py-5">
+                                    <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <h5 className="text-muted">No Services Found</h5>
+                                    <p className="text-muted">No tabbing services are available in the database.</p>
+                                    <button
+                                        className="btn btn-success"
+                                        onClick={() => fetchTabbingServices()}
+                                    >
+                                        <i className="fas fa-sync-alt me-2"></i>
+                                        Retry Loading
+                                    </button>
+                                </div>
+                            )}
+
                             {/* Tab Navigation */}
-                            <div className="row mb-4">
-                                <div className="col-12">
-                                    <div className="btn-group flex-wrap" role="group" aria-label="Service tabs">
-                                        {tabbingServices.map((service, index) => (
-                                            <button
-                                                key={service.id}
-                                                type="button"
-                                                className={`btn btn-outline-${service.color} ${activeTab === index ? 'active' : ''} mb-2`}
-                                                onClick={() => !isEditing && setActiveTab(index)}
-                                                disabled={isEditing}
-                                                style={{
-                                                    margin: '2px',
-                                                    fontSize: '14px',
-                                                    minWidth: '120px',
-                                                    opacity: isEditing && index !== activeTab ? 0.5 : 1
-                                                }}
-                                            >
-                                                {isEditing && editingIndex === index ? editFormData.tabTitle : service.tabTitle}
-                                                {isEditing && editingIndex === index && (
-                                                    <small className="ms-1">*</small>
-                                                )}
-                                            </button>
-                                        ))}
+                            {!fetchingServices && tabbingServices.length > 0 && (
+                                <div className="row mb-4">
+                                    <div className="col-12">
+                                        <div className="btn-group flex-wrap" role="group" aria-label="Service tabs">
+                                            {tabbingServices.map((service, index) => (
+                                                <button
+                                                    key={service.id}
+                                                    type="button"
+                                                    className={`btn btn-outline-${service.color} ${activeTab === index ? 'active' : ''} mb-2 d-flex align-items-center`}
+                                                    onClick={() => !isEditing && setActiveTab(index)}
+                                                    disabled={isEditing}
+                                                    style={{
+                                                        margin: '2px',
+                                                        fontSize: '14px',
+                                                        minWidth: '120px',
+                                                        opacity: isEditing && index !== activeTab ? 0.5 : 1
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={service.icon || '/images/services/default-service.svg'}
+                                                        alt=""
+                                                        style={{
+                                                            width: '16px',
+                                                            height: '16px',
+                                                            objectFit: 'cover',
+                                                            marginRight: '6px',
+                                                            borderRadius: '2px'
+                                                        }}
+                                                        onError={(e) => {
+                                                            e.target.src = '/images/services/default-service.svg';
+                                                        }}
+                                                    />
+                                                    {isEditing && editingIndex === index ? editFormData.tabTitle : service.tabTitle}
+                                                    {isEditing && editingIndex === index && (
+                                                        <small className="ms-1">*</small>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
 
                             {/* Active Tab Content */}
-                            {tabbingServices[activeTab] && (
+                            {!fetchingServices && tabbingServices.length > 0 && tabbingServices[activeTab] && (
                                 <div className={`row ${isEditing ? 'border border-warning rounded p-3' : ''}`}>
                                     {isEditing && (
                                         <div className="col-12 mb-3">
@@ -1409,16 +1781,18 @@ const TabbingServices = () => {
                                     )}
                                     <div className="col-lg-4 col-md-6 mb-4">
                                         <div className="text-center">
+                                            {/* Tab Specific Image */}
                                             <img
-                                                src={tabbingServices[activeTab].image}
+                                                src={tabbingServices[activeTab].icon || '/images/services/default-service.svg'}
                                                 alt={tabbingServices[activeTab].contentTitle}
                                                 className="img-fluid mb-3"
                                                 style={{
-                                                    maxWidth: '200px',
-                                                    height: '200px',
+                                                    maxWidth: '120px',
+                                                    height: '120px',
                                                     objectFit: 'cover',
                                                     borderRadius: '15px',
-                                                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                                                    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                                                    border: '3px solid white'
                                                 }}
                                                 onError={(e) => {
                                                     e.target.src = '/images/services/default-service.svg';

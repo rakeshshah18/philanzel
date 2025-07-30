@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import imageUpload from '../config/imageUpload.js';
 import { verifyToken, requireRole } from '../adminAuth/middleware/authMiddleware.js';
-import { createServices, getAllServices, updateServices, deleteServices } from '../controllers/servicesController.js';
+import { createServices, getAllServices, updateServices, deleteServices, createTestService } from '../controllers/servicesController.js';
 
 const router = express.Router();
 

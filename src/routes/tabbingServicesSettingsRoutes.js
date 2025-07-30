@@ -1,0 +1,24 @@
+import express from 'express';
+import tabbingServicesSettingsController from '../controllers/tabbingServicesSettingsController.js';
+import imageUpload from '../config/imageUpload.js';
+import { verifyToken } from '../adminAuth/middleware/authMiddleware.js';
+
+const router = express.Router();
+
+// Get tabbing services settings
+router.get('/settings', verifyToken, tabbingServicesSettingsController.getSettings);
+
+// Update common background image
+router.put('/settings/common-background',
+    verifyToken,
+    imageUpload.single('commonBackgroundImage'),
+    tabbingServicesSettingsController.updateCommonBackgroundImage
+);
+
+// Reset common background image to default
+router.put('/settings/reset-common-background',
+    verifyToken,
+    tabbingServicesSettingsController.resetCommonBackgroundImage
+);
+
+export default router;

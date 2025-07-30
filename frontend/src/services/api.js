@@ -244,4 +244,22 @@ export const servicesAPI = {
     delete: (id) => API.delete(`/admin/services/${id}`)
 };
 
+// Tabbing Services Settings API
+export const tabbingServicesSettingsAPI = {
+    // Get tabbing services settings
+    getSettings: () => API.get('/admin/tabbing-services/settings'),
+
+    // Update common background image
+    updateCommonBackgroundImage: (formData) => {
+        return API.put('/admin/tabbing-services/settings/common-background', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+
+    // Reset common background image to default
+    resetCommonBackgroundImage: () => API.put('/admin/tabbing-services/settings/reset-common-background')
+};
+
 export default API;

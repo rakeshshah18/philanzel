@@ -16,8 +16,43 @@ const verifyToken = async (req, res, next) => {
             });
         }
 
+        // Check if JWT secret is configured
+        const accessSecret = process.env.JWT_ACCESS_SECRET;
+        if (!accessSecret) {
+            console.error('JWT_ACCESS_SECRET environment variable is not set');
+            return res.status(500).json({
+                success: false,
+                message: 'Server configuration error'
+            });
+        }
+
         // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET || 'your-access-secret-key');
+        let decoded;
+        try {
+            decoded = jwt.verify(token, accessSecret);
+        } catch (jwtError) {
+            console.error('JWT verification failed:', jwtError.message);
+
+            if (jwtError.name === 'TokenExpiredError') {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Token expired',
+                    error: 'TOKEN_EXPIRED'
+                });
+            } else if (jwtError.name === 'JsonWebTokenError') {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Invalid token',
+                    error: 'TOKEN_INVALID'
+                });
+            } else {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Token verification failed',
+                    error: 'TOKEN_ERROR'
+                });
+            }
+        }
 
         // Check if admin exists and is active
         const admin = await Admin.findById(decoded.id);
@@ -40,13 +75,6 @@ const verifyToken = async (req, res, next) => {
 
     } catch (error) {
         console.error('Token verification error:', error);
-
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                success: false,
-                message: 'Token expired'
-            });
-        }
 
         if (error.name === 'JsonWebTokenError') {
             return res.status(401).json({

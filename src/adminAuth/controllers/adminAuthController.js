@@ -180,15 +180,51 @@ class AdminAuthController {
                 });
             }
 
-            // Verify refresh token
-            const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key');
+            // Verify refresh token with proper secret
+            const refreshSecret = process.env.JWT_REFRESH_SECRET;
+            if (!refreshSecret) {
+                console.error('JWT_REFRESH_SECRET environment variable is not set');
+                return res.status(500).json({
+                    success: false,
+                    message: 'Server configuration error'
+                });
+            }
+
+            let decoded;
+            try {
+                decoded = jwt.verify(refreshToken, refreshSecret);
+            } catch (jwtError) {
+                console.error('JWT verification failed:', jwtError.message);
+
+                // Clear the invalid refresh token cookie
+                res.clearCookie('refreshToken');
+
+                return res.status(401).json({
+                    success: false,
+                    message: 'Invalid or expired refresh token. Please login again.',
+                    error: 'TOKEN_INVALID'
+                });
+            }
 
             // Find admin
             const admin = await Admin.findById(decoded.id);
             if (!admin || admin.refreshToken !== refreshToken) {
+                // Clear the invalid refresh token cookie
+                res.clearCookie('refreshToken');
+
                 return res.status(401).json({
                     success: false,
-                    message: 'Invalid refresh token'
+                    message: 'Invalid refresh token. Please login again.',
+                    error: 'TOKEN_MISMATCH'
+                });
+            }
+
+            // Check if admin is still active
+            if (!admin.isActive) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Account is deactivated. Please contact super admin.',
+                    error: 'ACCOUNT_DEACTIVATED'
                 });
             }
 
@@ -235,6 +271,29 @@ class AdminAuthController {
 
         } catch (error) {
             console.error('Logout error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
+    }
+
+    // Clear all tokens (for fixing JWT secret issues)
+    async clearAllTokens(req, res) {
+        try {
+            // Clear all refresh tokens from database
+            await Admin.updateMany(
+                {},
+                { refreshToken: null }
+            );
+
+            res.status(200).json({
+                success: true,
+                message: 'All refresh tokens cleared. All users need to login again.'
+            });
+
+        } catch (error) {
+            console.error('Clear tokens error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Internal server error'

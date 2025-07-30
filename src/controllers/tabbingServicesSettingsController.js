@@ -1,0 +1,127 @@
+import TabbingServicesSettings from '../models/tabbingServicesSettings.js';
+import fs from 'fs';
+import path from 'path';
+
+class TabbingServicesSettingsController {
+    // Get tabbing services settings
+    async getSettings(req, res) {
+        try {
+            let settings = await TabbingServicesSettings.findOne();
+
+            // If no settings exist, create default ones
+            if (!settings) {
+                settings = new TabbingServicesSettings({
+                    commonBackgroundImage: {
+                        url: '/images/services/default-service.svg'
+                    }
+                });
+                await settings.save();
+            }
+
+            res.status(200).json({
+                success: true,
+                data: settings
+            });
+        } catch (error) {
+            console.error('Error fetching tabbing services settings:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to fetch settings',
+                error: error.message
+            });
+        }
+    }
+
+    // Update common background image
+    async updateCommonBackgroundImage(req, res) {
+        try {
+            let settings = await TabbingServicesSettings.findOne();
+
+            // If no settings exist, create new ones
+            if (!settings) {
+                settings = new TabbingServicesSettings();
+            }
+
+            // Handle file upload
+            if (req.file) {
+                // Delete old image file if it exists and is not the default
+                if (settings.commonBackgroundImage?.path &&
+                    !settings.commonBackgroundImage.path.includes('default-service.svg')) {
+                    try {
+                        fs.unlinkSync(settings.commonBackgroundImage.path);
+                    } catch (err) {
+                        console.warn('Could not delete old image:', err.message);
+                    }
+                }
+
+                // Update with new image
+                settings.commonBackgroundImage = {
+                    url: `/uploads/images/${req.file.filename}`,
+                    originalName: req.file.originalname,
+                    filename: req.file.filename,
+                    path: req.file.path,
+                    size: req.file.size,
+                    mimetype: req.file.mimetype
+                };
+            }
+
+            await settings.save();
+
+            res.status(200).json({
+                success: true,
+                message: 'Common background image updated successfully',
+                data: settings
+            });
+        } catch (error) {
+            console.error('Error updating common background image:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to update common background image',
+                error: error.message
+            });
+        }
+    }
+
+    // Reset common background image to default
+    async resetCommonBackgroundImage(req, res) {
+        try {
+            let settings = await TabbingServicesSettings.findOne();
+
+            if (!settings) {
+                settings = new TabbingServicesSettings();
+            }
+
+            // Delete current image file if it exists and is not the default
+            if (settings.commonBackgroundImage?.path &&
+                !settings.commonBackgroundImage.path.includes('default-service.svg')) {
+                try {
+                    fs.unlinkSync(settings.commonBackgroundImage.path);
+                } catch (err) {
+                    console.warn('Could not delete image:', err.message);
+                }
+            }
+
+            // Reset to default
+            settings.commonBackgroundImage = {
+                url: '/images/services/default-service.svg'
+            };
+
+            await settings.save();
+
+            res.status(200).json({
+                success: true,
+                message: 'Common background image reset to default',
+                data: settings
+            });
+        } catch (error) {
+            console.error('Error resetting common background image:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to reset common background image',
+                error: error.message
+            });
+        }
+    }
+}
+
+export default new TabbingServicesSettingsController();

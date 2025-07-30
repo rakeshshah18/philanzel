@@ -1,6 +1,13 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminNavbar = ({ onLoginClick, onRegisterClick, isAuthenticated, admin, onLogout }) => {
+    const navigate = useNavigate();
+
+    const handleLoginClick = () => {
+        navigate('/login');
+    };
+
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container-fluid">
@@ -22,7 +29,7 @@ const AdminNavbar = ({ onLoginClick, onRegisterClick, isAuthenticated, admin, on
                         <>
                             <button
                                 className="btn btn-outline-light me-2"
-                                onClick={onLoginClick}
+                                onClick={handleLoginClick}
                             >
                                 Login
                             </button>
