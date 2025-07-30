@@ -1153,6 +1153,12 @@ const TabbingServices = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editingIndex, setEditingIndex] = useState(null);
     const [commonImage, setCommonImage] = useState('/images/services/default-service.svg');
+    const [commonImageDescription, setCommonImageDescription] = useState('Transform your financial future with our comprehensive services');
+    const [commonImageButton, setCommonImageButton] = useState({
+        text: 'Get Started',
+        link: '#'
+    });
+    const [editingCommonSection, setEditingCommonSection] = useState(false);
     const [editFormData, setEditFormData] = useState({
         tabTitle: '',
         contentTitle: '',
@@ -1206,6 +1212,21 @@ const TabbingServices = () => {
                     setCommonImage(getImageUrl(settings.commonBackgroundImage.url));
                     console.log('Loaded common background image:', settings.commonBackgroundImage.url);
                 }
+
+                // Load common section description and button
+                if (settings.commonImageDescription) {
+                    setCommonImageDescription(settings.commonImageDescription);
+                }
+                if (settings.commonImageButton) {
+                    setCommonImageButton({
+                        text: settings.commonImageButton.text || 'Get Started',
+                        link: settings.commonImageButton.link || '#'
+                    });
+                }
+                console.log('Loaded common section settings:', {
+                    description: settings.commonImageDescription,
+                    button: settings.commonImageButton
+                });
             }
         } catch (error) {
             console.error('Error fetching services:', error);
@@ -1447,6 +1468,132 @@ const TabbingServices = () => {
         }
     };
 
+    // Add new tab function
+    const handleAddNewTab = async () => {
+        try {
+            setLoading(true);
+
+            // Create FormData for new service
+            const formData = new FormData();
+            formData.append('title', 'New Service');
+            formData.append('tabTitle', 'New Tab');
+            formData.append('contentTitle', 'New Service');
+            formData.append('description', 'This is a new service description. Click edit to customize it.');
+            formData.append('buttonText', 'Learn More');
+            formData.append('color', 'primary');
+
+            const response = await servicesAPI.createWithFile(formData);
+
+            if (response.data && response.data.data) {
+                // Refresh services from database
+                await fetchTabbingServices();
+                console.log('New tab created successfully:', response.data.data);
+                alert('New tab created successfully!');
+            }
+        } catch (error) {
+            console.error('Error creating new tab:', error);
+            alert(`Error creating new tab: ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Delete tab function
+    const handleDeleteTab = async (index) => {
+        if (!window.confirm('Are you sure you want to delete this tab? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const service = tabbingServices[index];
+
+            console.log('Attempting to delete tab:', { index, service });
+
+            if (service.id && !service.id.toString().startsWith('temp-')) {
+                // Delete from database
+                console.log('Deleting service with ID:', service.id);
+                const response = await servicesAPI.delete(service.id);
+                console.log('Delete API response:', response);
+
+                // Reset editing state if we were editing the deleted tab
+                if (editingIndex === index) {
+                    handleCancelEdit();
+                }
+
+                // Refresh services from database to get updated list
+                await fetchTabbingServices();
+
+                // Adjust active tab if necessary
+                const remainingServices = tabbingServices.length - 1;
+                if (activeTab >= remainingServices) {
+                    setActiveTab(Math.max(0, remainingServices - 1));
+                } else if (activeTab > index) {
+                    // If active tab is after the deleted tab, adjust index
+                    setActiveTab(activeTab - 1);
+                }
+
+                console.log('Tab deleted successfully');
+                alert('Tab deleted successfully!');
+            } else {
+                // For temp services, just remove from local state
+                console.log('Removing temp service from local state');
+                const updatedServices = tabbingServices.filter((_, i) => i !== index);
+                setTabbingServices(updatedServices);
+
+                // Adjust active tab for local deletion
+                if (activeTab >= updatedServices.length) {
+                    setActiveTab(Math.max(0, updatedServices.length - 1));
+                } else if (activeTab > index) {
+                    setActiveTab(activeTab - 1);
+                }
+
+                alert('Tab removed successfully!');
+            }
+        } catch (error) {
+            console.error('Error deleting tab:', error);
+            alert(`Error deleting tab: ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Common section editing functions
+    const handleEditCommonSection = () => {
+        setEditingCommonSection(true);
+    };
+
+    const handleSaveCommonSection = async () => {
+        try {
+            setLoading(true);
+
+            const response = await tabbingServicesSettingsAPI.updateCommonSettings({
+                description: commonImageDescription,
+                buttonText: commonImageButton.text,
+                buttonLink: commonImageButton.link
+            });
+
+            if (response.data.success) {
+                setEditingCommonSection(false);
+                console.log('Common section updated successfully');
+                alert('Common section settings updated successfully!');
+            } else {
+                throw new Error(response.data.message || 'Failed to update settings');
+            }
+        } catch (error) {
+            console.error('Error saving common section:', error);
+            alert('Failed to save common section settings. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCancelCommonSection = () => {
+        setEditingCommonSection(false);
+        // Reset to original values by refetching
+        fetchTabbingServices();
+    };
+
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -1614,6 +1761,108 @@ const TabbingServices = () => {
                                 </div>
                             </div>
 
+                            {/* Common Section Description and Button */}
+                            <div className="mb-4 p-3 border rounded">
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 className="mb-0">
+                                        <i className="fas fa-text-height me-2"></i>
+                                        Common Section Content
+                                    </h6>
+                                    {!editingCommonSection && (
+                                        <button
+                                            className="btn btn-outline-primary btn-sm"
+                                            onClick={handleEditCommonSection}
+                                            disabled={loading}
+                                        >
+                                            <i className="fas fa-edit me-1"></i>
+                                            Edit
+                                        </button>
+                                    )}
+                                </div>
+
+                                {!editingCommonSection ? (
+                                    <div className="row">
+                                        <div className="col-md-8">
+                                            <div className="mb-2">
+                                                <small className="text-muted">Description:</small>
+                                                <div className="p-2 bg-light rounded">
+                                                    {commonImageDescription}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                            <div className="mb-2">
+                                                <small className="text-muted">Button:</small>
+                                                <div className="p-2 bg-light rounded">
+                                                    <strong>Text:</strong> {commonImageButton.text}<br />
+                                                    <strong>Link:</strong> {commonImageButton.link}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div className="row mb-3">
+                                            <div className="col-md-8">
+                                                <label className="form-label small">Description</label>
+                                                <textarea
+                                                    className="form-control form-control-sm"
+                                                    rows="3"
+                                                    value={commonImageDescription}
+                                                    onChange={(e) => setCommonImageDescription(e.target.value)}
+                                                    placeholder="Enter description for the common section"
+                                                />
+                                            </div>
+                                            <div className="col-md-4">
+                                                <label className="form-label small">Button Text</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control form-control-sm mb-2"
+                                                    value={commonImageButton.text}
+                                                    onChange={(e) => setCommonImageButton(prev => ({ ...prev, text: e.target.value }))}
+                                                    placeholder="Button text"
+                                                />
+                                                <label className="form-label small">Button Link</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control form-control-sm"
+                                                    value={commonImageButton.link}
+                                                    onChange={(e) => setCommonImageButton(prev => ({ ...prev, link: e.target.value }))}
+                                                    placeholder="Button link (e.g., #contact, /about)"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="d-flex gap-2">
+                                            <button
+                                                className="btn btn-success btn-sm"
+                                                onClick={handleSaveCommonSection}
+                                                disabled={loading}
+                                            >
+                                                {loading ? (
+                                                    <>
+                                                        <span className="spinner-border spinner-border-sm me-1"></span>
+                                                        Saving...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <i className="fas fa-save me-1"></i>
+                                                        Save Changes
+                                                    </>
+                                                )}
+                                            </button>
+                                            <button
+                                                className="btn btn-secondary btn-sm"
+                                                onClick={handleCancelCommonSection}
+                                                disabled={loading}
+                                            >
+                                                <i className="fas fa-times me-1"></i>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             {/* Editing Form */}
                             {isEditing && (
                                 <div className="mb-4 p-3 bg-light rounded">
@@ -1728,41 +1977,104 @@ const TabbingServices = () => {
                             {!fetchingServices && tabbingServices.length > 0 && (
                                 <div className="row mb-4">
                                     <div className="col-12">
-                                        <div className="btn-group flex-wrap" role="group" aria-label="Service tabs">
+                                        <div className="d-flex flex-wrap align-items-center gap-2">
                                             {tabbingServices.map((service, index) => (
+                                                <div key={service.id} className="position-relative">
+                                                    <button
+                                                        type="button"
+                                                        className={`btn btn-outline-${service.color} ${activeTab === index ? 'active' : ''} d-flex align-items-center justify-content-between`}
+                                                        onClick={() => !isEditing && setActiveTab(index)}
+                                                        disabled={isEditing}
+                                                        style={{
+                                                            fontSize: '14px',
+                                                            minWidth: '140px',
+                                                            padding: '8px 12px',
+                                                            opacity: isEditing && index !== activeTab ? 0.5 : 1
+                                                        }}
+                                                    >
+                                                        <div className="d-flex align-items-center">
+                                                            <img
+                                                                src={service.icon || '/images/services/default-service.svg'}
+                                                                alt=""
+                                                                style={{
+                                                                    width: '16px',
+                                                                    height: '16px',
+                                                                    objectFit: 'cover',
+                                                                    marginRight: '6px',
+                                                                    borderRadius: '2px'
+                                                                }}
+                                                                onError={(e) => {
+                                                                    e.target.src = '/images/services/default-service.svg';
+                                                                }}
+                                                            />
+                                                            <span>
+                                                                {isEditing && editingIndex === index ? editFormData.tabTitle : service.tabTitle}
+                                                                {isEditing && editingIndex === index && (
+                                                                    <small className="ms-1">*</small>
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                        {/* Delete button inside tab */}
+                                                        {tabbingServices.length > 1 && !isEditing && (
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-sm ms-2 p-0"
+                                                                style={{
+                                                                    width: '18px',
+                                                                    height: '18px',
+                                                                    fontSize: '12px',
+                                                                    color: '#dc3545',
+                                                                    background: 'transparent',
+                                                                    border: 'none',
+                                                                    borderRadius: '3px',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center'
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDeleteTab(index);
+                                                                }}
+                                                                title="Delete tab"
+                                                                onMouseEnter={(e) => {
+                                                                    e.target.style.backgroundColor = '#f8d7da';
+                                                                }}
+                                                                onMouseLeave={(e) => {
+                                                                    e.target.style.backgroundColor = 'transparent';
+                                                                }}
+                                                            >
+                                                                <i className="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            ))}
+
+                                            {/* Add new tab button */}
+                                            {!isEditing && (
                                                 <button
-                                                    key={service.id}
                                                     type="button"
-                                                    className={`btn btn-outline-${service.color} ${activeTab === index ? 'active' : ''} mb-2 d-flex align-items-center`}
-                                                    onClick={() => !isEditing && setActiveTab(index)}
-                                                    disabled={isEditing}
+                                                    className="btn btn-outline-primary btn-sm d-flex align-items-center"
+                                                    onClick={handleAddNewTab}
+                                                    disabled={loading}
                                                     style={{
-                                                        margin: '2px',
-                                                        fontSize: '14px',
-                                                        minWidth: '120px',
-                                                        opacity: isEditing && index !== activeTab ? 0.5 : 1
+                                                        fontSize: '12px',
+                                                        minWidth: '100px'
                                                     }}
                                                 >
-                                                    <img
-                                                        src={service.icon || '/images/services/default-service.svg'}
-                                                        alt=""
-                                                        style={{
-                                                            width: '16px',
-                                                            height: '16px',
-                                                            objectFit: 'cover',
-                                                            marginRight: '6px',
-                                                            borderRadius: '2px'
-                                                        }}
-                                                        onError={(e) => {
-                                                            e.target.src = '/images/services/default-service.svg';
-                                                        }}
-                                                    />
-                                                    {isEditing && editingIndex === index ? editFormData.tabTitle : service.tabTitle}
-                                                    {isEditing && editingIndex === index && (
-                                                        <small className="ms-1">*</small>
+                                                    {loading ? (
+                                                        <>
+                                                            <span className="spinner-border spinner-border-sm me-1"></span>
+                                                            Adding...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <i className="fas fa-plus me-1"></i>
+                                                            Add Tab
+                                                        </>
                                                     )}
                                                 </button>
-                                            ))}
+                                            )}
                                         </div>
                                     </div>
                                 </div>

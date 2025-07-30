@@ -159,14 +159,20 @@ const updateServices = async (req, res) => {
 const deleteServices = async (req, res) => {
     try {
         const { id } = req.params;
-        const existingServices = await OurServices.findById(id);
+        console.log('Delete request received for service ID:', id);
+
+        const existingServices = await OurServices.findByIdAndDelete(id);
+        console.log('Database result:', existingServices);
+
         if (!existingServices) {
+            console.log('Service not found with ID:', id);
             return res.status(404).json({
                 status: 'error',
                 message: 'Service not found'
             });
         }
-        await existingServices.remove();
+
+        console.log('Service deleted successfully:', existingServices._id);
         return res.status(200).json({
             status: 'success',
             message: 'Service deleted successfully'

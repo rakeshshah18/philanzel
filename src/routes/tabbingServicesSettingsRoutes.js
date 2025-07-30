@@ -21,4 +21,10 @@ router.put('/settings/reset-common-background',
     tabbingServicesSettingsController.resetCommonBackgroundImage
 );
 
+// Update common section settings (description and button)
+router.put('/settings/common-section',
+    verifyToken,
+    tabbingServicesSettingsController.updateCommonSettings
+);
+
 export default router;

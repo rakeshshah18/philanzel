@@ -259,7 +259,10 @@ export const tabbingServicesSettingsAPI = {
     },
 
     // Reset common background image to default
-    resetCommonBackgroundImage: () => API.put('/admin/tabbing-services/settings/reset-common-background')
+    resetCommonBackgroundImage: () => API.put('/admin/tabbing-services/settings/reset-common-background'),
+
+    // Update common section settings (description and button)
+    updateCommonSettings: (data) => API.put('/admin/tabbing-services/settings/common-section', data)
 };
 
 export default API;

@@ -122,6 +122,46 @@ class TabbingServicesSettingsController {
             });
         }
     }
+
+    // Update common section settings (description and button)
+    async updateCommonSettings(req, res) {
+        try {
+            const { description, buttonText, buttonLink } = req.body;
+
+            let settings = await TabbingServicesSettings.findOne();
+
+            // If no settings exist, create new ones
+            if (!settings) {
+                settings = new TabbingServicesSettings();
+            }
+
+            // Update fields if provided
+            if (description !== undefined) {
+                settings.commonImageDescription = description.trim();
+            }
+            if (buttonText !== undefined) {
+                settings.commonImageButton.text = buttonText.trim();
+            }
+            if (buttonLink !== undefined) {
+                settings.commonImageButton.link = buttonLink.trim();
+            }
+
+            await settings.save();
+
+            res.status(200).json({
+                success: true,
+                message: 'Common section settings updated successfully',
+                data: settings
+            });
+        } catch (error) {
+            console.error('Error updating common section settings:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to update common section settings',
+                error: error.message
+            });
+        }
+    }
 }
 
 export default new TabbingServicesSettingsController();

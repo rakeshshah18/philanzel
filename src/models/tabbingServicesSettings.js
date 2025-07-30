@@ -28,6 +28,23 @@ const tabbingServicesSettingsSchema = new mongoose.Schema({
             required: false
         }
     },
+    commonImageDescription: {
+        type: String,
+        default: 'Transform your financial future with our comprehensive services',
+        trim: true
+    },
+    commonImageButton: {
+        text: {
+            type: String,
+            default: 'Get Started',
+            trim: true
+        },
+        link: {
+            type: String,
+            default: '#',
+            trim: true
+        }
+    },
     // Future settings can be added here
     isActive: {
         type: Boolean,
