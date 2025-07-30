@@ -313,4 +313,34 @@ export const whyChooseUsAPI = {
     delete: (id) => API.delete(`/admin/why-choose-us/${id}`)
 };
 
+// Our Association API endpoints
+export const ourAssociationAPI = {
+    // Get all our association entries
+    getAll: () => API.get('/admin/our-association'),
+
+    // Get single our association entry by ID
+    getById: (id) => API.get(`/admin/our-association/${id}`),
+
+    // Create new our association entry
+    create: (formData) => {
+        return API.post('/admin/our-association', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+
+    // Update our association entry
+    update: (id, formData) => {
+        return API.put(`/admin/our-association/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+
+    // Delete our association entry
+    delete: (id) => API.delete(`/admin/our-association/${id}`)
+};
+
 export default API;

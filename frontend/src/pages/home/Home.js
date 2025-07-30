@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Alert from '../../components/Alert';
-import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI, helpedIndustriesAPI, whyChooseUsAPI } from '../../services/api';
+import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI, helpedIndustriesAPI, whyChooseUsAPI, ourAssociationAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -1256,6 +1256,9 @@ const Home = () => {
 
                 {/* Why Choose Us Section */}
                 <WhyChooseUs />
+
+                {/* Our Association Section */}
+                <OurAssociation />
             </div>
         </div>
     );
@@ -3250,6 +3253,500 @@ const WhyChooseUs = () => {
                                                                     >
                                                                         {item.button.text}
                                                                     </a>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Our Association Component
+const OurAssociation = () => {
+    const [ourAssociation, setOurAssociation] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [showForm, setShowForm] = useState(false);
+    const [message, setMessage] = useState('');
+    const [formData, setFormData] = useState({
+        heading: '',
+        description: '',
+        button: { text: 'Learn More', link: '#' },
+        rowOne: [{ url: '', alt: '', originalName: '', filename: '' }],
+        rowTwo: [{ url: '', alt: '', originalName: '', filename: '' }],
+        rowThree: [{ url: '', alt: '', originalName: '', filename: '' }],
+        rowOneFiles: [],
+        rowTwoFiles: [],
+        rowThreeFiles: []
+    });
+
+    useEffect(() => {
+        fetchOurAssociation();
+    }, []);
+
+    const fetchOurAssociation = async () => {
+        try {
+            setLoading(true);
+            const response = await ourAssociationAPI.getAll();
+            setOurAssociation(response.data.data || []);
+        } catch (error) {
+            console.error('Error fetching our association:', error);
+            setMessage(`❌ Failed to fetch our association entries. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!formData.heading.trim() || !formData.description.trim()) {
+            setMessage('❌ Please fill in all required fields');
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const submitFormData = new FormData();
+            submitFormData.append('heading', formData.heading);
+            submitFormData.append('description', formData.description);
+            submitFormData.append('button', JSON.stringify(formData.button));
+
+            // Add row data
+            submitFormData.append('rowOneData', JSON.stringify(formData.rowOne));
+            submitFormData.append('rowTwoData', JSON.stringify(formData.rowTwo));
+            submitFormData.append('rowThreeData', JSON.stringify(formData.rowThree));
+
+            // Add files for each row
+            formData.rowOneFiles.forEach((file, index) => {
+                if (file) submitFormData.append(`rowOne_${index}`, file);
+            });
+            formData.rowTwoFiles.forEach((file, index) => {
+                if (file) submitFormData.append(`rowTwo_${index}`, file);
+            });
+            formData.rowThreeFiles.forEach((file, index) => {
+                if (file) submitFormData.append(`rowThree_${index}`, file);
+            });
+
+            if (isEditing) {
+                await ourAssociationAPI.update(editingId, submitFormData);
+                setMessage('✅ Our association entry updated successfully!');
+            } else {
+                await ourAssociationAPI.create(submitFormData);
+                setMessage('✅ Our association entry created successfully!');
+            }
+
+            resetForm();
+            await fetchOurAssociation();
+        } catch (error) {
+            console.error('Error saving our association entry:', error);
+            setMessage(`❌ Failed to save our association entry. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleEdit = (item) => {
+        setFormData({
+            heading: item.heading,
+            description: item.description,
+            button: item.button,
+            rowOne: item.rowOne || [],
+            rowTwo: item.rowTwo || [],
+            rowThree: item.rowThree || [],
+            rowOneFiles: [],
+            rowTwoFiles: [],
+            rowThreeFiles: []
+        });
+        setIsEditing(true);
+        setEditingId(item._id);
+        setShowForm(true);
+        setMessage('');
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this our association entry?')) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await ourAssociationAPI.delete(id);
+            setMessage('✅ Our association entry deleted successfully!');
+            await fetchOurAssociation();
+        } catch (error) {
+            console.error('Error deleting our association entry:', error);
+            setMessage(`❌ Failed to delete our association entry. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const addImageToRow = (rowName) => {
+        setFormData({
+            ...formData,
+            [rowName]: [...formData[rowName], { url: '', alt: '', originalName: '', filename: '' }]
+        });
+    };
+
+    const removeImageFromRow = (rowName, index) => {
+        const updatedRow = formData[rowName].filter((_, i) => i !== index);
+        const updatedFiles = formData[`${rowName}Files`].filter((_, i) => i !== index);
+        setFormData({
+            ...formData,
+            [rowName]: updatedRow,
+            [`${rowName}Files`]: updatedFiles
+        });
+    };
+
+    const updateImageInRow = (rowName, index, field, value) => {
+        const updatedRow = [...formData[rowName]];
+        updatedRow[index][field] = value;
+        setFormData({
+            ...formData,
+            [rowName]: updatedRow
+        });
+    };
+
+    const handleFileChange = (rowName, index, file) => {
+        const updatedFiles = [...formData[`${rowName}Files`]];
+        updatedFiles[index] = file;
+        setFormData({
+            ...formData,
+            [`${rowName}Files`]: updatedFiles
+        });
+    };
+
+    const resetForm = () => {
+        setFormData({
+            heading: '',
+            description: '',
+            button: { text: 'Learn More', link: '#' },
+            rowOne: [{ url: '', alt: '', originalName: '', filename: '' }],
+            rowTwo: [{ url: '', alt: '', originalName: '', filename: '' }],
+            rowThree: [{ url: '', alt: '', originalName: '', filename: '' }],
+            rowOneFiles: [],
+            rowTwoFiles: [],
+            rowThreeFiles: []
+        });
+        setIsEditing(false);
+        setEditingId(null);
+        setShowForm(false);
+        setMessage('');
+    };
+
+    const renderRowSection = (rowName, rowTitle, rowData, rowFiles) => (
+        <div className="mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-2">
+                <label className="form-label mb-0">{rowTitle}</label>
+                <button
+                    type="button"
+                    className="btn btn-success btn-sm"
+                    onClick={() => addImageToRow(rowName)}
+                    disabled={rowData.length >= 5}
+                >
+                    <i className="fas fa-plus"></i> Add Image
+                </button>
+            </div>
+            {rowData.map((image, index) => (
+                <div key={index} className="row mb-2 align-items-center">
+                    <div className="col-md-4">
+                        <input
+                            type="file"
+                            className="form-control form-control-sm"
+                            accept="image/*"
+                            onChange={(e) => handleFileChange(rowName, index, e.target.files[0])}
+                        />
+                    </div>
+                    <div className="col-md-4">
+                        <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            placeholder="Alt text"
+                            value={image.alt}
+                            onChange={(e) => updateImageInRow(rowName, index, 'alt', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-3">
+                        {image.url && (
+                            <img
+                                src={getImageUrl(image.url)}
+                                alt={image.alt}
+                                className="img-thumbnail"
+                                style={{ height: '40px', width: '40px', objectFit: 'cover' }}
+                            />
+                        )}
+                    </div>
+                    <div className="col-md-1">
+                        <button
+                            type="button"
+                            className="btn btn-danger btn-sm"
+                            onClick={() => removeImageFromRow(rowName, index)}
+                            disabled={rowData.length === 1}
+                        >
+                            <i className="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+
+    return (
+        <div className="container-fluid py-4">
+            <div className="row">
+                <div className="col-12">
+                    <div className="card shadow-sm">
+                        <div className="card-header bg-gradient bg-primary text-white">
+                            <h4 className="mb-0">
+                                <i className="fas fa-handshake me-2"></i>
+                                Our Association
+                            </h4>
+                        </div>
+
+                        <div className="card-body">
+                            {/* Alert Messages */}
+                            {message && (
+                                <Alert
+                                    type={message.includes('✅') ? 'success' : 'danger'}
+                                    message={message}
+                                    onClose={() => setMessage('')}
+                                />
+                            )}
+
+                            {/* Add/Edit Form */}
+                            {showForm && (
+                                <div className="card border-primary mb-4">
+                                    <div className="card-header bg-light">
+                                        <h5 className="mb-0">
+                                            {isEditing ? 'Edit Our Association Entry' : 'Add New Our Association Entry'}
+                                        </h5>
+                                    </div>
+                                    <div className="card-body">
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <label className="form-label">Heading *</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={formData.heading}
+                                                            onChange={(e) => setFormData({ ...formData, heading: e.target.value })}
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="row">
+                                                        <div className="col-md-6">
+                                                            <div className="mb-3">
+                                                                <label className="form-label">Button Text</label>
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    value={formData.button.text}
+                                                                    onChange={(e) => setFormData({
+                                                                        ...formData,
+                                                                        button: { ...formData.button, text: e.target.value }
+                                                                    })}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-md-6">
+                                                            <div className="mb-3">
+                                                                <label className="form-label">Button Link</label>
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    value={formData.button.link}
+                                                                    onChange={(e) => setFormData({
+                                                                        ...formData,
+                                                                        button: { ...formData.button, link: e.target.value }
+                                                                    })}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-3">
+                                                <label className="form-label">Description *</label>
+                                                <ReactQuill
+                                                    value={formData.description}
+                                                    onChange={(value) => setFormData({ ...formData, description: value })}
+                                                    modules={{
+                                                        toolbar: [
+                                                            [{ 'header': [1, 2, 3, false] }],
+                                                            ['bold', 'italic', 'underline', 'strike'],
+                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                            ['link'],
+                                                            ['clean']
+                                                        ],
+                                                    }}
+                                                />
+                                            </div>
+
+                                            {renderRowSection('rowOne', 'Row 1 Images (4-5 images)', formData.rowOne, formData.rowOneFiles)}
+                                            {renderRowSection('rowTwo', 'Row 2 Images (4-5 images)', formData.rowTwo, formData.rowTwoFiles)}
+                                            {renderRowSection('rowThree', 'Row 3 Images (4-5 images)', formData.rowThree, formData.rowThreeFiles)}
+
+                                            <div className="d-flex gap-2">
+                                                <button
+                                                    type="submit"
+                                                    className="btn btn-primary"
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? (
+                                                        <>
+                                                            <span className="spinner-border spinner-border-sm me-1"></span>
+                                                            Saving...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <i className="fas fa-save me-1"></i>
+                                                            {isEditing ? 'Update' : 'Create'}
+                                                        </>
+                                                    )}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-secondary"
+                                                    onClick={resetForm}
+                                                >
+                                                    <i className="fas fa-times me-1"></i>
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Data Display */}
+                            {loading ? (
+                                <div className="text-center py-4">
+                                    <div className="spinner-border text-primary" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            ) : ourAssociation.length === 0 ? (
+                                <div className="text-center py-4">
+                                    <p className="text-muted">No our association entries found. Click "Add New" to create one.</p>
+                                </div>
+                            ) : (
+                                <div className="row">
+                                    {ourAssociation.map((item) => (
+                                        <div key={item._id} className="col-12 mb-4">
+                                            <div className="card border-primary">
+                                                <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                                    <h5 className="mb-0">{item.heading}</h5>
+                                                    <div>
+                                                        <button
+                                                            className="btn btn-outline-primary btn-sm me-2"
+                                                            onClick={() => handleEdit(item)}
+                                                        >
+                                                            <i className="fas fa-edit"></i> Edit
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-outline-danger btn-sm"
+                                                            onClick={() => handleDelete(item._id)}
+                                                        >
+                                                            <i className="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="card-body">
+                                                    <div className="row">
+                                                        {/* Left side - Description and Button */}
+                                                        <div className="col-md-4">
+                                                            <div className="mb-3">
+                                                                <h6 className="text-muted">Description:</h6>
+                                                                <div dangerouslySetInnerHTML={{ __html: item.description }} />
+                                                            </div>
+
+                                                            {item.button && item.button.text && (
+                                                                <div className="mt-3">
+                                                                    <a
+                                                                        href={item.button.link}
+                                                                        className="btn btn-primary"
+                                                                        target={item.button.link.startsWith('http') ? '_blank' : '_self'}
+                                                                        rel={item.button.link.startsWith('http') ? 'noopener noreferrer' : ''}
+                                                                    >
+                                                                        {item.button.text}
+                                                                    </a>
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Right side - Image Rows */}
+                                                        <div className="col-md-8">
+                                                            <h6 className="text-muted mb-3">Association Images:</h6>
+
+                                                            {/* Row 1 */}
+                                                            {item.rowOne && item.rowOne.length > 0 && (
+                                                                <div className="mb-3">
+                                                                    <small className="text-muted">Row 1:</small>
+                                                                    <div className="d-flex flex-wrap gap-2 mt-1">
+                                                                        {item.rowOne.map((image, index) => (
+                                                                            <img
+                                                                                key={index}
+                                                                                src={getImageUrl(image.url)}
+                                                                                alt={image.alt || `Association ${index + 1}`}
+                                                                                className="rounded border"
+                                                                                style={{ height: '80px', width: '80px', objectFit: 'cover' }}
+                                                                            />
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Row 2 */}
+                                                            {item.rowTwo && item.rowTwo.length > 0 && (
+                                                                <div className="mb-3">
+                                                                    <small className="text-muted">Row 2:</small>
+                                                                    <div className="d-flex flex-wrap gap-2 mt-1">
+                                                                        {item.rowTwo.map((image, index) => (
+                                                                            <img
+                                                                                key={index}
+                                                                                src={getImageUrl(image.url)}
+                                                                                alt={image.alt || `Association ${index + 1}`}
+                                                                                className="rounded border"
+                                                                                style={{ height: '80px', width: '80px', objectFit: 'cover' }}
+                                                                            />
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Row 3 */}
+                                                            {item.rowThree && item.rowThree.length > 0 && (
+                                                                <div className="mb-3">
+                                                                    <small className="text-muted">Row 3:</small>
+                                                                    <div className="d-flex flex-wrap gap-2 mt-1">
+                                                                        {item.rowThree.map((image, index) => (
+                                                                            <img
+                                                                                key={index}
+                                                                                src={getImageUrl(image.url)}
+                                                                                alt={image.alt || `Association ${index + 1}`}
+                                                                                className="rounded border"
+                                                                                style={{ height: '80px', width: '80px', objectFit: 'cover' }}
+                                                                            />
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                         </div>

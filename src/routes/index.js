@@ -8,6 +8,7 @@ import servicesRoutes from './servicesRoutes.js';
 import tabbingServicesSettingsRoutes from './tabbingServicesSettingsRoutes.js';
 import helpedIndustriesRoutes from './helpedIndustriesRoutes.js';
 import whyChooseUsRoutes from './whyChooseUsRoutes.js';
+import ourAssociationRoutes from './ourAssociationRoutes.js';
 import express from 'express';
 const router = express.Router();
 
@@ -17,12 +18,14 @@ router.use('/admin/services', servicesRoutes);
 router.use('/admin/tabbing-services', tabbingServicesSettingsRoutes);
 router.use('/admin/helped-industries', helpedIndustriesRoutes);
 router.use('/admin/why-choose-us', whyChooseUsRoutes);
+router.use('/admin/our-association', ourAssociationRoutes);
 
 console.log('🚀 Routes registered:');
 console.log('  - /api/admin/services');
 console.log('  - /api/admin/tabbing-services');
 console.log('  - /api/admin/helped-industries');
 console.log('  - /api/admin/why-choose-us');
+console.log('  - /api/admin/our-association');
 
 router.use('/admin', homePageRoutes);
 router.use('/admin', newsRoutes);
