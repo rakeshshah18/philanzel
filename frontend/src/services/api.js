@@ -265,4 +265,22 @@ export const tabbingServicesSettingsAPI = {
     updateCommonSettings: (data) => API.put('/admin/tabbing-services/settings/common-section', data)
 };
 
+// Helped Industries API
+export const helpedIndustriesAPI = {
+    // Get all helped industries
+    getAll: () => API.get('/admin/helped-industries'),
+
+    // Get single helped industries by ID
+    getById: (id) => API.get(`/admin/helped-industries/${id}`),
+
+    // Create new helped industries
+    create: (data) => API.post('/admin/helped-industries', data),
+
+    // Update helped industries
+    update: (id, data) => API.put(`/admin/helped-industries/${id}`, data),
+
+    // Delete helped industries
+    delete: (id) => API.delete(`/admin/helped-industries/${id}`)
+};
+
 export default API;

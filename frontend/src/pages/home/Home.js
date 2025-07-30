@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Alert from '../../components/Alert';
-import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI } from '../../services/api';
+import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI, helpedIndustriesAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -352,9 +352,9 @@ const Home = () => {
     };
 
     const handleSaveHomeService = () => {
-        setHomeServices(prev => 
-            prev.map(service => 
-                service.id === editingHomeService 
+        setHomeServices(prev =>
+            prev.map(service =>
+                service.id === editingHomeService
                     ? { ...service, ...homeServiceFormData }
                     : service
             )
@@ -1179,7 +1179,7 @@ const Home = () => {
                                                                                 [{ 'header': [1, 2, false] }],
                                                                                 ['bold', 'italic', 'underline'],
                                                                                 ['link'],
-                                                                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                                                                 ['clean']
                                                                             ]
                                                                         }}
@@ -1198,13 +1198,13 @@ const Home = () => {
                                                         <td>
                                                             {editingHomeService === service.id ? (
                                                                 <>
-                                                                    <button 
+                                                                    <button
                                                                         className="btn btn-sm btn-success me-2"
                                                                         onClick={handleSaveHomeService}
                                                                     >
                                                                         <i className="fas fa-save"></i> Save
                                                                     </button>
-                                                                    <button 
+                                                                    <button
                                                                         className="btn btn-sm btn-secondary"
                                                                         onClick={handleCancelHomeServiceEdit}
                                                                     >
@@ -1213,13 +1213,13 @@ const Home = () => {
                                                                 </>
                                                             ) : (
                                                                 <>
-                                                                    <button 
+                                                                    <button
                                                                         className="btn btn-sm btn-outline-primary me-2"
                                                                         onClick={() => handleEditHomeService(service)}
                                                                     >
                                                                         <i className="fas fa-edit"></i> Edit
                                                                     </button>
-                                                                    <button 
+                                                                    <button
                                                                         className="btn btn-sm btn-outline-danger"
                                                                         onClick={() => handleDeleteHomeService(service.id)}
                                                                     >
@@ -1234,7 +1234,7 @@ const Home = () => {
                                         </table>
                                     </div>
                                     <div className="mt-3">
-                                        <button 
+                                        <button
                                             className="btn btn-success"
                                             onClick={handleAddHomeService}
                                         >
@@ -1250,6 +1250,9 @@ const Home = () => {
 
                 {/* Tabbing Services Section */}
                 <TabbingServices />
+
+                {/* Helped Industries Section */}
+                <HelpedIndustries />
             </div>
         </div>
     );
@@ -1894,7 +1897,7 @@ const TabbingServices = () => {
                                             <div className="mb-2">
                                                 <small className="text-muted">Description:</small>
                                                 <div className="p-2 bg-light rounded">
-                                                    <div dangerouslySetInnerHTML={{ __html: commonImageDescription }} />
+                                                    {commonImageDescription}
                                                 </div>
                                             </div>
                                         </div>
@@ -1923,7 +1926,7 @@ const TabbingServices = () => {
                                                             [{ 'header': [1, 2, false] }],
                                                             ['bold', 'italic', 'underline'],
                                                             ['link'],
-                                                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                                             ['clean']
                                                         ]
                                                     }}
@@ -2058,7 +2061,7 @@ const TabbingServices = () => {
                                                         [{ 'header': [1, 2, false] }],
                                                         ['bold', 'italic', 'underline'],
                                                         ['link'],
-                                                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                                         ['clean']
                                                     ]
                                                 }}
@@ -2282,6 +2285,552 @@ const TabbingServices = () => {
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Helped Industries Component
+const HelpedIndustries = () => {
+    const [helpedIndustries, setHelpedIndustries] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [showForm, setShowForm] = useState(false);
+    const [message, setMessage] = useState('');
+    const [formData, setFormData] = useState({
+        heading: '',
+        description: '',
+        industries: [{ name: '', icon: '' }]
+    });
+    const [addingIndustryTo, setAddingIndustryTo] = useState(null);
+    const [newIndustry, setNewIndustry] = useState({ name: '', icon: '' });
+    const [showIndustryForm, setShowIndustryForm] = useState(false);
+
+    useEffect(() => {
+        fetchHelpedIndustries();
+    }, []);
+
+    const fetchHelpedIndustries = async () => {
+        try {
+            setLoading(true);
+            const response = await helpedIndustriesAPI.getAll();
+            if (response.data && response.data.data) {
+                setHelpedIndustries(response.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching helped industries:', error);
+            setMessage(`❌ Failed to fetch helped industries. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleChange = (e, index = null, field = null) => {
+        const { name, value } = e.target;
+
+        if (field === 'industry') {
+            const updatedIndustries = [...formData.industries];
+            updatedIndustries[index][name] = value;
+            setFormData(prev => ({
+                ...prev,
+                industries: updatedIndustries
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
+    };
+
+    const handleAddIndustry = () => {
+        setFormData(prev => ({
+            ...prev,
+            industries: [...prev.industries, { name: '', icon: '' }]
+        }));
+    };
+
+    const handleRemoveIndustry = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            industries: prev.industries.filter((_, i) => i !== index)
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage('');
+
+        try {
+            console.log('=== Helped Industries Form Submission ===');
+            console.log('Form data:', formData);
+
+            // Filter out empty industries
+            const validIndustries = formData.industries.filter(
+                industry => industry.name.trim() && industry.icon.trim()
+            );
+
+            console.log('Valid industries:', validIndustries);
+
+            if (validIndustries.length === 0) {
+                setMessage('❌ Please add at least one industry with name and icon.');
+                return;
+            }
+
+            const submitData = {
+                ...formData,
+                industries: validIndustries
+            };
+
+            console.log('Submit data:', submitData);
+
+            let response;
+            if (isEditing) {
+                response = await helpedIndustriesAPI.update(editingId, submitData);
+                setMessage('✅ Helped industries updated successfully!');
+            } else {
+                console.log('Creating new helped industries...');
+                response = await helpedIndustriesAPI.create(submitData);
+                setMessage('✅ Helped industries created successfully!');
+            }
+
+            console.log('API response:', response);
+            await fetchHelpedIndustries();
+            resetForm();
+        } catch (error) {
+            console.error('Error saving helped industries:', error);
+            setMessage(`❌ Failed to save helped industries. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleEdit = (item) => {
+        setFormData({
+            heading: item.heading,
+            description: item.description,
+            industries: [...item.industries]
+        });
+        setIsEditing(true);
+        setEditingId(item._id);
+        setShowForm(true);
+        setMessage('');
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this helped industries entry?')) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await helpedIndustriesAPI.delete(id);
+            setMessage('✅ Helped industries deleted successfully!');
+            await fetchHelpedIndustries();
+        } catch (error) {
+            console.error('Error deleting helped industries:', error);
+            setMessage(`❌ Failed to delete helped industries. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteIndustry = async (itemId, industryIndex) => {
+        if (!window.confirm('Are you sure you want to delete this industry?')) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            // Find the item and remove the specific industry
+            const item = helpedIndustries.find(h => h._id === itemId);
+            if (!item) {
+                setMessage('❌ Item not found');
+                return;
+            }
+
+            // Create updated industries array without the deleted industry
+            const updatedIndustries = item.industries.filter((_, index) => index !== industryIndex);
+
+            // Check if at least one industry will remain
+            if (updatedIndustries.length === 0) {
+                setMessage('❌ Cannot delete the last industry. At least one industry is required.');
+                return;
+            }
+
+            // Update the item with the new industries array
+            const updateData = {
+                heading: item.heading,
+                description: item.description,
+                industries: updatedIndustries
+            };
+
+            await helpedIndustriesAPI.update(itemId, updateData);
+            setMessage('✅ Industry deleted successfully!');
+            await fetchHelpedIndustries();
+        } catch (error) {
+            console.error('Error deleting industry:', error);
+            setMessage(`❌ Failed to delete industry. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAddIndustryToEntry = async (itemId) => {
+        if (!newIndustry.name.trim() || !newIndustry.icon.trim()) {
+            setMessage('❌ Please fill in both industry name and icon');
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            // Find the item and add the new industry
+            const item = helpedIndustries.find(h => h._id === itemId);
+            if (!item) {
+                setMessage('❌ Item not found');
+                return;
+            }
+
+            // Create updated industries array with the new industry
+            const updatedIndustries = [...item.industries, { ...newIndustry }];
+
+            // Update the item with the new industries array
+            const updateData = {
+                heading: item.heading,
+                description: item.description,
+                industries: updatedIndustries
+            };
+
+            await helpedIndustriesAPI.update(itemId, updateData);
+            setMessage('✅ Industry added successfully!');
+            setNewIndustry({ name: '', icon: '' });
+            setShowIndustryForm(false);
+            setAddingIndustryTo(null);
+            await fetchHelpedIndustries();
+        } catch (error) {
+            console.error('Error adding industry:', error);
+            setMessage(`❌ Failed to add industry. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({
+            heading: '',
+            description: '',
+            industries: [{ name: '', icon: '' }]
+        });
+        setIsEditing(false);
+        setEditingId(null);
+        setShowForm(false);
+        setMessage('');
+        setAddingIndustryTo(null);
+        setNewIndustry({ name: '', icon: '' });
+        setShowIndustryForm(false);
+    };
+
+    return (
+        <div className="container-fluid py-4">
+            <div className="row mb-4">
+                <div className="col-12">
+                    <div className="card shadow-sm">
+                        <div className="card-header bg-info text-white">
+                            <h3 className="card-title mb-0">
+                                <i className="fas fa-industry me-2"></i>
+                                Helped Industries
+                            </h3>
+                        </div>
+                        <div className="card-body">
+                            {message && (
+                                <Alert
+                                    message={message}
+                                    onClose={() => setMessage('')}
+                                />
+                            )}
+
+                            {/* Add/Edit Form */}
+                            {showForm && (
+                                <div className="mb-4">
+                                    <div className="card border-info">
+                                        <div className="card-header bg-light">
+                                            <h5 className="mb-0">
+                                                {isEditing ? '✏️ Edit Helped Industries' : '➕ Add New Helped Industries'}
+                                            </h5>
+                                        </div>
+                                        <div className="card-body">
+                                            <form onSubmit={handleSubmit}>
+                                                <div className="row mb-3">
+                                                    <div className="col-md-6">
+                                                        <label className="form-label">Heading *</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            name="heading"
+                                                            value={formData.heading}
+                                                            onChange={handleChange}
+                                                            placeholder="Enter heading"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <div className="col-md-6">
+                                                        <label className="form-label">Description *</label>
+                                                        <ReactQuill
+                                                            theme="snow"
+                                                            value={formData.description}
+                                                            onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+                                                            placeholder="Enter description"
+                                                            modules={{
+                                                                toolbar: [
+                                                                    [{ 'header': [1, 2, false] }],
+                                                                    ['bold', 'italic', 'underline'],
+                                                                    ['link'],
+                                                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                                    ['clean']
+                                                                ]
+                                                            }}
+                                                            formats={[
+                                                                'header',
+                                                                'bold', 'italic', 'underline',
+                                                                'link',
+                                                                'list', 'bullet'
+                                                            ]}
+                                                            style={{ minHeight: '120px' }}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-3">
+                                                    <label className="form-label">Industries *</label>
+                                                    {formData.industries.map((industry, index) => (
+                                                        <div key={index} className="row mb-2 align-items-end">
+                                                            <div className="col-md-5">
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    name="name"
+                                                                    value={industry.name}
+                                                                    onChange={(e) => handleChange(e, index, 'industry')}
+                                                                    placeholder="Industry name"
+                                                                />
+                                                            </div>
+                                                            <div className="col-md-5">
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    name="icon"
+                                                                    value={industry.icon}
+                                                                    onChange={(e) => handleChange(e, index, 'industry')}
+                                                                    placeholder="FontAwesome icon class (e.g., fas fa-building)"
+                                                                />
+                                                            </div>
+                                                            <div className="col-md-2">
+                                                                {formData.industries.length > 1 && (
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn btn-outline-danger btn-sm"
+                                                                        onClick={() => handleRemoveIndustry(index)}
+                                                                    >
+                                                                        <i className="fas fa-trash"></i>
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-outline-info btn-sm mt-2"
+                                                        onClick={handleAddIndustry}
+                                                    >
+                                                        <i className="fas fa-plus me-1"></i> Add Industry
+                                                    </button>
+                                                </div>
+
+                                                <div className="d-flex gap-2">
+                                                    <button
+                                                        type="submit"
+                                                        className="btn btn-success"
+                                                        disabled={loading}
+                                                    >
+                                                        {loading ? (
+                                                            <>
+                                                                <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                                                Saving...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <i className="fas fa-save me-2"></i>
+                                                                {isEditing ? 'Update' : 'Create'}
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-secondary"
+                                                        onClick={resetForm}
+                                                    >
+                                                        <i className="fas fa-times me-2"></i>
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Add New Button */}
+                            {!showForm && (
+                                <div className="mb-3">
+                                    <button
+                                        className="btn btn-info"
+                                        onClick={() => setShowForm(true)}
+                                    >
+                                        <i className="fas fa-plus me-2"></i>
+                                        Add New Helped Industries
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Data Display */}
+                            {loading ? (
+                                <div className="text-center py-4">
+                                    <div className="spinner-border text-info" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            ) : helpedIndustries.length === 0 ? (
+                                <div className="text-center py-4">
+                                    <p className="text-muted">No helped industries found. Click "Add New" to create one.</p>
+                                </div>
+                            ) : (
+                                <div className="row">
+                                    {helpedIndustries.map((item) => (
+                                        <div key={item._id} className="col-12 mb-4">
+                                            <div className="card border-info">
+                                                <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                                    <h5 className="mb-0">{item.heading}</h5>
+                                                    <div>
+                                                        <button
+                                                            className="btn btn-outline-primary btn-sm me-2"
+                                                            onClick={() => handleEdit(item)}
+                                                        >
+                                                            <i className="fas fa-edit"></i> Edit
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-outline-danger btn-sm"
+                                                            onClick={() => handleDelete(item._id)}
+                                                        >
+                                                            <i className="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="card-body">
+                                                    <div className="row">
+                                                        {/* Left side - Heading and Description */}
+                                                        <div className="col-md-6">
+                                                            <div className="mb-3">
+                                                                <h6 className="text-muted">Description:</h6>
+                                                                <div dangerouslySetInnerHTML={{ __html: item.description }} />
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Right side - Industries */}
+                                                        <div className="col-md-6">
+                                                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                                                <h6 className="text-muted mb-0">Industries:</h6>
+                                                                <button
+                                                                    className="btn btn-success btn-sm"
+                                                                    onClick={() => {
+                                                                        setAddingIndustryTo(item._id);
+                                                                        setShowIndustryForm(true);
+                                                                    }}
+                                                                >
+                                                                    <i className="fas fa-plus"></i> Add Industry
+                                                                </button>
+                                                            </div>
+
+                                                            {/* Add Industry Form */}
+                                                            {showIndustryForm && addingIndustryTo === item._id && (
+                                                                <div className="card border-success mb-3">
+                                                                    <div className="card-body p-3">
+                                                                        <div className="row">
+                                                                            <div className="col-md-6">
+                                                                                <input
+                                                                                    type="text"
+                                                                                    className="form-control form-control-sm"
+                                                                                    placeholder="Industry Name"
+                                                                                    value={newIndustry.name}
+                                                                                    onChange={(e) => setNewIndustry({ ...newIndustry, name: e.target.value })}
+                                                                                />
+                                                                            </div>
+                                                                            <div className="col-md-6">
+                                                                                <input
+                                                                                    type="text"
+                                                                                    className="form-control form-control-sm"
+                                                                                    placeholder="Icon Class (e.g., fas fa-industry)"
+                                                                                    value={newIndustry.icon}
+                                                                                    onChange={(e) => setNewIndustry({ ...newIndustry, icon: e.target.value })}
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="mt-2 d-flex gap-2">
+                                                                            <button
+                                                                                className="btn btn-success btn-sm"
+                                                                                onClick={() => handleAddIndustryToEntry(item._id)}
+                                                                            >
+                                                                                <i className="fas fa-check"></i> Add
+                                                                            </button>
+                                                                            <button
+                                                                                className="btn btn-secondary btn-sm"
+                                                                                onClick={() => {
+                                                                                    setShowIndustryForm(false);
+                                                                                    setAddingIndustryTo(null);
+                                                                                    setNewIndustry({ name: '', icon: '' });
+                                                                                }}
+                                                                            >
+                                                                                <i className="fas fa-times"></i> Cancel
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Industries Grid */}
+                                                            <div className="row">
+                                                                {item.industries.map((industry, index) => (
+                                                                    <div key={index} className="col-md-3 col-sm-6 mb-3">
+                                                                        <div className="text-center p-3 border rounded position-relative">
+                                                                            <button
+                                                                                type="button"
+                                                                                className="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
+                                                                                style={{ fontSize: '10px', padding: '2px 4px' }}
+                                                                                onClick={() => handleDeleteIndustry(item._id, index)}
+                                                                                title="Delete this industry"
+                                                                            >
+                                                                                <i className="fas fa-trash"></i>
+                                                                            </button>
+                                                                            <i className={`${industry.icon} fa-lg text-info mb-2`}></i>
+                                                                            <h6 className="small">{industry.name}</h6>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>
