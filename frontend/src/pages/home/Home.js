@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Alert from '../../components/Alert';
-import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI, helpedIndustriesAPI, whyChooseUsAPI, ourAssociationAPI } from '../../services/api';
+import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI, helpedIndustriesAPI, whyChooseUsAPI, ourAssociationAPI, homeFAQsAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -595,12 +595,14 @@ const Home = () => {
                 )}
 
                 {/* Main Content Card */}
-                <div className="card" style={{ border: '1px solid #dee2e6' }}>
-                    <div className="card-body" style={{ padding: '20px' }}>
-                        {/* Section Title */}
-                        <h5 className="mb-3" style={{ color: '#6c757d', fontSize: '14px', fontWeight: 'normal' }}>
+                <div className="card shadow-sm border-primary">
+                    <div className="card-header bg-primary text-white">
+                        <h4 className="mb-0">
+                            <i className="fas fa-images me-2"></i>
                             HOME SLIDER
-                        </h5>
+                        </h4>
+                    </div>
+                    <div className="card-body" style={{ padding: '20px' }}>
 
                         {/* Controls */}
                         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -1129,10 +1131,10 @@ const Home = () => {
                         <div className="col-12">
                             <div className="card shadow-sm">
                                 <div className="card-header bg-primary text-white">
-                                    <h3 className="card-title mb-0">
+                                    <h4 className="mb-0">
                                         <i className="fas fa-home me-2"></i>
                                         Home Services
-                                    </h3>
+                                    </h4>
                                 </div>
                                 <div className="card-body">
                                     <div className="table-responsive">
@@ -1259,6 +1261,9 @@ const Home = () => {
 
                 {/* Our Association Section */}
                 <OurAssociation />
+
+                {/* Home FAQs Section */}
+                <HomeFAQs />
             </div>
         </div>
     );
@@ -1716,8 +1721,8 @@ const TabbingServices = () => {
             <div className="row">
                 <div className="col-12">
                     <div className="card shadow-sm">
-                        <div className="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                            <h3 className="card-title mb-0">
+                        <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h4 className="mb-0">
                                 <i className="fas fa-layer-group me-2"></i>
                                 Tabbing Services
                                 {fetchingServices && (
@@ -1725,7 +1730,7 @@ const TabbingServices = () => {
                                         <span className="visually-hidden">Loading...</span>
                                     </span>
                                 )}
-                            </h3>
+                            </h4>
                             <div>
                                 {!isEditing ? (
                                     <div className="btn-group">
@@ -2550,11 +2555,11 @@ const HelpedIndustries = () => {
             <div className="row mb-4">
                 <div className="col-12">
                     <div className="card shadow-sm">
-                        <div className="card-header bg-info text-white">
-                            <h3 className="card-title mb-0">
+                        <div className="card-header bg-primary text-white">
+                            <h4 className="mb-0">
                                 <i className="fas fa-industry me-2"></i>
                                 Helped Industries
-                            </h3>
+                            </h4>
                         </div>
                         <div className="card-body">
                             {message && (
@@ -2567,7 +2572,7 @@ const HelpedIndustries = () => {
                             {/* Add/Edit Form */}
                             {showForm && (
                                 <div className="mb-4">
-                                    <div className="card border-info">
+                                    <div className="card border-primary">
                                         <div className="card-header bg-light">
                                             <h5 className="mb-0">
                                                 {isEditing ? '✏️ Edit Helped Industries' : '➕ Add New Helped Industries'}
@@ -2722,7 +2727,7 @@ const HelpedIndustries = () => {
                                 <div className="row">
                                     {helpedIndustries.map((item) => (
                                         <div key={item._id} className="col-12 mb-4">
-                                            <div className="card border-info">
+                                            <div className="card border-primary">
                                                 <div className="card-header bg-light d-flex justify-content-between align-items-center">
                                                     <h5 className="mb-0">{item.heading}</h5>
                                                     <div>
@@ -2995,7 +3000,7 @@ const WhyChooseUs = () => {
             <div className="row">
                 <div className="col-12">
                     <div className="card shadow-sm">
-                        <div className="card-header bg-gradient bg-info text-white">
+                        <div className="card-header bg-primary text-white">
                             <div className="d-flex justify-content-between align-items-center">
                                 <h4 className="mb-0">
                                     <i className="fas fa-star me-2"></i>
@@ -3023,7 +3028,7 @@ const WhyChooseUs = () => {
 
                             {/* Add/Edit Form */}
                             {showForm && (
-                                <div className="card border-info mb-4">
+                                <div className="card border-primary mb-4">
                                     <div className="card-header bg-light">
                                         <h5 className="mb-0">
                                             {isEditing ? 'Edit Why Choose Us Entry' : 'Add New Why Choose Us Entry'}
@@ -3193,7 +3198,7 @@ const WhyChooseUs = () => {
                                 <div className="row">
                                     {whyChooseUs.map((item) => (
                                         <div key={item._id} className="col-12 mb-4">
-                                            <div className="card border-info">
+                                            <div className="card border-primary">
                                                 <div className="card-header bg-light d-flex justify-content-between align-items-center">
                                                     <h5 className="mb-0">{item.heading}</h5>
                                                     <div>
@@ -3509,7 +3514,7 @@ const OurAssociation = () => {
             <div className="row">
                 <div className="col-12">
                     <div className="card shadow-sm">
-                        <div className="card-header bg-gradient bg-primary text-white">
+                        <div className="card-header bg-primary text-white">
                             <h4 className="mb-0">
                                 <i className="fas fa-handshake me-2"></i>
                                 Our Association
@@ -3750,6 +3755,401 @@ const OurAssociation = () => {
                                                                 </div>
                                                             )}
                                                         </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Home FAQs Component
+const HomeFAQs = () => {
+    const [faqSections, setFaqSections] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [showForm, setShowForm] = useState(false);
+    const [message, setMessage] = useState('');
+    const [formData, setFormData] = useState({
+        heading: '',
+        description: '',
+        faqs: [{ question: '', answer: '' }]
+    });
+
+    useEffect(() => {
+        fetchFAQs();
+    }, []);
+
+    const fetchFAQs = async () => {
+        try {
+            setLoading(true);
+            const response = await homeFAQsAPI.getAll();
+            setFaqSections(response.data.data || []);
+        } catch (error) {
+            console.error('Error fetching FAQ sections:', error);
+            setMessage(`❌ Failed to fetch FAQ sections. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!formData.heading.trim() || !formData.description.trim()) {
+            setMessage('❌ Please fill in heading and description');
+            return;
+        }
+
+        // Validate FAQs
+        const validFAQs = formData.faqs.filter(faq => faq.question.trim() && faq.answer.trim());
+        if (validFAQs.length === 0) {
+            setMessage('❌ Please add at least one question and answer');
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const submitData = {
+                heading: formData.heading,
+                description: formData.description,
+                faqs: validFAQs
+            };
+
+            if (isEditing) {
+                await homeFAQsAPI.update(editingId, submitData);
+                setMessage('✅ FAQ section updated successfully!');
+            } else {
+                await homeFAQsAPI.create(submitData);
+                setMessage('✅ FAQ section created successfully!');
+            }
+
+            // Reset form and refresh data
+            resetForm();
+            await fetchFAQs();
+        } catch (error) {
+            console.error('Error saving FAQ section:', error);
+            setMessage(`❌ Failed to save FAQ section. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleEdit = (faqSection) => {
+        setFormData({
+            heading: faqSection.heading,
+            description: faqSection.description,
+            faqs: faqSection.faqs || [{ question: '', answer: '' }]
+        });
+        setIsEditing(true);
+        setEditingId(faqSection._id);
+        setShowForm(true);
+        setMessage('');
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this FAQ section?')) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await homeFAQsAPI.delete(id);
+            setMessage('✅ FAQ section deleted successfully!');
+            await fetchFAQs();
+        } catch (error) {
+            console.error('Error deleting FAQ section:', error);
+            setMessage(`❌ Failed to delete FAQ section. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({
+            heading: '',
+            description: '',
+            faqs: [{ question: '', answer: '' }]
+        });
+        setIsEditing(false);
+        setEditingId(null);
+        setShowForm(false);
+        setMessage('');
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleFAQChange = (index, field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            faqs: prev.faqs.map((faq, i) =>
+                i === index ? { ...faq, [field]: value } : faq
+            )
+        }));
+    };
+
+    const addFAQ = () => {
+        setFormData(prev => ({
+            ...prev,
+            faqs: [...prev.faqs, { question: '', answer: '' }]
+        }));
+    };
+
+    const removeFAQ = (index) => {
+        if (formData.faqs.length > 1) {
+            setFormData(prev => ({
+                ...prev,
+                faqs: prev.faqs.filter((_, i) => i !== index)
+            }));
+        }
+    }; return (
+        <div className="container-fluid py-4">
+            <div className="row">
+                <div className="col-12">
+                    <div className="card shadow-sm">
+                        <div className="card-header bg-primary text-white">
+                            <h4 className="mb-0">
+                                <i className="fas fa-question-circle me-2"></i>
+                                Home FAQs
+                            </h4>
+                        </div>
+                        <div className="card-body">
+                            {message && (
+                                <Alert
+                                    message={message}
+                                    type={message.startsWith('✅') ? 'success' : 'danger'}
+                                    onClose={() => setMessage('')}
+                                />
+                            )}
+
+                            {/* Add/Edit Form */}
+                            {showForm && (
+                                <div className="mb-4">
+                                    <div className="card border-primary">
+                                        <div className="card-header bg-light">
+                                            <h5 className="mb-0">
+                                                {isEditing ? '✏️ Edit FAQ Section' : '➕ Add New FAQ Section'}
+                                            </h5>
+                                        </div>
+                                        <div className="card-body">
+                                            <form onSubmit={handleSubmit}>
+                                                <div className="row">
+                                                    <div className="col-md-6 mb-3">
+                                                        <label htmlFor="heading" className="form-label">Section Heading *</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="heading"
+                                                            name="heading"
+                                                            value={formData.heading}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                            placeholder="Enter FAQ section heading"
+                                                        />
+                                                    </div>
+                                                    <div className="col-md-6 mb-3">
+                                                        <label htmlFor="description" className="form-label">Section Description *</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="description"
+                                                            name="description"
+                                                            value={formData.description}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                            placeholder="Enter FAQ section description"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-3">
+                                                    <div className="d-flex justify-content-between align-items-center mb-2">
+                                                        <label className="form-label mb-0">Questions and Answers *</label>
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm btn-outline-primary"
+                                                            onClick={addFAQ}
+                                                        >
+                                                            <i className="fas fa-plus me-1"></i>
+                                                            Add FAQ
+                                                        </button>
+                                                    </div>
+
+                                                    {formData.faqs.map((faq, index) => (
+                                                        <div key={index} className="border rounded p-3 mb-3">
+                                                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                                                <h6 className="mb-0">FAQ {index + 1}</h6>
+                                                                {formData.faqs.length > 1 && (
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn btn-sm btn-outline-danger"
+                                                                        onClick={() => removeFAQ(index)}
+                                                                    >
+                                                                        <i className="fas fa-trash"></i>
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                            <div className="mb-2">
+                                                                <label className="form-label">Question *</label>
+                                                                <textarea
+                                                                    className="form-control"
+                                                                    rows="2"
+                                                                    value={faq.question}
+                                                                    onChange={(e) => handleFAQChange(index, 'question', e.target.value)}
+                                                                    required
+                                                                    placeholder="Enter the question"
+                                                                    maxLength="200"
+                                                                />
+                                                                <small className="form-text text-muted">
+                                                                    {faq.question.length}/200 characters
+                                                                </small>
+                                                            </div>
+                                                            <div>
+                                                                <label className="form-label">Answer *</label>
+                                                                <textarea
+                                                                    className="form-control"
+                                                                    rows="3"
+                                                                    value={faq.answer}
+                                                                    onChange={(e) => handleFAQChange(index, 'answer', e.target.value)}
+                                                                    required
+                                                                    placeholder="Enter the answer"
+                                                                    maxLength="500"
+                                                                />
+                                                                <small className="form-text text-muted">
+                                                                    {faq.answer.length}/500 characters
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className="d-flex gap-2">
+                                                    <button
+                                                        type="submit"
+                                                        className="btn btn-primary"
+                                                        disabled={loading}
+                                                    >
+                                                        {loading ? (
+                                                            <>
+                                                                <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                                                Saving...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <i className="fas fa-save me-2"></i>
+                                                                {isEditing ? 'Update' : 'Create'}
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-secondary"
+                                                        onClick={resetForm}
+                                                        disabled={loading}
+                                                    >
+                                                        <i className="fas fa-times me-2"></i>
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Add New Button */}
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={() => setShowForm(!showForm)}
+                                        disabled={loading}
+                                    >
+                                        <i className="fas fa-plus me-2"></i>
+                                        Add New FAQ Section
+                                    </button>
+                                </div>
+                                <div>
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-primary"
+                                        onClick={fetchFAQs}
+                                        disabled={loading}
+                                    >
+                                        <i className="fas fa-refresh me-2"></i>
+                                        Refresh
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* FAQ Sections List */}
+                            {loading ? (
+                                <div className="text-center py-5">
+                                    <div className="spinner-border text-primary" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p className="mt-2 text-muted">Loading FAQ sections...</p>
+                                </div>
+                            ) : faqSections.length === 0 ? (
+                                <div className="text-center py-5">
+                                    <i className="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                                    <p className="text-muted">No FAQ sections found. Click "Add New FAQ Section" to create one.</p>
+                                </div>
+                            ) : (
+                                <div className="row">
+                                    {faqSections.map((section) => (
+                                        <div key={section._id} className="col-12 mb-4">
+                                            <div className="card border-primary">
+                                                <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                                    <h5 className="mb-0">{section.heading}</h5>
+                                                    <div>
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm btn-outline-primary me-2"
+                                                            onClick={() => handleEdit(section)}
+                                                            title="Edit FAQ Section"
+                                                        >
+                                                            <i className="fas fa-edit"></i>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm btn-outline-danger"
+                                                            onClick={() => handleDelete(section._id)}
+                                                            title="Delete FAQ Section"
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="card-body">
+                                                    <p className="text-muted mb-4">{section.description}</p>
+                                                    <div className="row">
+                                                        {section.faqs && section.faqs.map((faq, index) => (
+                                                            <div key={index} className="col-12 mb-3">
+                                                                <div className="border-start border-primary border-3 ps-3">
+                                                                    <h6 className="fw-bold text-primary mb-2">
+                                                                        <i className="fas fa-question me-2"></i>
+                                                                        {faq.question}
+                                                                    </h6>
+                                                                    <p className="mb-0">{faq.answer}</p>
+                                                                </div>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 </div>
                                             </div>

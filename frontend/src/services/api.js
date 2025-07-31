@@ -343,4 +343,28 @@ export const ourAssociationAPI = {
     delete: (id) => API.delete(`/admin/our-association/${id}`)
 };
 
+// Home FAQs API endpoints
+export const homeFAQsAPI = {
+    // Get all FAQs
+    getAll: () => API.get('/admin/home-faqs'),
+
+    // Get FAQs with pagination
+    getPaginated: (page = 1, limit = 10) => API.get(`/admin/home-faqs/paginated?page=${page}&limit=${limit}`),
+
+    // Search FAQs
+    search: (query) => API.get(`/admin/home-faqs/search?query=${encodeURIComponent(query)}`),
+
+    // Get single FAQ by ID
+    getById: (id) => API.get(`/admin/home-faqs/${id}`),
+
+    // Create new FAQ
+    create: (data) => API.post('/admin/home-faqs', data),
+
+    // Update FAQ
+    update: (id, data) => API.put(`/admin/home-faqs/${id}`, data),
+
+    // Delete FAQ
+    delete: (id) => API.delete(`/admin/home-faqs/${id}`)
+};
+
 export default API;
