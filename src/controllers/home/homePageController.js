@@ -1,4 +1,4 @@
-import HomePage from '../models/home/homePageModel.js';
+import HomePage from '../../models/home/homePageModel.js';
 import mongoose from 'mongoose';
 
 // Create new homepage content

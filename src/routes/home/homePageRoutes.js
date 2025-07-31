@@ -1,14 +1,14 @@
 import express from 'express';
 import multer from 'multer';
-import imageUpload from '../config/imageUpload.js';
-import { verifyToken, requireRole } from '../adminAuth/middleware/authMiddleware.js';
+import imageUpload from '../../config/imageUpload.js';
+import { verifyToken, requireRole } from '../../adminAuth/middleware/authMiddleware.js';
 import {
     createHomePage,
     getAllHomePages,
     getHomePageById,
     updateHomePage,
     deleteHomePage
-} from '../controllers/homePageController.js';
+} from '../../controllers/home/homePageController.js';
 
 const router = express.Router();
 

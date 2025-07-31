@@ -1,15 +1,15 @@
 import newInquiryRoute from './inquiryRoutes.js';
 import careerInquery from './career.js';
-import homePageRoutes from './homePageRoutes.js';
+import homePageRoutes from './home/homePageRoutes.js';
 import newsRoutes from './newsRoutes.js';
 import { routes as adminAuthRoutes } from '../adminAuth/index.js';
-import ourTrackRoutes from './ourTrackRoutes.js';
+import ourTrackRoutes from './home/ourTrackRoutes.js';
 import servicesRoutes from './servicesRoutes.js';
 import tabbingServicesSettingsRoutes from './tabbingServicesSettingsRoutes.js';
-import helpedIndustriesRoutes from './helpedIndustriesRoutes.js';
-import whyChooseUsRoutes from './whyChooseUsRoutes.js';
-import ourAssociationRoutes from './ourAssociationRoutes.js';
-import homeFAQsRoutes from './homeFAQsRoutes.js';
+import helpedIndustriesRoutes from './home/helpedIndustriesRoutes.js';
+import whyChooseUsRoutes from './home/whyChooseUsRoutes.js';
+import ourAssociationRoutes from './home/ourAssociationRoutes.js';
+import homeFAQsRoutes from './home/homeFAQsRoutes.js';
 import express from 'express';
 const router = express.Router();
 

@@ -1,4 +1,4 @@
-import OurTrack from "../models/home/ourTrack.js";
+import OurTrack from "../../models/home/ourTrack.js";
 
 const postOurTrack = async (req, res) => {
     try {

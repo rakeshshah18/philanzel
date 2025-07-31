@@ -1,6 +1,6 @@
 import express from 'express';
-import { verifyToken, requireRole } from '../adminAuth/middleware/authMiddleware.js';
-import { postOurTrack, getOurTrack, updateOurTrack, deleteOurTrack } from '../controllers/ourTrackController.js';
+import { verifyToken, requireRole } from '../../adminAuth/middleware/authMiddleware.js';
+import { postOurTrack, getOurTrack, updateOurTrack, deleteOurTrack } from '../../controllers/home/ourTrackController.js';
 
 const router = express.Router();
 

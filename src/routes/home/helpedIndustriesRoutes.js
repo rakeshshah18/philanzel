@@ -1,6 +1,6 @@
 import express from 'express';
-import { verifyToken, requireRole } from '../adminAuth/middleware/authMiddleware.js';
-import helpedIndustriesController from '../controllers/helpedIndustriesController.js';
+import { verifyToken, requireRole } from '../../adminAuth/middleware/authMiddleware.js';
+import helpedIndustriesController from '../../controllers/home/helpedIndustriesController.js';
 
 const router = express.Router();
 

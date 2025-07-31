@@ -1,7 +1,7 @@
 import express from 'express';
-import whyChooseUsController from '../controllers/whyChooseUsController.js';
-import { verifyToken, requireRole } from '../adminAuth/middleware/authMiddleware.js';
-import imageUpload from '../config/imageUpload.js';
+import whyChooseUsController from '../../controllers/home/whyChooseUsController.js';
+import { verifyToken, requireRole } from '../../adminAuth/middleware/authMiddleware.js';
+import imageUpload from '../../config/imageUpload.js';
 
 const router = express.Router();
 

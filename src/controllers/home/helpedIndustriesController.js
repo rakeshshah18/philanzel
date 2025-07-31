@@ -1,4 +1,4 @@
-import HelpedIndustries from '../models/home/helpedIndustries.js';
+import HelpedIndustries from '../../models/home/helpedIndustries.js';
 
 class HelpedIndustriesController {
     // Get all helped industries

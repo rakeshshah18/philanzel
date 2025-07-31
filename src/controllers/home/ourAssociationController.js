@@ -1,4 +1,4 @@
-import OurAssociation from '../models/home/ourAssociation.js';
+import OurAssociation from '../../models/home/ourAssociation.js';
 import fs from 'fs';
 import path from 'path';
 

@@ -1,4 +1,4 @@
-import HomeFAQs from '../models/home/homeFAQs.js';
+import HomeFAQs from '../../models/home/homeFAQs.js';
 import mongoose from 'mongoose';
 
 // Create new FAQ section

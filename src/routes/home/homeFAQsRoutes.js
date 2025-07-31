@@ -7,8 +7,8 @@ import {
     deleteHomeFAQ,
     searchHomeFAQs,
     getHomeFAQsWithPagination
-} from '../controllers/homeFAQSController.js';
-import { verifyToken, requireRole } from '../adminAuth/middleware/authMiddleware.js';
+} from '../../controllers/home/homeFAQSController.js';
+import { verifyToken, requireRole } from '../../adminAuth/middleware/authMiddleware.js';
 
 const router = express.Router();
 

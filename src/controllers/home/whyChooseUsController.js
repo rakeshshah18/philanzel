@@ -1,4 +1,4 @@
-import WhyChooseUs from '../models/home/whyChooseUs.js';
+import WhyChooseUs from '../../models/home/whyChooseUs.js';
 import fs from 'fs';
 import path from 'path';
 

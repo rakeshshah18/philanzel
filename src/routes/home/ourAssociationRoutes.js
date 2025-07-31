@@ -1,7 +1,7 @@
 import express from 'express';
-import ourAssociationController from '../controllers/ourAssociationController.js';
-import { verifyToken, requireRole } from '../adminAuth/middleware/authMiddleware.js';
-import imageUpload from '../config/imageUpload.js';
+import ourAssociationController from '../../controllers/home/ourAssociationController.js';
+import { verifyToken, requireRole } from '../../adminAuth/middleware/authMiddleware.js';
+import imageUpload from '../../config/imageUpload.js';
 
 const router = express.Router();
 
