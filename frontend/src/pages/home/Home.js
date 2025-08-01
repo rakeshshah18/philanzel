@@ -3704,7 +3704,7 @@ const OurAssociation = () => {
                                                             {/* Row 1 */}
                                                             {item.rowOne && item.rowOne.length > 0 && (
                                                                 <div className="mb-3">
-                                                                    <small className="text-muted">Row 1:</small>
+                                                                    <small className="text-muted">Images :</small>
                                                                     <div className="d-flex flex-wrap gap-2 mt-1">
                                                                         {item.rowOne.map((image, index) => (
                                                                             <img
@@ -3722,7 +3722,7 @@ const OurAssociation = () => {
                                                             {/* Row 2 */}
                                                             {item.rowTwo && item.rowTwo.length > 0 && (
                                                                 <div className="mb-3">
-                                                                    <small className="text-muted">Row 2:</small>
+                                                                    <small className="text-muted">Images :</small>
                                                                     <div className="d-flex flex-wrap gap-2 mt-1">
                                                                         {item.rowTwo.map((image, index) => (
                                                                             <img
@@ -3740,7 +3740,7 @@ const OurAssociation = () => {
                                                             {/* Row 3 */}
                                                             {item.rowThree && item.rowThree.length > 0 && (
                                                                 <div className="mb-3">
-                                                                    <small className="text-muted">Row 3:</small>
+                                                                    <small className="text-muted">Images :</small>
                                                                     <div className="d-flex flex-wrap gap-2 mt-1">
                                                                         {item.rowThree.map((image, index) => (
                                                                             <img

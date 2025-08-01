@@ -9,6 +9,17 @@ const Reviews = () => {
     const [showReviewEditModal, setShowReviewEditModal] = useState(false);
     const [editingSectionData, setEditingSectionData] = useState(null);
     const [showSectionEditModal, setShowSectionEditModal] = useState(false);
+    const [showAddReviewModal, setShowAddReviewModal] = useState(false);
+    const [addingToSectionId, setAddingToSectionId] = useState(null);
+    const [newReviewData, setNewReviewData] = useState({
+        userName: '',
+        rating: 5,
+        reviewText: '',
+        userProfilePhoto: '',
+        reviewProviderLogo: '',
+        isVerified: false,
+        isVisible: true
+    });
     const [message, setMessage] = useState('');
 
     useEffect(() => {
@@ -218,6 +229,61 @@ const Reviews = () => {
         }));
     };
 
+    // Add new review functions
+    const openAddReviewModal = (sectionId) => {
+        setAddingToSectionId(sectionId);
+        setNewReviewData({
+            userName: '',
+            rating: 5,
+            reviewText: '',
+            userProfilePhoto: '',
+            reviewProviderLogo: '',
+            isVerified: false,
+            isVisible: true
+        });
+        setShowAddReviewModal(true);
+    };
+
+    const handleNewReviewChange = (field, value) => {
+        setNewReviewData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const saveNewReview = async () => {
+        if (!newReviewData.userName.trim() || !newReviewData.reviewText.trim()) {
+            setMessage('❌ Please fill in user name and review text');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const section = reviewSections.find(s => s._id === addingToSectionId);
+            if (section) {
+                const updatedReviews = [...section.reviews, {
+                    ...newReviewData,
+                    reviewDate: new Date().toISOString()
+                }];
+
+                await reviewSectionsAPI.update(addingToSectionId, {
+                    ...section,
+                    reviews: updatedReviews
+                });
+
+                setMessage('✅ Review added successfully!');
+                setShowAddReviewModal(false);
+                setAddingToSectionId(null);
+                await fetchReviewSections();
+            }
+        } catch (error) {
+            console.error('Error adding review:', error);
+            setMessage(`❌ Failed to add review. ${error.response?.data?.message || error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Recalculate ratings function
     const recalculateRatings = async () => {
         try {
@@ -302,15 +368,14 @@ const Reviews = () => {
 
                                                     {section.writeReviewButton?.isEnabled && (
                                                         <div className="mb-3">
-                                                            <a
-                                                                href={section.writeReviewButton.url}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
+                                                            <button
                                                                 className="btn btn-primary btn-sm"
+                                                                onClick={() => openAddReviewModal(section._id)}
+                                                                disabled={loading}
                                                             >
                                                                 <i className="fas fa-pen me-2"></i>
-                                                                {section.writeReviewButton.text}
-                                                            </a>
+                                                                {section.writeReviewButton.text || 'Write Review'}
+                                                            </button>
                                                         </div>
                                                     )}
 
@@ -665,6 +730,156 @@ const Reviews = () => {
                                         <>
                                             <i className="fas fa-save me-2"></i>
                                             Save Changes
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Add New Review Modal */}
+            {showAddReviewModal && (
+                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">
+                                    <i className="fas fa-plus me-2"></i>
+                                    Add New Review
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => {
+                                        setShowAddReviewModal(false);
+                                        setAddingToSectionId(null);
+                                    }}
+                                ></button>
+                            </div>
+                            <div className="modal-body">
+                                <div className="row">
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">User Name *</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={newReviewData.userName}
+                                            onChange={(e) => handleNewReviewChange('userName', e.target.value)}
+                                            required
+                                            placeholder="Enter reviewer's name"
+                                        />
+                                    </div>
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">Rating *</label>
+                                        <select
+                                            className="form-select"
+                                            value={newReviewData.rating}
+                                            onChange={(e) => handleNewReviewChange('rating', parseInt(e.target.value))}
+                                        >
+                                            <option value={5}>5 Stars</option>
+                                            <option value={4}>4 Stars</option>
+                                            <option value={3}>3 Stars</option>
+                                            <option value={2}>2 Stars</option>
+                                            <option value={1}>1 Star</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="row">
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">User Profile Photo URL</label>
+                                        <input
+                                            type="url"
+                                            className="form-control"
+                                            value={newReviewData.userProfilePhoto}
+                                            onChange={(e) => handleNewReviewChange('userProfilePhoto', e.target.value)}
+                                            placeholder="https://example.com/profile.jpg"
+                                        />
+                                    </div>
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">Review Provider Logo URL</label>
+                                        <input
+                                            type="url"
+                                            className="form-control"
+                                            value={newReviewData.reviewProviderLogo}
+                                            onChange={(e) => handleNewReviewChange('reviewProviderLogo', e.target.value)}
+                                            placeholder="https://example.com/logo.png"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label">Review Text *</label>
+                                    <textarea
+                                        className="form-control"
+                                        rows="4"
+                                        value={newReviewData.reviewText}
+                                        onChange={(e) => handleNewReviewChange('reviewText', e.target.value)}
+                                        required
+                                        placeholder="Enter the review text..."
+                                    ></textarea>
+                                </div>
+
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                checked={newReviewData.isVerified}
+                                                onChange={(e) => handleNewReviewChange('isVerified', e.target.checked)}
+                                            />
+                                            <label className="form-check-label">
+                                                <i className="fas fa-check-circle me-1"></i>
+                                                Verified Review
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                checked={newReviewData.isVisible}
+                                                onChange={(e) => handleNewReviewChange('isVisible', e.target.checked)}
+                                            />
+                                            <label className="form-check-label">
+                                                <i className="fas fa-eye me-1"></i>
+                                                Visible to Users
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => {
+                                        setShowAddReviewModal(false);
+                                        setAddingToSectionId(null);
+                                    }}
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={saveNewReview}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2"></span>
+                                            Adding...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-plus me-2"></i>
+                                            Add Review
                                         </>
                                     )}
                                 </button>
