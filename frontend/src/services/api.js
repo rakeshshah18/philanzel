@@ -367,4 +367,31 @@ export const homeFAQsAPI = {
     delete: (id) => API.delete(`/admin/home-faqs/${id}`)
 };
 
+// Review Sections API endpoints
+export const reviewSectionsAPI = {
+    // Get all review sections
+    getAll: () => API.get('/admin/review-sections'),
+
+    // Get active review sections (public)
+    getActive: () => API.get('/admin/review-sections/active'),
+
+    // Get single review section by ID
+    getById: (id) => API.get(`/admin/review-sections/${id}`),
+
+    // Create new review section
+    create: (data) => API.post('/admin/review-sections', data),
+
+    // Update review section
+    update: (id, data) => API.put(`/admin/review-sections/${id}`, data),
+
+    // Add review to existing section
+    addReview: (id, reviewData) => API.post(`/admin/review-sections/${id}/reviews`, reviewData),
+
+    // Recalculate all ratings
+    recalculateRatings: () => API.post('/admin/review-sections/recalculate/ratings'),
+
+    // Delete review section
+    delete: (id) => API.delete(`/admin/review-sections/${id}`)
+};
+
 export default API;

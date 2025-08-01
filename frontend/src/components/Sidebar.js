@@ -5,6 +5,7 @@ const Sidebar = () => {
     const location = useLocation();
     const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
     const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
+    const [isSectionsDropdownOpen, setIsSectionsDropdownOpen] = useState(false);
 
     const isActive = (path) => location.pathname === path;
 
@@ -20,12 +21,21 @@ const Sidebar = () => {
             isActive('/service-7') || isActive('/service-8');
     };
 
+    // Check if any section route is active
+    const isSectionsActive = () => {
+        return isActive('/sections/reviews') || isActive('/sections/ads') || isActive('/sections/footer');
+    };
+
     const togglePagesDropdown = () => {
         setIsPagesDropdownOpen(!isPagesDropdownOpen);
     };
 
     const toggleServicesDropdown = () => {
         setIsServicesDropdownOpen(!isServicesDropdownOpen);
+    };
+
+    const toggleSectionsDropdown = () => {
+        setIsSectionsDropdownOpen(!isSectionsDropdownOpen);
     };
 
     return (
@@ -273,6 +283,82 @@ const Sidebar = () => {
                             >
                                 <i className="fas fa-chart-line me-2"></i>
                                 Service 8
+                            </Link>
+                        </div>
+                    )}
+                </div>
+
+                {/* Sections Dropdown */}
+                <div className="nav-item">
+                    <div
+                        className={`nav-link ${isSectionsActive() ? 'active' : ''}`}
+                        onClick={toggleSectionsDropdown}
+                        style={{
+                            cursor: 'pointer',
+                            userSelect: 'none'
+                        }}
+                    >
+                        <i className="fas fa-puzzle-piece me-2"></i>
+                        Sections
+                        <i className={`fas fa-chevron-${isSectionsDropdownOpen ? 'down' : 'right'} float-end mt-1`}></i>
+                    </div>
+
+                    {isSectionsDropdownOpen && (
+                        <div className="dropdown-submenu" style={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                            borderLeft: '3px solid rgba(255, 255, 255, 0.1)',
+                            marginLeft: '0.5rem',
+                            marginRight: '0.5rem',
+                            borderRadius: '4px',
+                            paddingTop: '0.25rem',
+                            paddingBottom: '0.25rem'
+                        }}>
+                            <Link
+                                to="/sections/reviews"
+                                className={`nav-link ${isActive('/sections/reviews') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/sections/reviews') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-star me-2"></i>
+                                Reviews
+                            </Link>
+
+                            <Link
+                                to="/sections/ads"
+                                className={`nav-link ${isActive('/sections/ads') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/sections/ads') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-bullhorn me-2"></i>
+                                Ads
+                            </Link>
+
+                            <Link
+                                to="/sections/footer"
+                                className={`nav-link ${isActive('/sections/footer') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/sections/footer') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-window-minimize me-2"></i>
+                                Footer
                             </Link>
                         </div>
                     )}

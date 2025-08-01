@@ -13,6 +13,9 @@ import HomePageForm from './pages/home/HomePageForm';
 import AdminHomePage from './pages/home/AdminHomePage';
 import { Service1, Service2, Service3, Service4, Service5, Service6, Service7, Service8 } from './pages/Services';
 import ServicesOverview from './pages/ServicesOverview';
+import Reviews from './pages/sections/Reviews';
+import Ads from './pages/sections/Ads';
+import Footer from './pages/sections/Footer';
 import LoginForm from './components/admin-forms/LoginForm';
 import RegisterForm from './components/admin-forms/RegisterForm';
 
@@ -33,6 +36,9 @@ const AppLayout = () => {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/home" element={<Home />} />
                     <Route path="/about-us" element={<AboutUs />} />
+                    <Route path="/sections/reviews" element={<Reviews />} />
+                    <Route path="/sections/ads" element={<Ads />} />
+                    <Route path="/sections/footer" element={<Footer />} />
                     <Route path="/services-overview" element={<ServicesOverview />} />
                     <Route path="/service-1" element={<Service1 />} />
                     <Route path="/service-2" element={<Service2 />} />

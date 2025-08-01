@@ -19,10 +19,17 @@ const createHomeFAQ = async (req, res) => {
         // Validate required fields
         const { heading, description, faqs } = req.body;
 
-        if (!heading || !description) {
+        if (!heading || !heading.trim()) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Heading and description are required'
+                message: 'Heading is required'
+            });
+        }
+
+        if (!description) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Description is required'
             });
         }
 
@@ -42,7 +49,7 @@ const createHomeFAQ = async (req, res) => {
                     message: `Question is required for FAQ ${i + 1}`
                 });
             }
-            if (!faq.answer || !faq.answer.trim()) {
+            if (!faq.answer) {
                 return res.status(400).json({
                     status: 'error',
                     message: `Answer is required for FAQ ${i + 1}`
@@ -53,10 +60,10 @@ const createHomeFAQ = async (req, res) => {
         // Create new FAQ section
         const newFAQSection = new HomeFAQs({
             heading: heading.trim(),
-            description: description.trim(),
+            description: description, // Don't trim HTML content from Quill
             faqs: faqs.map(faq => ({
                 question: faq.question.trim(),
-                answer: faq.answer.trim()
+                answer: faq.answer // Don't trim HTML content from Quill
             }))
         });
 
@@ -205,13 +212,13 @@ const updateHomeFAQ = async (req, res) => {
             updateData.heading = heading.trim();
         }
         if (description !== undefined) {
-            if (!description || !description.trim()) {
+            if (!description) {
                 return res.status(400).json({
                     status: 'error',
                     message: 'Description is required'
                 });
             }
-            updateData.description = description.trim();
+            updateData.description = description; // Don't trim HTML content from Quill
         }
         if (faqs !== undefined) {
             if (!Array.isArray(faqs)) {
@@ -236,7 +243,7 @@ const updateHomeFAQ = async (req, res) => {
                         message: `Question is required for FAQ ${i + 1}`
                     });
                 }
-                if (!faq.answer || !faq.answer.trim()) {
+                if (!faq.answer) {
                     return res.status(400).json({
                         status: 'error',
                         message: `Answer is required for FAQ ${i + 1}`
@@ -246,7 +253,7 @@ const updateHomeFAQ = async (req, res) => {
 
             updateData.faqs = faqs.map(faq => ({
                 question: faq.question.trim(),
-                answer: faq.answer.trim()
+                answer: faq.answer // Don't trim HTML content from Quill
             }));
         }
 

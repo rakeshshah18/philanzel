@@ -3964,15 +3964,19 @@ const HomeFAQs = () => {
                                                     </div>
                                                     <div className="col-md-6 mb-3">
                                                         <label htmlFor="description" className="form-label">Section Description *</label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            id="description"
-                                                            name="description"
+                                                        <ReactQuill
                                                             value={formData.description}
-                                                            onChange={handleInputChange}
-                                                            required
+                                                            onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
                                                             placeholder="Enter FAQ section description"
+                                                            modules={{
+                                                                toolbar: [
+                                                                    [{ 'header': [1, 2, 3, false] }],
+                                                                    ['bold', 'italic', 'underline', 'strike'],
+                                                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                                    ['link'],
+                                                                    ['clean']
+                                                                ],
+                                                            }}
                                                         />
                                                     </div>
                                                 </div>
@@ -4021,18 +4025,20 @@ const HomeFAQs = () => {
                                                             </div>
                                                             <div>
                                                                 <label className="form-label">Answer *</label>
-                                                                <textarea
-                                                                    className="form-control"
-                                                                    rows="3"
+                                                                <ReactQuill
                                                                     value={faq.answer}
-                                                                    onChange={(e) => handleFAQChange(index, 'answer', e.target.value)}
-                                                                    required
+                                                                    onChange={(value) => handleFAQChange(index, 'answer', value)}
                                                                     placeholder="Enter the answer"
-                                                                    maxLength="500"
+                                                                    modules={{
+                                                                        toolbar: [
+                                                                            [{ 'header': [1, 2, 3, false] }],
+                                                                            ['bold', 'italic', 'underline', 'strike'],
+                                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                                            ['link'],
+                                                                            ['clean']
+                                                                        ],
+                                                                    }}
                                                                 />
-                                                                <small className="form-text text-muted">
-                                                                    {faq.answer.length}/500 characters
-                                                                </small>
                                                             </div>
                                                         </div>
                                                     ))}
