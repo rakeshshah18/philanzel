@@ -139,7 +139,7 @@ const Ads = () => {
 
         try {
             setLoading(true);
-            
+
             // Create FormData for file upload
             const formData = new FormData();
             formData.append('title', newAdsData.title);
@@ -149,12 +149,12 @@ const Ads = () => {
             formData.append('linkUrl', newAdsData.linkUrl);
             formData.append('backgroundColor', newAdsData.backgroundColor);
             formData.append('isVisible', newAdsData.isVisible);
-            
+
             // Add image file if selected
             if (selectedImageFile) {
                 formData.append('image', selectedImageFile);
             }
-            
+
             await adsSectionsAPI.createWithFile(formData);
             setMessage('✅ Ads section created successfully!');
             setShowAddModal(false);
@@ -189,7 +189,7 @@ const Ads = () => {
 
         try {
             setLoading(true);
-            
+
             if (selectedImageFile) {
                 // If new image file selected, use FormData
                 const formData = new FormData();
@@ -201,13 +201,13 @@ const Ads = () => {
                 formData.append('backgroundColor', editingData.backgroundColor);
                 formData.append('isVisible', editingData.isVisible);
                 formData.append('image', selectedImageFile);
-                
+
                 await adsSectionsAPI.updateWithFile(editingData._id, formData);
             } else {
                 // No new file, use regular update
                 await adsSectionsAPI.update(editingData._id, editingData);
             }
-            
+
             setMessage('✅ Ads section updated successfully!');
             setShowEditModal(false);
             setEditingData(null);
@@ -404,15 +404,15 @@ const Ads = () => {
 
                                                     {(adsSection.imageUrl || adsSection.image || adsSection.link) && (
                                                         <div className="mb-2">
-                                                            <img 
+                                                            <img
                                                                 src={
                                                                     // Handle both new and old field names
-                                                                    (adsSection.imageUrl && adsSection.imageUrl.startsWith('/uploads') 
-                                                                        ? `http://localhost:8000${adsSection.imageUrl}` 
+                                                                    (adsSection.imageUrl && adsSection.imageUrl.startsWith('/uploads')
+                                                                        ? `http://localhost:8000${adsSection.imageUrl}`
                                                                         : adsSection.imageUrl) ||
                                                                     adsSection.image ||
                                                                     adsSection.link
-                                                                } 
+                                                                }
                                                                 alt={adsSection.title}
                                                                 className="img-fluid rounded"
                                                                 style={{ maxHeight: '120px', width: '100%', objectFit: 'cover' }}
@@ -523,9 +523,9 @@ const Ads = () => {
                                     </div>
                                     {(imagePreview || newAdsData.imageUrl) && (
                                         <div className="mt-2">
-                                            <img 
-                                                src={imagePreview || newAdsData.imageUrl} 
-                                                alt="Preview" 
+                                            <img
+                                                src={imagePreview || newAdsData.imageUrl}
+                                                alt="Preview"
                                                 className="img-thumbnail"
                                                 style={{ maxHeight: '100px', maxWidth: '150px' }}
                                             />
@@ -667,9 +667,9 @@ const Ads = () => {
                                     </div>
                                     {(imagePreview || editingData.imageUrl) && (
                                         <div className="mt-2">
-                                            <img 
-                                                src={imagePreview || editingData.imageUrl} 
-                                                alt="Preview" 
+                                            <img
+                                                src={imagePreview || editingData.imageUrl}
+                                                alt="Preview"
                                                 className="img-thumbnail"
                                                 style={{ maxHeight: '100px', maxWidth: '150px' }}
                                             />

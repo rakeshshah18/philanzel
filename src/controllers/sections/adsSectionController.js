@@ -77,7 +77,7 @@ const createAdsSection = async (req, res) => {
 // Helper function to migrate old data structure to new structure
 const migrateAdsData = (adsSection) => {
     const migrated = { ...adsSection.toObject() };
-    
+
     // Handle backward compatibility
     if (!migrated.imageUrl && (migrated.image || migrated.link)) {
         // If link contains 'image' or common image extensions, treat it as imageUrl
@@ -89,7 +89,7 @@ const migrateAdsData = (adsSection) => {
             migrated.linkUrl = migrated.linkUrl || migrated.link || '';
         }
     }
-    
+
     return migrated;
 };
 
@@ -105,7 +105,7 @@ const getAllAdsSections = async (req, res) => {
         }
 
         const adsSections = await AdsSection.find().sort({ createdAt: -1 });
-        
+
         // Migrate old data structure for frontend compatibility
         const migratedAdsSections = adsSections.map(migrateAdsData);
 
