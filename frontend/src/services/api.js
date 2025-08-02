@@ -394,4 +394,42 @@ export const reviewSectionsAPI = {
     delete: (id) => API.delete(`/admin/review-sections/${id}`)
 };
 
+// Ads Sections API endpoints
+export const adsSectionsAPI = {
+    // Get all ads sections
+    getAll: () => API.get('/admin/ads-sections'),
+
+    // Get ads sections with pagination
+    getPaginated: (page = 1, limit = 10) => API.get(`/admin/ads-sections/paginated?page=${page}&limit=${limit}`),
+
+    // Search ads sections
+    search: (query) => API.get(`/admin/ads-sections/search?query=${encodeURIComponent(query)}`),
+
+    // Get single ads section by ID
+    getById: (id) => API.get(`/admin/ads-sections/${id}`),
+
+    // Create new ads section
+    create: (data) => API.post('/admin/ads-sections', data),
+
+    // Create new ads section with file upload
+    createWithFile: (formData) => API.post('/admin/ads-sections', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+
+    // Update ads section
+    update: (id, data) => API.put(`/admin/ads-sections/${id}`, data),
+
+    // Update ads section with file upload
+    updateWithFile: (id, formData) => API.put(`/admin/ads-sections/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+
+    // Delete ads section
+    delete: (id) => API.delete(`/admin/ads-sections/${id}`)
+};
+
 export default API;

@@ -11,6 +11,7 @@ import whyChooseUsRoutes from './home/whyChooseUsRoutes.js';
 import ourAssociationRoutes from './home/ourAssociationRoutes.js';
 import homeFAQsRoutes from './home/homeFAQsRoutes.js';
 import reviewSectionRoutes from './sections/reviewSectionRoutes.js';
+import adsSectionRoutes from './sections/adsRoute.js';
 import express from 'express';
 const router = express.Router();
 
@@ -23,6 +24,7 @@ router.use('/admin/why-choose-us', whyChooseUsRoutes);
 router.use('/admin/our-association', ourAssociationRoutes);
 router.use('/admin/home-faqs', homeFAQsRoutes);
 router.use('/admin/review-sections', reviewSectionRoutes);
+router.use('/admin/ads-sections', adsSectionRoutes);
 
 // console.log('🚀 Routes registered:');
 // console.log('  - /api/admin/services');
@@ -32,6 +34,7 @@ router.use('/admin/review-sections', reviewSectionRoutes);
 // console.log('  - /api/admin/our-association');
 // console.log('  - /api/admin/home-faqs');
 // console.log('  - /api/admin/review-sections');
+// console.log('  - /api/admin/ads-sections');
 
 router.use('/admin', homePageRoutes);
 router.use('/admin', newsRoutes);
