@@ -12,6 +12,7 @@ import ourAssociationRoutes from './home/ourAssociationRoutes.js';
 import homeFAQsRoutes from './home/homeFAQsRoutes.js';
 import reviewSectionRoutes from './sections/reviewSectionRoutes.js';
 import adsSectionRoutes from './sections/adsRoute.js';
+import optimizeStrategyRoutes from './optimizeStrategyRoutes.js';
 import express from 'express';
 const router = express.Router();
 
@@ -25,6 +26,7 @@ router.use('/admin/our-association', ourAssociationRoutes);
 router.use('/admin/home-faqs', homeFAQsRoutes);
 router.use('/admin/review-sections', reviewSectionRoutes);
 router.use('/admin/ads-sections', adsSectionRoutes);
+router.use('/admin/optimize-strategy', optimizeStrategyRoutes);
 
 // console.log('🚀 Routes registered:');
 // console.log('  - /api/admin/services');

@@ -13,17 +13,26 @@ const API = axios.create({
 // Add auth token to requests
 API.interceptors.request.use(
     (config) => {
-        console.log('API Request:', config.method?.toUpperCase(), config.url);
+        console.log('🚀 API Request Details:');
+        console.log('  - Method:', config.method?.toUpperCase());
+        console.log('  - URL:', config.url);
+        console.log('  - Base URL:', config.baseURL);
+        console.log('  - Full URL:', `${config.baseURL}${config.url}`);
+        console.log('  - Headers:', config.headers);
 
         // Add auth token to requests
         const token = localStorage.getItem('adminToken');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log('  - Token present:', token.substring(0, 20) + '...');
+        } else {
+            console.log('  - ⚠️ No token found in localStorage');
         }
 
         return config;
     },
     (error) => {
+        console.error('❌ Request interceptor error:', error);
         return Promise.reject(error);
     }
 );
@@ -31,11 +40,22 @@ API.interceptors.request.use(
 // Handle token refresh
 API.interceptors.response.use(
     (response) => {
-        console.log('API Response:', response.status, response.config.url);
+        console.log('✅ API Response Success:');
+        console.log('  - Status:', response.status);
+        console.log('  - URL:', response.config.url);
+        console.log('  - Data:', response.data);
         return response;
     },
     async (error) => {
-        console.error('API Error:', error.response?.status, error.response?.data);
+        console.error('❌ API Response Error Details:');
+        console.error('  - Error type:', error.constructor.name);
+        console.error('  - Error message:', error.message);
+        console.error('  - Error code:', error.code);
+        console.error('  - Request URL:', error.config?.url);
+        console.error('  - Response status:', error.response?.status);
+        console.error('  - Response data:', error.response?.data);
+        console.error('  - Network error?', !error.response);
+        console.error('  - Full error object:', error);
 
         const originalRequest = error.config;
 
@@ -430,6 +450,33 @@ export const adsSectionsAPI = {
 
     // Delete ads section
     delete: (id) => API.delete(`/admin/ads-sections/${id}`)
+};
+
+// Optimize Strategy API endpoints
+export const optimizeStrategyAPI = {
+    // Get all optimize strategies
+    getAll: () => API.get('/admin/optimize-strategy'),
+
+    // Get active strategy (public, no auth required)
+    getActive: () => API.get('/admin/optimize-strategy/active'),
+
+    // Get strategies with pagination
+    getPaginated: (page = 1, limit = 10) => API.get(`/admin/optimize-strategy/paginated?page=${page}&limit=${limit}`),
+
+    // Search strategies
+    search: (query) => API.get(`/admin/optimize-strategy/search?query=${encodeURIComponent(query)}`),
+
+    // Get single strategy by ID
+    getById: (id) => API.get(`/admin/optimize-strategy/${id}`),
+
+    // Create new strategy
+    create: (data) => API.post('/admin/optimize-strategy', data),
+
+    // Update strategy
+    update: (id, data) => API.put(`/admin/optimize-strategy/${id}`, data),
+
+    // Delete strategy
+    delete: (id) => API.delete(`/admin/optimize-strategy/${id}`)
 };
 
 export default API;

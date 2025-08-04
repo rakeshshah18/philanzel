@@ -23,7 +23,7 @@ const Sidebar = () => {
 
     // Check if any section route is active
     const isSectionsActive = () => {
-        return isActive('/sections/reviews') || isActive('/sections/ads') || isActive('/sections/footer');
+        return isActive('/sections') || isActive('/sections/optimize-strategy') || isActive('/sections/reviews') || isActive('/sections/ads') || isActive('/sections/footer');
     };
 
     const togglePagesDropdown = () => {
@@ -313,6 +313,22 @@ const Sidebar = () => {
                             paddingTop: '0.25rem',
                             paddingBottom: '0.25rem'
                         }}>
+                            <Link
+                                to="/sections/optimize-strategy"
+                                className={`nav-link ${isActive('/sections/optimize-strategy') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/sections/optimize-strategy') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-chart-line me-2"></i>
+                                Optimize Strategy
+                            </Link>
+
                             <Link
                                 to="/sections/reviews"
                                 className={`nav-link ${isActive('/sections/reviews') ? 'active' : ''}`}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ReviewSections from './ReviewSections';
+import OptimizeStrategy from './OptimizeStrategy';
 import Alert from '../../components/Alert';
 
 const Sections = () => {
@@ -9,6 +10,7 @@ const Sections = () => {
     const tabs = [
         { id: 'review', label: '⭐ Review Sections', icon: 'fas fa-star' },
         { id: 'ads', label: '📢 Advertisements', icon: 'fas fa-bullhorn' },
+        { id: 'optimize', label: '📈 Optimize Strategy', icon: 'fas fa-chart-line' },
         { id: 'footer', label: '🦶 Footer', icon: 'fas fa-grip-horizontal' }
     ];
 
@@ -24,6 +26,8 @@ const Sections = () => {
                         <p className="text-muted">Coming soon...</p>
                     </div>
                 );
+            case 'optimize':
+                return <OptimizeStrategy setMessage={setMessage} />;
             case 'footer':
                 return (
                     <div className="text-center py-5">
@@ -66,8 +70,8 @@ const Sections = () => {
                                         <button
                                             key={tab.id}
                                             className={`nav-link px-4 py-3 border-0 ${activeTab === tab.id
-                                                    ? 'active bg-light text-primary fw-bold'
-                                                    : 'text-secondary'
+                                                ? 'active bg-light text-primary fw-bold'
+                                                : 'text-secondary'
                                                 }`}
                                             onClick={() => setActiveTab(tab.id)}
                                             style={{
