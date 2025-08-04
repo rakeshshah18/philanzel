@@ -1,4 +1,4 @@
-import OptimizeStrategy from '../models/optimizeStrategy.js';
+import OptimizeStrategy from '../models/sections/optimizeStrategy.js';
 import mongoose from 'mongoose';
 
 // Get all optimize strategies
