@@ -479,4 +479,49 @@ export const optimizeStrategyAPI = {
     delete: (id) => API.delete(`/admin/optimize-strategy/${id}`)
 };
 
+// Footer API endpoints
+export const footerAPI = {
+    // Get public footer data (no auth required)
+    getPublic: () => API.get('/footer/public'),
+
+    // Admin operations
+    admin: {
+        // Get footer data for admin
+        get: () => API.get('/admin/footer'),
+
+        // Update footer data
+        update: (data) => API.put('/admin/footer', data),
+
+        // Quick links operations
+        addQuickLink: (data) => API.post('/admin/footer/quick-links', data),
+        updateQuickLink: (id, data) => API.put(`/admin/footer/quick-links/${id}`, data),
+        deleteQuickLink: (id) => API.delete(`/admin/footer/quick-links/${id}`),
+
+        // Services operations
+        addService: (data) => API.post('/admin/footer/services', data),
+        updateService: (id, data) => API.put(`/admin/footer/services/${id}`, data),
+        deleteService: (id) => API.delete(`/admin/footer/services/${id}`),
+
+        // Calculators operations
+        addCalculator: (data) => API.post('/admin/footer/calculators', data),
+        updateCalculator: (id, data) => API.put(`/admin/footer/calculators/${id}`, data),
+        deleteCalculator: (id) => API.delete(`/admin/footer/calculators/${id}`),
+
+        // Social links operations
+        addSocialLink: (data) => API.post('/admin/footer/social-links', data),
+
+        // Optimize strategy operations (can also use optimizeStrategyAPI)
+        optimizeStrategy: {
+            getAll: () => API.get('/admin/footer/optimize-strategies'),
+            getPaginated: (page = 1, limit = 10) => API.get(`/admin/footer/optimize-strategies/paginated?page=${page}&limit=${limit}`),
+            search: (query) => API.get(`/admin/footer/optimize-strategies/search?query=${encodeURIComponent(query)}`),
+            getActive: () => API.get('/admin/footer/optimize-strategies/active'),
+            getById: (id) => API.get(`/admin/footer/optimize-strategies/${id}`),
+            create: (data) => API.post('/admin/footer/optimize-strategies', data),
+            update: (id, data) => API.put(`/admin/footer/optimize-strategies/${id}`, data),
+            delete: (id) => API.delete(`/admin/footer/optimize-strategies/${id}`)
+        }
+    }
+};
+
 export default API;

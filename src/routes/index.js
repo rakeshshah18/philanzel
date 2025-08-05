@@ -12,7 +12,7 @@ import ourAssociationRoutes from './home/ourAssociationRoutes.js';
 import homeFAQsRoutes from './home/homeFAQsRoutes.js';
 import reviewSectionRoutes from './sections/reviewSectionRoutes.js';
 import adsSectionRoutes from './sections/adsRoute.js';
-import optimizeStrategyRoutes from './optimizeStrategyRoutes.js';
+import footerRoutes from './footerRoutes.js';
 import express from 'express';
 const router = express.Router();
 
@@ -26,7 +26,9 @@ router.use('/admin/our-association', ourAssociationRoutes);
 router.use('/admin/home-faqs', homeFAQsRoutes);
 router.use('/admin/review-sections', reviewSectionRoutes);
 router.use('/admin/ads-sections', adsSectionRoutes);
-router.use('/admin/optimize-strategy', optimizeStrategyRoutes);
+router.use('/admin/footer', footerRoutes);
+router.use('/admin/optimize-strategy', footerRoutes); // Redirect optimize strategy to footer routes for backward compatibility
+router.use('/footer', footerRoutes); // Public footer endpoint
 
 // console.log('🚀 Routes registered:');
 // console.log('  - /api/admin/services');
