@@ -1,6 +1,6 @@
-/node_modules
-/.dist
-/.env
+/backend/node_modules
+/dist
+/backend/.env
 /API_TEST_GUIDE.md
 /frontend/build
 /frontend/node_modules
