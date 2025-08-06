@@ -155,6 +155,54 @@ export const homePageAPI = {
     delete: (id) => API.delete(`/admin/homepage/${id}`)
 };
 
+export const aboutUsAPI = {
+    // Create about us content
+    create: (formData) => API.post('/admin/about-us', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+
+    // Get all about us content
+    getAll: (params = {}) => API.get('/admin/about-us', { params }),
+
+    // Get about us content by ID
+    getById: (id) => API.get(`/admin/about-us/${id}`),
+
+    // Update about us content
+    update: (id, formData) => API.put(`/admin/about-us/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+
+    // Delete about us content
+    delete: (id) => API.delete(`/admin/about-us/${id}`)
+};
+
+export const ourJourneyAPI = {
+    // Create our journey content
+    create: (data) => API.post('/admin/our-journey', data),
+
+    // Get all our journey content
+    getAll: (params = {}) => API.get('/admin/our-journey', { params }),
+
+    // Get our journey content by ID
+    getById: (id) => API.get(`/admin/our-journey/${id}`),
+
+    // Update our journey content
+    update: (id, data) => API.put(`/admin/our-journey/${id}`, data),
+
+    // Delete our journey content
+    delete: (id) => API.delete(`/admin/our-journey/${id}`),
+
+    // Add card to our journey
+    addCard: (id, cardData) => API.post(`/admin/our-journey/${id}/cards`, cardData),
+
+    // Remove card from our journey
+    removeCard: (id, cardIndex) => API.delete(`/admin/our-journey/${id}/cards/${cardIndex}`)
+};
+
 export const newsAPI = {
     // Create news article
     create: (data) => API.post('/admin/news', data),

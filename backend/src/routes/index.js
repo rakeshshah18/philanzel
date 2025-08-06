@@ -1,6 +1,8 @@
 import newInquiryRoute from './inquiryRoutes.js';
 import careerInquery from './career.js';
 import homePageRoutes from './home/homePageRoutes.js';
+import aboutUsRoutes from './about/aboutUsRoutes.js';
+import ourJourneyRoutes from './about/ourJourneyRoutes.js';
 import newsRoutes from './newsRoutes.js';
 import { routes as adminAuthRoutes } from '../adminAuth/index.js';
 import ourTrackRoutes from './home/ourTrackRoutes.js';
@@ -40,6 +42,8 @@ router.use('/footer', footerRoutes); // Public footer endpoint
 // console.log('  - /api/admin/ads-sections');
 
 router.use('/admin', homePageRoutes);
+router.use('/admin', aboutUsRoutes);
+router.use('/admin', ourJourneyRoutes);
 router.use('/admin', newsRoutes);
 router.use('/admin/auth', adminAuthRoutes);
 router.use('/admin/auth', adminAuthRoutes);
