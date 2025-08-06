@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
@@ -6,6 +6,33 @@ const Sidebar = () => {
     const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
     const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
     const [isSectionsDropdownOpen, setIsSectionsDropdownOpen] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+    // Load dark mode preference from localStorage on component mount
+    useEffect(() => {
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        setIsDarkMode(savedDarkMode);
+        applyDarkMode(savedDarkMode);
+    }, []);
+
+    // Apply dark mode classes to body
+    const applyDarkMode = (darkMode) => {
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+            document.body.setAttribute('data-bs-theme', 'dark');
+        } else {
+            document.body.classList.remove('dark-mode');
+            document.body.setAttribute('data-bs-theme', 'light');
+        }
+    };
+
+    // Toggle dark mode
+    const toggleDarkMode = () => {
+        const newDarkMode = !isDarkMode;
+        setIsDarkMode(newDarkMode);
+        localStorage.setItem('darkMode', newDarkMode.toString());
+        applyDarkMode(newDarkMode);
+    };
 
     const isActive = (path) => location.pathname === path;
 
@@ -23,7 +50,7 @@ const Sidebar = () => {
 
     // Check if any section route is active
     const isSectionsActive = () => {
-        return isActive('/sections') || isActive('/sections/optimize-strategy') || isActive('/sections/reviews') || isActive('/sections/ads') || isActive('/sections/footer');
+        return isActive('/sections') || isActive('/sections/reviews') || isActive('/sections/ads') || isActive('/sections/footer');
     };
 
     const togglePagesDropdown = () => {
@@ -314,22 +341,6 @@ const Sidebar = () => {
                             paddingBottom: '0.25rem'
                         }}>
                             <Link
-                                to="/sections/optimize-strategy"
-                                className={`nav-link ${isActive('/sections/optimize-strategy') ? 'active' : ''}`}
-                                style={{
-                                    paddingLeft: '3rem',
-                                    paddingRight: '1rem',
-                                    fontSize: '0.9rem',
-                                    color: isActive('/sections/optimize-strategy') ? '#fff' : '#adb5bd',
-                                    width: '100%',
-                                    display: 'block'
-                                }}
-                            >
-                                <i className="fas fa-chart-line me-2"></i>
-                                Optimize Strategy
-                            </Link>
-
-                            <Link
                                 to="/sections/reviews"
                                 className={`nav-link ${isActive('/sections/reviews') ? 'active' : ''}`}
                                 style={{
@@ -378,6 +389,34 @@ const Sidebar = () => {
                             </Link>
                         </div>
                     )}
+                </div>
+
+                {/* Dark Mode Toggle Button */}
+                <div className="mt-auto pt-3" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                    <button
+                        className="btn btn-outline-light w-100 d-flex align-items-center justify-content-center"
+                        onClick={toggleDarkMode}
+                        style={{
+                            backgroundColor: 'transparent',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            color: '#adb5bd',
+                            fontSize: '0.9rem',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '6px',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                            e.target.style.color = '#fff';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                            e.target.style.color = '#adb5bd';
+                        }}
+                    >
+                        <i className={`fas ${isDarkMode ? 'fa-sun' : 'fa-moon'} me-2`}></i>
+                        {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                    </button>
                 </div>
 
             </nav>

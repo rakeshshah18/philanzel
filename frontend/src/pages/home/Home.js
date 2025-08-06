@@ -41,11 +41,33 @@ const Home = () => {
     const [showForm, setShowForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Check for dark mode
+    useEffect(() => {
+        const checkDarkMode = () => {
+            setIsDarkMode(document.body.classList.contains('dark-mode'));
+        };
+
+        checkDarkMode();
+
+        // Listen for dark mode changes
+        const observer = new MutationObserver(() => {
+            checkDarkMode();
+        });
+
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
+        return () => observer.disconnect();
+    }, []);
 
     const [formData, setFormData] = useState({
         heading: '',
@@ -401,15 +423,19 @@ const Home = () => {
     const currentItems = filteredItems.slice(startIndex, endIndex);
 
     return (
-        <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+        <div style={{
+            backgroundColor: isDarkMode ? '#121212' : '#f8f9fa',
+            minHeight: '100vh',
+            color: isDarkMode ? '#ffffff' : 'inherit'
+        }}>
             <div className="container-fluid px-4 py-3">
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h2 className="mb-0" style={{ color: '#333' }}>Home</h2>
+                    <h2 className="mb-0" style={{ color: isDarkMode ? '#ffffff' : '#333' }}>Home</h2>
                     <nav style={{ fontSize: '14px' }}>
-                        <span style={{ color: '#17a2b8' }}>Admin</span>
-                        <span className="mx-2" style={{ color: '#6c757d' }}>›</span>
-                        <span style={{ color: '#6c757d' }}>Home</span>
+                        <span style={{ color: isDarkMode ? '#0dcaf0' : '#17a2b8' }}>Admin</span>
+                        <span className="mx-2" style={{ color: isDarkMode ? '#adb5bd' : '#6c757d' }}>›</span>
+                        <span style={{ color: isDarkMode ? '#adb5bd' : '#6c757d' }}>Home</span>
                     </nav>
                 </div>
 
@@ -464,9 +490,13 @@ const Home = () => {
 
                 {/* Create/Edit Form */}
                 {showForm && (
-                    <div className="card mb-4" style={{ border: '1px solid #dee2e6' }}>
-                        <div className="card-header" style={{ backgroundColor: '#fff', borderBottom: '1px solid #dee2e6' }}>
-                            <h5 className="card-title mb-0" style={{ color: '#333' }}>
+                    <div className="card mb-4" style={{ border: isDarkMode ? '1px solid #444' : '1px solid #dee2e6' }}>
+                        <div className="card-header" style={{
+                            backgroundColor: isDarkMode ? '#2a2a2a' : '#fff',
+                            borderBottom: isDarkMode ? '1px solid #444' : '1px solid #dee2e6',
+                            color: isDarkMode ? '#ffffff' : 'inherit'
+                        }}>
+                            <h5 className="card-title mb-0" style={{ color: isDarkMode ? '#ffffff' : '#333' }}>
                                 {isEditing ? 'Edit Banner' : 'Add New Banner'}
                             </h5>
                         </div>

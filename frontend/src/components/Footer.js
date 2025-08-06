@@ -30,10 +30,10 @@ const Footer = () => {
 
     if (loading) {
         return (
-            <footer className="bg-dark text-light py-4">
+            <footer className="py-4" style={{ backgroundColor: '#2c3e50', color: '#ffffff' }}>
                 <div className="container">
                     <div className="text-center">
-                        <div className="spinner-border text-light" role="status">
+                        <div className="spinner-border" role="status">
                             <span className="visually-hidden">Loading footer...</span>
                         </div>
                     </div>
@@ -44,7 +44,7 @@ const Footer = () => {
 
     if (error || !footerData) {
         return (
-            <footer className="bg-dark text-light py-4">
+            <footer className="py-4" style={{ backgroundColor: '#2c3e50', color: '#ffffff' }}>
                 <div className="container">
                     <div className="text-center">
                         <p>&copy; {new Date().getFullYear()} Company Name. All rights reserved.</p>
@@ -66,7 +66,7 @@ const Footer = () => {
         <>
             {/* Optimize Strategy Section - Above Footer */}
             {strategies.length > 0 && (
-                <section className="optimize-strategy-section py-5 bg-light">
+                <section className="optimize-strategy-section py-5">
                     <div className="container">
                         <div className="row">
                             <div className="col-12">

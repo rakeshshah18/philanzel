@@ -452,33 +452,6 @@ export const adsSectionsAPI = {
     delete: (id) => API.delete(`/admin/ads-sections/${id}`)
 };
 
-// Optimize Strategy API endpoints
-export const optimizeStrategyAPI = {
-    // Get all optimize strategies
-    getAll: () => API.get('/admin/optimize-strategy'),
-
-    // Get active strategy (public, no auth required)
-    getActive: () => API.get('/admin/optimize-strategy/active'),
-
-    // Get strategies with pagination
-    getPaginated: (page = 1, limit = 10) => API.get(`/admin/optimize-strategy/paginated?page=${page}&limit=${limit}`),
-
-    // Search strategies
-    search: (query) => API.get(`/admin/optimize-strategy/search?query=${encodeURIComponent(query)}`),
-
-    // Get single strategy by ID
-    getById: (id) => API.get(`/admin/optimize-strategy/${id}`),
-
-    // Create new strategy
-    create: (data) => API.post('/admin/optimize-strategy', data),
-
-    // Update strategy
-    update: (id, data) => API.put(`/admin/optimize-strategy/${id}`, data),
-
-    // Delete strategy
-    delete: (id) => API.delete(`/admin/optimize-strategy/${id}`)
-};
-
 // Footer API endpoints
 export const footerAPI = {
     // Get public footer data (no auth required)

@@ -20,12 +20,14 @@ const AdminFooter = () => {
     const [showCalculatorModal, setShowCalculatorModal] = useState(false);
     const [showContactModal, setShowContactModal] = useState(false);
     const [showStrategyModal, setShowStrategyModal] = useState(false);
+    const [showSocialModal, setShowSocialModal] = useState(false);
 
     // Editing states
     const [editingQuickLink, setEditingQuickLink] = useState(null);
     const [editingService, setEditingService] = useState(null);
     const [editingCalculator, setEditingCalculator] = useState(null);
     const [editingStrategy, setEditingStrategy] = useState(null);
+    const [editingSocial, setEditingSocial] = useState(null);
 
     // Strategy management states
     const [strategies, setStrategies] = useState([]);
@@ -99,6 +101,14 @@ const AdminFooter = () => {
             title: 'Legal Disclaimer',
             description: ''
         }
+    });
+
+    const [socialForm, setSocialForm] = useState({
+        platform: 'Facebook',
+        url: '',
+        icon: 'fab fa-facebook',
+        isEnabled: true,
+        order: 1
     });
 
     useEffect(() => {
@@ -421,6 +431,43 @@ const AdminFooter = () => {
         }
     };
 
+    const handleSocialSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            setSaving(true);
+            let updatedSocialLinks = [...(footerData.contactUs?.followUs?.socialLinks || [])];
+            
+            if (editingSocial !== null) {
+                // Update existing social link
+                updatedSocialLinks[editingSocial] = { ...socialForm };
+            } else {
+                // Add new social link
+                updatedSocialLinks.push({ ...socialForm });
+            }
+            
+            const response = await footerAPI.admin.update({
+                contactUs: {
+                    ...footerData.contactUs,
+                    followUs: {
+                        ...footerData.contactUs.followUs,
+                        socialLinks: updatedSocialLinks
+                    }
+                }
+            });
+            
+            if (response.data.success) {
+                setFooterData(response.data.data);
+                showMessage('success', editingSocial !== null ? 'Social link updated successfully!' : 'Social link added successfully!');
+                setShowSocialModal(false);
+                setEditingSocial(null);
+            }
+        } catch (error) {
+            showMessage('error', 'Failed to save social link');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     // Modal open functions
     const openAboutModal = () => {
         setAboutForm({
@@ -516,6 +563,60 @@ const AdminFooter = () => {
             }
         });
         setShowContactModal(true);
+    };
+
+    const openSocialModal = (index = null) => {
+        if (index !== null) {
+            const link = footerData.contactUs.followUs.socialLinks[index];
+            setEditingSocial(index);
+            setSocialForm({
+                platform: link.platform || 'Facebook',
+                url: link.url || '',
+                icon: link.icon || 'fab fa-facebook',
+                isEnabled: link.isEnabled || true,
+                order: link.order || 1
+            });
+        } else {
+            setEditingSocial(null);
+            setSocialForm({
+                platform: 'Facebook',
+                url: '',
+                icon: 'fab fa-facebook',
+                isEnabled: true,
+                order: 1
+            });
+        }
+        setShowSocialModal(true);
+    };
+
+    const deleteSocialLink = async (index) => {
+        if (window.confirm('Are you sure you want to delete this social link?')) {
+            try {
+                setSaving(true);
+                // Since we don't have a delete endpoint, we'll update the entire social links array
+                const updatedSocialLinks = [...footerData.contactUs.followUs.socialLinks];
+                updatedSocialLinks.splice(index, 1);
+                
+                const response = await footerAPI.admin.update({
+                    contactUs: {
+                        ...footerData.contactUs,
+                        followUs: {
+                            ...footerData.contactUs.followUs,
+                            socialLinks: updatedSocialLinks
+                        }
+                    }
+                });
+
+                if (response.data.success) {
+                    setFooterData(response.data.data);
+                    showMessage('success', 'Social link deleted successfully!');
+                }
+            } catch (error) {
+                showMessage('error', 'Failed to delete social link');
+            } finally {
+                setSaving(false);
+            }
+        }
     };
 
     // Form handlers for add/edit modals
@@ -697,6 +798,18 @@ const AdminFooter = () => {
             order: 1,
             isActive: true,
             isVisible: true
+        });
+    };
+
+    const closeSocialModal = () => {
+        setShowSocialModal(false);
+        setEditingSocial(null);
+        setSocialForm({
+            platform: 'Facebook',
+            url: '',
+            icon: 'fab fa-facebook',
+            isEnabled: true,
+            order: 1
         });
     };
 
@@ -886,14 +999,14 @@ const AdminFooter = () => {
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`nav-link ${activeTab === 'settings' ? 'active' : ''}`}
-                                        onClick={() => setActiveTab('settings')}
+                                        className={`nav-link ${activeTab === 'copyright' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('copyright')}
                                         style={{
-                                            color: activeTab === 'settings' ? '#fff' : 'black',
-                                            backgroundColor: activeTab === 'settings' ? '#373D4D' : 'transparent'
+                                            color: activeTab === 'copyright' ? '#fff' : 'black',
+                                            backgroundColor: activeTab === 'copyright' ? '#373D4D' : 'transparent'
                                         }}
                                     >
-                                        Settings
+                                        Copyright
                                     </button>
                                 </li>
                             </ul>
@@ -1034,13 +1147,81 @@ const AdminFooter = () => {
                                                 </tbody>
                                             </table>
                                         </div>
+
+                                        {/* Social Links Section */}
+                                        <div className="mt-4">
+                                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 className="mb-0">Social Media Links</h6>
+                                                <button
+                                                    className="btn btn-primary btn-sm"
+                                                    onClick={() => setShowSocialModal(true)}
+                                                >
+                                                    <i className="fas fa-plus me-1"></i>Add Social Link
+                                                </button>
+                                            </div>
+
+                                            <div className="table-responsive">
+                                                <table className="table table-striped table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Platform</th>
+                                                            <th>URL</th>
+                                                            <th>Status</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {footerData.contactUs?.followUs?.socialLinks?.length > 0 ? (
+                                                            footerData.contactUs.followUs.socialLinks.map((link, index) => (
+                                                                <tr key={link._id || index}>
+                                                                    <td>
+                                                                        <i className={link.icon || 'fas fa-link'}></i>
+                                                                        <span className="ms-2">{link.platform}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                                                                            {link.url}
+                                                                        </a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span className={`badge ${link.isEnabled ? 'bg-success' : 'bg-secondary'}`}>
+                                                                            {link.isEnabled ? 'Active' : 'Inactive'}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-outline-primary btn-sm me-1"
+                                                                            onClick={() => openSocialModal(index)}
+                                                                        >
+                                                                            <i className="fas fa-edit"></i>
+                                                                        </button>
+                                                                        <button
+                                                                            className="btn btn-outline-danger btn-sm"
+                                                                            onClick={() => deleteSocialLink(index)}
+                                                                        >
+                                                                            <i className="fas fa-trash"></i>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            ))
+                                                        ) : (
+                                                            <tr>
+                                                                <td colSpan="4" className="text-center text-muted py-3">
+                                                                    No social links added yet. Click "Add Social Link" to get started.
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
 
-                                {/* Settings Tab */}
-                                {activeTab === 'settings' && (
+                                {/* Copyright Tab */}
+                                {activeTab === 'copyright' && (
                                     <div className="tab-pane active">
-                                        <h5 className="mb-3">Footer Settings</h5>
+                                        <h5 className="mb-3">Copyright Settings</h5>
                                         <div className="row">
                                             <div className="col-12 mb-3">
                                                 <label className="form-label">Copyright Text</label>
@@ -1073,7 +1254,7 @@ const AdminFooter = () => {
                                                     })}
                                                     disabled={saving}
                                                 >
-                                                    {saving ? 'Saving...' : 'Save Settings'}
+                                                    {saving ? 'Saving...' : 'Save Copyright'}
                                                 </button>
                                             </div>
                                         </div>
@@ -1989,8 +2170,108 @@ const AdminFooter = () => {
                 </div>
             </div>
 
+            {/* Social Link Modal */}
+            <div className={`modal fade ${showSocialModal ? 'show' : ''}`} style={{ display: showSocialModal ? 'block' : 'none' }} tabIndex="-1">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">{editingSocial !== null ? 'Edit' : 'Add'} Social Link</h5>
+                            <button type="button" className="btn-close" onClick={closeSocialModal}></button>
+                        </div>
+                        <form onSubmit={handleSocialSubmit}>
+                            <div className="modal-body">
+                                <div className="mb-3">
+                                    <label className="form-label">Platform</label>
+                                    <select
+                                        className="form-control"
+                                        value={socialForm.platform}
+                                        onChange={(e) => {
+                                            const platform = e.target.value;
+                                            let icon;
+                                            switch(platform) {
+                                                case 'Facebook': icon = 'fab fa-facebook'; break;
+                                                case 'Instagram': icon = 'fab fa-instagram'; break;
+                                                case 'LinkedIn': icon = 'fab fa-linkedin'; break;
+                                                case 'YouTube': icon = 'fab fa-youtube'; break;
+                                                case 'Twitter': icon = 'fab fa-twitter'; break;
+                                                default: icon = 'fas fa-link';
+                                            }
+                                            setSocialForm({ ...socialForm, platform, icon });
+                                        }}
+                                        required
+                                    >
+                                        <option value="Facebook">Facebook</option>
+                                        <option value="Instagram">Instagram</option>
+                                        <option value="LinkedIn">LinkedIn</option>
+                                        <option value="YouTube">YouTube</option>
+                                        <option value="Twitter">Twitter</option>
+                                    </select>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">URL</label>
+                                    <input
+                                        type="url"
+                                        className="form-control"
+                                        value={socialForm.url}
+                                        onChange={(e) => setSocialForm({ ...socialForm, url: e.target.value })}
+                                        placeholder="https://..."
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Icon Class</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={socialForm.icon}
+                                        onChange={(e) => setSocialForm({ ...socialForm, icon: e.target.value })}
+                                        placeholder="fab fa-facebook"
+                                        required
+                                    />
+                                    <small className="text-muted">FontAwesome icon class (e.g., fab fa-facebook)</small>
+                                </div>
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <label className="form-label">Order</label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                value={socialForm.order}
+                                                onChange={(e) => setSocialForm({ ...socialForm, order: parseInt(e.target.value) })}
+                                                min="1"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="form-check mt-4">
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input"
+                                                checked={socialForm.isEnabled}
+                                                onChange={(e) => setSocialForm({ ...socialForm, isEnabled: e.target.checked })}
+                                            />
+                                            <label className="form-check-label">
+                                                Active
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={closeSocialModal}>Cancel</button>
+                                <button type="submit" className="btn btn-primary" disabled={saving}>
+                                    {saving ? 'Saving...' : (editingSocial !== null ? 'Update' : 'Add')} Social Link
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             {/* Modal Backdrop */}
-            {(showAboutModal || showQuickLinkModal || showServiceModal || showCalculatorModal || showContactModal || showStrategyModal) &&
+            {(showAboutModal || showQuickLinkModal || showServiceModal || showCalculatorModal || showContactModal || showStrategyModal || showSocialModal) &&
                 <div className="modal-backdrop fade show"></div>
             }
         </div>
