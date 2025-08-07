@@ -203,6 +203,63 @@ export const ourJourneyAPI = {
     removeCard: (id, cardIndex) => API.delete(`/admin/our-journey/${id}/cards/${cardIndex}`)
 };
 
+export const ourFounderAPI = {
+    // Create our founder content
+    create: (formData) => API.post('/admin/about/our-founder', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+
+    // Get all our founder content (public route)
+    getAll: (params = {}) => API.get('/about/our-founder', { params }),
+
+    // Get our founder content by ID (public route)
+    getById: (id) => API.get(`/about/our-founder/${id}`),
+
+    // Update our founder content
+    update: (id, formData) => API.put(`/admin/about/our-founder/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+
+    // Delete our founder content
+    delete: (id) => API.delete(`/admin/about/our-founder/${id}`)
+};
+
+export const aboutWhyChooseUsAPI = {
+    // Temporarily use home WhyChooseUs data for About Us page
+    // Create why choose us content  
+    create: (formData) => API.post('/admin/why-choose-us', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+
+    // Get all why choose us content
+    getAll: (params = {}) => API.get('/admin/why-choose-us', { params }),
+
+    // Get why choose us content by ID
+    getById: (id) => API.get(`/admin/why-choose-us/${id}`),
+
+    // Update why choose us content
+    update: (id, formData) => API.put(`/admin/why-choose-us/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+
+    // Delete why choose us content
+    delete: (id) => API.delete(`/admin/why-choose-us/${id}`),
+
+    // Add point to why choose us
+    addPoint: (id, pointData) => API.post(`/admin/why-choose-us/${id}/points`, pointData),
+
+    // Remove point from why choose us
+    removePoint: (id, pointId) => API.delete(`/admin/why-choose-us/${id}/points/${pointId}`)
+};
+
 export const newsAPI = {
     // Create news article
     create: (data) => API.post('/admin/news', data),

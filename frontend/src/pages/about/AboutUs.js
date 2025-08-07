@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Alert from '../../components/Alert';
 import { useAuth } from '../../contexts/AuthContext';
-import { aboutUsAPI, ourJourneyAPI } from '../../services/api';
+import { aboutUsAPI, ourJourneyAPI, ourFounderAPI, aboutWhyChooseUsAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -37,6 +37,7 @@ const AboutUs = () => {
     const { isAuthenticated } = useAuth();
     const [aboutPages, setAboutPages] = useState([]);
     const [journeyData, setJourneyData] = useState([]);
+    const [whyChooseUsData, setWhyChooseUsData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [fetchLoading, setFetchLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -46,8 +47,7 @@ const AboutUs = () => {
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [searchTerm, setSearchTerm] = useState('');
+    const itemsPerPage = 10; // Fixed items per page
 
     // Our Journey form state
     const [showJourneyForm, setShowJourneyForm] = useState(false);
@@ -85,6 +85,8 @@ const AboutUs = () => {
     useEffect(() => {
         fetchAboutData();
         fetchJourneyData();
+        fetchWhyChooseUsData();
+        fetchOurFounderData();
     }, []);
 
     const fetchAboutData = async () => {
@@ -107,6 +109,16 @@ const AboutUs = () => {
         } catch (error) {
             console.error('Error fetching our journey data:', error);
             // Don't show error message for journey data as it's secondary content
+        }
+    };
+
+    const fetchWhyChooseUsData = async () => {
+        try {
+            const response = await aboutWhyChooseUsAPI.getAll();
+            setWhyChooseUsData(response.data.data || []);
+        } catch (error) {
+            console.error('Error fetching why choose us data:', error);
+            // Don't show error message for why choose us data as it's secondary content
         }
     };
 
@@ -377,16 +389,246 @@ const AboutUs = () => {
         setEditingJourneyId(null);
     };
 
-    // Filter and pagination logic
-    const filteredItems = aboutPages.filter(page =>
-        page.heading.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        page.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // WhyChooseUs Management Functions
+    const [whyChooseUsFormData, setWhyChooseUsFormData] = useState({
+        heading: '',
+        title: '',
+        button: '',
+        points: []
+    });
+    const [whyChooseUsImage, setWhyChooseUsImage] = useState(null);
+    const [showWhyChooseUsForm, setShowWhyChooseUsForm] = useState(false);
+    const [isEditingWhyChooseUs, setIsEditingWhyChooseUs] = useState(false);
+    const [editingWhyChooseUsId, setEditingWhyChooseUsId] = useState(null);
+    const [whyChooseUsLoading, setWhyChooseUsLoading] = useState(false);
+    const [showPointForm, setShowPointForm] = useState(false);
+    const [pointFormData, setPointFormData] = useState('');
 
-    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    // Our Founder state
+    const [ourFounderData, setOurFounderData] = useState([]);
+    const [ourFounderFormData, setOurFounderFormData] = useState({
+        name: '',
+        designation: '',
+        description: ''
+    });
+    const [ourFounderImage, setOurFounderImage] = useState(null);
+    const [showOurFounderForm, setShowOurFounderForm] = useState(false);
+    const [isEditingOurFounder, setIsEditingOurFounder] = useState(false);
+    const [editingOurFounderId, setEditingOurFounderId] = useState(null);
+    const [ourFounderLoading, setOurFounderLoading] = useState(false);
+
+    const handleWhyChooseUsChange = (e) => {
+        setWhyChooseUsFormData({
+            ...whyChooseUsFormData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleWhyChooseUsImageChange = (e) => {
+        setWhyChooseUsImage(e.target.files[0]);
+    };
+
+    const addPoint = () => {
+        if (pointFormData.trim()) {
+            setWhyChooseUsFormData({
+                ...whyChooseUsFormData,
+                points: [...whyChooseUsFormData.points, pointFormData.trim()]
+            });
+            setPointFormData('');
+            setShowPointForm(false);
+        }
+    };
+
+    const removePoint = (index) => {
+        setWhyChooseUsFormData({
+            ...whyChooseUsFormData,
+            points: whyChooseUsFormData.points.filter((_, i) => i !== index)
+        });
+    };
+
+    const handleWhyChooseUsSubmit = async (e) => {
+        e.preventDefault();
+        setWhyChooseUsLoading(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('heading', whyChooseUsFormData.heading);
+            formData.append('description', whyChooseUsFormData.title); // Backend expects 'description' field
+
+            // Format button as object with text and link
+            const buttonObj = {
+                text: whyChooseUsFormData.button || 'Get Started',
+                link: '#'
+            };
+            formData.append('button', JSON.stringify(buttonObj));
+
+            // Format points as array of objects with text and icon
+            const pointsArray = whyChooseUsFormData.points.map(point => ({
+                text: typeof point === 'string' ? point : (point.text || point.title || point.description || ''),
+                icon: 'fas fa-check'
+            }));
+            formData.append('points', JSON.stringify(pointsArray));
+
+            if (whyChooseUsImage) {
+                formData.append('image', whyChooseUsImage);
+            }
+
+            if (isEditingWhyChooseUs) {
+                await aboutWhyChooseUsAPI.update(editingWhyChooseUsId, formData);
+                setMessage('✅ Why Choose Us content updated successfully!');
+            } else {
+                await aboutWhyChooseUsAPI.create(formData);
+                setMessage('✅ Why Choose Us content created successfully!');
+            }
+
+            fetchWhyChooseUsData();
+            resetWhyChooseUsForm();
+        } catch (error) {
+            console.error('Error saving why choose us content:', error);
+            setMessage(error.response?.data?.message || '❌ Failed to save why choose us content.');
+        } finally {
+            setWhyChooseUsLoading(false);
+        }
+    };
+
+    const handleEditWhyChooseUs = (item) => {
+        setWhyChooseUsFormData({
+            heading: item.heading,
+            title: item.description || item.title, // Use description from backend
+            button: typeof item.button === 'string' ? item.button : (item.button?.text || ''),
+            points: item.points ? item.points.map(point =>
+                typeof point === 'string' ? point : (point.text || point.title || point.description || '')
+            ) : []
+        });
+        setIsEditingWhyChooseUs(true);
+        setEditingWhyChooseUsId(item._id);
+        setShowWhyChooseUsForm(true);
+    };
+
+    const handleDeleteWhyChooseUs = async (id) => {
+        if (window.confirm('Are you sure you want to delete this Why Choose Us content?')) {
+            try {
+                await aboutWhyChooseUsAPI.delete(id);
+                setMessage('✅ Why Choose Us content deleted successfully!');
+                fetchWhyChooseUsData();
+            } catch (error) {
+                console.error('Error deleting why choose us content:', error);
+                setMessage('❌ Failed to delete why choose us content.');
+            }
+        }
+    };
+
+    const resetWhyChooseUsForm = () => {
+        setWhyChooseUsFormData({
+            heading: '',
+            title: '',
+            button: '',
+            points: []
+        });
+        setWhyChooseUsImage(null);
+        setPointFormData('');
+        setShowWhyChooseUsForm(false);
+        setShowPointForm(false);
+        setIsEditingWhyChooseUs(false);
+        setEditingWhyChooseUsId(null);
+    };
+
+    // Our Founder Functions
+    const fetchOurFounderData = async () => {
+        try {
+            const response = await ourFounderAPI.getAll();
+            setOurFounderData(response.data.data);
+        } catch (error) {
+            console.error('Error fetching our founder data:', error);
+            setMessage('❌ Failed to fetch our founder data.');
+        }
+    };
+
+    const handleOurFounderChange = (e) => {
+        setOurFounderFormData({
+            ...ourFounderFormData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleOurFounderImageChange = (e) => {
+        const file = e.target.files[0];
+        setOurFounderImage(file);
+    };
+
+    const handleOurFounderSubmit = async (e) => {
+        e.preventDefault();
+        setOurFounderLoading(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('name', ourFounderFormData.name);
+            formData.append('designation', ourFounderFormData.designation);
+            formData.append('description', ourFounderFormData.description);
+
+            if (ourFounderImage) {
+                formData.append('image', ourFounderImage);
+            }
+
+            if (isEditingOurFounder) {
+                await ourFounderAPI.update(editingOurFounderId, formData);
+                setMessage('✅ Our founder content updated successfully!');
+            } else {
+                await ourFounderAPI.create(formData);
+                setMessage('✅ Our founder content created successfully!');
+            }
+
+            fetchOurFounderData();
+            resetOurFounderForm();
+        } catch (error) {
+            console.error('Error saving our founder content:', error);
+            setMessage(error.response?.data?.message || '❌ Failed to save our founder content.');
+        } finally {
+            setOurFounderLoading(false);
+        }
+    };
+
+    const handleEditOurFounder = (item) => {
+        setOurFounderFormData({
+            name: item.name,
+            designation: item.designation,
+            description: item.description
+        });
+        setIsEditingOurFounder(true);
+        setEditingOurFounderId(item._id);
+        setShowOurFounderForm(true);
+    };
+
+    const handleDeleteOurFounder = async (id) => {
+        if (window.confirm('Are you sure you want to delete this our founder content?')) {
+            try {
+                await ourFounderAPI.delete(id);
+                setMessage('✅ Our founder content deleted successfully!');
+                fetchOurFounderData();
+            } catch (error) {
+                console.error('Error deleting our founder content:', error);
+                setMessage('❌ Failed to delete our founder content.');
+            }
+        }
+    };
+
+    const resetOurFounderForm = () => {
+        setOurFounderFormData({
+            name: '',
+            designation: '',
+            description: ''
+        });
+        setOurFounderImage(null);
+        setShowOurFounderForm(false);
+        setIsEditingOurFounder(false);
+        setEditingOurFounderId(null);
+    };
+
+    // Pagination logic
+    const totalPages = Math.ceil(aboutPages.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const currentItems = filteredItems.slice(startIndex, endIndex);
+    const currentItems = aboutPages.slice(startIndex, endIndex);
 
     return (
         <div className="container-fluid py-4">
@@ -577,39 +819,6 @@ const AboutUs = () => {
                         </h4>
                     </div>
                     <div className="card-body">
-                        {/* Controls */}
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <div className="d-flex align-items-center">
-                                <span className="me-2">Show</span>
-                                <select
-                                    className="form-select form-select-sm me-2"
-                                    style={{ width: 'auto' }}
-                                    value={itemsPerPage}
-                                    onChange={(e) => {
-                                        setItemsPerPage(Number(e.target.value));
-                                        setCurrentPage(1);
-                                    }}
-                                >
-                                    <option value={5}>5</option>
-                                    <option value={10}>10</option>
-                                    <option value={25}>25</option>
-                                    <option value={50}>50</option>
-                                </select>
-                                <span>entries</span>
-                            </div>
-                            <div className="d-flex align-items-center">
-                                <label className="me-2">Search:</label>
-                                <input
-                                    type="text"
-                                    className="form-control form-control-sm"
-                                    style={{ width: '200px' }}
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="Search content..."
-                                />
-                            </div>
-                        </div>
-
                         {/* Content List */}
                         {currentItems.length > 0 ? (
                             <>
@@ -700,10 +909,7 @@ const AboutUs = () => {
 
                                 {/* Pagination */}
                                 {totalPages > 1 && (
-                                    <div className="d-flex justify-content-between align-items-center mt-3">
-                                        <div>
-                                            Showing {startIndex + 1} to {Math.min(endIndex, filteredItems.length)} of {filteredItems.length} entries
-                                        </div>
+                                    <div className="d-flex justify-content-end align-items-center mt-3">
                                         <nav>
                                             <ul className="pagination pagination-sm mb-0">
                                                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
@@ -1027,6 +1233,494 @@ const AboutUs = () => {
                                     className="btn btn-secondary"
                                     onClick={resetJourneyForm}
                                     disabled={journeyLoading}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Why Choose Us Section */}
+            {whyChooseUsData.length > 0 && (
+                <div className="card mb-4 mt-4">
+                    <div className="card-header">
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 className="card-title mb-0">
+                                    <i className="fas fa-star me-2"></i>
+                                    Why Choose Us
+                                </h4>
+                            </div>
+                            {isAuthenticated && (
+                                <div className="btn-group">
+                                    <button
+                                        className="btn btn-outline-primary btn-sm"
+                                        onClick={() => setShowWhyChooseUsForm(true)}
+                                        title="Add New Why Choose Us Content"
+                                    >
+                                        <i className="fas fa-plus me-1"></i>
+                                        Add Content
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="card-body">
+                        <div className="row">
+                            {whyChooseUsData.map((item, index) => (
+                                <div key={item._id} className="col-12 mb-4">
+                                    <div className="card border-warning">
+                                        <div className="card-body">
+                                            <div className="row align-items-center">
+                                                {item.image && (
+                                                    <div className="col-md-4 mb-3 mb-md-0">
+                                                        <img
+                                                            src={`http://localhost:3000${typeof item.image === 'string' ? item.image : item.image.url}`}
+                                                            alt={item.heading}
+                                                            className="img-fluid rounded"
+                                                            style={{ maxHeight: '300px', objectFit: 'cover' }}
+                                                        />
+                                                    </div>
+                                                )}
+                                                <div className={item.image ? 'col-md-8' : 'col-12'}>
+                                                    <div className="d-flex justify-content-between align-items-start mb-3">
+                                                        <div>
+                                                            <h3 className="text-warning mb-2">{item.heading}</h3>
+                                                            <div className="text-muted mb-3" dangerouslySetInnerHTML={{ __html: item.description || item.title || '' }}></div>
+                                                        </div>
+                                                        {isAuthenticated && (
+                                                            <div className="btn-group">
+                                                                <button
+                                                                    className="btn btn-outline-warning btn-sm"
+                                                                    onClick={() => handleEditWhyChooseUs(item)}
+                                                                    title="Edit"
+                                                                >
+                                                                    <i className="fas fa-edit"></i>
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-outline-danger btn-sm"
+                                                                    onClick={() => handleDeleteWhyChooseUs(item._id)}
+                                                                    title="Delete"
+                                                                >
+                                                                    <i className="fas fa-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {item.points && item.points.length > 0 && (
+                                                        <div className="mb-3">
+                                                            <ul className="list-unstyled">
+                                                                {item.points.map((point, pointIndex) => (
+                                                                    <li key={pointIndex} className="mb-2">
+                                                                        <i className="fas fa-check-circle text-success me-2"></i>
+                                                                        {typeof point === 'string' ? point : (point.text || point.title || point.description || '')}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+
+                                                    {item.button && (
+                                                        <button className="btn btn-warning">
+                                                            {typeof item.button === 'string' ? item.button : (item.button.text || '')}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {whyChooseUsData.length === 0 && (
+                <div className="card mb-4 mt-4">
+                    <div className="card-header">
+                        <div className="d-flex justify-content-between align-items-center">
+                            <h4 className="card-title mb-0">
+                                <i className="fas fa-star me-2"></i>
+                                Why Choose Us
+                            </h4>
+                            {isAuthenticated && (
+                                <button
+                                    className="btn btn-outline-primary btn-sm"
+                                    onClick={() => setShowWhyChooseUsForm(true)}
+                                    title="Add Why Choose Us Content"
+                                >
+                                    <i className="fas fa-plus me-1"></i>
+                                    Add Content
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    <div className="card-body text-center">
+                        <div className="py-4">
+                            <i className="fas fa-star display-1 mb-3 text-warning"></i>
+                            <h5>No Why Choose Us Content Yet</h5>
+                            <p>Add content to showcase why customers should choose your services.</p>
+                            {isAuthenticated && (
+                                <button
+                                    className="btn btn-warning"
+                                    onClick={() => setShowWhyChooseUsForm(true)}
+                                >
+                                    <i className="fas fa-plus me-2"></i>
+                                    Add Why Choose Us Content
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Why Choose Us Form */}
+            {showWhyChooseUsForm && (
+                <div className="card mb-4 mt-4">
+                    <div className="card-header">
+                        <h5 className="card-title mb-0">
+                            {isEditingWhyChooseUs ? 'Edit Why Choose Us Content' : 'Add New Why Choose Us Content'}
+                        </h5>
+                    </div>
+                    <div className="card-body">
+                        <form onSubmit={handleWhyChooseUsSubmit}>
+                            <div className="row">
+                                <div className="col-md-12 mb-3">
+                                    <label htmlFor="whyChooseUsHeading" className="form-label">Heading *</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="whyChooseUsHeading"
+                                        name="heading"
+                                        value={whyChooseUsFormData.heading}
+                                        onChange={handleWhyChooseUsChange}
+                                        placeholder="Enter main heading (e.g., 'Why Choose Us')"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12 mb-3">
+                                    <label htmlFor="whyChooseUsTitle" className="form-label">Title *</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="whyChooseUsTitle"
+                                        name="title"
+                                        value={whyChooseUsFormData.title}
+                                        onChange={handleWhyChooseUsChange}
+                                        placeholder="Enter subtitle or description"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12 mb-3">
+                                    <label htmlFor="whyChooseUsButton" className="form-label">Button Text</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="whyChooseUsButton"
+                                        name="button"
+                                        value={typeof whyChooseUsFormData.button === 'string' ? whyChooseUsFormData.button : (whyChooseUsFormData.button?.text || '')}
+                                        onChange={handleWhyChooseUsChange}
+                                        placeholder="Enter button text (optional)"
+                                    />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12 mb-3">
+                                    <label htmlFor="whyChooseUsImage" className="form-label">Image</label>
+                                    <input
+                                        type="file"
+                                        className="form-control"
+                                        id="whyChooseUsImage"
+                                        accept="image/*"
+                                        onChange={handleWhyChooseUsImageChange}
+                                    />
+                                    <small className="form-text text-muted">
+                                        Upload an image to represent why customers should choose you
+                                    </small>
+                                </div>
+                            </div>
+
+                            {/* Points Section */}
+                            <div className="row">
+                                <div className="col-12 mb-3">
+                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 className="mb-0">Key Points</h6>
+                                        <button
+                                            type="button"
+                                            className="btn btn-sm btn-outline-primary"
+                                            onClick={() => setShowPointForm(!showPointForm)}
+                                        >
+                                            <i className="fas fa-plus me-1"></i>
+                                            Add Point
+                                        </button>
+                                    </div>
+
+                                    {/* Add Point Form */}
+                                    {showPointForm && (
+                                        <div className="card mb-3">
+                                            <div className="card-body">
+                                                <div className="row">
+                                                    <div className="col-12 mb-2">
+                                                        <label className="form-label">Point *</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={pointFormData}
+                                                            onChange={(e) => setPointFormData(e.target.value)}
+                                                            placeholder="Enter a key point"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="d-flex gap-2">
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-sm btn-success"
+                                                        onClick={addPoint}
+                                                    >
+                                                        Add Point
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-sm btn-secondary"
+                                                        onClick={() => setShowPointForm(false)}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Display Added Points */}
+                                    {whyChooseUsFormData.points.length > 0 && (
+                                        <div className="row">
+                                            {whyChooseUsFormData.points.map((point, index) => (
+                                                <div key={index} className="col-md-6 col-lg-4 mb-3">
+                                                    <div className="card border-success">
+                                                        <div className="card-body">
+                                                            <div className="d-flex justify-content-between align-items-start">
+                                                                <span className="text-success">
+                                                                    <i className="fas fa-check-circle me-2"></i>
+                                                                    {typeof point === 'string' ? point : (point.text || point.title || point.description || '')}
+                                                                </span>
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-sm btn-outline-danger ms-2"
+                                                                    onClick={() => removePoint(index)}
+                                                                    title="Remove point"
+                                                                >
+                                                                    <i className="fas fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="d-flex gap-2">
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary"
+                                    disabled={whyChooseUsLoading}
+                                >
+                                    {whyChooseUsLoading ? 'Saving...' : (isEditingWhyChooseUs ? 'Update' : 'Create')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={resetWhyChooseUsForm}
+                                    disabled={whyChooseUsLoading}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Our Founder Section */}
+            <div className="card mb-4 mt-4">
+                <div className="card-header">
+                    <div className="d-flex justify-content-between align-items-center">
+                        <h4 className="card-title mb-0">
+                            <i className="fas fa-user-tie me-2 text-primary"></i>
+                            Our Founder
+                        </h4>
+                        {isAuthenticated && (
+                            <button
+                                className="btn btn-primary btn-sm"
+                                onClick={() => setShowOurFounderForm(true)}
+                                title="Add New Our Founder Content"
+                            >
+                                <i className="fas fa-plus me-2"></i>
+                                Add Content
+                            </button>
+                        )}
+                    </div>
+                </div>
+                <div className="card-body">
+                    {ourFounderData.length > 0 ? (
+                        <div className="row">
+                            {ourFounderData.map((founder) => (
+                                <div key={founder._id} className="col-md-6 col-lg-4 mb-4">
+                                    <div className="card h-100 border-0 shadow-sm">
+                                        <div className="position-relative">
+                                            <img
+                                                src={founder.image?.url || '/api/placeholder/300/300'}
+                                                alt={founder.image?.altText || founder.name}
+                                                className="card-img-top"
+                                                style={{ height: '250px', objectFit: 'cover' }}
+                                            />
+                                            {isAuthenticated && (
+                                                <div className="position-absolute top-0 end-0 m-2">
+                                                    <div className="btn-group" role="group">
+                                                        <button
+                                                            className="btn btn-sm btn-outline-light"
+                                                            onClick={() => handleEditOurFounder(founder)}
+                                                            title="Edit"
+                                                        >
+                                                            <i className="fas fa-edit"></i>
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-light text-danger"
+                                                            onClick={() => handleDeleteOurFounder(founder._id)}
+                                                            title="Delete"
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="card-body text-center">
+                                            <h5 className="card-title text-primary">{founder.name}</h5>
+                                            <p className="text-muted mb-2">
+                                                <i className="fas fa-briefcase me-1"></i>
+                                                {founder.designation}
+                                            </p>
+                                            <div 
+                                                className="card-text text-muted small"
+                                                dangerouslySetInnerHTML={{ __html: founder.description }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-5">
+                            <i className="fas fa-user-tie fa-3x text-muted mb-3"></i>
+                            <h5>No Our Founder Content Yet</h5>
+                            <p className="text-muted">Share information about your founder to build trust and connection.</p>
+                            {isAuthenticated && (
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => setShowOurFounderForm(true)}
+                                >
+                                    <i className="fas fa-plus me-2"></i>
+                                    Add Our Founder Content
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Our Founder Form */}
+            {showOurFounderForm && (
+                <div className="card mb-4 mt-4">
+                    <div className="card-header">
+                        <h5 className="card-title mb-0">
+                            {isEditingOurFounder ? 'Edit Our Founder Content' : 'Add New Our Founder Content'}
+                        </h5>
+                    </div>
+                    <div className="card-body">
+                        <form onSubmit={handleOurFounderSubmit}>
+                            <div className="row">
+                                <div className="col-md-6 mb-3">
+                                    <label htmlFor="ourFounderName" className="form-label">Name *</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="ourFounderName"
+                                        name="name"
+                                        value={ourFounderFormData.name}
+                                        onChange={handleOurFounderChange}
+                                        placeholder="Enter founder's name"
+                                        required
+                                    />
+                                </div>
+                                <div className="col-md-6 mb-3">
+                                    <label htmlFor="ourFounderDesignation" className="form-label">Designation *</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="ourFounderDesignation"
+                                        name="designation"
+                                        value={ourFounderFormData.designation}
+                                        onChange={handleOurFounderChange}
+                                        placeholder="Enter designation (e.g., Founder & CEO)"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12 mb-3">
+                                    <label htmlFor="ourFounderDescription" className="form-label">Description *</label>
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={ourFounderFormData.description}
+                                        onChange={(value) => setOurFounderFormData({
+                                            ...ourFounderFormData,
+                                            description: value
+                                        })}
+                                        placeholder="Enter founder's background, vision, or message"
+                                        style={{ height: '200px', marginBottom: '50px' }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12 mb-3">
+                                    <label htmlFor="ourFounderImage" className="form-label">Founder Image</label>
+                                    <input
+                                        type="file"
+                                        className="form-control"
+                                        id="ourFounderImage"
+                                        accept="image/*"
+                                        onChange={handleOurFounderImageChange}
+                                    />
+                                    <small className="form-text text-muted">
+                                        Upload a professional photo of the founder
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div className="d-flex gap-2">
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary"
+                                    disabled={ourFounderLoading}
+                                >
+                                    {ourFounderLoading ? 'Saving...' : (isEditingOurFounder ? 'Update' : 'Create')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={resetOurFounderForm}
+                                    disabled={ourFounderLoading}
                                 >
                                     Cancel
                                 </button>

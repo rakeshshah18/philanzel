@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/home/Home';
 import AboutUs from './pages/about/AboutUs';
+import Career from './pages/Career';
 import ContactForm from './pages/ContactForm';
 import CareerForm from './pages/CareerForm';
 import AdminInquiries from './pages/AdminInquiries';
@@ -40,6 +41,7 @@ const AppLayout = () => {
                             <Route path="/dashboard" element={<Dashboard />} />
                             <Route path="/home" element={<Home />} />
                             <Route path="/about-us" element={<AboutUs />} />
+                            <Route path="/career" element={<Career />} />
                             <Route path="/sections" element={<Sections />} />
                             <Route path="/sections/reviews" element={<Reviews />} />
                             <Route path="/sections/ads" element={<Ads />} />

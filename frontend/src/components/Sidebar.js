@@ -38,7 +38,7 @@ const Sidebar = () => {
 
     // Check if any page route is active
     const isPagesActive = () => {
-        return isActive('/home') || isActive('/about-us');
+        return isActive('/home') || isActive('/about-us') || isActive('/career');
     };
 
     // Check if any service route is active
@@ -138,6 +138,22 @@ const Sidebar = () => {
                             >
                                 <i className="fas fa-info-circle me-2"></i>
                                 About Us
+                            </Link>
+
+                            <Link
+                                to="/career"
+                                className={`nav-link ${isActive('/career') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/career') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-briefcase me-2"></i>
+                                Career
                             </Link>
                         </div>
                     )}
