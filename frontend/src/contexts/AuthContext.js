@@ -47,10 +47,10 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const login = async (loginData) => {
+    const login = async (email, password) => {
         try {
-            console.log('Login attempt with data:', loginData);
-            const response = await adminAuthAPI.login(loginData);
+            console.log('Login attempt with:', { email });
+            const response = await adminAuthAPI.login({ email, password });
             console.log('Login response:', response);
             const { admin: adminData, accessToken } = response.data.data;
 

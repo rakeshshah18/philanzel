@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 const careerSchema = new mongoose.Schema({
-    heading:{
+    heading: {
         type: String,
         required: false,
         trim: true,
@@ -39,5 +39,5 @@ const careerSchema = new mongoose.Schema({
 
 });
 
-const Career = mongoose.model("Career", careerSchema);
-export default Career;
+const CareerPost = mongoose.model("CareerPost", careerSchema);
+export default CareerPost;

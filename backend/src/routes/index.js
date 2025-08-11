@@ -1,5 +1,6 @@
 import newInquiryRoute from './inquiryRoutes.js';
 import careerInquery from './career.js';
+import careerPostRoutes from './careerPostRoutes.js';
 import homePageRoutes from './home/homePageRoutes.js';
 import aboutUsRoutes from './about/aboutUsRoutes.js';
 import ourJourneyRoutes from './about/ourJourneyRoutes.js';
@@ -21,7 +22,8 @@ const router = express.Router();
 
 router.use('/user', newInquiryRoute);
 router.use('/user', careerInquery);
-router.use('/admin/services', servicesRoutes);
+router.use('/admin/career-posts', careerPostRoutes);
+router.use('/career-posts', careerPostRoutes); // Public endpoint for career posts
 router.use('/admin/tabbing-services', tabbingServicesSettingsRoutes);
 router.use('/admin/helped-industries', helpedIndustriesRoutes);
 router.use('/admin/why-choose-us', whyChooseUsRoutes);

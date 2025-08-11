@@ -3,10 +3,12 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { AuthProvider } from './contexts/AuthContext';
 import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/home/Home';
 import AboutUs from './pages/about/AboutUs';
-import Career from './pages/Career';
+import AdminCareer from './pages/career/AdminCareer';
+import PublicCareer from './pages/PublicCareer';
 import ContactForm from './pages/ContactForm';
 import CareerForm from './pages/CareerForm';
 import AdminInquiries from './pages/AdminInquiries';
@@ -27,7 +29,7 @@ const AppLayout = () => {
     const location = useLocation();
 
     // Pages that should not show the sidebar
-    const noSidebarPages = ['/login', '/admin/login', '/admin/register'];
+    const noSidebarPages = ['/login', '/admin/login', '/admin/register', '/public-career'];
     const showSidebar = !noSidebarPages.includes(location.pathname);
 
     return (
@@ -35,14 +37,39 @@ const AppLayout = () => {
             <div className="d-flex flex-fill">
                 {showSidebar && <Sidebar />}
                 <div className={`app-content ${showSidebar ? 'flex-fill' : 'w-100'} d-flex flex-column`}>
-                    <main className="flex-fill">`
+                    <main className="flex-fill">
                         <Routes>
-                            <Route path="/" element={<Dashboard />} />
-                            <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/home" element={<Home />} />
-                            <Route path="/about-us" element={<AboutUs />} />
-                            <Route path="/career" element={<Career />} />
-                            <Route path="/sections" element={<Sections />} />
+                            <Route path="/" element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/dashboard" element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/home" element={
+                                <ProtectedRoute>
+                                    <Home />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/about-us" element={
+                                <ProtectedRoute>
+                                    <AboutUs />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/career" element={
+                                <ProtectedRoute>
+                                    <AdminCareer />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/public-career" element={<PublicCareer />} />
+                            <Route path="/sections" element={
+                                <ProtectedRoute>
+                                    <Sections />
+                                </ProtectedRoute>
+                            } />
                             <Route path="/sections/reviews" element={<Reviews />} />
                             <Route path="/sections/ads" element={<Ads />} />
                             <Route path="/sections/footer" element={<AdminFooter />} />

@@ -18,6 +18,14 @@ API.interceptors.request.use(
         console.log('  - URL:', config.url);
         console.log('  - Base URL:', config.baseURL);
         console.log('  - Full URL:', `${config.baseURL}${config.url}`);
+        console.log('  - Data type:', config.data?.constructor?.name);
+
+        // Handle FormData - remove Content-Type to let browser set it with boundary
+        if (config.data instanceof FormData) {
+            console.log('  - 📋 FormData detected, removing Content-Type header');
+            delete config.headers['Content-Type'];
+        }
+
         console.log('  - Headers:', config.headers);
 
         // Add auth token to requests

@@ -18,13 +18,13 @@ const Career = () => {
             <div className="row">
                 <div className="col-12">
                     {alert.show && (
-                        <Alert 
-                            message={alert.message} 
-                            type={alert.type} 
-                            onClose={() => setAlert({ show: false, message: '', type: '' })} 
+                        <Alert
+                            message={alert.message}
+                            type={alert.type}
+                            onClose={() => setAlert({ show: false, message: '', type: '' })}
                         />
                     )}
-                    
+
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <h1 className="h3 mb-0">Career Management</h1>
                     </div>
@@ -44,7 +44,7 @@ const Career = () => {
                                             <p className="text-muted mb-3">
                                                 Manage career applications and job postings here.
                                             </p>
-                                            
+
                                             <div className="row">
                                                 <div className="col-md-6 mb-3">
                                                     <div className="card bg-light">
@@ -58,7 +58,7 @@ const Career = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="col-md-6 mb-3">
                                                     <div className="card bg-light">
                                                         <div className="card-body text-center">

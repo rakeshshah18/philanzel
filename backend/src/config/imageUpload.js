@@ -1,43 +1,39 @@
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 
-const imageStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, './src/uploads/images');
+// Ensure upload directory exists
+const uploadDir = 'src/uploads/images/';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer for image uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
     },
-    filename: (req, file, cb) => {
-        // Create unique filename to prevent conflicts
+    filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const fileName = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
-        console.log(`Image uploaded: ${fileName} (Original: ${file.originalname})`);
-        cb(null, fileName);
-    },
+        const fileExtension = path.extname(file.originalname);
+        cb(null, file.fieldname + '-' + uniqueSuffix + fileExtension);
+    }
 });
 
-// File filter to allow only image files
-const imageFileFilter = (req, file, cb) => {
-    // Allow only image files
-    const allowedTypes = /jpeg|jpg|png|gif|webp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype) ||
-        file.mimetype.startsWith('image/');
-
-    if (mimetype && extname) {
-        return cb(null, true);
+const fileFilter = (req, file, cb) => {
+    // Accept only image files
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
     } else {
-        cb(new Error('Only image files (JPEG, JPG, PNG, GIF, WebP) are allowed!'));
+        cb(new Error('Only image files are allowed!'), false);
     }
 };
 
 const imageUpload = multer({
-    storage: imageStorage,
-    fileFilter: imageFileFilter,
+    storage: storage,
+    fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB file size limit
-    },
-    onError: (err, next) => {
-        console.log('Image upload error:', err);
-        next(err);
+        fileSize: 5 * 1024 * 1024 // 5MB limit
     }
 });
 
