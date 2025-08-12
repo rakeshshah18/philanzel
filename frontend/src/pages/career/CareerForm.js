@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { careerAPI } from '../services/api';
-import Alert from '../components/Alert';
+import { careerAPI } from '../../services/api';
+import Alert from '../../components/Alert';
 
 const CareerForm = () => {
     const [formData, setFormData] = useState({

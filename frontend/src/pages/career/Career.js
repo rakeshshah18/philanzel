@@ -6,7 +6,9 @@ import api from '../../services/api';
 // Helper function to get the correct image URL
 const getImageURL = (filename) => {
     const baseURL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8000';
-    return `${baseURL}/uploads/images/${filename}`;
+    const fullURL = `${baseURL}/uploads/images/${filename}`;
+    console.log('Generated image URL:', fullURL);
+    return fullURL;
 };
 
 const Career = () => {
@@ -40,6 +42,11 @@ const Career = () => {
         try {
             const response = await api.get('/career-posts');
             if (response.data.status === 'success') {
+                console.log('Career posts fetched:', response.data.data);
+                // Debug image structure
+                response.data.data.forEach((post, index) => {
+                    console.log(`Post ${index + 1} image:`, post.image);
+                });
                 setCareerPosts(response.data.data);
             }
         } catch (error) {
@@ -218,6 +225,13 @@ const Career = () => {
                             <button
                                 className={`nav-link ${activeTab === 'content' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('content')}
+                                style={{
+                                    backgroundColor: activeTab === 'content' ? '#007bff' : 'transparent',
+                                    color: activeTab === 'content' ? '#ffffff' : '#495057',
+                                    border: activeTab === 'content' ? '1px solid #007bff' : '1px solid #a1a5a8ff',
+                                    borderBottom: activeTab === 'content' ? '1px solid #007bff' : '1px solid #a4a8acff',
+                                    fontWeight: activeTab === 'content' ? '600' : '400'
+                                }}
                             >
                                 Career Content Management
                             </button>
@@ -226,6 +240,13 @@ const Career = () => {
                             <button
                                 className={`nav-link ${activeTab === 'applications' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('applications')}
+                                style={{
+                                    backgroundColor: activeTab === 'applications' ? '#007bff' : 'transparent',
+                                    color: activeTab === 'applications' ? '#ffffff' : '#495057',
+                                    border: activeTab === 'applications' ? '1px solid #007bff' : '1px solid #5d6063ff',
+                                    borderBottom: activeTab === 'applications' ? '1px solid #007bff' : '1px solid #717375ff',
+                                    fontWeight: activeTab === 'applications' ? '600' : '400'
+                                }}
                             >
                                 Job Applications ({applications.length})
                             </button>
@@ -318,13 +339,65 @@ const Career = () => {
                                     careerPosts.map((post) => (
                                         <div key={post._id} className="col-md-6 col-lg-4 mb-4">
                                             <div className="card h-100">
-                                                {post.image && (
-                                                    <img
-                                                        src={getImageURL(post.image.filename)}
-                                                        className="card-img-top"
-                                                        alt={post.heading}
-                                                        style={{ height: '200px', objectFit: 'cover' }}
-                                                    />
+                                                {post.image && post.image.filename ? (
+                                                    <div style={{ position: 'relative' }}>
+                                                        <img
+                                                            src={getImageURL(post.image.filename)}
+                                                            className="card-img-top"
+                                                            alt={post.heading}
+                                                            style={{ height: '200px', objectFit: 'cover' }}
+                                                            onError={(e) => {
+                                                                console.error('Image failed to load:', getImageURL(post.image.filename));
+                                                                console.error('Post image object:', post.image);
+                                                                e.target.style.display = 'none';
+                                                                // Show fallback message
+                                                                const fallback = e.target.nextElementSibling;
+                                                                if (fallback) fallback.style.display = 'flex';
+                                                            }}
+                                                            onLoad={() => {
+                                                                console.log('Image loaded successfully:', getImageURL(post.image.filename));
+                                                            }}
+                                                        />
+                                                        <div
+                                                            style={{
+                                                                display: 'none',
+                                                                height: '200px',
+                                                                backgroundColor: '#f8f9fa',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                color: '#6c757d',
+                                                                fontSize: '14px',
+                                                                border: '2px dashed #dee2e6'
+                                                            }}
+                                                        >
+                                                            <div className="text-center">
+                                                                <i className="fas fa-image mb-2" style={{ fontSize: '24px' }}></i>
+                                                                <br />
+                                                                Image not available
+                                                                <br />
+                                                                <small>{post.image.filename}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        style={{
+                                                            height: '200px',
+                                                            backgroundColor: '#f8f9fa',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            color: '#6c757d',
+                                                            fontSize: '14px',
+                                                            border: '2px dashed #dee2e6'
+                                                        }}
+                                                    >
+                                                        <div className="text-center">
+                                                            <i className="fas fa-image mb-2" style={{ fontSize: '24px' }}></i>
+                                                            <br />
+                                                            No image uploaded
+                                                        </div>
+                                                    </div>
                                                 )}
                                                 <div className="card-body d-flex flex-column">
                                                     <h5 className="card-title">{post.heading}</h5>
@@ -448,6 +521,30 @@ const Career = () => {
                     )}
                 </div>
             </div>
+
+            {/* Custom CSS for tab styling */}
+            <style jsx>{`
+                .nav-link:hover {
+                    background-color: #e9ecef !important;
+                    color: #495057 !important;
+                    transition: all 0.2s ease;
+                }
+                
+                .nav-link.active:hover {
+                    background-color: #0056b3 !important;
+                    color: #ffffff !important;
+                }
+                
+                .nav-tabs .nav-link {
+                    border-top-left-radius: 0.375rem;
+                    border-top-right-radius: 0.375rem;
+                    margin-right: 2px;
+                }
+                
+                .nav-tabs {
+                    border-bottom: 2px solid #dee2e6;
+                }
+            `}</style>
         </div>
     );
 };

@@ -16,7 +16,7 @@ const getImageUrl = (imageUrl) => {
     // If it's a relative URL from backend, prepend the base URL
     const baseUrl = process.env.NODE_ENV === 'production'
         ? ''
-        : 'http://localhost:8000';
+    : 'http://localhost:8000';
 
     // Handle backend upload paths correctly
     if (imageUrl.startsWith('/uploads/')) {

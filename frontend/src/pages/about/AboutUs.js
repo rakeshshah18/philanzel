@@ -17,7 +17,7 @@ const getImageUrl = (imageUrl) => {
     // If it's a relative URL from backend, prepend the base URL
     const baseUrl = process.env.NODE_ENV === 'production'
         ? ''
-        : 'http://localhost:8000';
+    : 'http://localhost:8000';
 
     // Handle backend upload paths correctly
     if (imageUrl.startsWith('/uploads/')) {
@@ -1579,7 +1579,7 @@ const AboutUs = () => {
                                     <div className="card h-100 border-0 shadow-sm">
                                         <div className="position-relative">
                                             <img
-                                                src={founder.image?.url || '/api/placeholder/300/300'}
+                                                src={founder.image?.url ? getImageUrl(founder.image.url) : '/api/placeholder/300/300'}
                                                 alt={founder.image?.altText || founder.name}
                                                 className="card-img-top"
                                                 style={{ height: '250px', objectFit: 'cover' }}
@@ -1611,7 +1611,7 @@ const AboutUs = () => {
                                                 <i className="fas fa-briefcase me-1"></i>
                                                 {founder.designation}
                                             </p>
-                                            <div 
+                                            <div
                                                 className="card-text text-muted small"
                                                 dangerouslySetInnerHTML={{ __html: founder.description }}
                                             />

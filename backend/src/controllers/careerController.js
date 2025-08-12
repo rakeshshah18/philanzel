@@ -101,12 +101,30 @@ const getAllCareerApplications = async (req, res) => {
             });
         }
 
-        const applications = await Career.find().sort({ createdAt: -1 });
+        // Get search parameter from query
+        const { search } = req.query;
+        let query = {};
+
+        // If search parameter exists, create search conditions
+        if (search && search.trim()) {
+            const searchRegex = new RegExp(search.trim(), 'i'); // Case-insensitive search
+            query = {
+                $or: [
+                    { fullName: searchRegex },
+                    { email: searchRegex },
+                    { phone: searchRegex },
+                    { message: searchRegex }
+                ]
+            };
+        }
+
+        const applications = await Career.find(query).sort({ createdAt: -1 });
 
         res.status(200).json({
             status: 'success',
-            message: 'Career applications retrieved successfully',
+            message: search ? `Career applications search results for "${search}"` : 'Career applications retrieved successfully',
             count: applications.length,
+            searchTerm: search || null,
             data: applications
         });
 

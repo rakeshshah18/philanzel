@@ -38,6 +38,7 @@ router.use('/career-posts', careerPostRoutes);
 
 // Specific admin routes
 router.use('/admin/tabbing-services', tabbingServicesSettingsRoutes);
+router.use('/admin/services', servicesRoutes);
 router.use('/admin/helped-industries', helpedIndustriesRoutes);
 router.use('/admin/why-choose-us', whyChooseUsRoutes);
 router.use('/admin/our-association', ourAssociationRoutes);

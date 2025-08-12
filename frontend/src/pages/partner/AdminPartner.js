@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Nav, Tab, Table, Button, Form, Alert, Card, Badge, Modal } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import api from '../services/api';
+import api from '../../services/api';
 
 function AdminPartner() {
     const [activeTab, setActiveTab] = useState('content');
@@ -173,10 +173,18 @@ function AdminPartner() {
                     <Tab.Container activeKey={activeTab} onSelect={setActiveTab}>
                         <Nav variant="tabs" className="mb-4">
                             <Nav.Item>
-                                <Nav.Link eventKey="content">Content Management</Nav.Link>
+                                <Nav.Link 
+                                    eventKey="content"
+                                    className={activeTab === 'content' ? 'active-partner-tab' : 'inactive-partner-tab'}
+                                >
+                                    Content Management
+                                </Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link eventKey="applications">
+                                <Nav.Link 
+                                    eventKey="applications"
+                                    className={activeTab === 'applications' ? 'active-partner-tab' : 'inactive-partner-tab'}
+                                >
                                     Partner Applications ({applications.length})
                                 </Nav.Link>
                             </Nav.Item>
@@ -437,6 +445,37 @@ function AdminPartner() {
                     </Tab.Container>
                 </Col>
             </Row>
+            
+            {/* Custom CSS for Partner Management Tabs */}
+            <style jsx>{`
+                .active-partner-tab {
+                    color: #6c757d !important;
+                    background-color: #fff !important;
+                    border-color: #dee2e6 #dee2e6 #fff !important;
+                    font-weight: 600 !important;
+                    border-bottom: 1px solid #fff !important;
+                }
+                
+                .inactive-partner-tab {
+                    color: #495057 !important;
+                    background-color: transparent !important;
+                    border-color: #dee2e6 !important;
+                    font-weight: 400 !important;
+                }
+                
+                .active-partner-tab:hover,
+                .active-partner-tab:focus {
+                    color: #5a6268 !important;
+                    background-color: #fff !important;
+                }
+                
+                .inactive-partner-tab:hover,
+                .inactive-partner-tab:focus {
+                    color: #495057 !important;
+                    background-color: #f8f9fa !important;
+                    border-color: #dee2e6 !important;
+                }
+            `}</style>
         </Container>
     );
 }

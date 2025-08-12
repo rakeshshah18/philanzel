@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Alert from '../components/Alert';
-import api from '../services/api';
+import Alert from '../../components/Alert';
+import api from '../../services/api';
 
 // Helper function to get the correct image URL
 const getImageURL = (filename) => {
