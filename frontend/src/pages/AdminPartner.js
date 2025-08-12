@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Nav, Tab, Table, Button, Form, Alert } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Container, Row, Col, Nav, Tab, Table, Button, Form, Alert, Card, Badge, Modal } from 'react-bootstrap';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import api from '../services/api';
 
 function AdminPartner() {
@@ -12,6 +14,8 @@ function AdminPartner() {
         description: ''
     });
     const [postId, setPostId] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     // Applications State
     const [applications, setApplications] = useState([]);
@@ -98,6 +102,7 @@ function AdminPartner() {
                     description: savedData.description || ''
                 });
                 setPostId(savedData._id);
+                setShowEditModal(false); // Close the modal
                 showAlert('Partner content updated successfully!');
             }
         } catch (error) {
@@ -181,56 +186,183 @@ function AdminPartner() {
                             {/* Content Management Tab */}
                             <Tab.Pane eventKey="content">
                                 <Row>
-                                    <Col lg={8}>
+                                    <Col>
+                                        {/* Content Display Card */}
+                                        <Card className="mb-4 shadow-sm">
+                                            <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
+                                                <h5 className="mb-0">
+                                                    <i className="fas fa-file-alt me-2"></i>
+                                                    Partner Page Content
+                                                </h5>
+                                                <div>
+                                                    <Badge bg={postId ? 'success' : 'warning'} className="me-2">
+                                                        {postId ? 'Published' : 'Draft'}
+                                                    </Badge>
+                                                    <Button
+                                                        variant="light"
+                                                        size="sm"
+                                                        onClick={() => setShowEditModal(true)}
+                                                    >
+                                                        <i className="fas fa-edit me-1"></i>
+                                                        Edit Content
+                                                    </Button>
+                                                </div>
+                                            </Card.Header>
+                                            <Card.Body>
+                                                {partnerPost.heading || partnerPost.thought || partnerPost.description ? (
+                                                    <div>
+                                                        <div className="mb-3">
+                                                            <h6 className="text-muted mb-2">Page Heading</h6>
+                                                            <h4 className="text-primary">
+                                                                {partnerPost.heading || 'No heading set'}
+                                                            </h4>
+                                                        </div>
+
+                                                        <div className="mb-3">
+                                                            <h6 className="text-muted mb-2">Thought</h6>
+                                                            <div className="text-secondary fst-italic">
+                                                                <div dangerouslySetInnerHTML={{
+                                                                    __html: partnerPost.thought || '<em>No thought set</em>'
+                                                                }} />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="mb-3">
+                                                            <h6 className="text-muted mb-2">Description</h6>
+                                                            <div className="border-start border-primary border-3 ps-3">
+                                                                <div dangerouslySetInnerHTML={{
+                                                                    __html: partnerPost.description || '<em>No description set</em>'
+                                                                }} />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-center py-5">
+                                                        <i className="fas fa-file-plus fa-3x text-muted mb-3"></i>
+                                                        <h5 className="text-muted">No Content Created</h5>
+                                                        <p className="text-muted mb-3">
+                                                            Get started by creating your partner page content.
+                                                        </p>
+                                                        <Button
+                                                            variant="primary"
+                                                            onClick={() => setShowEditModal(true)}
+                                                        >
+                                                            <i className="fas fa-plus me-2"></i>
+                                                            Create Content
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </Card.Body>
+                                        </Card>
+                                    </Col>
+                                </Row>
+
+                                {/* Edit Content Modal */}
+                                <Modal
+                                    show={showEditModal}
+                                    onHide={() => setShowEditModal(false)}
+                                    size="lg"
+                                    backdrop="static"
+                                >
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>
+                                            <i className="fas fa-edit me-2"></i>
+                                            {postId ? 'Edit Partner Content' : 'Create Partner Content'}
+                                        </Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
                                         <Form onSubmit={handleSubmit}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Page Heading</Form.Label>
+                                                <Form.Label>
+                                                    <i className="fas fa-heading me-2"></i>
+                                                    Page Heading
+                                                </Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     name="heading"
                                                     value={partnerPost.heading}
                                                     onChange={handleInputChange}
-                                                    placeholder="Enter page heading"
+                                                    placeholder="Enter an engaging page heading"
                                                     required
                                                 />
                                             </Form.Group>
 
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Thought</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="thought"
+                                                <Form.Label>
+                                                    <i className="fas fa-lightbulb me-2"></i>
+                                                    Thought/Tagline
+                                                </Form.Label>
+                                                <ReactQuill
+                                                    theme="snow"
                                                     value={partnerPost.thought}
-                                                    onChange={handleInputChange}
-                                                    placeholder="Enter your thought"
-                                                    required
+                                                    onChange={(content) => setPartnerPost(prev => ({ ...prev, thought: content }))}
+                                                    placeholder="Enter a compelling thought or tagline"
+                                                    style={{ backgroundColor: 'white' }}
+                                                    modules={{
+                                                        toolbar: [
+                                                            ['bold', 'italic', 'underline'],
+                                                            ['link'],
+                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                            ['clean']
+                                                        ]
+                                                    }}
                                                 />
                                             </Form.Group>
 
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Description</Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    rows={6}
-                                                    name="description"
+                                                <Form.Label>
+                                                    <i className="fas fa-file-text me-2"></i>
+                                                    Description
+                                                </Form.Label>
+                                                <ReactQuill
+                                                    theme="snow"
                                                     value={partnerPost.description}
-                                                    onChange={handleInputChange}
-                                                    placeholder="Enter page description"
-                                                    required
+                                                    onChange={(content) => setPartnerPost(prev => ({ ...prev, description: content }))}
+                                                    placeholder="Provide detailed information about your partnership program, benefits, requirements, etc."
+                                                    style={{ backgroundColor: 'white', height: '200px', marginBottom: '50px' }}
+                                                    modules={{
+                                                        toolbar: [
+                                                            [{ 'header': [1, 2, 3, false] }],
+                                                            ['bold', 'italic', 'underline', 'strike'],
+                                                            [{ 'color': [] }, { 'background': [] }],
+                                                            ['blockquote', 'code-block'],
+                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                            [{ 'indent': '-1' }, { 'indent': '+1' }],
+                                                            ['link', 'image'],
+                                                            ['clean']
+                                                        ]
+                                                    }}
                                                 />
                                             </Form.Group>
-
-                                            <Button
-                                                type="submit"
-                                                variant="primary"
-                                                disabled={loading}
-                                                className="mb-4"
-                                            >
-                                                {loading ? 'Saving...' : (postId ? 'Update Content' : 'Create Content')}
-                                            </Button>
                                         </Form>
-                                    </Col>
-                                </Row>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => setShowEditModal(false)}
+                                            disabled={loading}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            variant="primary"
+                                            onClick={handleSubmit}
+                                            disabled={loading}
+                                        >
+                                            {loading ? (
+                                                <>
+                                                    <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                                    Saving...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="fas fa-save me-2"></i>
+                                                    {postId ? 'Update Content' : 'Create Content'}
+                                                </>
+                                            )}
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
                             </Tab.Pane>
 
                             {/* Applications Tab */}
