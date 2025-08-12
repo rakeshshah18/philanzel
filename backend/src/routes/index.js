@@ -1,8 +1,10 @@
+import partnerAssociationImageRoutes from './partnerAssociationImageRoutes.js';
+// router.use('/partner', partnerAssociationImageRoutes);
 import newInquiryRoute from './inquiryRoutes.js';
-import careerInquery from './career.js';
-import careerPostRoutes from './careerPostRoutes.js';
-import partnerInquiry from './partner.js';
-import partnerPostRoutes from './partnerPostRoutes.js';
+import careerInquery from './career/career.js';
+import careerPostRoutes from './career/careerPostRoutes.js';
+import partnerInquiry from './partner/partner.js';
+import partnerPostRoutes from './partner/partnerPostRoutes.js';
 import homePageRoutes from './home/homePageRoutes.js';
 import aboutUsRoutes from './about/aboutUsRoutes.js';
 import ourJourneyRoutes from './about/ourJourneyRoutes.js';
@@ -17,7 +19,7 @@ import ourAssociationRoutes from './home/ourAssociationRoutes.js';
 import homeFAQsRoutes from './home/homeFAQsRoutes.js';
 import reviewSectionRoutes from './sections/reviewSectionRoutes.js';
 import adsSectionRoutes from './sections/adsRoute.js';
-import footerRoutes from './footerRoutes.js';
+import footerRoutes from './sections/footerRoutes.js';
 import express from 'express';
 
 const router = express.Router();
@@ -57,6 +59,7 @@ router.use('/admin/our-track', ourTrackRoutes);
 // Partner routes MUST come before general /admin routes
 router.use('/admin/partner-posts', partnerPostRoutes);
 router.use('/partner-posts', partnerPostRoutes);
+router.use('/partner', partnerAssociationImageRoutes);
 
 // General /admin routes MUST come LAST
 router.use('/admin', homePageRoutes);

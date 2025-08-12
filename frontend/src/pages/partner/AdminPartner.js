@@ -158,6 +158,71 @@ function AdminPartner() {
         }
     };
 
+
+
+    // Partner Association Images State (local to Partner page)
+    const [partnerImages, setPartnerImages] = useState([]);
+    const [partnerImagesLoading, setPartnerImagesLoading] = useState(false);
+    const [partnerImagesError, setPartnerImagesError] = useState('');
+    const [newImageFile, setNewImageFile] = useState(null);
+    const [newImageAlt, setNewImageAlt] = useState('');
+
+    // Fetch images for Partner page only (from /partner-association)
+    useEffect(() => {
+        const fetchImages = async () => {
+            setPartnerImagesLoading(true);
+            setPartnerImagesError('');
+            try {
+                const response = await api.get('/partner');
+                setPartnerImages(response.data?.data || []);
+            } catch (err) {
+                setPartnerImagesError('Failed to load images');
+            } finally {
+                setPartnerImagesLoading(false);
+            }
+        };
+        fetchImages();
+    }, []);
+
+    // Add new image to Partner Association
+    const handleAddImage = async (e) => {
+        e.preventDefault();
+        if (!newImageFile) return;
+        setPartnerImagesLoading(true);
+        setPartnerImagesError('');
+        try {
+            const formData = new FormData();
+            formData.append('image', newImageFile);
+            formData.append('alt', newImageAlt);
+            // Save to /admin/partner-association
+            await api.post('/partner', formData);
+            setNewImageFile(null);
+            setNewImageAlt('');
+            // Refresh images
+            const response = await api.get('/partner');
+            setPartnerImages(response.data?.data || []);
+        } catch (err) {
+            setPartnerImagesError('Failed to add image');
+        } finally {
+            setPartnerImagesLoading(false);
+        }
+    };
+
+    // Delete image from Partner Association
+    const handleDeleteImage = async (id) => {
+        if (!window.confirm('Delete this image?')) return;
+        setPartnerImagesLoading(true);
+        setPartnerImagesError('');
+        try {
+            await api.delete(`/partner/${id}`);
+            setPartnerImages(prev => prev.filter(img => img._id !== id));
+        } catch (err) {
+            setPartnerImagesError('Failed to delete image');
+        } finally {
+            setPartnerImagesLoading(false);
+        }
+    };
+
     return (
         <Container fluid className="py-4">
             <Row>
@@ -262,6 +327,59 @@ function AdminPartner() {
                                                 )}
                                             </Card.Body>
                                         </Card>
+                                    </Col>
+                                </Row>
+
+                                {/* Partner Association Images Row */}
+                                <Row className="mb-4">
+                                    <Col>
+                                        <h5 className="mb-3">Our Association</h5>
+                                        {partnerImagesError && <Alert variant="danger">{partnerImagesError}</Alert>}
+                                        {partnerImagesLoading ? (
+                                            <div className="text-center py-3">
+                                                <span className="spinner-border text-primary" role="status"></span>
+                                            </div>
+                                        ) : (
+                                            <div className="d-flex flex-row align-items-center overflow-auto" style={{ gap: '1rem' }}>
+                                                {partnerImages.map(img => (
+                                                    <div key={img._id} className="position-relative">
+                                                        <img
+                                                            src={img.url?.startsWith('http') ? img.url : `http://localhost:8000${img.url}`}
+                                                            alt={img.alt || 'Association'}
+                                                            style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #ddd' }}
+                                                        />
+                                                        <Button
+                                                            variant="outline-danger"
+                                                            size="sm"
+                                                            className="position-absolute top-0 end-0"
+                                                            style={{ zIndex: 2 }}
+                                                            onClick={() => handleDeleteImage(img._id)}
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                                {/* Inline Upload Field */}
+                                                <form onSubmit={handleAddImage} className="d-flex flex-column align-items-center" style={{ minWidth: '120px' }}>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={e => setNewImageFile(e.target.files[0])}
+                                                        style={{ marginBottom: '0.5rem' }}
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        className="form-control form-control-sm mb-2"
+                                                        placeholder="Alt text (optional)"
+                                                        value={newImageAlt}
+                                                        onChange={e => setNewImageAlt(e.target.value)}
+                                                    />
+                                                    <Button type="submit" variant="success" size="sm" disabled={!newImageFile || partnerImagesLoading}>
+                                                        <i className="fas fa-plus"></i> Add
+                                                    </Button>
+                                                </form>
+                                            </div>
+                                        )}
                                     </Col>
                                 </Row>
 

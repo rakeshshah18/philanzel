@@ -1,8 +1,8 @@
 import express from 'express';
 import multer from 'multer';
-import careerInquiry, { getAllCareerApplications } from '../controllers/careerController.js';
-import upload from '../config/multer.js';
-import verifyCaptcha from '../middlewares/verifyCaptcha.js';
+import careerInquiry, { getAllCareerApplications } from '../../controllers/careerController.js';
+import upload from '../../config/multer.js';
+import verifyCaptcha from '../../middlewares/verifyCaptcha.js';
 
 const router = express.Router();
 

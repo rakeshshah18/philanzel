@@ -1,6 +1,6 @@
 import express from 'express';
-import partnerInquiry, { getAllPartnerApplications, updateApplicationStatus, deletePartnerApplication } from '../controllers/partnerController.js';
-import verifyCaptcha from '../middlewares/verifyCaptcha.js';
+import partnerInquiry, { getAllPartnerApplications, updateApplicationStatus, deletePartnerApplication } from '../../controllers/partnerController.js';
+import verifyCaptcha from '../../middlewares/verifyCaptcha.js';
 
 const router = express.Router();
 

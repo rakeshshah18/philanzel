@@ -6,7 +6,7 @@ import {
     createCareerPost,
     updateCareerPost,
     deleteCareerPost
-} from '../controllers/careerPostController.js';
+} from '../../controllers/careerPostController.js';
 
 const router = express.Router();
 

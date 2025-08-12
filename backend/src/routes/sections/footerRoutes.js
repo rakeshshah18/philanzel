@@ -32,7 +32,7 @@ import {
 
     // Social links operations
     addSocialLink
-} from '../controllers/footerController.js';
+} from '../../controllers/footerController.js';
 
 const router = express.Router();
 
