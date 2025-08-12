@@ -173,7 +173,7 @@ function AdminPartner() {
                     <Tab.Container activeKey={activeTab} onSelect={setActiveTab}>
                         <Nav variant="tabs" className="mb-4">
                             <Nav.Item>
-                                <Nav.Link 
+                                <Nav.Link
                                     eventKey="content"
                                     className={activeTab === 'content' ? 'active-partner-tab' : 'inactive-partner-tab'}
                                 >
@@ -181,7 +181,7 @@ function AdminPartner() {
                                 </Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link 
+                                <Nav.Link
                                     eventKey="applications"
                                     className={activeTab === 'applications' ? 'active-partner-tab' : 'inactive-partner-tab'}
                                 >
@@ -445,7 +445,7 @@ function AdminPartner() {
                     </Tab.Container>
                 </Col>
             </Row>
-            
+
             {/* Custom CSS for Partner Management Tabs */}
             <style jsx>{`
                 .active-partner-tab {

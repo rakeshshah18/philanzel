@@ -39,7 +39,7 @@ const AdminApplications = () => {
             return;
         }
 
-    const downloadUrl = `http://localhost:8000/uploads/${resume.filename}`;
+        const downloadUrl = `http://localhost:8000/uploads/${resume.filename}`;
 
         // Create a temporary link element and trigger download
         const link = document.createElement('a');
