@@ -38,7 +38,7 @@ const Sidebar = () => {
 
     // Check if any page route is active
     const isPagesActive = () => {
-        return isActive('/home') || isActive('/about-us') || isActive('/career');
+        return isActive('/home') || isActive('/about-us') || isActive('/career') || isActive('/partner');
     };
 
     // Check if any service route is active
@@ -154,6 +154,22 @@ const Sidebar = () => {
                             >
                                 <i className="fas fa-briefcase me-2"></i>
                                 Career
+                            </Link>
+
+                            <Link
+                                to="/partner"
+                                className={`nav-link ${isActive('/partner') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/partner') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-handshake me-2"></i>
+                                Become A Partner
                             </Link>
                         </div>
                     )}

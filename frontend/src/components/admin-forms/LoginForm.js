@@ -32,7 +32,7 @@ const LoginForm = ({ show, onClose, onLogin, loading }) => {
             // Standalone page login
             try {
                 setIsLoading(true);
-                const result = await login(formData);
+                const result = await login(formData.email, formData.password);
                 if (result.success) {
                     navigate('/dashboard');
                 } else {

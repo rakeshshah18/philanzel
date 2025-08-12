@@ -9,6 +9,8 @@ import Home from './pages/home/Home';
 import AboutUs from './pages/about/AboutUs';
 import AdminCareer from './pages/career/AdminCareer';
 import PublicCareer from './pages/PublicCareer';
+import AdminPartner from './pages/AdminPartner';
+import PublicPartner from './pages/PublicPartner';
 import ContactForm from './pages/ContactForm';
 import CareerForm from './pages/CareerForm';
 import AdminInquiries from './pages/AdminInquiries';
@@ -65,6 +67,12 @@ const AppLayout = () => {
                                 </ProtectedRoute>
                             } />
                             <Route path="/public-career" element={<PublicCareer />} />
+                            <Route path="/partner" element={
+                                <ProtectedRoute>
+                                    <AdminPartner />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/public-partner" element={<PublicPartner />} />
                             <Route path="/sections" element={
                                 <ProtectedRoute>
                                     <Sections />

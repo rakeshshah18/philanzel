@@ -53,7 +53,7 @@ const Dashboard = () => {
         setAuthLoading(true);
         setAuthMessage('');
 
-        const result = await login(loginData);
+        const result = await login(loginData.email, loginData.password);
 
         if (result.success) {
             setAuthMessage('✅ Login successful!');

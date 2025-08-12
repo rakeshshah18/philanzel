@@ -85,9 +85,13 @@ class AdminAuthController {
     // Login admin
     async login(req, res) {
         try {
+            console.log('🔑 Login attempt received');
+            console.log('📧 Request body:', req.body);
+
             // Check validation errors
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
+                console.log('❌ Validation errors:', errors.array());
                 return res.status(400).json({
                     success: false,
                     message: 'Validation failed',
@@ -96,33 +100,41 @@ class AdminAuthController {
             }
 
             const { email, password } = req.body;
+            console.log('🔍 Looking for admin with email:', email);
 
             // Find admin by email
             const admin = await Admin.findOne({ email });
             if (!admin) {
+                console.log('❌ No admin found with email:', email);
                 return res.status(401).json({
                     success: false,
                     message: 'Invalid credentials'
                 });
             }
 
+            console.log('✅ Admin found:', admin.name);
+
             // Check if admin is active
             if (!admin.isActive) {
+                console.log('❌ Admin account is deactivated');
                 return res.status(401).json({
                     success: false,
                     message: 'Account is deactivated. Please contact super admin.'
                 });
             }
 
+            console.log('🔐 Checking password...');
             // Check password
             const isPasswordValid = await admin.comparePassword(password);
             if (!isPasswordValid) {
+                console.log('❌ Invalid password');
                 return res.status(401).json({
                     success: false,
                     message: 'Invalid credentials'
                 });
             }
 
+            console.log('✅ Password valid, generating tokens...');
             // Generate tokens
             const accessToken = admin.generateAccessToken();
             const refreshToken = admin.generateRefreshToken();
@@ -139,6 +151,7 @@ class AdminAuthController {
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             });
 
+            console.log('✅ Login successful for:', admin.name);
             res.status(200).json({
                 success: true,
                 message: 'Login successful',
@@ -149,7 +162,8 @@ class AdminAuthController {
             });
 
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('❌ Login error:', error);
+            console.error('❌ Error stack:', error.stack);
 
             // Handle specific MongoDB connection errors
             if (error.name === 'MongooseError' && error.message.includes('buffering timed out')) {
@@ -162,7 +176,7 @@ class AdminAuthController {
 
             res.status(500).json({
                 success: false,
-                message: 'Internal server error',
+                message: 'Internal server error during login',
                 error: process.env.NODE_ENV === 'development' ? error.message : undefined
             });
         }
