@@ -19,6 +19,9 @@ function AdminPartner() {
 
     // Applications State
     const [applications, setApplications] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
+    const [filteredApplications, setFilteredApplications] = useState([]);
 
     // Alert State
     const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
@@ -29,6 +32,33 @@ function AdminPartner() {
         fetchPartnerPost();
         fetchApplications();
     }, []);
+
+    useEffect(() => {
+        let filtered = applications.filter(app => {
+            const term = searchTerm.toLowerCase();
+            return (
+                app.serviceName?.toLowerCase().includes(term) ||
+                app.personName?.toLowerCase().includes(term) ||
+                app.email?.toLowerCase().includes(term) ||
+                app.phone?.toLowerCase().includes(term) ||
+                app.message?.toLowerCase().includes(term)
+            );
+        });
+        if (sortConfig.key) {
+            filtered = filtered.sort((a, b) => {
+                let aValue = a[sortConfig.key];
+                let bValue = b[sortConfig.key];
+                if (sortConfig.key === "createdAt") {
+                    aValue = new Date(aValue);
+                    bValue = new Date(bValue);
+                }
+                if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+                if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+                return 0;
+            });
+        }
+        setFilteredApplications(filtered);
+    }, [applications, searchTerm, sortConfig]);
 
     const showAlert = (message, variant = 'success') => {
         setAlert({ show: true, message, variant });
@@ -152,12 +182,20 @@ function AdminPartner() {
         switch (status) {
             case 'pending': return 'warning';
             case 'reviewed': return 'info';
-            case 'accepted': return 'success';
+            case 'approved': return 'success';
             case 'rejected': return 'danger';
             default: return 'secondary';
         }
     };
 
+    const handleSort = (key) => {
+        setSortConfig(prev => {
+            if (prev.key === key) {
+                return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
+            }
+            return { key, direction: "asc" };
+        });
+    };
 
 
     // Partner Association Images State (local to Partner page)
@@ -493,27 +531,35 @@ function AdminPartner() {
 
                             {/* Applications Tab */}
                             <Tab.Pane eventKey="applications">
+                                <div className="mb-3">
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Search applications..."
+                                        value={searchTerm}
+                                        onChange={e => setSearchTerm(e.target.value)}
+                                    />
+                                </div>
                                 <div className="table-responsive">
                                     <Table striped bordered hover>
                                         <thead>
                                             <tr>
-                                                <th>Service Name</th>
-                                                <th>Person Name</th>
-                                                <th>Email</th>
+                                                <th style={{ cursor: "pointer" }} onClick={() => handleSort("serviceName")}>Service Name {sortConfig.key === "serviceName" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}</th>
+                                                <th style={{ cursor: "pointer" }} onClick={() => handleSort("personName")}>Person Name {sortConfig.key === "personName" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}</th>
+                                                <th style={{ cursor: "pointer" }} onClick={() => handleSort("email")}>Email {sortConfig.key === "email" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}</th>
                                                 <th>Phone</th>
                                                 <th>Message</th>
-                                                <th>Status</th>
-                                                <th>Submitted</th>
+                                                <th style={{ cursor: "pointer" }} onClick={() => handleSort("status")}>Status {sortConfig.key === "status" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}</th>
+                                                <th style={{ cursor: "pointer" }} onClick={() => handleSort("createdAt")}>Submitted {sortConfig.key === "createdAt" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {applications.length === 0 ? (
+                                            {filteredApplications.length === 0 ? (
                                                 <tr>
                                                     <td colSpan="8" className="text-center">No applications found</td>
                                                 </tr>
                                             ) : (
-                                                applications.map((application) => (
+                                                filteredApplications.map((application) => (
                                                     <tr key={application._id}>
                                                         <td>{application.serviceName}</td>
                                                         <td>{application.personName}</td>
@@ -540,7 +586,7 @@ function AdminPartner() {
                                                                 >
                                                                     <option value="pending">Pending</option>
                                                                     <option value="reviewed">Reviewed</option>
-                                                                    <option value="accepted">Accepted</option>
+                                                                    <option value="approved">Approved</option>
                                                                     <option value="rejected">Rejected</option>
                                                                 </select>
                                                                 <Button
@@ -568,30 +614,30 @@ function AdminPartner() {
             <style jsx>{`
                 .active-partner-tab {
                     color: #6c757d !important;
-                    background-color: #fff !important;
-                    border-color: #dee2e6 #dee2e6 #fff !important;
+                    background-color: #666060ff !important;
+                    border-color: #555758ff #75797eff #696767ff !important;
                     font-weight: 600 !important;
-                    border-bottom: 1px solid #fff !important;
+                    border-bottom: 1px solid #696565ff !important;
                 }
                 
                 .inactive-partner-tab {
                     color: #495057 !important;
                     background-color: transparent !important;
-                    border-color: #dee2e6 !important;
+                    border-color: #646668ff !important;
                     font-weight: 400 !important;
                 }
                 
                 .active-partner-tab:hover,
                 .active-partner-tab:focus {
-                    color: #5a6268 !important;
-                    background-color: #fff !important;
+                    color: #262b30ff !important;
+                    background-color: #b4b0b0ff !important;
                 }
                 
                 .inactive-partner-tab:hover,
                 .inactive-partner-tab:focus {
                     color: #495057 !important;
-                    background-color: #f8f9fa !important;
-                    border-color: #dee2e6 !important;
+                    background-color: #636464ff !important;
+                    border-color: #696a6bff !important;
                 }
             `}</style>
         </Container>

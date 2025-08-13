@@ -1,5 +1,4 @@
 import partnerAssociationImageRoutes from './partnerAssociationImageRoutes.js';
-// router.use('/partner', partnerAssociationImageRoutes);
 import newInquiryRoute from './inquiryRoutes.js';
 import careerInquery from './career/career.js';
 import careerPostRoutes from './career/careerPostRoutes.js';

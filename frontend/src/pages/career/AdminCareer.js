@@ -10,6 +10,66 @@ const getImageURL = (filename) => {
 };
 
 const AdminCareer = () => {
+    // Restore missing functions
+    // Apply all filters (search + date range)
+    const applyFilters = (applicationsData, searchValue, dateFilter) => {
+        let result = applicationsData;
+        // Apply search filter
+        if (searchValue) {
+            result = result.filter(app =>
+                app.fullName?.toLowerCase().includes(searchValue.toLowerCase()) ||
+                app.email?.toLowerCase().includes(searchValue.toLowerCase()) ||
+                app.phone?.includes(searchValue) ||
+                app.message?.toLowerCase().includes(searchValue.toLowerCase())
+            );
+        }
+        // Apply date range filter
+        if (dateFilter.startDate || dateFilter.endDate) {
+            result = result.filter(app => {
+                const appDate = new Date(app.createdAt);
+                const startDate = dateFilter.startDate ? new Date(dateFilter.startDate) : null;
+                const endDate = dateFilter.endDate ? new Date(dateFilter.endDate + 'T23:59:59') : null;
+                if (startDate && endDate) {
+                    return appDate >= startDate && appDate <= endDate;
+                } else if (startDate) {
+                    return appDate >= startDate;
+                } else if (endDate) {
+                    return appDate <= endDate;
+                }
+                return true;
+            });
+        }
+        const sortedResult = sortApplications(result);
+        setFilteredApplications(sortedResult);
+    };
+
+    // Clear search
+    const clearSearch = () => {
+        setSearchTerm('');
+        applyFilters(applications, '', dateRange);
+    };
+
+    // Clear date filter
+    const clearDateFilter = () => {
+        setDateRange({ startDate: '', endDate: '' });
+        applyFilters(applications, searchTerm, { startDate: '', endDate: '' });
+    };
+
+    // Handle date range change
+    const handleDateRangeChange = (field, value) => {
+        const newDateRange = { ...dateRange, [field]: value };
+        setDateRange(newDateRange);
+        applyFilters(applications, searchTerm, newDateRange);
+    };
+
+    // Sorting functionality
+    const handleSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
     const { isAuthenticated } = useAuth();
     const [alert, setAlert] = useState({ show: false, message: '', type: '' });
 
@@ -144,68 +204,83 @@ const AdminCareer = () => {
     };
 
     // Clear search
-    const clearSearch = () => {
-        setSearchTerm('');
-        applyFilters(applications, '', dateRange);
-    };
-
-    // Clear date filter
-    const clearDateFilter = () => {
-        setDateRange({ startDate: '', endDate: '' });
-        applyFilters(applications, searchTerm, { startDate: '', endDate: '' });
-    };
-
-    // Apply all filters (search + date range)
-    const applyFilters = (applicationsData, searchValue, dateFilter) => {
-        let result = applicationsData;
-
-        // Apply search filter
-        if (searchValue) {
-            result = result.filter(app =>
-                app.fullName.toLowerCase().includes(searchValue.toLowerCase()) ||
-                app.email.toLowerCase().includes(searchValue.toLowerCase()) ||
-                app.phone.includes(searchValue) ||
-                app.message.toLowerCase().includes(searchValue.toLowerCase())
-            );
-        }
-
-        // Apply date range filter
-        if (dateFilter.startDate || dateFilter.endDate) {
-            result = result.filter(app => {
-                const appDate = new Date(app.createdAt);
-                const startDate = dateFilter.startDate ? new Date(dateFilter.startDate) : null;
-                const endDate = dateFilter.endDate ? new Date(dateFilter.endDate + 'T23:59:59') : null;
-
-                if (startDate && endDate) {
-                    return appDate >= startDate && appDate <= endDate;
-                } else if (startDate) {
-                    return appDate >= startDate;
-                } else if (endDate) {
-                    return appDate <= endDate;
+    <style jsx>{`
+                .active-career-tab {
+                    color: #fff;
+                    background-color: #262b30ff;
+                    border-color: #555758ff #75797eff #696767ff !important;
+                    font-weight: 600 !important;
+                    border-bottom: 1px solid #696565ff !important;
                 }
-                return true;
-            });
-        }
-
-        const sortedResult = sortApplications(result);
-        setFilteredApplications(sortedResult);
-    };
-
-    // Handle date range change
-    const handleDateRangeChange = (field, value) => {
-        const newDateRange = { ...dateRange, [field]: value };
-        setDateRange(newDateRange);
-        applyFilters(applications, searchTerm, newDateRange);
-    };
-
-    // Sorting functionality
-    const handleSort = (key) => {
-        let direction = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
-    };
+                .inactive-career-tab {
+                    color: #495057 !important;
+                    background-color: transparent !important;
+                    border-color: #646668ff !important;
+                    font-weight: 400 !important;
+                }
+                .active-career-tab:hover,
+                .active-career-tab:focus {
+                    color: #262b30ff !important;
+                    background-color: #5f5b5bff !important;
+                }
+                .inactive-career-tab:hover,
+                .inactive-career-tab:focus {
+                    color: #495057 !important;
+                    background-color: #636464ff !important;
+                    border-color: #696a6bff !important;
+                }
+                .sortable-header:hover {
+                    background-color: #e9ecef !important;
+                    transition: background-color 0.2s ease;
+                }
+                .table tbody tr:hover {
+                    background-color: #f8f9fa !important;
+                }
+                .card {
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    border: 1px solid #e9ecef;
+                }
+                .date-filter-active {
+                    border-left: 4px solid #007bff;
+                }
+                .filter-summary {
+                    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                }
+                .table {
+                    border-collapse: separate;
+                    border-spacing: 0;
+                }
+                .table th {
+                    border-top: none;
+                    border-bottom: 2px solid #dee2e6;
+                    background-color: #f8f9fa;
+                    color: #495057;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    font-size: 0.875rem;
+                    letter-spacing: 0.5px;
+                }
+                .table td {
+                    border-top: 1px solid #f1f3f4;
+                    padding: 12px;
+                    vertical-align: middle;
+                }
+                .btn:hover {
+                    transform: translateY(-1px);
+                    transition: all 0.2s ease;
+                    color: #495057;
+                }
+                .btn:active {
+                    color: #495057 !important;
+                    background-color: transparent !important;
+                    border-color: #646668ff !important;
+                    font-weight: 400 !important;
+                }
+                .form-control:focus {
+                    border-color: #007bff;
+                    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                }
+            `}</style>
 
     // Sort applications based on current sort config
     const sortApplications = (applicationsToSort) => {
@@ -456,6 +531,7 @@ const AdminCareer = () => {
                             <button
                                 className={`nav-link ${activeTab === 'content' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('content')}
+                                style={activeTab === 'content' ? { backgroundColor: '#2f323aff', fontWeight: 600 } : {}}
                             >
                                 Career Content Management
                             </button>
@@ -464,6 +540,7 @@ const AdminCareer = () => {
                             <button
                                 className={`nav-link ${activeTab === 'applications' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('applications')}
+                                style={activeTab === 'applications' ? { backgroundColor: '#2f323aff', fontWeight: 600 } : {}}
                             >
                                 Job Applications ({searchTerm ? filteredApplications.length : applications.length})
                                 {searchTerm && (
@@ -611,7 +688,9 @@ const AdminCareer = () => {
                                             Sorted by {sortConfig.key === 'fullName' ? 'Name' :
                                                 sortConfig.key === 'createdAt' ? 'Date' :
                                                     sortConfig.key === 'email' ? 'Email' : sortConfig.key}
-                                            ({sortConfig.direction === 'asc' ? 'A-Z' : 'Z-A'})
+                                            ({sortConfig.key === 'createdAt'
+                                                ? (sortConfig.direction === 'asc' ? 'Oldest-Newest' : 'Newest-Oldest')
+                                                : (sortConfig.direction === 'asc' ? 'A-Z' : 'Z-A')})
                                             <button
                                                 className="btn btn-sm btn-outline-secondary ms-2"
                                                 onClick={() => setSortConfig({ key: 'createdAt', direction: 'desc' })}
@@ -886,7 +965,7 @@ const AdminCareer = () => {
             {/* Custom CSS Styles */}
             <style jsx>{`
                 .sortable-header:hover {
-                    background-color: #e9ecef !important;
+                    background-color: #484b4eff !important;
                     transition: background-color 0.2s ease;
                 }
                 
@@ -932,8 +1011,15 @@ const AdminCareer = () => {
                 .btn:hover {
                     transform: translateY(-1px);
                     transition: all 0.2s ease;
+                    color: #495057;
                 }
-                
+                .btn:active {
+                    color: #495057 !important;
+                    background-color: transparent !important;
+                    border-color: #646668ff !important;
+                    font-weight: 400 !important;
+                }
+
                 .form-control:focus {
                     border-color: #007bff;
                     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
