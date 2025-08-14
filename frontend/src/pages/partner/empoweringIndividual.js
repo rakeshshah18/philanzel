@@ -5,6 +5,12 @@ import axios from '../../services/api';
 
 const EmpoweringIndividual = () => {
     // Helper to strip HTML tags from a string
+    // Helper to decode HTML entities
+    const decodeHtmlEntities = (str) => {
+        const txt = document.createElement('textarea');
+        txt.innerHTML = str;
+        return txt.value;
+    };
     const stripHtmlTags = (str) => str ? str.replace(/<[^>]*>?/gm, '') : '';
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -149,7 +155,7 @@ const EmpoweringIndividual = () => {
                         data.map(item => (
                             <div key={item._id} className="card mb-4">
                                 <div className="card-body">
-                                    <h5 className="card-title">{stripHtmlTags(item.commonDescription)}</h5>
+                                    <h5 className="card-title" dangerouslySetInnerHTML={{ __html: decodeHtmlEntities(item.commonDescription) }} />
                                     <div className="row">
                                         {item.content.map((c, idx) => (
                                             <div key={idx} className="col-md-4 mb-3">

@@ -33,6 +33,8 @@ const getImageUrl = (imageUrl) => {
 };
 
 const Home = () => {
+    // Helper to decode HTML entities
+    // Helper to decode HTML entities
     const [homePages, setHomePages] = useState([]);
     const [fetchLoading, setFetchLoading] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -1938,7 +1940,7 @@ const TabbingServices = () => {
                                             <div className="mb-2">
                                                 <small className="text-muted">Description:</small>
                                                 <div className="p-2 bg-light rounded">
-                                                    {commonImageDescription}
+                                                    <div dangerouslySetInnerHTML={{ __html: commonImageDescription }} />
                                                 </div>
                                             </div>
                                         </div>
