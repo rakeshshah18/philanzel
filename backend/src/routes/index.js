@@ -20,6 +20,7 @@ import homeFAQsRoutes from './home/homeFAQsRoutes.js';
 import reviewSectionRoutes from './sections/reviewSectionRoutes.js';
 import adsSectionRoutes from './sections/adsRoute.js';
 import footerRoutes from './sections/footerRoutes.js';
+import empoweringIndividual from './partner/empoweringIndividualRoutes.js';
 import express from 'express';
 
 const router = express.Router();
@@ -62,6 +63,8 @@ router.use('/partner-posts', partnerPostRoutes);
 router.use('/partner', partnerAssociationImageRoutes);
 //partner our process routes
 router.use('/partner/our-process', ourProcessRoutes);
+// Empowering Individuals routes
+router.use('/partner/empowering-individuals', empoweringIndividual);
 
 
 // General /admin routes MUST come LAST

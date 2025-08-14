@@ -44,6 +44,7 @@ app.use((req, res, next) => {
 // Serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "./src/career/documents")));
 app.use("/uploads/images", express.static(path.join(__dirname, "./src/uploads/images")));
+app.use("/uploads/empowering-individuals", express.static(path.join(__dirname, "./uploads/empowering-individuals")));
 
 // Serve React app in production
 if (process.env.NODE_ENV === 'production') {

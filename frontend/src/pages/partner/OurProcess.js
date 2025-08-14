@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../services/api';
+import EmpoweringIndividual from './empoweringIndividual';
 
 const OurProcess = () => {
     const [processes, setProcesses] = useState([]);
@@ -109,6 +110,8 @@ const OurProcess = () => {
                     </li>
                 ))}
             </ul>
+            {/* Render Empowering Individuals below Existing Processes */}
+            <EmpoweringIndividual />
         </div>
     );
 };
