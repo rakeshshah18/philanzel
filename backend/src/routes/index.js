@@ -1,9 +1,10 @@
-import partnerAssociationImageRoutes from './partnerAssociationImageRoutes.js';
+import partnerAssociationImageRoutes from './partner/partnerAssociationImageRoutes.js';
 import newInquiryRoute from './inquiryRoutes.js';
 import careerInquery from './career/career.js';
 import careerPostRoutes from './career/careerPostRoutes.js';
 import partnerInquiry from './partner/partner.js';
 import partnerPostRoutes from './partner/partnerPostRoutes.js';
+import ourProcessRoutes from './partner/ourProcess.js';
 import homePageRoutes from './home/homePageRoutes.js';
 import aboutUsRoutes from './about/aboutUsRoutes.js';
 import ourJourneyRoutes from './about/ourJourneyRoutes.js';
@@ -59,6 +60,9 @@ router.use('/admin/our-track', ourTrackRoutes);
 router.use('/admin/partner-posts', partnerPostRoutes);
 router.use('/partner-posts', partnerPostRoutes);
 router.use('/partner', partnerAssociationImageRoutes);
+//partner our process routes
+router.use('/partner/our-process', ourProcessRoutes);
+
 
 // General /admin routes MUST come LAST
 router.use('/admin', homePageRoutes);

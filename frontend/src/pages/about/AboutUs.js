@@ -1277,7 +1277,12 @@ const AboutUs = () => {
                                                 {item.image && (
                                                     <div className="col-md-4 mb-3 mb-md-0">
                                                         <img
-                                                            src={`http://localhost:3000${typeof item.image === 'string' ? item.image : item.image.url}`}
+                                                            src={(() => {
+                                                                const url = typeof item.image === 'string' ? item.image : item.image.url;
+                                                                return url && url.startsWith('/uploads/images/')
+                                                                    ? `http://localhost:8000${url}`
+                                                                    : `http://localhost:3000${url}`;
+                                                            })()}
                                                             alt={item.heading}
                                                             className="img-fluid rounded"
                                                             style={{ maxHeight: '300px', objectFit: 'cover' }}

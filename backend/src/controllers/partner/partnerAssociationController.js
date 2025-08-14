@@ -1,4 +1,4 @@
-import PartnerAssociationImage from '../models/partner/partnerAssociationImage.js';
+import PartnerAssociationImage from '../../models/partner/partnerAssociationImage.js';
 import path from 'path';
 
 export const getAll = async (req, res) => {

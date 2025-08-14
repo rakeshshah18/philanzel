@@ -1,4 +1,4 @@
-import PartnerApplication from '../models/partner/partnerApplication.js';
+import PartnerApplication from '../../models/partner/partnerApplication.js';
 import mongoose from 'mongoose';
 
 // Submit partner application

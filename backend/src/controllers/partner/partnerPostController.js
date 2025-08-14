@@ -1,4 +1,4 @@
-import PartnerPost from '../models/partner/partnerPost.js';
+import PartnerPost from '../../models/partner/partnerPost.js';
 import mongoose from 'mongoose';
 import fs from 'fs';
 import path from 'path';
@@ -77,8 +77,8 @@ export const getPartnerPost = async (req, res) => {
 
 // Create new partner post
 export const createPartnerPost = async (req, res) => {
-    console.log('🎯 createPartnerPost called! Request body:', req.body);
-    console.log('🎯 This means the route is working!');
+    // console.log('🎯 createPartnerPost called! Request body:', req.body);
+    // console.log('🎯 This means the route is working!');
 
     try {
         console.log('📥 Partner post creation request received:', req.body);

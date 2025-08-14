@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAll, create, deleteImage } from '../../controllers/partnerAssociationController.js';
+import { getAll, create, deleteImage } from '../../controllers/partner/partnerAssociationController.js';
 import imageUpload from '../../config/imageUpload.js';
 import { verifyToken, requireRole } from '../../adminAuth/middleware/authMiddleware.js';
 

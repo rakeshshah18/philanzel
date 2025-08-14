@@ -1,6 +1,6 @@
 import express from 'express';
-import { getAll, create, deleteImage } from '../controllers/partnerAssociationController.js';
-import imageUpload from '../config/imageUpload.js';
+import { getAll, create, deleteImage } from '../../controllers/partner/partnerAssociationController.js';
+import imageUpload from '../../config/imageUpload.js';
 
 const router = express.Router();
 

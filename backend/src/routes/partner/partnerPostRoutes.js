@@ -5,7 +5,7 @@ import {
     createPartnerPost,
     updatePartnerPost,
     deletePartnerPost
-} from '../../controllers/partnerPostController.js';
+} from '../../controllers/partner/partnerPostController.js';
 
 console.log('🎯 partnerPostRoutes.js loaded successfully');
 
