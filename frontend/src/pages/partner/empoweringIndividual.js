@@ -145,6 +145,7 @@ const EmpoweringIndividual = () => {
     return (
         <div className="mt-5">
             <h3 className="mb-3">Empowering Individuals</h3>
+            <button className="btn btn-success pb-sm-2 mb-2" onClick={() => setShowForm(true)}>Add New</button>
             {loading && <div>Loading...</div>}
             {error && <div className="text-danger">{error}</div>}
             {!showForm && (
@@ -183,7 +184,7 @@ const EmpoweringIndividual = () => {
                             </div>
                         ))
                     )}
-                    <button className="btn btn-success" onClick={() => setShowForm(true)}>Add New</button>
+                    
                 </div>
             )}
             {showForm && (

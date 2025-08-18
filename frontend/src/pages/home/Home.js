@@ -831,7 +831,7 @@ const Home = () => {
                                                                 onClick={() => handleView(page)}
                                                                 title="View Details"
                                                             >
-                                                                <i className="fas fa-eye"></i>
+                                                                <i className="bi bi-eye"></i>
                                                             </button>
                                                             <button
                                                                 style={{
@@ -845,7 +845,7 @@ const Home = () => {
                                                                 onClick={() => handleEdit(page)}
                                                                 title="Edit"
                                                             >
-                                                                <i className="fas fa-edit"></i>
+                                                                <i className="bi bi-pencil-square"></i>
                                                             </button>
                                                             <button
                                                                 style={{
@@ -859,7 +859,7 @@ const Home = () => {
                                                                 onClick={() => deleteHomePage(page._id)}
                                                                 title="Delete"
                                                             >
-                                                                <i className="fas fa-trash"></i>
+                                                                <i className="bi bi-trash"></i>
                                                             </button>
                                                         </div>
                                                     </td>
@@ -1257,7 +1257,7 @@ const Home = () => {
                                                                         className="btn btn-sm btn-outline-danger"
                                                                         onClick={() => handleDeleteHomeService(service.id)}
                                                                     >
-                                                                        <i className="fas fa-trash"></i> Delete
+                                                                        <i className="bi bi-trash"></i> Delete
                                                                     </button>
                                                                 </>
                                                             )}
@@ -2227,7 +2227,7 @@ const TabbingServices = () => {
                                                                     e.target.style.backgroundColor = 'transparent';
                                                                 }}
                                                             >
-                                                                <i className="fas fa-trash-alt"></i>
+                                                                <i className="bi bi-trash"></i>
                                                             </button>
                                                         )}
                                                     </button>
@@ -2683,7 +2683,7 @@ const HelpedIndustries = () => {
                                                                         className="btn btn-outline-danger btn-sm"
                                                                         onClick={() => handleRemoveIndustry(index)}
                                                                     >
-                                                                        <i className="fas fa-trash"></i>
+                                                                        <i className="bi bi-trash"></i>
                                                                     </button>
                                                                 )}
                                                             </div>
@@ -2773,7 +2773,7 @@ const HelpedIndustries = () => {
                                                             className="btn btn-outline-danger btn-sm"
                                                             onClick={() => handleDelete(item._id)}
                                                         >
-                                                            <i className="fas fa-trash"></i> Delete
+                                                            <i className="bi bi-trash"></i> Delete
                                                         </button>
                                                     </div>
                                                 </div>
@@ -2860,7 +2860,7 @@ const HelpedIndustries = () => {
                                                                                 onClick={() => handleDeleteIndustry(item._id, index)}
                                                                                 title="Delete this industry"
                                                                             >
-                                                                                <i className="fas fa-trash"></i>
+                                                                                <i className="bi bi-trash"></i>
                                                                             </button>
                                                                             <i className={`${industry.icon} fa-lg text-info mb-2`}></i>
                                                                             <h6 className="small">{industry.name}</h6>
@@ -3145,7 +3145,7 @@ const WhyChooseUs = () => {
                                                                 onClick={() => removePoint(index)}
                                                                 disabled={formData.points.length === 1}
                                                             >
-                                                                <i className="fas fa-trash"></i>
+                                                                <i className="bi bi-trash"></i>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -3244,7 +3244,7 @@ const WhyChooseUs = () => {
                                                             className="btn btn-outline-danger btn-sm"
                                                             onClick={() => handleDelete(item._id)}
                                                         >
-                                                            <i className="fas fa-trash"></i> Delete
+                                                            <i className="bi bi-trash"></i> Delete
                                                         </button>
                                                     </div>
                                                 </div>
@@ -3533,7 +3533,7 @@ const OurAssociation = () => {
                             onClick={() => removeImageFromRow(rowName, index)}
                             disabled={rowData.length === 1}
                         >
-                            <i className="fas fa-trash"></i>
+                            <i className="bi bi-trash"></i>
                         </button>
                     </div>
                 </div>
@@ -3702,7 +3702,7 @@ const OurAssociation = () => {
                                                             className="btn btn-outline-danger btn-sm"
                                                             onClick={() => handleDelete(item._id)}
                                                         >
-                                                            <i className="fas fa-trash"></i> Delete
+                                                            <i className="bi bi-trash"></i> Delete
                                                         </button>
                                                     </div>
                                                 </div>
@@ -4036,7 +4036,7 @@ const HomeFAQs = () => {
                                                                         className="btn btn-sm btn-outline-danger"
                                                                         onClick={() => removeFAQ(index)}
                                                                     >
-                                                                        <i className="fas fa-trash"></i>
+                                                                        <i className="bi bi-trash"></i>
                                                                     </button>
                                                                 )}
                                                             </div>
@@ -4162,7 +4162,7 @@ const HomeFAQs = () => {
                                                             onClick={() => handleEdit(section)}
                                                             title="Edit FAQ Section"
                                                         >
-                                                            <i className="fas fa-edit"></i>
+                                                            <i className="bi bi-pencil-square"></i>
                                                         </button>
                                                         <button
                                                             type="button"
@@ -4170,7 +4170,7 @@ const HomeFAQs = () => {
                                                             onClick={() => handleDelete(section._id)}
                                                             title="Delete FAQ Section"
                                                         >
-                                                            <i className="fas fa-trash"></i>
+                                                            <i className="bi bi-trash"></i>
                                                         </button>
                                                     </div>
                                                 </div>

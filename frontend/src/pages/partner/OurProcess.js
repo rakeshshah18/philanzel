@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../services/api';
 import EmpoweringIndividual from './empoweringIndividual';
+import PotentialGrowth from './potentialGrowth';
 
 const OurProcess = () => {
     const [processes, setProcesses] = useState([]);
@@ -88,8 +89,10 @@ const OurProcess = () => {
                         <button type="button" className="btn btn-danger btn-sm" onClick={() => removeStep(idx)} disabled={form.steps.length === 1}>Remove Step</button>
                     </div>
                 ))}
-                <button type="button" className="btn btn-secondary mb-2" onClick={addStep}>Add Step</button>
-                <button type="submit" className="btn btn-primary">{editingId ? 'Update' : 'Create'} Process</button>
+                <div className='d-flex gap-3'>
+                    <button type="button" className="btn btn-secondary mb-2" onClick={addStep}>Add Step</button>
+                    <button type="submit" className="btn btn-primary mb-2">{editingId ? 'Update' : 'Create'} Process</button>
+                </div>
                 {editingId && <button type="button" className="btn btn-warning ms-2" onClick={() => { setEditingId(null); setForm({ heading: '', description: '', steps: [{ name: '', heading: '', description: '', icon: null }] }); }}>Cancel Edit</button>}
             </form>
             <h5>Existing Processes</h5>
@@ -112,6 +115,8 @@ const OurProcess = () => {
             </ul>
             {/* Render Empowering Individuals below Existing Processes */}
             <EmpoweringIndividual />
+            {/* Potential Growth is part of Become a Partner, so render here only for /partner */}
+            <PotentialGrowth />
         </div>
     );
 };

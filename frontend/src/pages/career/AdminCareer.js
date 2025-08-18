@@ -696,7 +696,7 @@ const AdminCareer = () => {
                                                 onClick={() => setSortConfig({ key: 'createdAt', direction: 'desc' })}
                                                 title="Reset to default sorting"
                                             >
-                                                <i className="fas fa-undo"></i>
+                                                <i className="bi bi-x-circle"></i>
                                             </button>
                                         </small>
                                     )}
@@ -708,7 +708,7 @@ const AdminCareer = () => {
                                         <input
                                             type="text"
                                             className="form-control"
-                                            placeholder="Search by name, email, phone, or message..."
+                                            placeholder="Search by name, email, phone..."
                                             value={searchTerm}
                                             onChange={(e) => handleSearch(e.target.value)}
                                         />
@@ -721,11 +721,11 @@ const AdminCareer = () => {
                                             {searchLoading ? (
                                                 <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                             ) : (
-                                                <i className="fas fa-times"></i>
+                                                <i className="bi bi-x"></i>
                                             )}
                                         </button>
                                         <button className="btn btn-primary" type="button" disabled>
-                                            <i className="fas fa-search"></i>
+                                            <i className="bi bi-search"></i>
                                         </button>
                                     </div>
                                     {searchTerm && (
@@ -752,7 +752,7 @@ const AdminCareer = () => {
                                                     onClick={() => setShowDateFilter(!showDateFilter)}
                                                     title={showDateFilter ? "Hide date filter" : "Show date filter"}
                                                 >
-                                                    <i className={`fas fa-chevron-${showDateFilter ? 'up' : 'down'}`}></i>
+                                                    <i className={`bi-chevron-${showDateFilter ? 'up' : 'down'}`}></i>
                                                 </button>
                                             </div>
 
@@ -787,7 +787,7 @@ const AdminCareer = () => {
                                                     {(dateRange.startDate || dateRange.endDate) && (
                                                         <div className="mt-2 d-flex justify-content-between align-items-center">
                                                             <small className="text-success">
-                                                                <i className="fas fa-filter me-1"></i>
+                                                                <i className="bi bi-filter me-1"></i>
                                                                 {dateRange.startDate && dateRange.endDate ?
                                                                     `${dateRange.startDate} to ${dateRange.endDate}` :
                                                                     dateRange.startDate ?
@@ -800,7 +800,7 @@ const AdminCareer = () => {
                                                                 onClick={clearDateFilter}
                                                                 title="Clear date filter"
                                                             >
-                                                                <i className="fas fa-times"></i>
+                                                                <i className="bi bi-eye-slash"></i>
                                                             </button>
                                                         </div>
                                                     )}

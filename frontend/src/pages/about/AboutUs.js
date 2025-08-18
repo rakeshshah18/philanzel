@@ -890,14 +890,14 @@ const AboutUs = () => {
                                                                 onClick={() => handleEdit(item)}
                                                                 title="Edit"
                                                             >
-                                                                <i className="fas fa-edit"></i>
+                                                                <i className="bi bi-pencil-square"></i>
                                                             </button>
                                                             <button
                                                                 className="btn btn-outline-danger"
                                                                 onClick={() => handleDelete(item._id)}
                                                                 title="Delete"
                                                             >
-                                                                <i className="fas fa-trash"></i>
+                                                                <i className="bi bi-trash"></i>
                                                             </button>
                                                         </div>
                                                     </td>
@@ -1003,14 +1003,14 @@ const AboutUs = () => {
                                                         onClick={() => handleEditJourney(journey)}
                                                         title="Edit Journey"
                                                     >
-                                                        <i className="fas fa-edit"></i>
+                                                        <i className="bi bi-pencil-square"></i>
                                                     </button>
                                                     <button
                                                         className="btn btn-outline-danger"
                                                         onClick={() => handleDeleteJourney(journey._id)}
                                                         title="Delete Journey"
                                                     >
-                                                        <i className="fas fa-trash"></i>
+                                                        <i className="bi bi-trash"></i>
                                                     </button>
                                                 </div>
                                             )}
@@ -1302,14 +1302,14 @@ const AboutUs = () => {
                                                                     onClick={() => handleEditWhyChooseUs(item)}
                                                                     title="Edit"
                                                                 >
-                                                                    <i className="fas fa-edit"></i>
+                                                                    <i className="bi bi-pencil-square"></i>
                                                                 </button>
                                                                 <button
                                                                     className="btn btn-outline-danger btn-sm"
                                                                     onClick={() => handleDeleteWhyChooseUs(item._id)}
                                                                     title="Delete"
                                                                 >
-                                                                    <i className="fas fa-trash"></i>
+                                                                    <i className="bi bi-trash"></i>
                                                                 </button>
                                                             </div>
                                                         )}
@@ -1597,14 +1597,14 @@ const AboutUs = () => {
                                                             onClick={() => handleEditOurFounder(founder)}
                                                             title="Edit"
                                                         >
-                                                            <i className="fas fa-edit"></i>
+                                                            <i className="bi bi-pencil-square"></i>
                                                         </button>
                                                         <button
                                                             className="btn btn-sm btn-outline-light text-danger"
                                                             onClick={() => handleDeleteOurFounder(founder._id)}
                                                             title="Delete"
                                                         >
-                                                            <i className="fas fa-trash"></i>
+                                                            <i className="bi bi-trash"></i>
                                                         </button>
                                                     </div>
                                                 </div>

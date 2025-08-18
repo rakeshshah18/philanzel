@@ -379,7 +379,7 @@ function AdminPartner() {
                                         ) : (
                                             <div className="d-flex flex-row align-items-center overflow-auto" style={{ gap: '1rem' }}>
                                                 {partnerImages.map((img) => (
-                                                    <div key={img._id} className="position-relative">
+                                                    <div key={img._id} className="position-relative" style={{ minWidth: '120px', minHeight: '120px' }}>
                                                         <img
                                                             src={img.url?.startsWith('http') ? img.url : `http://localhost:8000${img.url}`}
                                                             alt={img.alt || 'Association'}
@@ -388,11 +388,11 @@ function AdminPartner() {
                                                         <Button
                                                             variant="outline-danger"
                                                             size="sm"
-                                                            className="position-absolute top-0 end-0"
-                                                            style={{ zIndex: 2 }}
+                                                            className="position-absolute"
+                                                            style={{ top: '8px', right: '8px', zIndex: 10, borderRadius: '50%', padding: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}
                                                             onClick={() => handleDeleteImage(img._id)}
                                                         >
-                                                            <i className="fas fa-trash"></i>
+                                                            <i className="bi bi-trash"></i>
                                                         </Button>
                                                     </div>
                                                 ))}

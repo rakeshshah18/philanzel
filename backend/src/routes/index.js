@@ -21,7 +21,9 @@ import reviewSectionRoutes from './sections/reviewSectionRoutes.js';
 import adsSectionRoutes from './sections/adsRoute.js';
 import footerRoutes from './sections/footerRoutes.js';
 import empoweringIndividual from './partner/empoweringIndividualRoutes.js';
+import potentialGrowthRoutes from './partner/potentialGrowthRoutes.js';
 import express from 'express';
+import uploadRoutes from './partner/upload.js';
 
 const router = express.Router();
 
@@ -65,7 +67,11 @@ router.use('/partner', partnerAssociationImageRoutes);
 router.use('/partner/our-process', ourProcessRoutes);
 // Empowering Individuals routes
 router.use('/partner/empowering-individuals', empoweringIndividual);
+// Potential Growth routes
+router.use('/partner/potential-growth', potentialGrowthRoutes);
 
+// Register the new /api/upload route for image uploads
+router.use('/upload', uploadRoutes);
 
 // General /admin routes MUST come LAST
 router.use('/admin', homePageRoutes);
