@@ -1,10 +1,10 @@
 import express from 'express';
 import {
-  createPartnerFAQ,
-  getAllPartnerFAQs,
-  getPartnerFAQById,
-  updatePartnerFAQ,
-  deletePartnerFAQ
+    createPartnerFAQ,
+    getAllPartnerFAQs,
+    getPartnerFAQById,
+    updatePartnerFAQ,
+    deletePartnerFAQ
 } from '../controllers/partner/partnerFAQsController.js';
 
 const router = express.Router();
