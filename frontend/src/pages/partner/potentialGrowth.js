@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import API from '../../services/api';
+import WhyChoosePhilanzel from './WhyChoosePhilanzel';
 
 const apiUrl = '/partner/potential-growth';
 
@@ -193,7 +196,7 @@ const PotentialGrowth = () => {
                                             {editSolutionIdx === idx ? (
                                                 <form onSubmit={handleUpdateSolution}>
                                                     <input type="text" name="heading" placeholder="Heading" className="form-control mb-2" value={solutionForm.heading} onChange={handleSolutionChange} required />
-                                                    <input type="text" name="description" placeholder="Description" className="form-control mb-2" value={solutionForm.description} onChange={handleSolutionChange} required />
+                                                    <ReactQuill theme="snow" value={solutionForm.description} onChange={value => setSolutionForm({ ...solutionForm, description: value })} className="mb-2" />
                                                     <input type="file" name="icon" accept="image/*" className="form-control mb-2" onChange={handleSolutionChange} required />
                                                     {solutionForm.icon && (
                                                         <img src={solutionForm.icon.startsWith('/uploads') ? (process.env.NODE_ENV === 'production' ? solutionForm.icon : `http://localhost:8000${solutionForm.icon}`) : solutionForm.icon} alt="icon preview" style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '8px' }} />
@@ -246,7 +249,7 @@ const PotentialGrowth = () => {
                 {showSolutionForm && (
                     <form onSubmit={handleAddSolution} className="mt-2 p-2 border rounded bg-light">
                         <input type="text" name="heading" placeholder="Heading" className="form-control mb-2" value={solutionForm.heading} onChange={handleSolutionChange} required />
-                        <input type="text" name="description" placeholder="Description" className="form-control mb-2" value={solutionForm.description} onChange={handleSolutionChange} required />
+                        <ReactQuill theme="snow" value={solutionForm.description} onChange={value => setSolutionForm({ ...solutionForm, description: value })} className="mb-2" />
                         <input type="file" name="icon" accept="image/*" className="form-control mb-2" onChange={handleSolutionChange} required />
                         {solutionForm.icon && (
                             <img src={solutionForm.icon.startsWith('/uploads') ? (process.env.NODE_ENV === 'production' ? solutionForm.icon : `http://localhost:8000${solutionForm.icon}`) : solutionForm.icon} alt="icon preview" style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '8px' }} />
@@ -263,7 +266,7 @@ const PotentialGrowth = () => {
                         </div>
                         <div className="mb-2">
                             <label>Common Description</label>
-                            <textarea name="commonDescription" className="form-control" value={form.commonDescription} onChange={handleChange} required />
+                            <ReactQuill theme="snow" value={form.commonDescription} onChange={value => setForm({ ...form, commonDescription: value })} className="mb-2" />
                         </div>
                         <button type="submit" className="btn btn-primary me-2">Save</button>
                         <button type="button" className="btn btn-secondary" onClick={() => setEditMode(false)}>Cancel</button>
@@ -277,4 +280,13 @@ const PotentialGrowth = () => {
     );
 };
 
-export default PotentialGrowth;
+
+// Display WhyChoosePhilanzel below Potential Growth
+export default function PotentialGrowthWithWhyChoosePhilanzel() {
+    return (
+        <>
+            <PotentialGrowth />
+            <WhyChoosePhilanzel />
+        </>
+    );
+}

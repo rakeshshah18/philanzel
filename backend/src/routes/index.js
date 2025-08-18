@@ -1,4 +1,5 @@
 import partnerAssociationImageRoutes from './partner/partnerAssociationImageRoutes.js';
+import whyChoosePhilanzelRoutes from './partner/whyChoosePhilanzel.js';
 import newInquiryRoute from './inquiryRoutes.js';
 import careerInquery from './career/career.js';
 import careerPostRoutes from './career/careerPostRoutes.js';
@@ -72,6 +73,9 @@ router.use('/partner/potential-growth', potentialGrowthRoutes);
 
 // Register the new /api/upload route for image uploads
 router.use('/upload', uploadRoutes);
+
+// Why Choose Philanzel routes
+router.use('/partner/why-choose-philanzel', whyChoosePhilanzelRoutes);
 
 // General /admin routes MUST come LAST
 router.use('/admin', homePageRoutes);

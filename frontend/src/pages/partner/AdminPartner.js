@@ -611,7 +611,7 @@ function AdminPartner() {
             </Row>
 
             {/* Custom CSS for Partner Management Tabs */}
-            <style jsx>{`
+            <style>{`
         .active-partner-tab {
           color: #6c757d !important;
           background-color: #666060ff !important;
