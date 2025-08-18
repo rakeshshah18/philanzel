@@ -1,5 +1,6 @@
 import partnerAssociationImageRoutes from './partner/partnerAssociationImageRoutes.js';
 import whyChoosePhilanzelRoutes from './partner/whyChoosePhilanzel.js';
+import partnerFAQsRoutes from './partnerFAQs.js';
 import newInquiryRoute from './inquiryRoutes.js';
 import careerInquery from './career/career.js';
 import careerPostRoutes from './career/careerPostRoutes.js';
@@ -63,6 +64,8 @@ router.use('/admin/our-track', ourTrackRoutes);
 // Partner routes MUST come before general /admin routes
 router.use('/admin/partner-posts', partnerPostRoutes);
 router.use('/partner-posts', partnerPostRoutes);
+router.use('/admin/partner-faqs', partnerFAQsRoutes);
+router.use('/partner-faqs', partnerFAQsRoutes);
 router.use('/partner', partnerAssociationImageRoutes);
 //partner our process routes
 router.use('/partner/our-process', ourProcessRoutes);

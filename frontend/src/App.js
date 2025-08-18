@@ -11,6 +11,7 @@ import AdminCareer from './pages/career/AdminCareer';
 import PublicCareer from './pages/career/PublicCareer';
 import AdminPartner from './pages/partner/AdminPartner';
 import PublicPartner from './pages/partner/BecomePartner';
+import PartnerFAQs from './pages/partner/PartnerFAQs';
 import ContactForm from './pages/ContactForm';
 import CareerForm from './pages/career/CareerForm';
 import AdminInquiries from './pages/AdminInquiries';
@@ -72,6 +73,7 @@ const AppLayout = () => {
                                     <AdminPartner />
                                 </ProtectedRoute>
                             } />
+                            <Route path="/partner-faqs" element={<PartnerFAQs />} />
                             <Route path="/public-partner" element={<PublicPartner />} />
                             <Route path="/sections" element={
                                 <ProtectedRoute>
