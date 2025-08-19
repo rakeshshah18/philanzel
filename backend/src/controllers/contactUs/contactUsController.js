@@ -73,7 +73,24 @@ import ContactForm from '../../models/contactUs/contactForm.js';
 
 export async function getAllContactForms(req, res) {
     try {
-        const forms = await ContactForm.find().sort({ createdAt: -1 });
+        const { term, date } = req.query;
+        let filter = {};
+        if (term) {
+            const regex = new RegExp(term, 'i');
+            filter.$or = [
+                { name: regex },
+                { email: regex },
+                { servicesType: regex }
+            ];
+        }
+        if (date) {
+            // Expect date in YYYY-MM-DD format, treat as UTC
+            const [year, month, day] = date.split('-').map(Number);
+            const start = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+            const end = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
+            filter.createdAt = { $gte: start, $lte: end };
+        }
+        const forms = await ContactForm.find(filter).sort({ createdAt: -1 });
         res.json(forms);
     } catch (error) {
         console.error('Error fetching contact form submissions:', error);

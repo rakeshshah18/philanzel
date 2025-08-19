@@ -8,14 +8,15 @@ const contactFormSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: [
-            'service 1',
-            'service 2',
-            'service 3',
-            'service 4',
-            'service 5',
-            'service 6',
-            'service 7',
-            'service 8'
+            'Million Dollar Club - (MDC)',
+            'Retirement Solutions',
+            'Mutual Funds',
+            'Insurance',
+            'Training & Handholding',
+            'Alternative Investment Fund (AIF)',
+            'Health Insurance',
+            'Portfolio Management Services (PMS)',
+            'PE FUND'
         ]
     },
     createdAt: { type: Date, default: Date.now }
