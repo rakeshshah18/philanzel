@@ -12,7 +12,7 @@ import PublicCareer from './pages/career/PublicCareer';
 import AdminPartner from './pages/partner/AdminPartner';
 import PublicPartner from './pages/partner/BecomePartner';
 import PartnerFAQs from './pages/partner/PartnerFAQs';
-import ContactForm from './pages/ContactForm';
+import ContactForm from './pages/contactUs/ContactForm';
 import CareerForm from './pages/career/CareerForm';
 import AdminInquiries from './pages/AdminInquiries';
 import AdminApplications from './pages/AdminApplications';

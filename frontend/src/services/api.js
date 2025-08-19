@@ -610,4 +610,21 @@ export const footerAPI = {
     }
 };
 
+export const contactInfoAPI = {
+    // Get all contact info
+    getAll: () => API.get('/contact-us/info'),
+
+    // Get contact info by ID
+    getById: (id) => API.get(`/contact-us/info/${id}`),
+
+    // Create new contact info
+    create: (data) => API.post('/contact-us/info', data),
+
+    // Update contact info
+    update: (id, data) => API.put(`/contact-us/info/${id}`, data),
+
+    // Delete contact info
+    delete: (id) => API.delete(`/contact-us/info/${id}`)
+};
+
 export default API;

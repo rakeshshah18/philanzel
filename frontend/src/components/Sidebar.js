@@ -171,6 +171,22 @@ const Sidebar = () => {
                                 <i className="fas fa-handshake me-2"></i>
                                 Become A Partner
                             </Link>
+
+                            <Link
+                                to="/contact"
+                                className={`nav-link ${isActive('/contact') ? 'active' : ''}`}
+                                style={{
+                                    paddingLeft: '3rem',
+                                    paddingRight: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: isActive('/contact') ? '#fff' : '#adb5bd',
+                                    width: '100%',
+                                    display: 'block'
+                                }}
+                            >
+                                <i className="fas fa-envelope me-2"></i>
+                                Contact Us
+                            </Link>
                         </div>
                     )}
                 </div>

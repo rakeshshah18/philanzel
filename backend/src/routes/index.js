@@ -1,4 +1,5 @@
 import partnerAssociationImageRoutes from './partner/partnerAssociationImageRoutes.js';
+import contactUsRoutes from './contactUs/contactUsRoutes.js';
 import whyChoosePhilanzelRoutes from './partner/whyChoosePhilanzel.js';
 import partnerFAQsRoutes from './partnerFAQs.js';
 import newInquiryRoute from './inquiryRoutes.js';
@@ -79,6 +80,9 @@ router.use('/upload', uploadRoutes);
 
 // Why Choose Philanzel routes
 router.use('/partner/why-choose-philanzel', whyChoosePhilanzelRoutes);
+
+// Contact Us form submissions route
+router.use('/contact-us', contactUsRoutes);
 
 // General /admin routes MUST come LAST
 router.use('/admin', homePageRoutes);
