@@ -62,6 +62,50 @@ export default function PartnerFAQs() {
     };
 
     // FAQ items edit logic
+    // Handler to start editing a specific FAQ item (only one at a time)
+    const handleFaqItemEdit = (faqId, idx) => {
+        setFaqItemsForm(prev => ({
+            ...prev,
+            [faqId]: prev[faqId]
+                ? prev[faqId].map((item, i) =>
+                    i === idx
+                        ? { ...item, editing: true }
+                        : { ...item, editing: false }
+                )
+                : faqs.find(f => f._id === faqId).faqs.map((item, i) =>
+                    i === idx
+                        ? { ...item, editing: true }
+                        : { ...item, editing: false }
+                )
+        }));
+    };
+
+    // Handler to save an edited FAQ item
+    const handleFaqItemSave = async (faqId, idx) => {
+        const faq = faqs.find(f => f._id === faqId);
+        const updatedItems = faqItemsForm[faqId].map((item, i) => ({ question: item.question, answer: item.answer }));
+        try {
+            await axios.put(`${API_BASE}/admin/partner-faqs/${faqId}`, {
+                ...faq,
+                faqs: updatedItems
+            });
+            fetchFaqs();
+            setFaqItemsForm(prev => ({
+                ...prev,
+                [faqId]: prev[faqId].map(item => ({ ...item, editing: false }))
+            }));
+        } catch (err) {
+            setError('Failed to update FAQ item');
+        }
+    };
+
+    // Handler to cancel editing an FAQ item
+    const handleFaqItemCancel = (faqId, idx) => {
+        setFaqItemsForm(prev => ({
+            ...prev,
+            [faqId]: prev[faqId].map(item => ({ ...item, editing: false }))
+        }));
+    };
     const handleFaqEditClick = (faq) => {
         setFaqEditMode({ ...faqEditMode, [faq._id]: true });
         setFaqItemsForm({ ...faqItemsForm, [faq._id]: faq.faqs.map(item => ({ question: item.question, answer: item.answer })) });
@@ -154,31 +198,14 @@ export default function PartnerFAQs() {
                 faqs.map(faq => (
                     <div key={faq._id} className="card mb-3">
                         <div className="card-body">
-                            {editingId === faq._id ? (
-                                <Form>
-                                    <Form.Group className="mb-2">
-                                        <Form.Label>Heading</Form.Label>
-                                        <Form.Control name="heading" value={editForm.heading} onChange={handleEditChange} />
-                                    </Form.Group>
-                                    <Form.Group className="mb-2">
-                                        <Form.Label>Description</Form.Label>
-                                        <ReactQuill theme="snow" value={editForm.description} onChange={handleQuillChange} />
-                                    </Form.Group>
-                                    <Button variant="success" size="sm" onClick={() => handleEditSave(faq)}>Save</Button>{' '}
-                                    <Button variant="secondary" size="sm" onClick={handleEditCancel}>Cancel</Button>
-                                </Form>
-                            ) : (
-                                <>
-                                    <Button variant="outline-primary" size="sm" className="mb-2" onClick={() => handleEditClick(faq)}>Edit</Button>
-                                    <h4>{faq.heading}</h4>
-                                    <div dangerouslySetInnerHTML={{ __html: faq.description }} />
-                                </>
-                            )}
+                            <>
+                                <h4>{faq.heading}</h4>
+                                <div dangerouslySetInnerHTML={{ __html: faq.description }} />
+                            </>
                             {/* FAQ items section */}
                             <div className="mt-3">
                                 <div className="d-flex mb-2">
-                                    <Button variant="outline-success" size="sm" onClick={() => handleFaqAddClick(faq)}>Add</Button>
-                                    <Button variant="outline-primary" size="sm" className="ms-2" onClick={() => handleFaqEditClick(faq)}>Edit</Button>
+                                    <Button variant="outline-success" size="sm" onClick={() => handleFaqAddClick(faq)}>Add Question</Button>
                                 </div>
                                 {/* Add FAQ item */}
                                 {faqAddMode[faq._id] && (
@@ -196,41 +223,39 @@ export default function PartnerFAQs() {
                                     </Form>
                                 )}
                                 {/* Edit FAQ items */}
-                                {faqEditMode[faq._id] ? (
-                                    <Form>
-                                        {faqItemsForm[faq._id] && faqItemsForm[faq._id].map((item, idx) => (
-                                            <div key={idx} className="d-flex align-items-center mb-2">
+                                {faq.faqs && faq.faqs.length > 0 && (
+                                    <ul className="list-unstyled">
+                                        {(faqItemsForm[faq._id] || faq.faqs).map((item, idx) => (
+                                            <li key={idx} className="d-flex align-items-center mb-2">
                                                 <div style={{ flex: 1 }}>
-                                                    <Form.Label>Question</Form.Label>
-                                                    <ReactQuill theme="snow" value={item.question} onChange={value => handleFaqItemChange(faq._id, idx, 'question', value)} />
-                                                    <Form.Label>Answer</Form.Label>
-                                                    <ReactQuill theme="snow" value={item.answer} onChange={value => handleFaqItemChange(faq._id, idx, 'answer', value)} />
+                                                    {item.editing ? (
+                                                        <Form className="mb-2">
+                                                            <Form.Label>Question</Form.Label>
+                                                            <ReactQuill theme="snow" value={item.question} onChange={value => handleFaqItemChange(faq._id, idx, 'question', value)} />
+                                                            <Form.Label>Answer</Form.Label>
+                                                            <ReactQuill theme="snow" value={item.answer} onChange={value => handleFaqItemChange(faq._id, idx, 'answer', value)} />
+                                                            <Button variant="success" size="sm" className="me-2" onClick={() => handleFaqItemSave(faq._id, idx)}>Save</Button>
+                                                            <Button variant="secondary" size="sm" onClick={() => handleFaqItemCancel(faq._id, idx)}>Cancel</Button>
+                                                        </Form>
+                                                    ) : (
+                                                        <>
+                                                            <div><strong dangerouslySetInnerHTML={{ __html: item.question }} /></div>
+                                                            <div><span dangerouslySetInnerHTML={{ __html: item.answer }} /></div>
+                                                            <hr />
+                                                        </>
+                                                    )}
                                                 </div>
+                                                {!item.editing && (
+                                                    <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleFaqItemEdit(faq._id, idx)} title="Edit">
+                                                        Edit
+                                                    </Button>
+                                                )}
                                                 <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleFaqItemDelete(faq, idx)} title="Delete">
                                                     &times;
                                                 </Button>
-                                            </div>
+                                            </li>
                                         ))}
-                                        <Button variant="success" size="sm" onClick={() => handleFaqItemsSave(faq)}>Save</Button>{' '}
-                                        <Button variant="secondary" size="sm" onClick={() => handleFaqItemsCancel(faq)}>Cancel</Button>
-                                    </Form>
-                                ) : (
-                                    faq.faqs && faq.faqs.length > 0 && (
-                                        <ul className="list-unstyled">
-                                            {faq.faqs.map((item, idx) => (
-                                                <li key={idx} className="d-flex align-items-center mb-2">
-                                                    <div style={{ flex: 1 }}>
-                                                        <div><strong dangerouslySetInnerHTML={{ __html: item.question }} /></div>
-                                                        <div><span dangerouslySetInnerHTML={{ __html: item.answer }} /></div>
-                                                        <hr />
-                                                    </div>
-                                                    <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleFaqItemDelete(faq, idx)} title="Delete">
-                                                        &times;
-                                                    </Button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )
+                                    </ul>
                                 )}
                             </div>
                         </div>
