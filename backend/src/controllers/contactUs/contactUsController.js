@@ -1,4 +1,21 @@
+// BULK DELETE ContactForm submissions
+export async function deleteContactForms(req, res) {
+    try {
+        const { ids } = req.body;
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'No IDs provided for deletion' });
+        }
+        const result = await ContactForm.deleteMany({ _id: { $in: ids } });
+        res.json({ message: 'Contact form submissions deleted', deletedCount: result.deletedCount });
+    } catch (error) {
+        console.error('Error deleting contact form submissions:', error);
+        res.status(500).json({ error: 'Failed to delete contact form submissions' });
+    }
+}
+
+// ...existing code...
 import ContactInfo from '../../models/contactUs/contactInfo.js';
+import ContactForm from '../../models/contactUs/contactForm.js';
 
 // CREATE ContactInfo
 export async function createContactInfo(req, res) {
@@ -11,7 +28,6 @@ export async function createContactInfo(req, res) {
         res.status(500).json({ error: 'Failed to create contact info' });
     }
 }
-
 // READ all ContactInfo
 export async function getAllContactInfo(req, res) {
     try {
@@ -69,7 +85,7 @@ export async function createContactForm(req, res) {
         res.status(500).json({ error: 'Failed to create contact form submission' });
     }
 }
-import ContactForm from '../../models/contactUs/contactForm.js';
+// ...existing code...
 
 export async function getAllContactForms(req, res) {
     try {

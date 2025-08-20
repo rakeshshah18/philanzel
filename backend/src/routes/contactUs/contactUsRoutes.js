@@ -1,3 +1,4 @@
+
 import express from 'express';
 import {
     getAllContactForms,
@@ -6,7 +7,8 @@ import {
     getAllContactInfo,
     getContactInfoById,
     updateContactInfo,
-    deleteContactInfo
+    deleteContactInfo,
+    deleteContactForms
 } from '../../controllers/contactUs/contactUsController.js';
 
 const router = express.Router();
@@ -16,6 +18,9 @@ router.get('/forms', getAllContactForms);
 
 // POST /api/contact-us/forms
 router.post('/forms', createContactForm);
+
+// BULK DELETE contact form submissions
+router.delete('/forms', deleteContactForms);
 
 // ContactInfo CRUD routes
 // CREATE
