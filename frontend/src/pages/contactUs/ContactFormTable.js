@@ -129,22 +129,6 @@ const ContactFormTable = () => {
 
     return (
         <div className="container mt-4" style={{ marginLeft: '2rem' }}>
-            <div className="row mb-3">
-                <div className="col-auto">
-                    <button className="btn btn-danger btn-sm" onClick={handleDeleteSelected} disabled={selectedRows.length === 0}>
-                        Delete Selected
-                    </button>
-                    <div style={{ fontSize: '0.95rem', marginTop: '0.25rem', color: '#555' }}>
-                        {selectedRows.length > 0 ? `${selectedRows.length} row${selectedRows.length > 1 ? 's' : ''} selected` : 'No rows selected'}
-                    </div>
-                </div>
-                <div className="col-6">
-                    <input type="text" className="form-control" placeholder="Search Name, Email, or Service Type" value={search.term} onChange={e => setSearch(s => ({ ...s, term: e.target.value }))} />
-                </div>
-                <div className="col-3">
-                    <input type="date" className="form-control" value={search.date} onChange={e => setSearch(s => ({ ...s, date: e.target.value }))} />
-                </div>
-            </div>
             <div className="d-flex justify-content-between align-items-center mb-2">
                 <div>
                     <h4 className="me-3 mb-0">Contact Form Submissions</h4>
@@ -178,7 +162,15 @@ const ContactFormTable = () => {
                 </div>
             </div>
             <div className="row mb-3">
-                <div className="col-8">
+                <div className="col-2">
+                    <button className="btn btn-danger btn-sm" onClick={handleDeleteSelected} disabled={selectedRows.length === 0}>
+                        Delete Selected
+                    </button>
+                    <div style={{ fontSize: '0.95rem', marginTop: '0.25rem', color: '#555' }}>
+                        {selectedRows.length > 0 ? `${selectedRows.length} row${selectedRows.length > 1 ? 's' : ''} selected` : 'No rows selected'}
+                    </div>
+                </div>
+                <div className="col-6">
                     <input type="text" className="form-control" placeholder="Search Name, Email, or Service Type" value={search.term} onChange={e => setSearch(s => ({ ...s, term: e.target.value }))} />
                 </div>
                 <div className="col-4">
