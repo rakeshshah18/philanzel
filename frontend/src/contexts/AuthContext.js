@@ -26,7 +26,13 @@ export const AuthProvider = ({ children }) => {
     const checkAuthStatus = async () => {
         try {
             const token = localStorage.getItem('adminToken');
-            if (!token) {
+            // Check for token existence and expiration
+            const { isJwtExpired } = require('../utils/jwt');
+            if (!token || isJwtExpired(token)) {
+                localStorage.removeItem('adminToken');
+                setAdmin(null);
+                setIsAuthenticated(false);
+                setAlert({ show: true, message: 'Session expired. Please log in again.', type: 'warning' });
                 setLoading(false);
                 return;
             }
@@ -42,6 +48,9 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem('adminToken');
             setAdmin(null);
             setIsAuthenticated(false);
+            if (error?.response?.data?.message?.includes('jwt expired')) {
+                setAlert({ show: true, message: 'Session expired. Please log in again.', type: 'warning' });
+            }
         } finally {
             setLoading(false);
         }

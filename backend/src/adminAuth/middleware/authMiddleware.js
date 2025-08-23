@@ -26,6 +26,16 @@ const verifyToken = async (req, res, next) => {
             });
         }
 
+        // Check blacklist
+        const { isTokenBlacklisted } = await import('../utils/tokenBlacklist.js');
+        if (isTokenBlacklisted(token)) {
+            return res.status(401).json({
+                success: false,
+                message: 'Token has been revoked. Please login again.',
+                error: 'TOKEN_BLACKLISTED'
+            });
+        }
+
         // Verify token
         let decoded;
         try {

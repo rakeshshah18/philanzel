@@ -186,6 +186,7 @@ class AdminAuthController {
     async refreshToken(req, res) {
         try {
             const { refreshToken } = req.cookies;
+            const { blacklistToken } = await import('../utils/tokenBlacklist.js');
 
             if (!refreshToken) {
                 return res.status(401).json({
@@ -242,6 +243,17 @@ class AdminAuthController {
                 });
             }
 
+            // Rotate refresh token
+            const newRefreshToken = admin.generateRefreshToken();
+            admin.refreshToken = newRefreshToken;
+            await admin.save();
+            res.cookie('refreshToken', newRefreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            });
+
             // Generate new access token
             const newAccessToken = admin.generateAccessToken();
 
@@ -266,6 +278,15 @@ class AdminAuthController {
     async logout(req, res) {
         try {
             const { refreshToken } = req.cookies;
+            const authHeader = req.headers.authorization;
+            const accessToken = authHeader && authHeader.startsWith('Bearer ')
+                ? authHeader.substring(7)
+                : null;
+            const { blacklistToken } = await import('../utils/tokenBlacklist.js');
+
+            if (accessToken) {
+                blacklistToken(accessToken);
+            }
 
             if (refreshToken) {
                 // Remove refresh token from database
