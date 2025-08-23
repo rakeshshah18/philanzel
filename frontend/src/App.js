@@ -18,7 +18,7 @@ import AdminInquiries from './pages/AdminInquiries';
 import AdminApplications from './pages/AdminApplications';
 import HomePageForm from './pages/home/HomePageForm';
 import AdminHomePage from './pages/home/AdminHomePage';
-import { Service1, Service2, Service3, Service4, Service5, Service6, Service7, Service8 } from './pages/Services';
+import ServicePage from './pages/ServicePage';
 import ServicesOverview from './pages/ServicesOverview';
 import Sections from './pages/sections/Sections';
 import Reviews from './pages/sections/Reviews';
@@ -84,14 +84,7 @@ const AppLayout = () => {
                             <Route path="/sections/ads" element={<Ads />} />
                             <Route path="/sections/footer" element={<AdminFooter />} />
                             <Route path="/services-overview" element={<ServicesOverview />} />
-                            <Route path="/service-1" element={<Service1 />} />
-                            <Route path="/service-2" element={<Service2 />} />
-                            <Route path="/service-3" element={<Service3 />} />
-                            <Route path="/service-4" element={<Service4 />} />
-                            <Route path="/service-5" element={<Service5 />} />
-                            <Route path="/service-6" element={<Service6 />} />
-                            <Route path="/service-7" element={<Service7 />} />
-                            <Route path="/service-8" element={<Service8 />} />
+                            <Route path="/services/:serviceId" element={<ServicePage />} />
                             <Route path="/contact" element={<ContactForm />} />
                             <Route path="/careers" element={<CareerForm />} />
                             <Route path="/admin/inquiries" element={<AdminInquiries />} />

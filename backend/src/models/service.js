@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
 
 const ourServicesSchema = new mongoose.Schema({
+    sections: [
+        {
+            title: { type: String, required: true },
+            content: { type: String },
+        }
+    ],
     // Legacy fields for backward compatibility
     name: {
         type: String,

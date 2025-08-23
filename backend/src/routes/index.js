@@ -29,6 +29,9 @@ import express from 'express';
 import uploadRoutes from './partner/upload.js';
 
 const router = express.Router();
+import serviceRoutes from './all services/serviceRoutes.js';
+// Dynamic services API
+router.use('/services', serviceRoutes);
 
 console.log('🔧 Routes index.js loading...');
 

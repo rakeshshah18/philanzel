@@ -1,4 +1,62 @@
 import axios from 'axios';
+// Career API
+export const careerAPI = {
+    // Submit career application
+    submit: (formData) => API.post('/user/career-inquiry', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+    // Get all career applications (admin)
+    getAll: () => API.get('/user/applications'),
+    // Get application by ID
+    getById: (id) => API.get(`/user/career/${id}`),
+    // Update application status
+    updateStatus: (id, status) => API.put(`/user/career/${id}/status`, { status }),
+    // Delete application
+    delete: (id) => API.delete(`/user/career/${id}`)
+};
+
+// Home Page API
+export const homePageAPI = {
+    // Create homepage content
+    create: (data) => API.post('/admin/homepage', data),
+    // Create homepage content with file upload
+    createWithFile: (formData) => API.post('/admin/homepage', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+    // Get all homepage content
+    getAll: () => API.get('/admin/homepage'),
+    // Get homepage content by ID
+    getById: (id) => API.get(`/admin/homepage/${id}`),
+    // Update homepage content
+    update: (id, data) => API.put(`/admin/homepage/${id}`, data),
+    // Update homepage content with file upload
+    updateWithFile: (id, formData) => API.put(`/admin/homepage/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+    // Delete homepage content
+    delete: (id) => API.delete(`/admin/homepage/${id}`)
+};
+
+// Inquiry API
+export const inquiryAPI = {
+    // Submit new user inquiry
+    submit: (data) => API.post('/inquiry', data),
+    // Get all inquiries (admin)
+    getAll: () => API.get('/inquiry'),
+    // Get inquiry by ID
+    getById: (id) => API.get(`/inquiry/${id}`),
+    // Update inquiry status
+    updateStatus: (id, status) => API.put(`/inquiry/${id}/status`, { status }),
+    // Delete inquiry
+    delete: (id) => API.delete(`/inquiry/${id}`)
+};
+// ...existing code...
 
 // Create axios instance with base configuration
 const API = axios.create({
@@ -10,158 +68,86 @@ const API = axios.create({
     withCredentials: true, // Enable cookies for refresh tokens
 });
 
+// GLOBAL REFRESH LOGIC
+let isRefreshing = false;
+let failedQueue = [];
+let globalRefreshRetryCount = 0;
+const MAX_GLOBAL_REFRESH_RETRIES = 2;
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
 // Add auth token to requests
 API.interceptors.request.use(
     (config) => {
-        console.log('🚀 API Request Details:');
-        console.log('  - Method:', config.method?.toUpperCase());
-        console.log('  - URL:', config.url);
-        console.log('  - Base URL:', config.baseURL);
-        console.log('  - Full URL:', `${config.baseURL}${config.url}`);
-        console.log('  - Data type:', config.data?.constructor?.name);
-
-        // Handle FormData - remove Content-Type to let browser set it with boundary
-        if (config.data instanceof FormData) {
-            console.log('  - 📋 FormData detected, removing Content-Type header');
-            delete config.headers['Content-Type'];
-        }
-
-        console.log('  - Headers:', config.headers);
-
-        // Add auth token to requests
         const token = localStorage.getItem('adminToken');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
-            console.log('  - Token present:', token.substring(0, 20) + '...');
-        } else {
-            console.log('  - ⚠️ No token found in localStorage');
         }
-
+        if (config.data instanceof FormData) {
+            delete config.headers['Content-Type'];
+        }
         return config;
     },
-    (error) => {
-        console.error('❌ Request interceptor error:', error);
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
-// Handle token refresh
 API.interceptors.response.use(
-    (response) => {
-        console.log('✅ API Response Success:');
-        console.log('  - Status:', response.status);
-        console.log('  - URL:', response.config.url);
-        console.log('  - Data:', response.data);
-        return response;
-    },
-    async (error) => {
-        console.error('❌ API Response Error Details:');
-        console.error('  - Error type:', error.constructor.name);
-        console.error('  - Error message:', error.message);
-        console.error('  - Error code:', error.code);
-        console.error('  - Request URL:', error.config?.url);
-        console.error('  - Response status:', error.response?.status);
-        console.error('  - Response data:', error.response?.data);
-        console.error('  - Network error?', !error.response);
-        console.error('  - Full error object:', error);
-
+    response => response,
+    async error => {
         const originalRequest = error.config;
-
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response && error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
-
-            try {
-                // Try to refresh token
-                const response = await API.post('/admin/auth/refresh-token');
-                const { accessToken } = response.data.data;
-
-                // Update stored token
-                localStorage.setItem('adminToken', accessToken);
-
-                // Retry original request
-                originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-                return API(originalRequest);
-            } catch (refreshError) {
-                // Refresh failed, redirect to login
-                localStorage.removeItem('adminToken');
+            if (globalRefreshRetryCount >= MAX_GLOBAL_REFRESH_RETRIES) {
+                // Only redirect after refresh attempts fail
                 window.location.href = '/login';
-                return Promise.reject(refreshError);
+                return Promise.reject(error);
             }
+            globalRefreshRetryCount++;
+            if (!isRefreshing) {
+                isRefreshing = true;
+                try {
+                    const { data } = await axios.post('/api/auth/refresh', {}, { withCredentials: true });
+                    API.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+                    localStorage.setItem('adminToken', data.accessToken);
+                    processQueue(null, data.accessToken);
+                    return API(originalRequest);
+                } catch (err) {
+                    processQueue(err, null);
+                    // Only redirect after refresh fails
+                    window.location.href = '/login';
+                    return Promise.reject(err);
+                } finally {
+                    isRefreshing = false;
+                }
+            }
+            return new Promise(function (resolve, reject) {
+                failedQueue.push({ resolve, reject });
+            })
+                .then(token => {
+                    originalRequest.headers['Authorization'] = 'Bearer ' + token;
+                    return API(originalRequest);
+                })
+                .catch(err => {
+                    // Only redirect after refresh fails
+                    window.location.href = '/login';
+                    return Promise.reject(err);
+                });
         }
-
         return Promise.reject(error);
     }
 );
 
-// API endpoints
-export const inquiryAPI = {
-    // Submit new user inquiry
-    submit: (data) => API.post('/inquiry', data),
 
-    // Get all inquiries (admin)
-    getAll: () => API.get('/inquiry'),
-
-    // Get inquiry by ID
-    getById: (id) => API.get(`/inquiry/${id}`),
-
-    // Update inquiry status
-    updateStatus: (id, status) => API.put(`/inquiry/${id}/status`, { status }),
-
-    // Delete inquiry
-    delete: (id) => API.delete(`/inquiry/${id}`)
-};
-
-export const careerAPI = {
-    // Submit career application
-    submit: (formData) => API.post('/user/career-inquiry', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    }),
-
-    // Get all career applications (admin)
-    getAll: () => API.get('/user/applications'),
-
-    // Get application by ID
-    getById: (id) => API.get(`/user/career/${id}`),
-
-    // Update application status
-    updateStatus: (id, status) => API.put(`/user/career/${id}/status`, { status }),
-
-    // Delete application
-    delete: (id) => API.delete(`/user/career/${id}`)
-};
-
-export const homePageAPI = {
-    // Create homepage content
-    create: (data) => API.post('/admin/homepage', data),
-
-    // Create homepage content with file upload
-    createWithFile: (formData) => API.post('/admin/homepage', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    }),
-
-    // Get all homepage content
-    getAll: () => API.get('/admin/homepage'),
-
-    // Get homepage content by ID
-    getById: (id) => API.get(`/admin/homepage/${id}`),
-
-    // Update homepage content
-    update: (id, data) => API.put(`/admin/homepage/${id}`, data),
-
-    // Update homepage content with file upload
-    updateWithFile: (id, formData) => API.put(`/admin/homepage/${id}`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    }),
-
-    // Delete homepage content
-    delete: (id) => API.delete(`/admin/homepage/${id}`)
-};
+export default API;
 
 export const aboutUsAPI = {
     // Create about us content
@@ -627,4 +613,4 @@ export const contactInfoAPI = {
     delete: (id) => API.delete(`/contact-us/info/${id}`)
 };
 
-export default API;
+

@@ -5,16 +5,7 @@ import ServiceModal from '../components/ServiceModal';
 import './ServicesOverview.css';
 
 const ServicesOverview = () => {
-    const [services, setServices] = useState([
-        { id: 'service-1', name: 'Human Resources', image: '/images/services/hr.svg', color: 'primary', description: 'Complete HR solutions for your business' },
-        { id: 'service-2', name: 'Staff Augmentation', image: '/images/services/staff.svg', color: 'success', description: 'Skilled professionals to enhance your team' },
-        { id: 'service-3', name: 'Quality Assurance', image: '/images/services/quality.svg', color: 'info', description: 'Ensuring excellence in all deliverables' },
-        { id: 'service-4', name: 'Business Consulting', image: '/images/services/consulting.svg', color: 'warning', description: 'Strategic guidance for business growth' },
-        { id: 'service-5', name: 'Business Development', image: '/images/services/business.svg', color: 'secondary', description: 'Expanding your business opportunities' },
-        { id: 'service-6', name: 'Finance & Accounting', image: '/images/services/finance.svg', color: 'dark', description: 'Professional financial management services' },
-        { id: 'service-7', name: 'Customer Support', image: '/images/services/support.svg', color: 'danger', description: 'Excellence in customer service delivery' },
-        { id: 'service-8', name: 'Digital Marketing', image: '/images/services/default-service.svg', color: 'primary', description: 'Comprehensive digital marketing solutions' }
-    ]);
+    const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -27,16 +18,7 @@ const ServicesOverview = () => {
     const { showAlert } = useAuth();
 
     // Default static services for display
-    const staticServices = [
-        { id: 'static-1', name: 'Human Resources', image: '/images/services/hr.svg', color: 'primary', description: 'Complete HR solutions for your business' },
-        { id: 'static-2', name: 'Staff Augmentation', image: '/images/services/staff.svg', color: 'success', description: 'Skilled professionals to enhance your team' },
-        { id: 'static-3', name: 'Quality Assurance', image: '/images/services/quality.svg', color: 'info', description: 'Ensuring excellence in all deliverables' },
-        { id: 'static-4', name: 'Business Consulting', image: '/images/services/consulting.svg', color: 'warning', description: 'Strategic guidance for business growth' },
-        { id: 'static-5', name: 'Business Development', image: '/images/services/business.svg', color: 'secondary', description: 'Expanding your business opportunities' },
-        { id: 'static-6', name: 'Finance & Accounting', image: '/images/services/finance.svg', color: 'dark', description: 'Professional financial management services' },
-        { id: 'static-7', name: 'Customer Support', image: '/images/services/support.svg', color: 'danger', description: 'Excellence in customer service delivery' },
-        { id: 'static-8', name: 'Digital Marketing', image: '/images/services/default-service.svg', color: 'primary', description: 'Comprehensive digital marketing solutions' }
-    ];
+    // ...existing code...
 
     useEffect(() => {
         fetchServices();
@@ -47,16 +29,12 @@ const ServicesOverview = () => {
             setLoading(true);
             const response = await servicesAPI.getAll();
             if (response.data.data && response.data.data.length > 0) {
-                // Update services with data from backend if available
-                const updatedServices = services.map((service, index) => {
-                    const backendService = response.data.data[index];
-                    return backendService ? { ...service, name: backendService.name, _id: backendService._id } : service;
-                });
-                setServices(updatedServices);
+                setServices(response.data.data);
+            } else {
+                setServices([]);
             }
         } catch (error) {
             console.error('Error fetching services:', error);
-            // Don't show alert for initial load failure, just use default services
         } finally {
             setLoading(false);
         }
@@ -263,13 +241,8 @@ const ServicesOverview = () => {
     };
 
     const createServiceUrl = (serviceName) => {
-        // Convert service name to URL-friendly format
-        return serviceName
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-            .replace(/\s+/g, '-') // Replace spaces with hyphens
-            .replace(/-+/g, '-') // Replace multiple hyphens with single
-            .trim('-'); // Remove leading/trailing hyphens
+        // Use MongoDB _id for dynamic routing
+        return serviceName;
     };
     return (
         <div className="container-fluid py-4">
@@ -399,8 +372,8 @@ const ServicesOverview = () => {
                                                 {/* Buttons Column - Read More Link */}
                                                 <td>
                                                     <a
-                                                        href={`/services/${createServiceUrl(service.name)}`}
-                                                        className={`btn btn-outline-${service.color} btn-sm`}
+                                                        href={`/services/${service._id}`}
+                                                        className={`btn btn-outline-${service.color || 'primary'} btn-sm`}
                                                         title={`Read more about ${service.name}`}
                                                     >
                                                         <i className="fas fa-book-open me-1"></i>
