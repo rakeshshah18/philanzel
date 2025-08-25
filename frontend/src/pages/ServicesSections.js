@@ -1,32 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { servicesAPI } from '../services/api';
-import ServiceModal from '../components/ServiceModal';
-import './ServicesOverview.css';
-import { Link } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
+import ServiceModal from '../components/ServiceModal';
 
-const ServicesOverview = () => {
+const ServicesSections = () => {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [showModal, setShowModal] = useState(false);
+    const [showEditListModal, setShowEditListModal] = useState(false);
     const [editingService, setEditingService] = useState(null);
     const [isEdit, setIsEdit] = useState(false);
-    const [showEditListModal, setShowEditListModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         fetchServices();
     }, []);
 
     const fetchServices = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await servicesAPI.getAll();
-            if (response.data.data && response.data.data.length > 0) {
-                setServices(response.data.data);
-            } else {
-                setServices([]);
-            }
-        } catch (error) {
+            setServices(response.data.data || []);
+        } catch {
             setServices([]);
         } finally {
             setLoading(false);
@@ -56,7 +50,7 @@ const ServicesOverview = () => {
     };
 
     return (
-        <div className="services-overview-container">
+        <div className="services-sections-container">
             <h2 className="mb-4">Services Sections</h2>
             <div className="d-flex align-items-center mb-3">
                 <button className="btn btn-primary me-2" onClick={handleAddService}>
@@ -70,7 +64,18 @@ const ServicesOverview = () => {
                     Edit Service Name
                 </button>
             </div>
-
+            {loading ? (
+                <div className="text-center py-4">
+                    <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p className="mt-2">Loading services...</p>
+                </div>
+            ) : (
+                services.length === 0 && (
+                    <div className="text-center text-muted">No services found.</div>
+                )
+            )}
             <Modal show={showEditListModal} onHide={() => setShowEditListModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Edit Service Name</Modal.Title>
@@ -111,19 +116,6 @@ const ServicesOverview = () => {
                     )}
                 </Modal.Body>
             </Modal>
-
-            {loading ? (
-                <div className="text-center py-4">
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                    <p className="mt-2">Loading services...</p>
-                </div>
-            ) : (
-                services.length === 0 && (
-                    <div className="text-center text-muted">No services found.</div>
-                )
-            )}
             <ServiceModal
                 show={showModal}
                 onHide={() => setShowModal(false)}
@@ -135,4 +127,4 @@ const ServicesOverview = () => {
     );
 };
 
-export default ServicesOverview;
+export default ServicesSections;

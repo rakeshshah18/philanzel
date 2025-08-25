@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { servicesAPI } from '../services/api';
 import axios from 'axios';
 
 const ServicePage = () => {
-    const { serviceId } = useParams();
+    const { serviceName } = useParams();
     const [service, setService] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`/api/services/${serviceId}`)
+        servicesAPI.getAll()
             .then(res => {
-                setService(res.data.data);
+                const found = res.data.data.find(s => s.name.replace(/\s+/g, '-').toLowerCase() === serviceName);
+                setService(found || null);
                 setLoading(false);
             })
             .catch(() => {
                 setService(null);
                 setLoading(false);
             });
-    }, [serviceId]);
+    }, [serviceName]);
 
     if (loading) return <div>Loading...</div>;
     if (!service) return <div>Service not found.</div>;
