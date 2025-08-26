@@ -6,7 +6,19 @@ const ServicePage = () => {
     const { serviceId } = useParams();
     const [service, setService] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+    const [availableSections, setAvailableSections] = useState([]);
+    const [selectedSectionId, setSelectedSectionId] = useState('');
+    const [addingSection, setAddingSection] = useState(false);
 
+    // Fetch available AboutService sections for modal
+    useEffect(() => {
+        if (showAddSectionModal) {
+            axios.get('/api/admin/services-sections/about-service')
+                .then(res => setAvailableSections(res.data.data || []))
+                .catch(() => setAvailableSections([]));
+        }
+    }, [showAddSectionModal]);
     useEffect(() => {
         setLoading(true);
         axios.get(`/api/services/slug/${serviceId}`)
@@ -29,10 +41,10 @@ const ServicePage = () => {
     return (
         <div>
             <h1>{service.name}</h1>
-            <p>{service.description}</p>
-            {/* <pre style={{ background: '#f8f9fa', padding: '10px', fontSize: '12px', border: '1px solid #eee', marginBottom: '1rem' }}>
-                Debug: {JSON.stringify(service, null, 2)}
-            </pre> */}
+            {/* <p>{service.description}</p> */}
+            <button className="btn btn-success mb-3" onClick={() => setShowAddSectionModal(true)}>
+                Add Section
+            </button>
             {service.sections && service.sections.length > 0 && (
                 <div>
                     <h2>Sections</h2>
@@ -45,6 +57,53 @@ const ServicePage = () => {
                             )}
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Add Section Modal */}
+            {showAddSectionModal && (
+                <div className="modal fade show" style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Select Section to Add</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowAddSectionModal(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                {availableSections.length === 0 ? (
+                                    <div>No sections available.</div>
+                                ) : (
+                                    <select className="form-select" value={selectedSectionId} onChange={e => setSelectedSectionId(e.target.value)}>
+                                        <option value="">-- Select Section --</option>
+                                        {availableSections.map(section => (
+                                            <option key={section._id} value={section._id}>{section.heading}</option>
+                                        ))}
+                                    </select>
+                                )}
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowAddSectionModal(false)}>Cancel</button>
+                                <button type="button" className="btn btn-primary" disabled={!selectedSectionId || addingSection} onClick={async () => {
+                                    if (!selectedSectionId) return;
+                                    setAddingSection(true);
+                                    try {
+                                        await axios.post(`/api/services/${serviceId}/add-section`, { sectionId: selectedSectionId });
+                                        setShowAddSectionModal(false);
+                                        setSelectedSectionId('');
+                                        setAddingSection(false);
+                                        // Refresh service data
+                                        setLoading(true);
+                                        const res = await axios.get(`/api/services/slug/${serviceId}`);
+                                        setService(res.data.data || null);
+                                        setLoading(false);
+                                    } catch (err) {
+                                        alert('Failed to add section: ' + (err?.response?.data?.message || err.message));
+                                        setAddingSection(false);
+                                    }
+                                }}>Add</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

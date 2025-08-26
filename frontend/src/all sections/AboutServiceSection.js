@@ -109,25 +109,10 @@ const AboutServiceSection = () => {
         }
     };
 
-    const addDemoSection = async () => {
-        const demo = {
-            image: 'https://via.placeholder.com/100',
-            heading: 'Demo Service',
-            description: 'This is a demo about service section.'
-        };
-        try {
-            await axios.post(API_URL, demo);
-            fetchSections();
-        } catch (err) {
-            alert('Failed to add demo section: ' + (err?.response?.data?.message || err.message));
-            console.error('Demo section POST error:', err);
-        }
-    };
 
     return (
         <div className="about-service-section">
             <h2>About Service Sections</h2>
-            <Button variant="success" size="sm" className="mb-2" onClick={addDemoSection}>Add Demo Section</Button>
             {loading ? <div>Loading...</div> : (
                 <ul className="list-group">
                     {sections.map(section => (
@@ -138,7 +123,6 @@ const AboutServiceSection = () => {
                                 {section.image && <img src={section.image} alt="Section" style={{ maxWidth: 100 }} />}
                             </div>
                             <div>
-                                <Button variant="outline-secondary" size="sm" className="me-2" onClick={() => handleAddTo(section)}>Add To</Button>
                                 <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleEdit(section)}>Edit</Button>
                                 <Button variant="outline-danger" size="sm" onClick={() => handleDelete(section._id)}><i className="bi bi-trash"></i></Button>
                             </div>
