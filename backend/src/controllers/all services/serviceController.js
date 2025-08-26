@@ -1,11 +1,14 @@
 import OurServices from '../../models/service.js';
+import AboutService from '../../models/all services/aboutService.js';
 
 // Create a new service with dynamic sections
 export const createService = async (req, res) => {
     try {
         const { name, description, image, isActive, sections } = req.body;
+        const slug = name.replace(/\s+/g, '-').toLowerCase();
         const newService = new OurServices({
             name,
+            slug,
             description,
             image,
             isActive,
@@ -36,6 +39,58 @@ export const getServiceById = async (req, res) => {
         res.status(200).json({ success: true, data: service });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to fetch service', error: error.message });
+    }
+};
+
+// Get a single service by slug
+export const getServiceBySlug = async (req, res) => {
+    try {
+        const service = await OurServices.findOne({ slug: req.params.slug });
+        if (!service) return res.status(404).json({ success: false, message: 'Service not found' });
+        res.status(200).json({ success: true, data: service });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to fetch service by slug', error: error.message });
+    }
+};
+
+// Add AboutService section to a service
+export const addSectionToService = async (req, res) => {
+    try {
+        const { serviceName } = req.params;
+        const { sectionId } = req.body;
+        console.log('AddSectionToService: serviceName param:', serviceName);
+        if (!sectionId) {
+            return res.status(400).json({ success: false, message: 'Section ID required' });
+        }
+        // Find the section
+        const section = await AboutService.findById(sectionId);
+        if (!section) {
+            console.log('AddSectionToService: Section not found:', sectionId);
+            return res.status(404).json({ success: false, message: 'Section not found' });
+        }
+        // Find the service by slug
+        const service = await OurServices.findOne({ slug: serviceName });
+        console.log('AddSectionToService: Service query result:', service);
+        if (!service) {
+            console.log('AddSectionToService: Service not found for slug:', serviceName);
+            return res.status(404).json({ success: false, message: 'Service not found' });
+        }
+        // Prevent duplicate sections (by sectionId)
+        const alreadyExists = service.sections.some(s => s._id?.toString() === section._id.toString());
+        if (alreadyExists) {
+            return res.status(400).json({ success: false, message: 'Section already added to this service.' });
+        }
+        service.sections.push({
+            title: section.heading,
+            content: section.description,
+            image: section.image || '',
+            _id: section._id
+        });
+        await service.save();
+        res.json({ success: true, message: 'Section added to service', service });
+    } catch (err) {
+        console.log('AddSectionToService: Error:', err);
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 

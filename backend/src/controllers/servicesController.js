@@ -326,3 +326,35 @@ export const createTestService = async (req, res) => {
         });
     }
 };
+
+// Add AboutService section to a service
+import AboutService from '../models/all services/aboutService.js';
+export const addSectionToService = async (req, res) => {
+    try {
+        const { serviceName } = req.params;
+        const { sectionId } = req.body;
+        if (!sectionId) {
+            return res.status(400).json({ success: false, message: 'Section ID required' });
+        }
+        // Find the section
+        const section = await AboutService.findById(sectionId);
+        if (!section) {
+            return res.status(404).json({ success: false, message: 'Section not found' });
+        }
+        // Find the service
+        const service = await OurServices.findOne({ name: serviceName });
+        if (!service) {
+            return res.status(404).json({ success: false, message: 'Service not found' });
+        }
+        // Add section to service.sections (store minimal info or full section)
+        service.sections.push({
+            title: section.heading,
+            content: section.description,
+            image: section.image || ''
+        });
+        await service.save();
+        res.json({ success: true, message: 'Section added to service', service });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};

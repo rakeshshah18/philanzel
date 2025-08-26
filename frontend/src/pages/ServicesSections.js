@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { servicesAPI } from '../services/api';
 import { Modal, Button } from 'react-bootstrap';
 import ServiceModal from '../components/ServiceModal';
+import AboutServiceSection from '../all sections/AboutServiceSection';
 
 const ServicesSections = () => {
     const [services, setServices] = useState([]);
@@ -123,6 +124,7 @@ const ServicesSections = () => {
                 service={editingService}
                 isEdit={isEdit}
             />
+            <AboutServiceSection />
         </div>
     );
 };

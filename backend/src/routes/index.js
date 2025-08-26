@@ -27,6 +27,7 @@ import empoweringIndividual from './partner/empoweringIndividualRoutes.js';
 import potentialGrowthRoutes from './partner/potentialGrowthRoutes.js';
 import express from 'express';
 import uploadRoutes from './partner/upload.js';
+import aboutServiceRoutes from './all services/aboutServiceRoutes.js';
 
 const router = express.Router();
 import serviceRoutes from './all services/serviceRoutes.js';
@@ -91,5 +92,6 @@ router.use('/contact-us', contactUsRoutes);
 router.use('/admin', homePageRoutes);
 router.use('/admin', aboutUsRoutes);
 router.use('/admin', ourJourneyRoutes);
+router.use('/admin/services-sections/about-service', aboutServiceRoutes);
 
 export default router;

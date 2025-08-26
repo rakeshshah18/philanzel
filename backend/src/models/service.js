@@ -5,12 +5,19 @@ const ourServicesSchema = new mongoose.Schema({
         {
             title: { type: String, required: true },
             content: { type: String },
+            image: { type: String, default: '' },
         }
     ],
     // Legacy fields for backward compatibility
     name: {
         type: String,
         trim: true
+    },
+    slug: {
+        type: String,
+        trim: true,
+        required: true,
+        unique: true
     },
     description: {
         type: String,

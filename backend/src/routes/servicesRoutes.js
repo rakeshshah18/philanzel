@@ -38,4 +38,8 @@ router.get('/', verifyToken, requireRole('admin'), getAllServices);
 router.put('/:id', verifyToken, requireRole('admin'), imageUpload.single('image'), handleMulterError, updateServices);
 router.delete('/:id', verifyToken, requireRole('admin'), deleteServices);
 
+// Add AboutService section to a service
+import { addSectionToService } from '../controllers/servicesController.js';
+router.post('/:serviceName/add-section', verifyToken, requireRole('admin'), addSectionToService);
+
 export default router;

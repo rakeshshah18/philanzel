@@ -68,7 +68,7 @@ app.use('/api', routes);
 connectDB();
 
 // More explicit server binding
-const server = app.listen(config.PORT, '127.0.0.1', () => {
+const server = app.listen(config.PORT, () => {
     console.log(`Server is running on port ${config.PORT}`);
     console.log(`🌐 Server accessible at: http://localhost:${config.PORT}`);
     console.log(`🏥 Health check: http://localhost:${config.PORT}/health`);
