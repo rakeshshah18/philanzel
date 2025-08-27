@@ -1,3 +1,4 @@
+import sectionRoutes from './all services/sectionRoutes.js';
 import partnerAssociationImageRoutes from './partner/partnerAssociationImageRoutes.js';
 import contactUsRoutes from './contactUs/contactUsRoutes.js';
 import whyChoosePhilanzelRoutes from './partner/whyChoosePhilanzel.js';
@@ -93,5 +94,7 @@ router.use('/admin', homePageRoutes);
 router.use('/admin', aboutUsRoutes);
 router.use('/admin', ourJourneyRoutes);
 router.use('/admin/services-sections/about-service', aboutServiceRoutes);
+// Flexible section API for all services
+router.use('/sections', sectionRoutes);
 
 export default router;

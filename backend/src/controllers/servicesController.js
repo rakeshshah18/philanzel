@@ -29,6 +29,11 @@ const createServices = async (req, res) => {
             imagePath = `/uploads/images/${req.file.filename}`;
         }
 
+        // Generate slug from name/title if not provided
+        let slug = req.body.slug;
+        if (!slug) {
+            slug = (serviceName || serviceTitle || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        }
         // Add new service
         const newServices = new OurServices({
             name: serviceName.trim(),
@@ -39,7 +44,8 @@ const createServices = async (req, res) => {
             buttonText: buttonText || 'Learn More',
             color: color || 'primary',
             image: imagePath,
-            icon: imagePath // Use same image for icon
+            icon: imagePath, // Use same image for icon
+            slug: slug
         });
 
         await newServices.save();

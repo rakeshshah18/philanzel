@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -112,7 +113,6 @@ const AboutServiceSection = () => {
 
     return (
         <div className="about-service-section">
-            <h2>About Service Sections</h2>
             {loading ? <div>Loading...</div> : (
                 <ul className="list-group">
                     {sections.map(section => (
@@ -122,9 +122,10 @@ const AboutServiceSection = () => {
                                 <p>{section.description}</p>
                                 {section.image && <img src={section.image} alt="Section" style={{ maxWidth: 100 }} />}
                             </div>
-                            <div>
-                                <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleEdit(section)}>Edit</Button>
+                            <div className="d-flex gap-2">
+                                <Button variant="outline-primary" size="sm" onClick={() => handleEdit(section)}>Edit</Button>
                                 <Button variant="outline-danger" size="sm" onClick={() => handleDelete(section._id)}><i className="bi bi-trash"></i></Button>
+                                <Button variant="outline-success" size="sm" onClick={() => handleAddTo(section)}>Add To Service Page</Button>
                             </div>
                         </li>
                     ))}

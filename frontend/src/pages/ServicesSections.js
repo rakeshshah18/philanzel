@@ -3,6 +3,7 @@ import { servicesAPI } from '../services/api';
 import { Modal, Button } from 'react-bootstrap';
 import ServiceModal from '../components/ServiceModal';
 import AboutServiceSection from '../all sections/AboutServiceSection';
+import SectionManager from '../all sections/SectionManager';
 
 const ServicesSections = () => {
     const [services, setServices] = useState([]);
@@ -11,6 +12,7 @@ const ServicesSections = () => {
     const [editingService, setEditingService] = useState(null);
     const [isEdit, setIsEdit] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [showCreateSectionModal, setShowCreateSectionModal] = useState(false);
 
     useEffect(() => {
         fetchServices();
@@ -53,8 +55,8 @@ const ServicesSections = () => {
     return (
         <div className="services-sections-container">
             <h2 className="mb-4">Services Sections</h2>
-            <div className="d-flex align-items-center mb-3">
-                <button className="btn btn-primary me-2" onClick={handleAddService}>
+            <div className="d-flex align-items-center gap-2 mb-3">
+                <button className="btn btn-primary" onClick={handleAddService}>
                     Add New Service
                 </button>
                 <button
@@ -63,6 +65,9 @@ const ServicesSections = () => {
                     disabled={services.length === 0}
                 >
                     Edit Service Name
+                </button>
+                <button className="btn btn-primary" onClick={() => setShowCreateSectionModal(true)}>
+                    Create New Section
                 </button>
             </div>
             {loading ? (
@@ -125,6 +130,7 @@ const ServicesSections = () => {
                 isEdit={isEdit}
             />
             <AboutServiceSection />
+            <SectionManager showCreateModal={showCreateSectionModal} setShowCreateModal={setShowCreateSectionModal} />
         </div>
     );
 };
