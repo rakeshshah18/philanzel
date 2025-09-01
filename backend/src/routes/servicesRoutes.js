@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import imageUpload from '../config/imageUpload.js';
 import { verifyToken, requireRole } from '../adminAuth/middleware/authMiddleware.js';
-import { createServices, getAllServices, updateServices, deleteServices, createTestService } from '../controllers/servicesController.js';
+import { createServices, getAllServices, updateServices, deleteServices } from '../controllers/servicesController.js';
 
 const router = express.Router();
 
@@ -39,7 +39,8 @@ router.put('/:id', verifyToken, requireRole('admin'), imageUpload.single('image'
 router.delete('/:id', verifyToken, requireRole('admin'), deleteServices);
 
 // Add AboutService section to a service
-import { addSectionToService } from '../controllers/servicesController.js';
+import { addSectionToService, addSectionToServiceById } from '../controllers/servicesController.js';
+router.post('/:serviceId/sections', verifyToken, requireRole('admin'), addSectionToServiceById);
 router.post('/:serviceName/add-section', verifyToken, requireRole('admin'), addSectionToService);
 
 export default router;

@@ -20,9 +20,11 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
     const showCreateModal = typeof externalShowCreateModal === 'boolean' ? externalShowCreateModal : internalShowCreateModal;
     const setShowCreateModal = externalSetShowCreateModal || internalSetShowCreateModal;
     const [formData, setFormData] = useState({
+        name: '',
         heading: [''],
         description: [''],
         subheading: [''],
+        points: [''],
         subdescription: [''],
         images: [''],
         faqs: [{ question: '', answer: '' }],
@@ -52,7 +54,7 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
         e.preventDefault();
         await createSection(formData);
         setShowCreateModal(false);
-        setFormData({ heading: [''], description: [''], subheading: [''], subdescription: [''], images: [''], faqs: [{ question: '', answer: '' }] });
+        setFormData({ name: '', heading: [''], description: [''], subheading: [''], subdescription: [''], images: [''], faqs: [{ question: '', answer: '' }] });
         fetchSections();
     };
 
@@ -62,17 +64,53 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                 <ul className="list-group">
                     {sections.map(section => (
                         <li key={section._id} className="list-group-item">
+                            {section.name && (
+                                <div><strong>Section Name:</strong> {section.name}</div>
+                            )}
                             {Array.isArray(section.heading) && section.heading.filter(h => h).length > 0 && (
-                                <div><strong>Heading:</strong> {section.heading.filter(h => h).join(', ')}</div>
+                                <div><strong>Heading:</strong>
+                                    <ul className="mb-0">
+                                        {section.heading.filter(h => h).map((h, idx) => (
+                                            <li key={idx}>{h}</li>
+                                        ))}
+                                    </ul>
+                                </div>
                             )}
                             {Array.isArray(section.description) && section.description.filter(d => d).length > 0 && (
-                                <div><strong>Description:</strong> {section.description.filter(d => d).join(', ')}</div>
+                                <div><strong>Description:</strong>
+                                    <ul className="mb-0">
+                                        {section.description.filter(d => d).map((d, idx) => (
+                                            <li key={idx}>{d}</li>
+                                        ))}
+                                    </ul>
+                                </div>
                             )}
                             {Array.isArray(section.subheading) && section.subheading.filter(s => s).length > 0 && (
-                                <div><strong>Subheading:</strong> {section.subheading.filter(s => s).join(', ')}</div>
+                                <div><strong>Subheading:</strong>
+                                    <ul className="mb-0">
+                                        {section.subheading.filter(s => s).map((s, idx) => (
+                                            <li key={idx}>{s}</li>
+                                        ))}
+                                    </ul>
+                                </div>
                             )}
                             {Array.isArray(section.subdescription) && section.subdescription.filter(s => s).length > 0 && (
-                                <div><strong>Subdescription:</strong> {section.subdescription.filter(s => s).join(', ')}</div>
+                                <div><strong>Subdescription:</strong>
+                                    <ul className="mb-0">
+                                        {section.subdescription.filter(s => s).map((s, idx) => (
+                                            <li key={idx}>{s}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                            {Array.isArray(section.points) && section.points.filter(p => p).length > 0 && (
+                                <div><strong>Points:</strong>
+                                    <ul className="mb-0">
+                                        {section.points.filter(p => p).map((p, idx) => (
+                                            <li key={idx}>{p}</li>
+                                        ))}
+                                    </ul>
+                                </div>
                             )}
                             {Array.isArray(section.images) && section.images.filter(img => img).length > 0 && (
                                 <div><strong>Images:</strong> {section.images.filter(img => img).map((img, idx) => (
@@ -97,6 +135,7 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                         description: section.description || '',
                                         subheading: section.subheading || '',
                                         subdescription: section.subdescription || '',
+                                        points: section.points || [],
                                         images: section.images || [],
                                         faqs: section.faqs || [],
                                     });
@@ -105,6 +144,7 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                         description: !!section.description,
                                         subheading: !!section.subheading,
                                         subdescription: !!section.subdescription,
+                                        points: !!(section.points && section.points.length),
                                         images: !!(section.images && section.images.length),
                                         faqs: !!(section.faqs && section.faqs.length),
                                     });
@@ -116,7 +156,7 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                         <div className="modal-dialog">
                                             <div className="modal-content">
                                                 <div className="modal-header">
-                                                    <h5 className="modal-title">Edit Section</h5>
+                                                    <h5 className="modal-title">Edit Section{editFormData.name ? `: ${editFormData.name}` : ''}</h5>
                                                     <button type="button" className="btn-close" onClick={() => setShowEditModal(false)}></button>
                                                 </div>
                                                 <form onSubmit={async e => {
@@ -175,6 +215,22 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                                     {editFieldSelection.subdescription && (
                                                         <textarea className="form-control mb-2" placeholder="Subdescription" value={editFormData.subdescription} onChange={e => setEditFormData({ ...editFormData, subdescription: e.target.value })} />
                                                     )}
+                                                    {editFieldSelection.points && (
+                                                        <div className="mb-2">
+                                                            <label>Points:</label>
+                                                            {(Array.isArray(editFormData.points) ? editFormData.points : ['']).map((val, idx) => (
+                                                                <div key={idx} className="input-group mb-2">
+                                                                    <input type="text" className="form-control" placeholder="Point" value={val} onChange={e => {
+                                                                        const arr = Array.isArray(editFormData.points) ? [...editFormData.points] : [''];
+                                                                        arr[idx] = e.target.value;
+                                                                        setEditFormData({ ...editFormData, points: arr });
+                                                                    }} />
+                                                                    <button type="button" className="btn btn-outline-success" style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }} onClick={() => setEditFormData({ ...editFormData, points: [...(Array.isArray(editFormData.points) ? editFormData.points : ['']), ''] })}><i className="bi bi-plus-lg"></i></button>
+                                                                    <button type="button" className="btn btn-outline-danger" style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={() => setEditFormData({ ...editFormData, points: (Array.isArray(editFormData.points) ? editFormData.points : ['']).filter((_, i) => i !== idx) })} disabled={(Array.isArray(editFormData.points) ? editFormData.points.length : 1) === 1}><i className="bi bi-dash-lg"></i></button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                     {editFieldSelection.images && (
                                                         <div className="mb-2">
                                                             <label>Images (comma separated URLs):</label>
@@ -221,27 +277,16 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
             )}
             {showCreateModal && (
                 <div className="modal fade show" style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog">
-                        <div className="modal-content">
+                    <div className="modal-dialog modal-lg" style={{ maxWidth: '900px', width: '100%' }}>
+                        <div className="modal-content" style={{ borderRadius: '12px' }}>
                             <div className="modal-header">
                                 <h5 className="modal-title">Create New Section</h5>
                                 <button type="button" className="btn-close" onClick={() => setShowCreateModal(false)}></button>
                             </div>
-                            <form onSubmit={e => {
-                                e.preventDefault();
-                                createSection(formData);
-                                setShowCreateModal(false);
-                                setFormData({
-                                    heading: [''],
-                                    description: [''],
-                                    subheading: [''],
-                                    subdescription: [''],
-                                    images: [''],
-                                    faqs: [{ question: '', answer: '' }]
-                                });
-                                fetchSections();
-                            }} className="modal-body">
+                            <form onSubmit={handleCreate} className="modal-body">
                                 <div className="mb-3">
+                                    <label className="form-label">Section Name:</label>
+                                    <input type="text" className="form-control mb-2" placeholder="Section Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
                                     <label className="form-label">Fields:</label>
                                     {/* Heading */}
                                     <label>Heading:</label>
@@ -282,6 +327,7 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                             <button type="button" className="btn btn-outline-danger" style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={() => setFormData({ ...formData, subheading: formData.subheading.filter((_, i) => i !== idx) })} disabled={formData.subheading.length === 1}><i className="bi bi-dash-lg"></i></button>
                                         </div>
                                     ))}
+                                    {/* Points */}
                                     {/* Subdescription */}
                                     <label>Subdescription:</label>
                                     {formData.subdescription.map((val, idx) => (
@@ -293,6 +339,19 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                             }} />
                                             <button type="button" className="btn btn-outline-success" style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }} onClick={() => setFormData({ ...formData, subdescription: [...formData.subdescription, ''] })}><i className="bi bi-plus-lg"></i></button>
                                             <button type="button" className="btn btn-outline-danger" style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={() => setFormData({ ...formData, subdescription: formData.subdescription.filter((_, i) => i !== idx) })} disabled={formData.subdescription.length === 1}><i className="bi bi-dash-lg"></i></button>
+                                        </div>
+                                    ))}
+                                    {/* Points */}
+                                    <label>Points:</label>
+                                    {formData.points.map((val, idx) => (
+                                        <div key={idx} className="input-group mb-2">
+                                            <input type="text" className="form-control" placeholder="Point" value={val} onChange={e => {
+                                                const arr = [...formData.points];
+                                                arr[idx] = e.target.value;
+                                                setFormData({ ...formData, points: arr });
+                                            }} />
+                                            <button type="button" className="btn btn-outline-success" style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }} onClick={() => setFormData({ ...formData, points: [...formData.points, ''] })}><i className="bi bi-plus-lg"></i></button>
+                                            <button type="button" className="btn btn-outline-danger" style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={() => setFormData({ ...formData, points: formData.points.filter((_, i) => i !== idx) })} disabled={formData.points.length === 1}><i className="bi bi-dash-lg"></i></button>
                                         </div>
                                     ))}
                                     {/* Images */}

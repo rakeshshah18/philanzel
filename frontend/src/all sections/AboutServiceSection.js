@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { Modal, Button, Form } from 'react-bootstrap';
 
-const API_URL = '/api/admin/services-sections/about-service';
+const API_URL = 'http://localhost:8000/api/sections';
 
 const SERVICE_PAGES = [
     'Retirement Solutions',
@@ -118,6 +118,7 @@ const AboutServiceSection = () => {
                     {sections.map(section => (
                         <li key={section._id} className="list-group-item d-flex justify-content-between align-items-center">
                             <div>
+                                {section.name && <div><strong>Section Name:</strong> {section.name}</div>}
                                 <strong>{section.heading}</strong>
                                 <p>{section.description}</p>
                                 {section.image && <img src={section.image} alt="Section" style={{ maxWidth: 100 }} />}
@@ -134,9 +135,17 @@ const AboutServiceSection = () => {
 
             <Modal show={showAddToModal} onHide={() => setShowAddToModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Add Section To Service Page</Modal.Title>
+                    <Modal.Title>
+                        Add Section To Service Page
+                        {selectedSection && selectedSection.name && (
+                            <span className="ms-2 text-primary">({selectedSection.name})</span>
+                        )}
+                    </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {selectedSection && selectedSection.name && (
+                        <div className="mb-2"><strong>Section Name:</strong> {selectedSection.name}</div>
+                    )}
                     <Form onSubmit={handleAddToSubmit}>
                         <Form.Group className="mb-3">
                             <Form.Label>Select Service Page</Form.Label>

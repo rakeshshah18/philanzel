@@ -14,7 +14,7 @@ const ServicePage = () => {
     // Fetch available AboutService sections for modal
     useEffect(() => {
         if (showAddSectionModal) {
-            axios.get('/api/admin/services-sections/about-service')
+            axios.get('http://localhost:8000/api/sections')
                 .then(res => setAvailableSections(res.data.data || []))
                 .catch(() => setAvailableSections([]));
         }
@@ -76,7 +76,7 @@ const ServicePage = () => {
                                     <select className="form-select" value={selectedSectionId} onChange={e => setSelectedSectionId(e.target.value)}>
                                         <option value="">-- Select Section --</option>
                                         {availableSections.map(section => (
-                                            <option key={section._id} value={section._id}>{section.heading}</option>
+                                            <option key={section._id} value={section._id}>{section.name}</option>
                                         ))}
                                     </select>
                                 )}
@@ -87,7 +87,15 @@ const ServicePage = () => {
                                     if (!selectedSectionId) return;
                                     setAddingSection(true);
                                     try {
-                                        await axios.post(`/api/services/${serviceId}/add-section`, { sectionId: selectedSectionId });
+                                        const token = localStorage.getItem('adminToken');
+                                        const headers = {
+                                            Authorization: `Bearer ${token}`,
+                                        };
+                                        console.log('DEBUG: Add Section Request Headers:', headers);
+                                        console.log('DEBUG: Token value:', token);
+                                        await axios.post(`http://localhost:8000/api/services/${service._id}/sections`, { sectionId: selectedSectionId }, {
+                                            headers,
+                                        });
                                         setShowAddSectionModal(false);
                                         setSelectedSectionId('');
                                         setAddingSection(false);

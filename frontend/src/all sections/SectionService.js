@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/sections';
+const API_URL = 'http://localhost:8000/api/sections';
 
 export const createSection = async (sectionData) => {
     const res = await axios.post(API_URL, sectionData);

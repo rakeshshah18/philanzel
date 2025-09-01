@@ -1,3 +1,33 @@
+// Add section to service by _id
+export const addSectionToServiceById = async (req, res) => {
+    try {
+        const { serviceId } = req.params;
+        const { sectionId } = req.body;
+        if (!sectionId) {
+            return res.status(400).json({ success: false, message: 'Section ID required' });
+        }
+        // Find the section
+        const section = await Section.findById(sectionId);
+        if (!section) {
+            return res.status(404).json({ success: false, message: 'Section not found', sectionId });
+        }
+        // Find the service by _id
+        const service = await OurServices.findById(serviceId);
+        if (!service) {
+            return res.status(404).json({ success: false, message: 'Service not found', serviceId });
+        }
+        // Add section to service.sections
+        service.sections.push({
+            title: Array.isArray(section.heading) ? section.heading[0] : section.heading,
+            content: Array.isArray(section.description) ? section.description[0] : section.description,
+            image: Array.isArray(section.images) && section.images.length ? section.images[0] : (section.image || '')
+        });
+        await service.save();
+        res.json({ success: true, message: 'Section added to service', service });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
 import OurServices from '../models/service.js';
 
 const createServices = async (req, res) => {
@@ -202,165 +232,43 @@ export {
 };
 
 // Test function to create a default service for debugging
-export const createTestService = async (req, res) => {
-    try {
-        console.log('Creating 9 default tabbing services...');
-
-        // First, clear existing services
-        await OurServices.deleteMany({});
-        console.log('Cleared existing services');
-
-        const defaultServices = [
-            {
-                name: 'Investment Planning',
-                title: 'Investment Planning',
-                tabTitle: 'Investment',
-                contentTitle: 'Smart Investment Planning',
-                description: 'Build wealth through strategic investment planning tailored to your financial goals and risk tolerance.',
-                buttonText: 'Start Investing',
-                color: 'primary',
-                order: 1
-            },
-            {
-                name: 'Retirement Solutions',
-                title: 'Retirement Solutions',
-                tabTitle: 'Retirement',
-                contentTitle: 'Secure Your Future',
-                description: 'Plan today for a comfortable tomorrow with our comprehensive retirement planning services.',
-                buttonText: 'Plan Retirement',
-                color: 'success',
-                order: 2
-            },
-            {
-                name: 'Tax Planning',
-                title: 'Tax Planning',
-                tabTitle: 'Tax Strategy',
-                contentTitle: 'Optimize Your Taxes',
-                description: 'Minimize your tax burden with expert tax planning strategies and year-round support.',
-                buttonText: 'Reduce Taxes',
-                color: 'info',
-                order: 3
-            },
-            {
-                name: 'Insurance Services',
-                title: 'Insurance Services',
-                tabTitle: 'Insurance',
-                contentTitle: 'Protect What Matters',
-                description: 'Comprehensive insurance solutions to protect your family, business, and financial future.',
-                buttonText: 'Get Protected',
-                color: 'warning',
-                order: 4
-            },
-            {
-                name: 'Estate Planning',
-                title: 'Estate Planning',
-                tabTitle: 'Estate',
-                contentTitle: 'Legacy Protection',
-                description: 'Preserve and transfer your wealth efficiently with professional estate planning services.',
-                buttonText: 'Plan Legacy',
-                color: 'dark',
-                order: 5
-            },
-            {
-                name: 'Business Advisory',
-                title: 'Business Advisory',
-                tabTitle: 'Business',
-                contentTitle: 'Business Growth Solutions',
-                description: 'Strategic business advisory services to help your company grow and succeed.',
-                buttonText: 'Grow Business',
-                color: 'danger',
-                order: 6
-            },
-            {
-                name: 'Wealth Management',
-                title: 'Wealth Management',
-                tabTitle: 'Wealth',
-                contentTitle: 'Comprehensive Wealth Management',
-                description: 'Holistic wealth management services for high-net-worth individuals and families.',
-                buttonText: 'Manage Wealth',
-                color: 'secondary',
-                order: 7
-            },
-            {
-                name: 'Financial Planning',
-                title: 'Financial Planning',
-                tabTitle: 'Planning',
-                contentTitle: 'Complete Financial Planning',
-                description: 'Comprehensive financial planning to help you achieve all your life goals.',
-                buttonText: 'Start Planning',
-                color: 'primary',
-                order: 8
-            },
-            {
-                name: 'Risk Management',
-                title: 'Risk Management',
-                tabTitle: 'Risk',
-                contentTitle: 'Smart Risk Management',
-                description: 'Identify, assess, and mitigate financial risks to protect your assets and investments.',
-                buttonText: 'Manage Risk',
-                color: 'success',
-                order: 9
-            }
-        ];
-
-        const createdServices = [];
-        for (const serviceData of defaultServices) {
-            const service = new OurServices({
-                ...serviceData,
-                image: '/images/services/default-service.svg',
-                icon: '/images/services/default-service.svg'
-            });
-
-            const savedService = await service.save();
-            createdServices.push(savedService);
-            console.log(`Created service: ${serviceData.title}`);
-        }
-
-        console.log(`Successfully created ${createdServices.length} tabbing services`);
-
-        return res.status(201).json({
-            status: 'success',
-            message: `Created ${createdServices.length} default tabbing services`,
-            data: createdServices
-        });
-    } catch (error) {
-        console.error('Error creating default services:', error);
-        return res.status(500).json({
-            status: 'error',
-            message: 'Failed to create default services',
-            error: error.message
-        });
-    }
-};
 
 // Add AboutService section to a service
-import AboutService from '../models/all services/aboutService.js';
+import Section from '../models/all services/section.js';
 export const addSectionToService = async (req, res) => {
     try {
         const { serviceName } = req.params;
         const { sectionId } = req.body;
+        console.log('[AddSectionToService] Received:', { serviceName, sectionId });
         if (!sectionId) {
+            console.log('[AddSectionToService] No sectionId provided');
             return res.status(400).json({ success: false, message: 'Section ID required' });
         }
         // Find the section
-        const section = await AboutService.findById(sectionId);
+        const section = await Section.findById(sectionId);
+        console.log('[AddSectionToService] Found section:', section);
         if (!section) {
-            return res.status(404).json({ success: false, message: 'Section not found' });
+            console.log('[AddSectionToService] Section not found for id:', sectionId);
+            return res.status(404).json({ success: false, message: 'Section not found', sectionId });
         }
         // Find the service
         const service = await OurServices.findOne({ name: serviceName });
+        console.log('[AddSectionToService] Found service:', service);
         if (!service) {
-            return res.status(404).json({ success: false, message: 'Service not found' });
+            console.log('[AddSectionToService] Service not found for name:', serviceName);
+            return res.status(404).json({ success: false, message: 'Service not found', serviceName });
         }
         // Add section to service.sections (store minimal info or full section)
         service.sections.push({
-            title: section.heading,
-            content: section.description,
-            image: section.image || ''
+            title: Array.isArray(section.heading) ? section.heading[0] : section.heading,
+            content: Array.isArray(section.description) ? section.description[0] : section.description,
+            image: Array.isArray(section.images) && section.images.length ? section.images[0] : (section.image || '')
         });
         await service.save();
+        console.log('[AddSectionToService] Section added successfully');
         res.json({ success: true, message: 'Section added to service', service });
     } catch (err) {
+        console.log('[AddSectionToService] Error:', err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
