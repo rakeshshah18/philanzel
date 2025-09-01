@@ -1,3 +1,33 @@
+// Edit a section in a service
+export const updateServiceSection = async (req, res) => {
+    try {
+        const { serviceId, sectionIndex } = req.params;
+        const updateData = req.body;
+        const service = await OurServices.findById(serviceId);
+        if (!service) return res.status(404).json({ success: false, message: 'Service not found' });
+        if (!service.sections || !service.sections[sectionIndex]) return res.status(404).json({ success: false, message: 'Section not found' });
+        service.sections[sectionIndex] = { ...service.sections[sectionIndex], ...updateData };
+        await service.save();
+        res.json({ success: true, message: 'Section updated', service });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// Delete a section from a service
+export const deleteServiceSection = async (req, res) => {
+    try {
+        const { serviceId, sectionIndex } = req.params;
+        const service = await OurServices.findById(serviceId);
+        if (!service) return res.status(404).json({ success: false, message: 'Service not found' });
+        if (!service.sections || !service.sections[sectionIndex]) return res.status(404).json({ success: false, message: 'Section not found' });
+        service.sections.splice(sectionIndex, 1);
+        await service.save();
+        res.json({ success: true, message: 'Section deleted', service });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
 // Add section to service by _id
 export const addSectionToServiceById = async (req, res) => {
     try {
@@ -16,12 +46,16 @@ export const addSectionToServiceById = async (req, res) => {
         if (!service) {
             return res.status(404).json({ success: false, message: 'Service not found', serviceId });
         }
-        // Add section to service.sections
-        service.sections.push({
-            title: Array.isArray(section.heading) ? section.heading[0] : section.heading,
-            content: Array.isArray(section.description) ? section.description[0] : section.description,
-            image: Array.isArray(section.images) && section.images.length ? section.images[0] : (section.image || '')
-        });
+        // Add full section object (excluding _id and timestamps)
+        const {
+            _id,
+            createdAt,
+            updatedAt,
+            ...sectionData
+        } = section.toObject();
+        // Ensure title is set for validation
+        sectionData.title = sectionData.title || sectionData.name || (Array.isArray(sectionData.heading) ? sectionData.heading[0] : '');
+        service.sections.push(sectionData);
         await service.save();
         res.json({ success: true, message: 'Section added to service', service });
     } catch (err) {

@@ -4,6 +4,19 @@ const ourServicesSchema = new mongoose.Schema({
     sections: [
         {
             title: { type: String, required: true },
+            name: { type: String },
+            heading: [{ type: String }],
+            description: [{ type: String }],
+            subheading: [{ type: String }],
+            subdescription: [{ type: String }],
+            points: [{ type: String }],
+            images: [{ type: String }],
+            faqs: [
+                {
+                    question: { type: String },
+                    answer: { type: String }
+                }
+            ],
             content: { type: String },
             image: { type: String, default: '' },
         }

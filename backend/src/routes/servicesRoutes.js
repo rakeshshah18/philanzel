@@ -2,9 +2,13 @@ import express from 'express';
 import multer from 'multer';
 import imageUpload from '../config/imageUpload.js';
 import { verifyToken, requireRole } from '../adminAuth/middleware/authMiddleware.js';
-import { createServices, getAllServices, updateServices, deleteServices } from '../controllers/servicesController.js';
+import { createServices, getAllServices, updateServices, deleteServices, updateServiceSection, deleteServiceSection } from '../controllers/servicesController.js';
 
 const router = express.Router();
+
+// Edit a section in a service
+router.put('/:serviceId/sections/:sectionIndex', verifyToken, requireRole('admin'), updateServiceSection);
+router.delete('/:serviceId/sections/:sectionIndex', verifyToken, requireRole('admin'), deleteServiceSection);
 
 // Multer error handling middleware
 const handleMulterError = (err, req, res, next) => {
