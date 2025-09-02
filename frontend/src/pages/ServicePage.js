@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -114,65 +116,71 @@ const ServicePage = () => {
             {service.sections && service.sections.length > 0 && (
                 <div>
                     <h2>Sections</h2>
-                    {service.sections.map((section, idx) => (
-                        <div key={section._id || idx} style={{ marginBottom: '1.5rem', border: '1px solid #eee', padding: '1rem', borderRadius: '8px', position: 'relative' }}>
-                            <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', gap: 8 }}>
-                                <button className="btn btn-sm btn-outline-primary" onClick={() => handleEditSection(idx)} title="Edit"><i className="bi bi-pencil"></i></button>
-                                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteSection(idx)} title="Delete"><i className="bi bi-trash"></i></button>
-                            </div>
-                            <h3>{section.title}</h3>
-                            {/* Heading */}
-                            {Array.isArray(section.heading) && section.heading.length > 0 && (
-                                <div><strong>Heading:</strong> {section.heading.join(', ')}</div>
-                            )}
-                            {/* Description */}
-                            {Array.isArray(section.description) && section.description.length > 0 && (
-                                <div><strong>Description:</strong> {section.description.map((d, i) => (
-                                    <div key={i} dangerouslySetInnerHTML={{ __html: d }} />
-                                ))}</div>
-                            )}
-                            {/* Subheading */}
-                            {Array.isArray(section.subheading) && section.subheading.length > 0 && (
-                                <div><strong>Subheading:</strong> {section.subheading.join(', ')}</div>
-                            )}
-                            {/* Subdescription */}
-                            {Array.isArray(section.subdescription) && section.subdescription.length > 0 && (
-                                <div><strong>Subdescription:</strong> {section.subdescription.map((sd, i) => (
-                                    <div key={i} dangerouslySetInnerHTML={{ __html: sd }} />
-                                ))}</div>
-                            )}
-                            {/* Points */}
-                            {Array.isArray(section.points) && section.points.length > 0 && (
-                                <div><strong>Points:</strong>
-                                    <ul>
-                                        {section.points.map((p, i) => (
-                                            <li key={i} dangerouslySetInnerHTML={{ __html: p }} />
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                            {/* Images */}
-                            {Array.isArray(section.images) && section.images.length > 0 && (
-                                <div><strong>Images:</strong>
-                                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                                        {section.images.map((img, i) => img && (
-                                            <img key={i} src={img} alt={`Section ${i}`} style={{ maxWidth: 120, maxHeight: 120, borderRadius: 6, border: '1px solid #ccc' }} />
-                                        ))}
+                    <div className="row">
+                        {service.sections.map((section, idx) => (
+                            <div key={section._id || idx} className="col-md-6 d-flex">
+                                <div className="card shadow-sm mb-4 flex-fill" style={{ maxWidth: 650, borderRadius: 16, border: 'none', position: 'relative', background: '#f8f9fa' }}>
+                                    <div className="card-body" style={{ padding: '1.25rem 1.5rem' }}>
+                                        <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 8 }}>
+                                            <button className="btn btn-sm btn-outline-primary" onClick={() => handleEditSection(idx)} title="Edit"><i className="bi bi-pencil"></i></button>
+                                            <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteSection(idx)} title="Delete"><i className="bi bi-trash"></i></button>
+                                        </div>
+                                        <h3 className="card-title" style={{ marginBottom: 12, background: 'linear-gradient(90deg, #e3f2fd 0%, #bbdefb 100%)', padding: '0.5rem 1rem', borderRadius: '8px', color: '#1565c0', fontWeight: 600, display: 'inline-block', width: 'auto', maxWidth: '100%' }}>{section.title}</h3>
+                                        {/* Heading */}
+                                        {Array.isArray(section.heading) && section.heading.filter(h => h && h.trim()).length > 0 && (
+                                            <div className="mb-2"><strong>Heading:</strong> {section.heading.filter(h => h && h.trim()).join(', ')}</div>
+                                        )}
+                                        {/* Description */}
+                                        {Array.isArray(section.description) && section.description.filter(d => d && d.trim()).length > 0 && (
+                                            <div className="mb-2"><strong>Description:</strong> {section.description.filter(d => d && d.trim()).map((d, i) => (
+                                                <div key={i} dangerouslySetInnerHTML={{ __html: d }} />
+                                            ))}</div>
+                                        )}
+                                        {/* Subheading */}
+                                        {Array.isArray(section.subheading) && section.subheading.filter(s => s && s.trim()).length > 0 && (
+                                            <div className="mb-2"><strong>Subheading:</strong> {section.subheading.filter(s => s && s.trim()).join(', ')}</div>
+                                        )}
+                                        {/* Subdescription */}
+                                        {Array.isArray(section.subdescription) && section.subdescription.filter(sd => sd && sd.trim()).length > 0 && (
+                                            <div className="mb-2"><strong>Subdescription:</strong> {section.subdescription.filter(sd => sd && sd.trim()).map((sd, i) => (
+                                                <div key={i} dangerouslySetInnerHTML={{ __html: sd }} />
+                                            ))}</div>
+                                        )}
+                                        {/* Points */}
+                                        {Array.isArray(section.points) && section.points.filter(p => p && p.trim()).length > 0 && (
+                                            <div className="mb-2"><strong>Points:</strong>
+                                                <ul className="ps-3 mb-0">
+                                                    {section.points.filter(p => p && p.trim()).map((p, i) => (
+                                                        <li key={i} dangerouslySetInnerHTML={{ __html: p }} />
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                        {/* Images */}
+                                        {Array.isArray(section.images) && section.images.filter(img => img && img.trim()).length > 0 && (
+                                            <div className="mb-2"><strong>Images:</strong>
+                                                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                                                    {section.images.filter(img => img && img.trim()).map((img, i) => (
+                                                        <img key={i} src={img} alt={`Section ${i}`} style={{ maxWidth: 120, maxHeight: 120, borderRadius: 6, border: '1px solid #ccc', background: '#fff' }} />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        {/* FAQs */}
+                                        {Array.isArray(section.faqs) && section.faqs.filter(faq => faq && faq.question && faq.question.trim()).length > 0 && (
+                                            <div className="mb-2"><strong>FAQs:</strong>
+                                                <ul className="ps-3 mb-0">
+                                                    {section.faqs.filter(faq => faq && faq.question && faq.question.trim()).map((faq, i) => (
+                                                        <li key={i}><strong>Q:</strong> {faq.question}<br /><strong>A:</strong> <span dangerouslySetInnerHTML={{ __html: faq.answer }} /></li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            )}
-                            {/* FAQs */}
-                            {Array.isArray(section.faqs) && section.faqs.length > 0 && (
-                                <div><strong>FAQs:</strong>
-                                    <ul>
-                                        {section.faqs.map((faq, i) => (
-                                            <li key={i}><strong>Q:</strong> {faq.question}<br /><strong>A:</strong> <span dangerouslySetInnerHTML={{ __html: faq.answer }} /></li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                            </div>
+                        ))}
+                    </div>
                     {/* Edit Section Modal */}
                     {showEditModal && editingSectionData && (
                         <div className="modal fade show" style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }}>
@@ -200,7 +208,13 @@ const ServicePage = () => {
                                                 <label className="form-label">Description</label>
                                                 {Array.isArray(editingSectionData.description) ? (
                                                     editingSectionData.description.map((d, i) => (
-                                                        <textarea key={i} className="form-control mb-1" value={d} onChange={e => handleEditArrayFieldChange('description', i, e.target.value)} />
+                                                        <ReactQuill
+                                                            key={i}
+                                                            theme="snow"
+                                                            value={d}
+                                                            onChange={value => handleEditArrayFieldChange('description', i, value)}
+                                                            className="mb-1"
+                                                        />
                                                     ))
                                                 ) : null}
                                             </div>
@@ -216,7 +230,13 @@ const ServicePage = () => {
                                                 <label className="form-label">Subdescription</label>
                                                 {Array.isArray(editingSectionData.subdescription) ? (
                                                     editingSectionData.subdescription.map((sd, i) => (
-                                                        <textarea key={i} className="form-control mb-1" value={sd} onChange={e => handleEditArrayFieldChange('subdescription', i, e.target.value)} />
+                                                        <ReactQuill
+                                                            key={i}
+                                                            theme="snow"
+                                                            value={sd}
+                                                            onChange={value => handleEditArrayFieldChange('subdescription', i, value)}
+                                                            className="mb-1"
+                                                        />
                                                     ))
                                                 ) : null}
                                             </div>
@@ -224,7 +244,13 @@ const ServicePage = () => {
                                                 <label className="form-label">Points</label>
                                                 {Array.isArray(editingSectionData.points) ? (
                                                     editingSectionData.points.map((p, i) => (
-                                                        <textarea key={i} className="form-control mb-1" value={p} onChange={e => handleEditArrayFieldChange('points', i, e.target.value)} />
+                                                        <ReactQuill
+                                                            key={i}
+                                                            theme="snow"
+                                                            value={p}
+                                                            onChange={value => handleEditArrayFieldChange('points', i, value)}
+                                                            className="mb-1"
+                                                        />
                                                     ))
                                                 ) : null}
                                             </div>
@@ -246,11 +272,16 @@ const ServicePage = () => {
                                                                 newFaqs[i] = { ...newFaqs[i], question: e.target.value };
                                                                 setEditingSectionData(prev => ({ ...prev, faqs: newFaqs }));
                                                             }} />
-                                                            <textarea className="form-control mb-1" placeholder="Answer" value={faq.answer || ''} onChange={e => {
-                                                                const newFaqs = [...editingSectionData.faqs];
-                                                                newFaqs[i] = { ...newFaqs[i], answer: e.target.value };
-                                                                setEditingSectionData(prev => ({ ...prev, faqs: newFaqs }));
-                                                            }} />
+                                                            <ReactQuill
+                                                                theme="snow"
+                                                                value={faq.answer || ''}
+                                                                onChange={value => {
+                                                                    const newFaqs = [...editingSectionData.faqs];
+                                                                    newFaqs[i] = { ...newFaqs[i], answer: value };
+                                                                    setEditingSectionData(prev => ({ ...prev, faqs: newFaqs }));
+                                                                }}
+                                                                className="mb-1"
+                                                            />
                                                         </div>
                                                     ))
                                                 ) : null}
