@@ -613,4 +613,13 @@ export const contactInfoAPI = {
     delete: (id) => API.delete(`/contact-us/info/${id}`)
 };
 
+// Calculator Pages API
+export const calculatorPagesAPI = {
+    getAll: () => API.get('/calculators/pages'),
+    getById: (id) => API.get(`/calculators/pages/${id}`),
+    create: (data) => API.post('/calculators/pages', data),
+    update: (id, data) => API.put(`/calculators/pages/${id}`, data),
+    delete: (id) => API.delete(`/calculators/pages/${id}`)
+};
+
 

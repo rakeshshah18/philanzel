@@ -29,6 +29,7 @@ import potentialGrowthRoutes from './partner/potentialGrowthRoutes.js';
 import express from 'express';
 import uploadRoutes from './partner/upload.js';
 import aboutServiceRoutes from './all services/aboutServiceRoutes.js';
+import calculatorPagesRoutes from './calculators/pagesRoutes.js';
 
 const router = express.Router();
 import serviceRoutes from './all services/serviceRoutes.js';
@@ -89,6 +90,9 @@ router.use('/partner/why-choose-philanzel', whyChoosePhilanzelRoutes);
 
 // Contact Us form submissions route
 router.use('/contact-us', contactUsRoutes);
+
+// Register calculators pages API
+router.use('/calculators/pages', calculatorPagesRoutes);
 
 // General /admin routes MUST come LAST
 router.use('/admin', homePageRoutes);

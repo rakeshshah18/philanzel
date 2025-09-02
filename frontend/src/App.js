@@ -27,6 +27,7 @@ import AdminFooter from './pages/sections/AdminFooter';
 import LoginForm from './components/admin-forms/LoginForm';
 import RegisterForm from './components/admin-forms/RegisterForm';
 import ServicesSections from './pages/ServicesSections';
+import Calculators from './pages/Calculators';
 
 // Component to handle layout with conditional sidebar
 const AppLayout = () => {
@@ -94,6 +95,7 @@ const AppLayout = () => {
                             <Route path="/login" element={<LoginForm />} />
                             <Route path="/admin/register" element={<RegisterForm />} />
                             <Route path="/services-sections" element={<ServicesSections />} />
+                            <Route path="/calculators" element={<Calculators />} />
                         </Routes>
                     </main>
                     {/* Show footer (which includes OptimizeStrategy) only on footer admin page for preview */}

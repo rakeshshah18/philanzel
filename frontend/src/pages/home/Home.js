@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Alert from '../../components/Alert';
 import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI, helpedIndustriesAPI, whyChooseUsAPI, ourAssociationAPI, homeFAQsAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
@@ -45,10 +45,7 @@ const Home = () => {
     const [editingId, setEditingId] = useState(null);
     const [isDarkMode, setIsDarkMode] = useState(false);
 
-    // Pagination state
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [searchTerm, setSearchTerm] = useState('');
+    // Removed unused pagination state variables
 
     // Check for dark mode
     useEffect(() => {
@@ -264,9 +261,7 @@ const Home = () => {
         }
     };
 
-    const handleView = (page) => {
-        alert(`Title: ${page.heading}\nDescription: ${page.description}\nButton: ${page.button?.text || 'No button'} -> ${page.button?.link || 'No link'}\nAlt Text: ${page.image?.altText || 'No alt text'}`);
-    };
+    // Removed unused handleView function
 
     // OurTrack functions
     const fetchTrackData = async () => {
@@ -413,16 +408,24 @@ const Home = () => {
         });
     };
 
-    // Filter and pagination logic
-    const filteredItems = homePages.filter(page =>
-        page.heading.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        page.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Removed unused filter and pagination logic
 
-    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentItems = filteredItems.slice(startIndex, endIndex);
+    // Custom Slider State
+    const [sliderIndex, setSliderIndex] = useState(0);
+    const sliderRef = useRef(null);
+
+    // Auto-slide every 5 seconds
+    useEffect(() => {
+        if (!homePages.length) return;
+        const interval = setInterval(() => {
+            setSliderIndex(prev => (prev + 1) % homePages.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [homePages.length]);
+
+    const goToSlide = idx => setSliderIndex(idx);
+    const prevSlide = () => setSliderIndex(idx => idx === 0 ? homePages.length - 1 : idx - 1);
+    const nextSlide = () => setSliderIndex(idx => (idx + 1) % homePages.length);
 
     return (
         <div style={{
@@ -442,43 +445,7 @@ const Home = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="mb-3">
-                    <button
-                        className="btn me-2"
-                        style={{
-                            backgroundColor: '#17a2b8',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            padding: '8px 16px',
-                            fontSize: '14px'
-                        }}
-                        onClick={() => {
-                            if (isEditing) {
-                                handleCancelEdit();
-                            } else {
-                                setShowForm(!showForm);
-                            }
-                        }}
-                    >
-                        {isEditing ? 'Cancel' : 'Add New'}
-                    </button>
-                    <button
-                        className="btn"
-                        style={{
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            padding: '8px 16px',
-                            fontSize: '14px'
-                        }}
-                        onClick={fetchHomePages}
-                        disabled={fetchLoading}
-                    >
-                        {fetchLoading ? 'Refreshing...' : 'Refresh'}
-                    </button>
-                </div>
+                {/* Removed previous Add New and Refresh buttons above slider */}
 
                 {/* Success/Error Messages */}
                 {message && (
@@ -626,301 +593,74 @@ const Home = () => {
                     </div>
                 )}
 
-                {/* Main Content Card */}
-                <div className="card shadow-sm border-primary">
-                    <div className="card-header bg-primary text-white">
-                        <h4 className="mb-0">
-                            <i className="fas fa-images me-2"></i>
-                            HOME SLIDER
-                        </h4>
-                    </div>
-                    <div className="card-body" style={{ padding: '20px' }}>
-
-                        {/* Controls */}
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <div className="d-flex align-items-center">
-                                <span className="me-2" style={{ fontSize: '14px' }}>Show</span>
-                                <select
-                                    className="form-select form-select-sm me-2"
-                                    style={{ width: 'auto', fontSize: '14px' }}
-                                    value={itemsPerPage}
-                                    onChange={(e) => {
-                                        setItemsPerPage(Number(e.target.value));
-                                        setCurrentPage(1);
-                                    }}
-                                >
-                                    <option value={5}>5</option>
-                                    <option value={10}>10</option>
-                                    <option value={25}>25</option>
-                                    <option value={50}>50</option>
-                                </select>
-                                <span style={{ fontSize: '14px' }}>entries</span>
-                            </div>
-                            <div className="d-flex align-items-center">
-                                <label className="me-2" style={{ fontSize: '14px' }}>Search:</label>
-                                <input
-                                    type="text"
-                                    className="form-control form-control-sm"
-                                    style={{ width: '200px', fontSize: '14px' }}
-                                    value={searchTerm}
-                                    onChange={(e) => {
-                                        setSearchTerm(e.target.value);
-                                        setCurrentPage(1);
-                                    }}
-                                    placeholder=""
-                                />
-                            </div>
+                {/* Custom Home Slider */}
+                {homePages.length > 0 && (
+                    <div className="custom-slider" style={{ position: 'relative', maxWidth: 900, margin: '0 auto 2rem', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', background: '#fff' }}>
+                        {/* Add New & Refresh Buttons */}
+                        <div style={{ position: 'absolute', top: 24, left: 32, display: 'flex', gap: 10, zIndex: 2 }}>
+                            <button
+                                className="btn btn-info"
+                                style={{ fontWeight: 500, fontSize: 18, borderRadius: 6, padding: '6px 18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                title={isEditing ? 'Cancel' : 'Add New'}
+                                onClick={() => { if (isEditing) { handleCancelEdit(); } else { setShowForm(!showForm); } }}
+                            >
+                                {isEditing ? <i className="bi bi-x-lg"></i> : <i className="bi bi-plus-lg"></i>}
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                style={{ fontWeight: 500, fontSize: 18, borderRadius: 6, padding: '6px 18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                title="Refresh"
+                                onClick={fetchHomePages}
+                                disabled={fetchLoading}
+                            >
+                                {fetchLoading ? <i className="bi bi-arrow-repeat"></i> : <i className="bi bi-arrow-clockwise"></i>}
+                            </button>
                         </div>
-
-                        {/* Table */}
-                        {fetchLoading ? (
-                            <div className="text-center py-5">
-                                <div className="spinner-border" role="status">
-                                    <span className="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        ) : currentItems.length === 0 ? (
-                            <div className="text-center py-5">
-                                <p className="text-muted">No banners found.</p>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="table-responsive">
-                                    <table className="table" style={{ backgroundColor: '#454d55', color: 'white', marginBottom: '0' }}>
-                                        <thead>
-                                            <tr style={{ backgroundColor: '#343a40' }}>
-                                                <th style={{
-                                                    width: '60px',
-                                                    color: '#adb5bd',
-                                                    fontSize: '14px',
-                                                    fontWeight: 'normal',
-                                                    padding: '12px 8px',
-                                                    borderTop: 'none'
-                                                }}>No</th>
-                                                <th style={{
-                                                    width: '120px',
-                                                    color: '#adb5bd',
-                                                    fontSize: '14px',
-                                                    fontWeight: 'normal',
-                                                    padding: '12px 8px',
-                                                    borderTop: 'none'
-                                                }}>Thumbnail</th>
-                                                <th style={{
-                                                    color: '#adb5bd',
-                                                    fontSize: '14px',
-                                                    fontWeight: 'normal',
-                                                    padding: '12px 8px',
-                                                    borderTop: 'none'
-                                                }}>Title</th>
-                                                <th style={{
-                                                    color: '#adb5bd',
-                                                    fontSize: '14px',
-                                                    fontWeight: 'normal',
-                                                    padding: '12px 8px',
-                                                    borderTop: 'none'
-                                                }}>Category</th>
-                                                <th style={{
-                                                    width: '100px',
-                                                    color: '#adb5bd',
-                                                    fontSize: '14px',
-                                                    fontWeight: 'normal',
-                                                    padding: '12px 8px',
-                                                    borderTop: 'none'
-                                                }}>Status</th>
-                                                <th style={{
-                                                    width: '150px',
-                                                    color: '#adb5bd',
-                                                    fontSize: '14px',
-                                                    fontWeight: 'normal',
-                                                    padding: '12px 8px',
-                                                    borderTop: 'none'
-                                                }}>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {currentItems.map((page, index) => (
-                                                <tr key={page._id} style={{ borderTop: '1px solid #565e64' }}>
-                                                    <td style={{
-                                                        color: '#adb5bd',
-                                                        fontSize: '14px',
-                                                        padding: '12px 8px',
-                                                        verticalAlign: 'middle'
-                                                    }}>
-                                                        {startIndex + index + 1}
-                                                    </td>
-                                                    <td style={{ padding: '8px' }}>
-                                                        {page.image?.url ? (
-                                                            <img
-                                                                src={getImageUrl(page.image.url)}
-                                                                alt={page.image.altText}
-                                                                style={{
-                                                                    width: '80px',
-                                                                    height: '60px',
-                                                                    objectFit: 'cover',
-                                                                    borderRadius: '4px'
-                                                                }}
-                                                                onError={(e) => {
-                                                                    console.error('Image failed to load:', page.image.url);
-                                                                    e.target.style.display = 'none';
-                                                                    e.target.nextSibling.style.display = 'flex';
-                                                                }}
-                                                            />
-                                                        ) : null}
-                                                        <div
-                                                            style={{
-                                                                width: '80px',
-                                                                height: '60px',
-                                                                backgroundColor: '#6c757d',
-                                                                display: page.image?.url ? 'none' : 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                fontSize: '12px',
-                                                                color: 'white',
-                                                                borderRadius: '4px'
-                                                            }}
-                                                        >
-                                                            No Image
-                                                        </div>
-                                                    </td>
-                                                    <td style={{
-                                                        color: '#adb5bd',
-                                                        fontSize: '14px',
-                                                        padding: '12px 8px',
-                                                        verticalAlign: 'middle',
-                                                        maxWidth: '300px'
-                                                    }}>
-                                                        {page.heading}
-                                                    </td>
-                                                    <td style={{
-                                                        color: '#adb5bd',
-                                                        fontSize: '14px',
-                                                        padding: '12px 8px',
-                                                        verticalAlign: 'middle'
-                                                    }}>
-                                                        Homepage Banner
-                                                    </td>
-                                                    <td style={{
-                                                        padding: '12px 8px',
-                                                        verticalAlign: 'middle'
-                                                    }}>
-                                                        <span style={{
-                                                            backgroundColor: '#28a745',
-                                                            color: 'white',
-                                                            padding: '4px 8px',
-                                                            borderRadius: '4px',
-                                                            fontSize: '12px',
-                                                            fontWeight: '500'
-                                                        }}>
-                                                            Active
-                                                        </span>
-                                                    </td>
-                                                    <td style={{
-                                                        padding: '12px 8px',
-                                                        verticalAlign: 'middle'
-                                                    }}>
-                                                        <div className="d-flex gap-1">
-                                                            <button
-                                                                style={{
-                                                                    backgroundColor: '#28a745',
-                                                                    border: 'none',
-                                                                    color: 'white',
-                                                                    padding: '6px 8px',
-                                                                    borderRadius: '4px',
-                                                                    fontSize: '12px'
-                                                                }}
-                                                                onClick={() => handleView(page)}
-                                                                title="View Details"
-                                                            >
-                                                                <i className="bi bi-eye"></i>
-                                                            </button>
-                                                            <button
-                                                                style={{
-                                                                    backgroundColor: '#17a2b8',
-                                                                    border: 'none',
-                                                                    color: 'white',
-                                                                    padding: '6px 8px',
-                                                                    borderRadius: '4px',
-                                                                    fontSize: '12px'
-                                                                }}
-                                                                onClick={() => handleEdit(page)}
-                                                                title="Edit"
-                                                            >
-                                                                <i className="bi bi-pencil-square"></i>
-                                                            </button>
-                                                            <button
-                                                                style={{
-                                                                    backgroundColor: '#dc3545',
-                                                                    border: 'none',
-                                                                    color: 'white',
-                                                                    padding: '6px 8px',
-                                                                    borderRadius: '4px',
-                                                                    fontSize: '12px'
-                                                                }}
-                                                                onClick={() => deleteHomePage(page._id)}
-                                                                title="Delete"
-                                                            >
-                                                                <i className="bi bi-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                {/* Pagination */}
-                                <div className="d-flex justify-content-between align-items-center mt-3">
-                                    <div>
-                                        <span style={{ fontSize: '14px', color: '#6c757d' }}>
-                                            Showing {startIndex + 1} to {Math.min(endIndex, filteredItems.length)} of {filteredItems.length} entries
-                                        </span>
+                        <div style={{ display: 'flex', transition: 'transform 2.6s cubic-bezier(.4,0,.2,1)', transform: `translateX(-${sliderIndex * 100}%)` }} ref={sliderRef}>
+                            {homePages.map((slide, idx) => (
+                                <div key={slide._id || idx} style={{ minWidth: '100%', boxSizing: 'border-box', padding: 0, position: 'relative', height: 440, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f7fa' }}>
+                                    {/* Edit/Delete buttons at top right of outer div */}
+                                    <div style={{ position: 'absolute', top: 24, right: 32, display: 'flex', gap: 10, zIndex: 2 }}>
+                                        <button
+                                            style={{ background: '#17a2b8', color: 'white', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 15, cursor: 'pointer' }}
+                                            onClick={() => handleEdit(slide)}
+                                        >
+                                            <i className="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button
+                                            style={{ background: '#dc3545', color: 'white', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 15, cursor: 'pointer' }}
+                                            onClick={() => deleteHomePage(slide._id)}
+                                        >
+                                            <i className="bi bi-trash"></i>
+                                        </button>
                                     </div>
-                                    <nav>
-                                        <ul className="pagination pagination-sm mb-0">
-                                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                                <button
-                                                    className="page-link"
-                                                    onClick={() => setCurrentPage(currentPage - 1)}
-                                                    disabled={currentPage === 1}
-                                                    style={{ fontSize: '14px' }}
-                                                >
-                                                    Previous
-                                                </button>
-                                            </li>
-                                            {[...Array(totalPages)].map((_, i) => (
-                                                <li key={i + 1} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                                                    <button
-                                                        className="page-link"
-                                                        onClick={() => setCurrentPage(i + 1)}
-                                                        style={{
-                                                            fontSize: '14px',
-                                                            backgroundColor: currentPage === i + 1 ? '#17a2b8' : 'white',
-                                                            borderColor: currentPage === i + 1 ? '#17a2b8' : '#dee2e6',
-                                                            color: currentPage === i + 1 ? 'white' : '#007bff'
-                                                        }}
-                                                    >
-                                                        {i + 1}
-                                                    </button>
-                                                </li>
-                                            ))}
-                                            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                                                <button
-                                                    className="page-link"
-                                                    onClick={() => setCurrentPage(currentPage + 1)}
-                                                    disabled={currentPage === totalPages}
-                                                    style={{ fontSize: '14px' }}
-                                                >
-                                                    Next
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </nav>
+                                    <div style={{ display: 'flex', width: '90%', height: '80%', background: 'rgba(255,255,255,0.95)', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', position: 'relative', alignItems: 'center', justifyContent: 'flex-start', margin: '0 auto' }}>
+                                        {/* Image on left */}
+                                        <div style={{ flex: '0 0 240px', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                                            {slide.image?.url && (
+                                                <img src={getImageUrl(slide.image.url)} alt={slide.image?.altText || slide.heading} style={{ maxHeight: 220, maxWidth: 220, objectFit: 'cover', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }} />
+                                            )}
+                                        </div>
+                                        {/* Content on right */}
+                                        <div style={{ flex: 1, padding: '2rem 2rem 1rem 2rem', minWidth: 0 }}>
+                                            <h2 style={{ margin: '0 0 12px 0', fontWeight: 700, color: '#1565c0', fontSize: 28 }}>{slide.heading}</h2>
+                                            <div style={{ margin: '0.5rem 0 0', color: '#333', fontSize: 18 }} dangerouslySetInnerHTML={{ __html: slide.description }} />
+                                        </div>
+                                    </div>
                                 </div>
-                            </>
-                        )}
+                            ))}
+                        </div>
+                        {/* Navigation Arrows */}
+                        <button onClick={prevSlide} style={{ position: 'absolute', top: '50%', left: 10, transform: 'translateY(-50%)', background: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', cursor: 'pointer', fontSize: 22, color: '#1565c0', zIndex: 2 }}>&lt;</button>
+                        <button onClick={nextSlide} style={{ position: 'absolute', top: '50%', right: 10, transform: 'translateY(-50%)', background: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', cursor: 'pointer', fontSize: 22, color: '#1565c0', zIndex: 2 }}>&gt;</button>
+                        {/* Dots */}
+                        <div style={{ position: 'absolute', bottom: 16, left: 0, right: 0, textAlign: 'center' }}>
+                            {homePages.map((_, idx) => (
+                                <span key={idx} onClick={() => goToSlide(idx)} style={{ display: 'inline-block', width: 12, height: 12, margin: '0 6px', borderRadius: '50%', background: sliderIndex === idx ? '#1565c0' : '#bbdefb', cursor: 'pointer', transition: 'background 0.2s' }} />
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* OurTrack Section */}
                 <div className="container-fluid py-4">
