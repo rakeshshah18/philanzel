@@ -1,0 +1,8 @@
+.card-text {
+    white-space: normal;
+    word-break: break-word;
+}
+
+.card-text p {
+    margin: 0 0 1em 0;
+}

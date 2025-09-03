@@ -27,7 +27,7 @@ import AdminFooter from './pages/sections/AdminFooter';
 import LoginForm from './components/admin-forms/LoginForm';
 import RegisterForm from './components/admin-forms/RegisterForm';
 import ServicesSections from './pages/ServicesSections';
-import Calculators from './pages/Calculators';
+import Calculators from './pages/calculators/Calculators';
 
 // Component to handle layout with conditional sidebar
 const AppLayout = () => {

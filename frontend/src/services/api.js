@@ -622,4 +622,12 @@ export const calculatorPagesAPI = {
     delete: (id) => API.delete(`/calculators/pages/${id}`)
 };
 
+export const calculatorSectionsAPI = {
+    getAll: () => API.get('/calculators/sections'),
+    getById: (id) => API.get(`/calculators/sections/${id}`),
+    create: (data) => API.post('/calculators/sections', data),
+    update: (id, data) => API.put(`/calculators/sections/${id}`, data),
+    delete: (id) => API.delete(`/calculators/sections/${id}`)
+};
+
 

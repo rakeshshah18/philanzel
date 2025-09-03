@@ -30,6 +30,7 @@ import express from 'express';
 import uploadRoutes from './partner/upload.js';
 import aboutServiceRoutes from './all services/aboutServiceRoutes.js';
 import calculatorPagesRoutes from './calculators/pagesRoutes.js';
+import calculatorSectionRoutes from './calculators/sectionRoutes.js';
 
 const router = express.Router();
 import serviceRoutes from './all services/serviceRoutes.js';
@@ -93,6 +94,7 @@ router.use('/contact-us', contactUsRoutes);
 
 // Register calculators pages API
 router.use('/calculators/pages', calculatorPagesRoutes);
+router.use('/calculators/sections', calculatorSectionRoutes);
 
 // General /admin routes MUST come LAST
 router.use('/admin', homePageRoutes);

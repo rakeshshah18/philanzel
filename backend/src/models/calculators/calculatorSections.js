@@ -6,6 +6,7 @@ const faqSchema = new mongoose.Schema({
 }, { _id: false });
 
 const calculatorSectionSchema = new mongoose.Schema({
+    sectionName: { type: String, required: true },
     heading: { type: String, required: true },
     content: { type: String, required: true },
     faqs: [faqSchema]
