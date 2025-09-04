@@ -619,7 +619,15 @@ export const calculatorPagesAPI = {
     getById: (id) => API.get(`/calculators/pages/${id}`),
     create: (data) => API.post('/calculators/pages', data),
     update: (id, data) => API.put(`/calculators/pages/${id}`, data),
-    delete: (id) => API.delete(`/calculators/pages/${id}`)
+    delete: (id) => API.delete(`/calculators/pages/${id}`),
+    // Add section to calculator page by id
+    addSectionToPage: (id, sectionId) => API.post(`/calculators/pages/${id}/add-section`, { sectionId }),
+    // Get calculator page by slug
+    getBySlug: (slug) => API.get(`/calculators/pages/slug/${slug}`),
+    // Edit a section in a calculator page's embedded sections array
+    editSectionInPage: (pageId, sectionId, data) => API.put(`/calculators/pages/${pageId}/sections/${sectionId}`, data),
+    // Delete a section from a calculator page's embedded sections array
+    deleteSectionFromPage: (pageId, sectionId) => API.delete(`/calculators/pages/${pageId}/sections/${sectionId}`)
 };
 
 export const calculatorSectionsAPI = {

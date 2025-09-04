@@ -2,6 +2,14 @@ import mongoose from "mongoose";
 
 const calculatorPageSchema = new mongoose.Schema({
     name: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
+    sections: [{
+        _id: { type: mongoose.Schema.Types.ObjectId },
+        sectionName: String,
+        heading: String,
+        content: String,
+        faqs: Array
+    }],
     createdAt: { type: Date, default: Date.now }
 });
 
