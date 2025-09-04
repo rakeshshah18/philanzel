@@ -69,7 +69,7 @@ const Footer = () => {
                         <div className="card shadow-sm">
                             <div className="card-header bg-dark text-white">
                                 <h4 className="mb-0">
-                                    <i className="fas fa-window-minimize me-2"></i>
+                                    <i className="bi bi-dash-lg me-2"></i>
                                     Footer Management
                                 </h4>
                             </div>
@@ -96,13 +96,13 @@ const Footer = () => {
                         <div className="card shadow-sm">
                             <div className="card-header bg-dark text-white">
                                 <h4 className="mb-0">
-                                    <i className="fas fa-window-minimize me-2"></i>
+                                    <i className="bi bi-dash-lg me-2"></i>
                                     Footer Management
                                 </h4>
                             </div>
                             <div className="card-body">
                                 <div className="alert alert-danger">
-                                    <i className="fas fa-exclamation-triangle me-2"></i>
+                                    <i className="bi bi-exclamation-triangle me-2"></i>
                                     {error}
                                 </div>
                                 <button
@@ -126,7 +126,7 @@ const Footer = () => {
                     <div className="card shadow-sm">
                         <div className="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                             <h4 className="mb-0">
-                                <i className="fas fa-window-minimize me-2"></i>
+                                <i className="bi bi-dash-lg me-2"></i>
                                 Footer Management
                             </h4>
                             <div>
@@ -135,7 +135,7 @@ const Footer = () => {
                                         className="btn btn-outline-light"
                                         onClick={() => setEditMode(true)}
                                     >
-                                        <i className="fas fa-edit me-2"></i>
+                                        <i className="bi bi-pencil-square me-2"></i>
                                         Edit Footer
                                     </button>
                                 ) : (
@@ -152,7 +152,7 @@ const Footer = () => {
                                                 </>
                                             ) : (
                                                 <>
-                                                    <i className="fas fa-save me-2"></i>
+                                                    <i className="bi bi-save me-2"></i>
                                                     Save Changes
                                                 </>
                                             )}
@@ -164,7 +164,7 @@ const Footer = () => {
                                                 fetchFooterData();
                                             }}
                                         >
-                                            <i className="fas fa-times me-2"></i>
+                                            <i className="bi bi-x-lg me-2"></i>
                                             Cancel
                                         </button>
                                     </>
@@ -428,23 +428,23 @@ const Footer = () => {
                                 <div className="col-12">
                                     <div className="d-flex gap-2 flex-wrap">
                                         <button className="btn btn-primary">
-                                            <i className="fas fa-plus me-2"></i>
+                                            <i className="bi bi-plus-lg me-2"></i>
                                             Add Quick Link
                                         </button>
                                         <button className="btn btn-success">
-                                            <i className="fas fa-plus me-2"></i>
+                                            <i className="bi bi-plus-lg me-2"></i>
                                             Add Service
                                         </button>
                                         <button className="btn btn-info">
-                                            <i className="fas fa-plus me-2"></i>
+                                            <i className="bi bi-plus-lg me-2"></i>
                                             Add Calculator
                                         </button>
                                         <button className="btn btn-warning">
-                                            <i className="fas fa-plus me-2"></i>
+                                            <i className="bi bi-plus-lg me-2"></i>
                                             Add Social Link
                                         </button>
                                         <button className="btn btn-secondary">
-                                            <i className="fas fa-eye me-2"></i>
+                                            <i className="bi bi-eye me-2"></i>
                                             Preview Footer
                                         </button>
                                     </div>

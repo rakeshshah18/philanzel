@@ -7,6 +7,17 @@ import './Calculators.css';
 import 'katex/dist/katex.min.css';
 
 const Calculators = () => {
+    // Dark mode detection
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    useEffect(() => {
+        const checkDarkMode = () => {
+            setIsDarkMode(document.body.classList.contains('dark-mode'));
+        };
+        checkDarkMode();
+        const observer = new MutationObserver(() => checkDarkMode());
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        return () => observer.disconnect();
+    }, []);
     const [showAddModal, setShowAddModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -179,7 +190,7 @@ const Calculators = () => {
     const isHtmlContent = content => /<\/?[a-z][\s\S]*>/i.test(content);
 
     return (
-        <div className="container-fluid py-4">
+        <div className="container-fluid py-4" style={{ background: isDarkMode ? '#181818' : 'linear-gradient(135deg, #b6b2efff 0%, #dfccf0ff 100%)', minHeight: '100vh' }}>
             <h2 className="mb-2">Calculators</h2>
             <div className="d-flex gap-2 mb-3">
                 <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
@@ -189,7 +200,10 @@ const Calculators = () => {
                     Delete Calculator
                 </button>
                 <button className="btn btn-success" onClick={() => setShowSectionModal(true)}>
-                    Add Section
+                    Create Section
+                </button>
+                <button className="btn btn-outline-secondary" onClick={fetchSections} title="Refresh Sections">
+                    <i className="bi bi-arrow-clockwise"></i>
                 </button>
             </div>
 
@@ -204,33 +218,47 @@ const Calculators = () => {
                         {sections.length === 0 ? (
                             <div>No sections found.</div>
                         ) : (
-                            <div className="row">
+                            <div className="row justify-content-center">
                                 {sections.map(section => {
                                     const htmlContent = isHtmlContent(section.content);
                                     return (
-                                        <div className="col-md-6 mb-3" key={section._id}>
-                                            <div className="card">
-                                                <div className="card-body">
-                                                    <h5 className="card-title">{section.sectionName || 'No name'}</h5>
+                                        <div className="col-12 col-sm-6 mb-4 d-flex justify-content-center" key={section._id}>
+                                            <div className="card shadow-sm h-100 w-100" style={{
+                                                borderRadius: '16px',
+                                                background: isDarkMode ? '#000' : 'linear-gradient(135deg, #9c98d3ff 0%, #b89bd3ff 100%)',
+                                                color: isDarkMode ? '#fff' : '#212529',
+                                                minWidth: 340,
+                                                maxWidth: 800
+                                            }}>
+                                                <div className="card-body d-flex flex-column" style={{ color: isDarkMode ? '#fff' : '#212529' }}>
+                                                    <h5 className="card-title" style={{
+                                                        fontWeight: 700,
+                                                        background: isDarkMode ? '#222' : '#c5bde5ff',
+                                                        color: isDarkMode ? '#dfd0d0ff' : '#212529',
+                                                        borderRadius: '8px',
+                                                        padding: '0.5rem 1rem',
+                                                        marginBottom: '1rem',
+                                                        display: 'inline-block'
+                                                    }}>{section.sectionName || 'No name'}</h5>
                                                     {section.heading && (
-                                                        <h6 className="card-subtitle mb-2 text-muted">{section.heading}</h6>
+                                                        <h6 className="card-subtitle mb-2" style={{ color: isDarkMode ? '#fff' : '#6c757d' }}>{section.heading}</h6>
                                                     )}
                                                     {htmlContent ? (
-                                                        <div className="card-text" dangerouslySetInnerHTML={{ __html: section.content }} />
+                                                        <div className="card-text" style={{ color: isDarkMode ? '#fff' : '#212529' }} dangerouslySetInnerHTML={{ __html: section.content }} />
                                                     ) : (
-                                                        <p className="card-text" style={{ whiteSpace: 'pre-line' }}>{section.content}</p>
+                                                        <p className="card-text" style={{ whiteSpace: 'pre-line', color: isDarkMode ? '#fff' : '#212529' }}>{section.content}</p>
                                                     )}
                                                     {section.faqs && section.faqs.length > 0 && (
-                                                        <div>
-                                                            <strong>FAQs:</strong> <br />
-                                                            <ul>
+                                                        <div className="mt-2">
+                                                            <strong style={{ color: isDarkMode ? '#fff' : '#212529' }}>FAQs:</strong> <br />
+                                                            <ul className="ps-3 mb-0">
                                                                 {section.faqs.map((faq, idx) => (
-                                                                    <li key={idx}><strong>{faq.question}</strong>: {faq.description}</li>
+                                                                    <li key={idx} style={{ color: isDarkMode ? '#fff' : '#212529' }}><strong>{faq.question}</strong>: {faq.description}</li>
                                                                 ))}
                                                             </ul>
                                                         </div>
                                                     )}
-                                                    <div className="mt-3 d-flex gap-2">
+                                                    <div className="mt-auto d-flex gap-2">
                                                         <button type="button" className="btn btn-sm btn-outline-info" onClick={() => handleEditSection(section)} title="Edit">
                                                             <i className="bi bi-pencil-square"></i> Edit
                                                         </button>

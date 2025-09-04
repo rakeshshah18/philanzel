@@ -191,6 +191,11 @@ export default function PartnerFAQs() {
 
     return (
         <div className="container-fluid mt-4 px-0">
+            <style>{`
+                body.dark-mode .faq-text {
+                    color: #f8f9fa !important;
+                }
+            `}</style>
             <h2>Partner FAQs</h2>
             {faqs.length === 0 ? (
                 <div>No FAQs found.</div>
@@ -239,8 +244,8 @@ export default function PartnerFAQs() {
                                                         </Form>
                                                     ) : (
                                                         <>
-                                                            <div><strong dangerouslySetInnerHTML={{ __html: item.question }} /></div>
-                                                            <div><span dangerouslySetInnerHTML={{ __html: item.answer }} /></div>
+                                                            <div className="faq-text" style={{ color: '#626364ff' }}><strong dangerouslySetInnerHTML={{ __html: item.question }} /></div>
+                                                            <div className="faq-text" style={{ color: '#575858ff' }}><span dangerouslySetInnerHTML={{ __html: item.answer }} /></div>
                                                             <hr />
                                                         </>
                                                     )}

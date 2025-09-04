@@ -18,15 +18,15 @@ import AdminInquiries from './pages/AdminInquiries';
 import AdminApplications from './pages/AdminApplications';
 import HomePageForm from './pages/home/HomePageForm';
 import AdminHomePage from './pages/home/AdminHomePage';
-import ServicePage from './pages/ServicePage';
-import ServicesOverview from './pages/ServicesOverview';
+import ServicePage from './pages/service pages/ServicePage';
+import ServicesOverview from './pages/service pages/ServicesOverview';
 import Sections from './pages/sections/Sections';
 import Reviews from './pages/sections/Reviews';
 import Ads from './pages/sections/Ads';
 import AdminFooter from './pages/sections/AdminFooter';
 import LoginForm from './components/admin-forms/LoginForm';
 import RegisterForm from './components/admin-forms/RegisterForm';
-import ServicesSections from './pages/ServicesSections';
+import ServicesSections from './pages/service pages/ServicesSections';
 import Calculators from './pages/calculators/Calculators';
 import CalculatorPage from './pages/calculators/CalculatorPage';
 

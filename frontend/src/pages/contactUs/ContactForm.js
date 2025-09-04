@@ -79,6 +79,36 @@ const ContactForm = () => {
 
     return (
         <div className="container mt-4 px-0 mx-0">
+            <style>{`
+                .ql-container, .ql-editor {
+                    background: transparent !important;
+                }
+                body.dark-mode .bg-light {
+                    background-color: #23272b !important;
+                }
+                .contact-point, .contact-point * {
+                    background: transparent !important;
+                }
+                body.dark-mode .contact-point, body.dark-mode .contact-point * {
+                    color: #f8f9fa !important;
+                }
+                .btn-point-edit {
+                    background-color: #007bff !important;
+                    color: #fff !important;
+                    border: none !important;
+                }
+                .btn-point-delete {
+                    background-color: #dc3545 !important;
+                    color: #fff !important;
+                    border: none !important;
+                }
+                .btn-point-edit:hover {
+                    background-color: #0056b3 !important;
+                }
+                .btn-point-delete:hover {
+                    background-color: #a71d2a !important;
+                }
+            `}</style>
             <h2 style={{ marginLeft: '2rem' }}>Contact Us</h2>
             <ul className="nav nav-tabs mb-3" style={{ justifyContent: 'start', marginLeft: '2rem' }}>
                 <li className="nav-item">
@@ -116,7 +146,7 @@ const ContactForm = () => {
                                 <div>
                                     <button className="btn btn-primary btn-sm mt-2" onClick={() => setEditing({ field: 'headingDesc' })}>Edit</button>
                                     <h3 className="mb-2">{contactInfo.heading}</h3>
-                                    <div dangerouslySetInnerHTML={{ __html: contactInfo.description }} />
+                                    <div className="contact-point" style={{ background: 'transparent' }} dangerouslySetInnerHTML={{ __html: contactInfo.description }} />
                                 </div>
                             )}
                             {/* Points */}
@@ -126,21 +156,21 @@ const ContactForm = () => {
                                     let sanitizedPoint = point.replace(/(<br\s*\/?>\s*){2,}/gi, '<br>');
                                     sanitizedPoint = sanitizedPoint.replace(/^(<br\s*\/?>)+/i, '').replace(/(<br\s*\/?>)+$/i, '').trim();
                                     return (
-                                        <li key={idx} className="d-flex justify-content-between align-items-center" style={{ marginBottom: '0.5rem' }}>
-                                            <span>
-                                                <span dangerouslySetInnerHTML={{ __html: sanitizedPoint }} style={{ margin: 0, padding: 0, display: 'block' }} />
+                                        <li key={idx} className="d-flex justify-content-between align-items-center contact-point" style={{ marginBottom: '0.5rem', background: 'transparent' }}>
+                                            <span className="contact-point" style={{ background: 'transparent' }}>
+                                                <span dangerouslySetInnerHTML={{ __html: sanitizedPoint }} style={{ margin: 0, padding: 0, display: 'block', background: 'transparent' }} />
                                             </span>
                                             <span>
                                                 {editing.field === 'point' && editing.index === idx ? (
                                                     <span>
-                                                        <ReactQuill value={editValue} onChange={setEditValue} style={{ background: 'transparent', border: 'none' }} />
+                                                        <ReactQuill value={editValue} onChange={setEditValue} style={{ background: '', border: 'none' }} />
                                                         <button className="btn btn-success btn-sm me-2" onClick={() => handleEditPoint(idx)}>Save</button>
                                                         <button className="btn btn-secondary btn-sm" onClick={() => setEditing({ field: null, index: null })}>Cancel</button>
                                                     </span>
                                                 ) : (
                                                     <span>
-                                                        <button className="btn btn-primary btn-sm ms-2" onClick={() => { setEditing({ field: 'point', index: idx }); setEditValue(point); }}>Edit</button>
-                                                        <button className="btn btn-danger btn-sm ms-2" onClick={() => handleDeletePoint(idx)}>Delete</button>
+                                                        <button className="btn btn-point-edit btn-sm ms-2" onClick={() => { setEditing({ field: 'point', index: idx }); setEditValue(point); }}>Edit</button>
+                                                        <button className="btn btn-point-delete btn-sm ms-2" onClick={() => handleDeletePoint(idx)}>Delete</button>
                                                     </span>
                                                 )}
                                             </span>

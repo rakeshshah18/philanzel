@@ -299,8 +299,9 @@ const Reviews = () => {
         }
     };
 
+    const isDarkMode = document.body.classList.contains('dark-mode');
     return (
-        <div className="container-fluid py-4">
+        <div className="container-fluid py-4" style={{ background: isDarkMode ? '#181818' : 'linear-gradient(135deg, #e9f7b6 0%, #ccf0df 100%)', minHeight: '100vh' }}>
             <div className="row">
                 <div className="col-12">
                     <div className="card shadow-sm">
@@ -310,186 +311,185 @@ const Reviews = () => {
                                 Review Sections
                             </h4>
                         </div>
-                        <div className="card-body">
-                            {message && (
-                                <Alert
-                                    message={message}
-                                    type={message.startsWith('✅') ? 'success' : 'danger'}
-                                    onClose={() => setMessage('')}
-                                />
-                            )}
+                    </div>
+                    <div className="card-body py-2">
+                        {message && (
+                            <Alert
+                                message={message}
+                                type={message.startsWith('✅') ? 'success' : 'danger'}
+                                onClose={() => setMessage('')}
+                            />
+                        )}
 
-                            {/* Review Sections List */}
-                            <div className="row">
-                                {loading && reviewSections.length === 0 ? (
-                                    <div className="col-12 text-center py-4">
-                                        <div className="spinner-border" role="status">
-                                            <span className="visually-hidden">Loading...</span>
-                                        </div>
-                                        <p className="mt-2">Loading review sections...</p>
+                        {/* Review Sections List */}
+                        <div className="row">
+                            {loading && reviewSections.length === 0 ? (
+                                <div className="col-12 text-center py-4">
+                                    <div className="spinner-border" role="status">
+                                        <span className="visually-hidden">Loading...</span>
                                     </div>
-                                ) : reviewSections.length === 0 ? (
-                                    <div className="col-12 text-center py-5">
-                                        <i className="fas fa-star fa-3x text-muted mb-3"></i>
-                                        <h5 className="text-muted">No Review Sections Found</h5>
-                                        <p className="text-muted">No review sections available at the moment.</p>
-                                    </div>
-                                ) : (
-                                    reviewSections.map((section) => (
-                                        <div key={section._id} className="col-12 mb-4">
-                                            <div className="card h-100 shadow-sm">
-                                                <div className="card-header d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <h5 className="mb-1">
-                                                            {section.heading}
-                                                            <span className="badge bg-info ms-2">{section.reviewProvider}</span>
-                                                        </h5>
-                                                        <div className="d-flex align-items-center">
-                                                            <div className="me-2">
-                                                                {getStars(calculateManualRating(section).average)}
-                                                            </div>
-                                                            <span className="text-muted">
-                                                                {calculateManualRating(section).average.toFixed(1)}
-                                                                ({(section.reviews?.filter(r => r.isVisible)?.length || 0)} reviews)
-                                                            </span>
+                                    <p className="mt-2">Loading review sections...</p>
+                                </div>
+                            ) : reviewSections.length === 0 ? (
+                                <div className="col-12 text-center py-5">
+                                    <i className="fas fa-star fa-3x text-muted mb-3"></i>
+                                    <h5 className="text-muted">No Review Sections Found</h5>
+                                    <p className="text-muted">No review sections available at the moment.</p>
+                                </div>
+                            ) : (
+                                reviewSections.map((section) => (
+                                    <div key={section._id} className="col-12 mb-4">
+                                        <div className="card h-100 shadow-lg" style={{ borderRadius: '18px', background: document.body.classList.contains('dark-mode') ? '#222' : 'linear-gradient(135deg, #e9f7b6 0%, #ccf0df 100%)', color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529' }}>
+                                            <div className="card-header d-flex justify-content-between align-items-center" style={{ borderRadius: '18px 18px 0 0', background: document.body.classList.contains('dark-mode') ? '#333' : '#e9f7b6', color: document.body.classList.contains('dark-mode') ? '#ffe066' : '#212529' }}>
+                                                <div>
+                                                    <h5 className="mb-1" style={{ fontWeight: 700 }}>{section.heading}
+                                                        <span className="badge bg-info ms-2" style={{ fontSize: '0.95rem', background: document.body.classList.contains('dark-mode') ? '#ffe066' : '#17a2b8', color: document.body.classList.contains('dark-mode') ? '#222' : '#fff' }}>{section.reviewProvider}</span>
+                                                    </h5>
+                                                    <div className="d-flex align-items-center">
+                                                        <div className="me-2">
+                                                            {getStars(calculateManualRating(section).average)}
                                                         </div>
+                                                        <span className="text-muted">
+                                                            {calculateManualRating(section).average.toFixed(1)}
+                                                            ({(section.reviews?.filter(r => r.isVisible)?.length || 0)} reviews)
+                                                        </span>
                                                     </div>
-                                                    <button
-                                                        className="btn btn-outline-primary btn-sm"
-                                                        onClick={() => editSection(section)}
-                                                        title="Edit Section"
-                                                    >
-                                                        <i className="fas fa-edit me-1"></i>
-                                                        Edit
-                                                    </button>
                                                 </div>
-                                                <div className="card-body">
-                                                    <p className="card-text">{section.description}</p>
+                                                <button
+                                                    className="btn btn-outline-primary btn-sm"
+                                                    onClick={() => editSection(section)}
+                                                    title="Edit Section"
+                                                >
+                                                    <i className="bi bi-pencil-square me-1"></i>
+                                                    Edit
+                                                </button>
+                                            </div>
+                                            <div className="card-body" style={{ padding: '1.2rem' }}>
+                                                <p className="card-text" style={{ fontSize: '1.05rem' }}>{section.description}</p>
 
-                                                    {section.writeReviewButton?.isEnabled && (
-                                                        <div className="mb-3">
-                                                            <button
-                                                                className="btn btn-primary btn-sm"
-                                                                onClick={() => openAddReviewModal(section._id)}
-                                                                disabled={loading}
-                                                            >
-                                                                <i className="fas fa-pen me-2"></i>
-                                                                {section.writeReviewButton.text || 'Write Review'}
-                                                            </button>
-                                                        </div>
-                                                    )}
+                                                {section.writeReviewButton?.isEnabled && (
+                                                    <div className="mb-3">
+                                                        <button
+                                                            className="btn btn-primary btn-sm"
+                                                            onClick={() => openAddReviewModal(section._id)}
+                                                            disabled={loading}
+                                                        >
+                                                            <i className="bi bi-pencil me-2"></i>
+                                                            {section.writeReviewButton.text || 'Write Review'}
+                                                        </button>
+                                                    </div>
+                                                )}
 
-                                                    {section.reviews && section.reviews.length > 0 && (
-                                                        <div>
-                                                            <div className="row">
-                                                                {section.reviews.map((review, index) => (
-                                                                    <div key={index} className="col-md-4 mb-3">
-                                                                        <div className="card border-light position-relative">
-                                                                            <div className="card-body p-3">
-                                                                                <div className="d-flex justify-content-between align-items-start mb-2">
-                                                                                    <div className="d-flex align-items-center flex-grow-1">
-                                                                                        {review.userProfilePhoto && (
-                                                                                            <img
-                                                                                                src={review.userProfilePhoto}
-                                                                                                alt={review.userName}
-                                                                                                className="rounded-circle me-2"
-                                                                                                style={{ width: '32px', height: '32px', objectFit: 'cover' }}
-                                                                                                onError={(e) => {
-                                                                                                    e.target.style.display = 'none';
-                                                                                                }}
-                                                                                            />
-                                                                                        )}
-                                                                                        <div className="flex-grow-1">
-                                                                                            <h6 className="mb-0 small">{review.userName}</h6>
-                                                                                            <div className="small">
-                                                                                                {getStars(review.rating)}
-                                                                                            </div>
+                                                {section.reviews && section.reviews.length > 0 && (
+                                                    <div>
+                                                        <div className="row justify-content-center">
+                                                            {section.reviews.map((review, index) => (
+                                                                <div key={index} className="col-md-6 col-lg-4 mb-3 d-flex justify-content-center">
+                                                                    <div className="card position-relative shadow-sm w-100" style={{ borderRadius: '14px', background: document.body.classList.contains('dark-mode') ? '#333' : '#ebf6c5ff', color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529', minWidth: 280, maxWidth: 400 }}>
+                                                                        <div className="card-body p-3">
+                                                                            <div className="d-flex justify-content-between align-items-start mb-2">
+                                                                                <div className="d-flex align-items-center flex-grow-1">
+                                                                                    {review.userProfilePhoto && (
+                                                                                        <img
+                                                                                            src={review.userProfilePhoto}
+                                                                                            alt={review.userName}
+                                                                                            className="rounded-circle me-2"
+                                                                                            style={{ width: '32px', height: '32px', objectFit: 'cover', boxShadow: document.body.classList.contains('dark-mode') ? '0 2px 8px #000' : '0 2px 8px #ccc' }}
+                                                                                            onError={(e) => {
+                                                                                                e.target.style.display = 'none';
+                                                                                            }}
+                                                                                        />
+                                                                                    )}
+                                                                                    <div className="flex-grow-1">
+                                                                                        <h6 className="mb-0 small" style={{ fontWeight: 600 }}>{review.userName}</h6>
+                                                                                        <div className="small">
+                                                                                            {getStars(review.rating)}
                                                                                         </div>
-                                                                                        {review.reviewProviderLogo && (
-                                                                                            <img
-                                                                                                src={review.reviewProviderLogo}
-                                                                                                alt="Provider"
-                                                                                                style={{ width: '20px', height: '20px', objectFit: 'contain' }}
-                                                                                                onError={(e) => {
-                                                                                                    e.target.style.display = 'none';
-                                                                                                }}
-                                                                                            />
-                                                                                        )}
                                                                                     </div>
-                                                                                    <div className="dropdown">
-                                                                                        <button
-                                                                                            className="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                                                                            type="button"
-                                                                                            data-bs-toggle="dropdown"
-                                                                                            style={{ fontSize: '0.75rem' }}
-                                                                                        >
-                                                                                            <i className="fas fa-ellipsis-v"></i>
-                                                                                        </button>
-                                                                                        <ul className="dropdown-menu">
-                                                                                            <li>
-                                                                                                <button
-                                                                                                    className="dropdown-item"
-                                                                                                    onClick={() => editIndividualReview(section._id, index)}
-                                                                                                >
-                                                                                                    <i className="fas fa-edit me-2"></i>Edit Review
-                                                                                                </button>
-                                                                                            </li>
-                                                                                            <li>
-                                                                                                <button
-                                                                                                    className="dropdown-item"
-                                                                                                    onClick={() => toggleReviewVisibility(section._id, index)}
-                                                                                                >
-                                                                                                    <i className={`fas fa-eye${review.isVisible ? '-slash' : ''} me-2`}></i>
-                                                                                                    {review.isVisible ? 'Hide' : 'Show'} Review
-                                                                                                </button>
-                                                                                            </li>
-                                                                                            <li><hr className="dropdown-divider" /></li>
-                                                                                            <li>
-                                                                                                <button
-                                                                                                    className="dropdown-item text-danger"
-                                                                                                    onClick={() => deleteIndividualReview(section._id, index)}
-                                                                                                >
-                                                                                                    <i className="fas fa-trash me-2"></i>Delete Review
-                                                                                                </button>
-                                                                                            </li>
-                                                                                        </ul>
-                                                                                    </div>
+                                                                                    {review.reviewProviderLogo && (
+                                                                                        <img
+                                                                                            src={review.reviewProviderLogo}
+                                                                                            alt="Provider"
+                                                                                            style={{ width: '20px', height: '20px', objectFit: 'contain', marginLeft: 8 }}
+                                                                                            onError={(e) => {
+                                                                                                e.target.style.display = 'none';
+                                                                                            }}
+                                                                                        />
+                                                                                    )}
                                                                                 </div>
-                                                                                <p className="small mb-2 text-muted">
-                                                                                    {review.reviewText}
-                                                                                </p>
-                                                                                <div className="d-flex justify-content-between align-items-center">
-                                                                                    <div>
-                                                                                        {review.isVerified && (
-                                                                                            <span className="badge bg-success">
-                                                                                                <i className="fas fa-check-circle me-1"></i>
-                                                                                                Verified
-                                                                                            </span>
-                                                                                        )}
-                                                                                        {!review.isVisible && (
-                                                                                            <span className="badge bg-secondary ms-1">
-                                                                                                <i className="fas fa-eye-slash me-1"></i>
-                                                                                                Hidden
-                                                                                            </span>
-                                                                                        )}
-                                                                                    </div>
-                                                                                    <small className="text-muted">
-                                                                                        {new Date(review.reviewDate).toLocaleDateString()}
-                                                                                    </small>
+                                                                                <div className="dropdown">
+                                                                                    <button
+                                                                                        className="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                                                        type="button"
+                                                                                        data-bs-toggle="dropdown"
+                                                                                        style={{ fontSize: '0.75rem' }}
+                                                                                    >
+                                                                                        <i className="bi bi-three-dots-vertical"></i>
+                                                                                    </button>
+                                                                                    <ul className="dropdown-menu">
+                                                                                        <li>
+                                                                                            <button
+                                                                                                className="dropdown-item"
+                                                                                                onClick={() => editIndividualReview(section._id, index)}
+                                                                                            >
+                                                                                                <i className="bi bi-pencil-square me-2"></i>Edit Review
+                                                                                            </button>
+                                                                                        </li>
+                                                                                        <li>
+                                                                                            <button
+                                                                                                className="dropdown-item"
+                                                                                                onClick={() => toggleReviewVisibility(section._id, index)}
+                                                                                            >
+                                                                                                <i className={`bi bi-eye${review.isVisible ? '-slash' : ''} me-2`}></i>
+                                                                                                {review.isVisible ? 'Hide' : 'Show'} Review
+                                                                                            </button>
+                                                                                        </li>
+                                                                                        <li><hr className="dropdown-divider" /></li>
+                                                                                        <li>
+                                                                                            <button
+                                                                                                className="dropdown-item text-danger"
+                                                                                                onClick={() => deleteIndividualReview(section._id, index)}
+                                                                                            >
+                                                                                                <i className="bi bi-trash me-2"></i>Delete Review
+                                                                                            </button>
+                                                                                        </li>
+                                                                                    </ul>
                                                                                 </div>
+                                                                            </div>
+                                                                            <p className="small mb-2 text-muted" style={{ fontSize: '1rem' }}>
+                                                                                {review.reviewText}
+                                                                            </p>
+                                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                                <div>
+                                                                                    {review.isVerified && (
+                                                                                        <span className="badge bg-success">
+                                                                                            <i className="bi bi-patch-check-fill me-1"></i>
+                                                                                            Verified
+                                                                                        </span>
+                                                                                    )}
+                                                                                    {!review.isVisible && (
+                                                                                        <span className="badge bg-secondary ms-1">
+                                                                                            <i className="bi bi-eye-slash me-1"></i>
+                                                                                            Hidden
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                                <small className="text-muted">
+                                                                                    {new Date(review.reviewDate).toLocaleDateString()}
+                                                                                </small>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                ))}
-                                                            </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
-                                                    )}
-                                                </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
-                                    ))
-                                )}
-                            </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>

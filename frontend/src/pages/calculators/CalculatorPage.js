@@ -124,33 +124,77 @@ const CalculatorPage = () => {
     };
 
     return (
-        <div className="container-fluid py-4 ps-2" style={{ paddingLeft: 0, marginLeft: 0 }}>
+        <div className="container-fluid py-4 ps-2" style={{ paddingLeft: 0, marginLeft: 0, background: document.body.classList.contains('dark-mode') ? '#181818' : 'linear-gradient(135deg, #b6b2efff 0%, #dfccf0ff 100%)', minHeight: '100vh' }}>
             <h2>{pageInfo ? pageInfo.name : 'Calculator Page'}</h2>
-            <button className="btn btn-success mb-3" onClick={handleAddSectionClick}>
-                Add Section
-            </button>
+            <div className="d-flex gap-2 mb-3">
+                <button className="btn btn-success" onClick={handleAddSectionClick}>
+                    Add Section
+                </button>
+            </div>
             {error && <div className="alert alert-danger">{error}</div>}
-            {/* Sections List */}
+            {/* Sections List as Cards */}
             <div>
-                <h4>Sections</h4>
+                <h4 style={{
+                    fontWeight: 700,
+                    background: document.body.classList.contains('dark-mode') ? '#222' : '#e9e6f7',
+                    color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529',
+                    borderRadius: '8px',
+                    padding: '0.5rem 1rem',
+                    marginBottom: '1rem',
+                    display: 'inline-block'
+                }}>Sections</h4>
                 {pageSections.length === 0 ? (
                     <div>No sections added yet.</div>
                 ) : (
-                    <ul>
+                    <div className="row justify-content-center">
                         {pageSections.map(section => (
-                            <li key={section._id} className="mb-3">
-                                <strong>{section.sectionName}</strong><br />
-                                {section.heading && <span>{section.heading}</span>}<br />
-                                {section.content && <div dangerouslySetInnerHTML={{ __html: section.content }} />}
-                                <button className="btn btn-sm btn-outline-info me-2" onClick={() => openEditModal(section)}>
-                                    Edit
-                                </button>
-                                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteSection(section._id)}>
-                                    Delete
-                                </button>
-                            </li>
+                            <div className="col-12 col-sm-6 mb-4 d-flex justify-content-center" key={section._id}>
+                                <div className="card shadow-sm h-100 w-100" style={{
+                                    borderRadius: '16px',
+                                    background: document.body.classList.contains('dark-mode') ? '#000' : 'linear-gradient(135deg, #9c98d3ff 0%, #b89bd3ff 100%)',
+                                    color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529',
+                                    minWidth: 340,
+                                    maxWidth: 800
+                                }}>
+                                    <div className="card-body d-flex flex-column" style={{ color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529' }}>
+                                        <h5 className="card-title" style={{
+                                            fontWeight: 700,
+                                            background: document.body.classList.contains('dark-mode') ? '#222' : '#c5bde5ff',
+                                            color: document.body.classList.contains('dark-mode') ? '#dfd0d0ff' : '#212529',
+                                            borderRadius: '8px',
+                                            padding: '0.5rem 1rem',
+                                            marginBottom: '1rem',
+                                            display: 'inline-block'
+                                        }}>{section.sectionName || 'No name'}</h5>
+                                        {section.heading && (
+                                            <h6 className="card-subtitle mb-2" style={{ color: document.body.classList.contains('dark-mode') ? '#fff' : '#6c757d' }}>{section.heading}</h6>
+                                        )}
+                                        {section.content && (
+                                            <div className="card-text" style={{ color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529' }} dangerouslySetInnerHTML={{ __html: section.content }} />
+                                        )}
+                                        {section.faqs && section.faqs.length > 0 && (
+                                            <div className="mt-2">
+                                                <strong style={{ color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529' }}>FAQs:</strong> <br />
+                                                <ul className="ps-3 mb-0">
+                                                    {section.faqs.map((faq, idx) => (
+                                                        <li key={idx} style={{ color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529' }}><strong>{faq.question}</strong>: {faq.description}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                        <div className="mt-auto d-flex gap-2">
+                                            <button className="btn btn-sm btn-outline-info" onClick={() => openEditModal(section)}>
+                                                Edit
+                                            </button>
+                                            <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteSection(section._id)}>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 )}
             </div>
             {/* Modal for section selection */}
@@ -170,7 +214,7 @@ const CalculatorPage = () => {
                                         <option value="">Select a section</option>
                                         {availableSections.map(section => (
                                             <option key={section._id} value={section._id}>
-                                                {section.sectionName} - {section.heading}
+                                                {section.sectionName}
                                             </option>
                                         ))}
                                     </select>

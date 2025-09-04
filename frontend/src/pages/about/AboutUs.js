@@ -1587,7 +1587,7 @@ const AboutUs = () => {
                                                 src={founder.image?.url ? getImageUrl(founder.image.url) : '/api/placeholder/300/300'}
                                                 alt={founder.image?.altText || founder.name}
                                                 className="card-img-top"
-                                                style={{ height: '250px', objectFit: 'cover' }}
+                                                style={{ height: '250px', width: '100%', objectFit: 'cover', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #e0e0e0' }}
                                             />
                                             {isAuthenticated && (
                                                 <div className="position-absolute top-0 end-0 m-2">

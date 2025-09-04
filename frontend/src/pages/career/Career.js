@@ -345,7 +345,7 @@ const Career = () => {
                                                             src={getImageURL(post.image.filename)}
                                                             className="card-img-top"
                                                             alt={post.heading}
-                                                            style={{ height: '200px', objectFit: 'cover' }}
+                                                            style={{ height: '200px', width: '100%', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e0e0e0', background: '#f8f9fa' }}
                                                             onError={(e) => {
                                                                 console.error('Image failed to load:', getImageURL(post.image.filename));
                                                                 console.error('Post image object:', post.image);

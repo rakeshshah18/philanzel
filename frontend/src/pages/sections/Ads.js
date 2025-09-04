@@ -275,13 +275,17 @@ const Ads = () => {
     };
 
     return (
-        <div className="container-fluid py-4">
+        <div className="container-fluid py-4" style={{ background: document.body.classList.contains('dark-mode') ? '#181818' : 'linear-gradient(135deg, #d9cc9fff 0%, #dfa35fff 100%)', minHeight: '100vh' }}>
             {message && <Alert message={message} onClose={() => setMessage('')} />}
 
             <div className="row">
                 <div className="col-12">
                     <div className="card shadow-sm">
-                        <div className="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                        <div className="card-header text-dark d-flex justify-content-between align-items-center"
+                            style={{
+                                background: document.body.classList.contains('dark-mode') ? '#222' : '#ff9f31ff',
+                            }}
+                        >
                             <h4 className="mb-0">
                                 <i className="fas fa-bullhorn me-2"></i>
                                 Ads Management
@@ -296,7 +300,11 @@ const Ads = () => {
                             </button>
                         </div>
 
-                        <div className="card-body">
+                        <div className="card-body"
+                            style={{
+                                background: document.body.classList.contains('dark-mode') ? '#222' : 'linear-gradient(135deg, #e0d4abff 0%, #dab183ff 100%)',
+                            }}
+                        >
                             {/* Search Bar */}
                             <div className="row mb-3">
                                 <div className="col-md-8">
@@ -304,17 +312,24 @@ const Ads = () => {
                                         <input
                                             type="text"
                                             className="form-control"
-                                            placeholder="Search ads sections by title, hashtag..."
+                                            placeholder="Search by title, hashtag..."
+                                            style={{
+                                                backgroundColor: document.body.classList.contains('dark-mode') ? '#333' : '#d3c29fff'
+                                            }}
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                         />
                                         <button
-                                            className="btn btn-outline-warning"
+                                            className="btn btn-outline-secondary"
                                             onClick={handleSearch}
                                             disabled={loading}
                                         >
-                                            <i className="fas fa-search"></i>
+                                            <i className="bi bi-search"
+                                                style={{
+                                                    backgroundColor: document.body.classList.contains('dark-mode') ? '#333' : '#d3c29fff'
+                                                }}
+                                            ></i>
                                         </button>
                                     </div>
                                 </div>
@@ -326,7 +341,7 @@ const Ads = () => {
                                             fetchAdsSections();
                                         }}
                                     >
-                                        <i className="fas fa-times me-2"></i>
+                                        <i className="bi bi-x me-2"></i>
                                         Clear Search
                                     </button>
                                 </div>
@@ -352,109 +367,124 @@ const Ads = () => {
 
                             {/* Ads Sections List */}
                             {!loading && adsSections.length > 0 && (
-                                <div className="row">
-                                    {adsSections.map((adsSection) => (
-                                        <div key={adsSection._id} className="col-md-6 col-lg-4 mb-4">
-                                            <div className="card h-100" style={{ backgroundColor: adsSection.backgroundColor }}>
-                                                <div className="card-body">
-                                                    <div className="d-flex justify-content-between align-items-start mb-2">
-                                                        <h5 className="card-title mb-1">{adsSection.title}</h5>
-                                                        <div className="dropdown">
-                                                            <button
-                                                                className="btn btn-sm btn-outline-secondary"
-                                                                type="button"
-                                                                data-bs-toggle="dropdown"
-                                                            >
-                                                                <i className="fas fa-ellipsis-v"></i>
-                                                            </button>
-                                                            <ul className="dropdown-menu">
-                                                                <li>
-                                                                    <button
-                                                                        className="dropdown-item"
-                                                                        onClick={() => editAdsSection(adsSection)}
-                                                                    >
-                                                                        <i className="fas fa-edit me-2"></i>Edit
-                                                                    </button>
-                                                                </li>
-                                                                <li>
-                                                                    <button
-                                                                        className="dropdown-item"
-                                                                        onClick={() => toggleVisibility(adsSection._id, adsSection.isVisible)}
-                                                                    >
-                                                                        <i className={`fas fa-${adsSection.isVisible ? 'eye-slash' : 'eye'} me-2`}></i>
-                                                                        {adsSection.isVisible ? 'Hide' : 'Show'}
-                                                                    </button>
-                                                                </li>
-                                                                <li><hr className="dropdown-divider" /></li>
-                                                                <li>
-                                                                    <button
-                                                                        className="dropdown-item text-danger"
-                                                                        onClick={() => deleteAdsSection(adsSection._id)}
-                                                                    >
-                                                                        <i className="fas fa-trash me-2"></i>Delete
-                                                                    </button>
-                                                                </li>
-                                                            </ul>
+                                <div className="row justify-content-center" >
+                                    {adsSections.map((adsSection) => {
+                                        const isDarkMode = document.body.classList.contains('dark-mode');
+                                        return (
+                                            <div key={adsSection._id} className="col-12 col-sm-6 col-lg-4 mb-4 d-flex justify-content-center">
+                                                <div
+                                                    className="card shadow-lg h-100 w-100"
+                                                    style={{
+                                                        borderRadius: '18px',
+                                                        background: isDarkMode
+                                                            ? '#222'
+                                                            : 'linear-gradient(135deg, #d9cc9fff 0%, #dfa35fff 100%)',
+                                                        color: isDarkMode ? '#fff' : '#212529',
+                                                        minWidth: 340,
+                                                        maxWidth: 420,
+                                                        boxShadow: isDarkMode ? '0 2px 16px rgba(0,0,0,0.7)' : '0 2px 16px rgba(200,200,200,0.2)'
+                                                    }}
+                                                >
+                                                    <div className="card-body d-flex flex-column" style={{ padding: '1.2rem', color: isDarkMode ? '#fff' : '#212529' }}>
+                                                        <div className="d-flex justify-content-between align-items-start mb-2">
+                                                            <h5 className="card-title mb-1" style={{ fontWeight: 700, background: isDarkMode ? '#333' : '#fffbe6', color: isDarkMode ? '#ffe066' : '#212529', borderRadius: '8px', padding: '0.4rem 1rem', display: 'inline-block' }}>{adsSection.title}</h5>
+                                                            <div className="dropdown">
+                                                                <button
+                                                                    className="btn btn-sm btn-outline-secondary"
+                                                                    type="button"
+                                                                    data-bs-toggle="dropdown"
+                                                                >
+                                                                    <i className="bi bi-three-dots-vertical"></i>
+                                                                </button>
+                                                                <ul className="dropdown-menu">
+                                                                    <li>
+                                                                        <button
+                                                                            className="dropdown-item"
+                                                                            onClick={() => editAdsSection(adsSection)}
+                                                                        >
+                                                                            <i className="fas fa-edit me-2"></i>Edit
+                                                                        </button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <button
+                                                                            className="dropdown-item"
+                                                                            onClick={() => toggleVisibility(adsSection._id, adsSection.isVisible)}
+                                                                        >
+                                                                            <i className={`fas fa-${adsSection.isVisible ? 'eye-slash' : 'eye'} me-2`}></i>
+                                                                            {adsSection.isVisible ? 'Hide' : 'Show'}
+                                                                        </button>
+                                                                    </li>
+                                                                    <li><hr className="dropdown-divider" /></li>
+                                                                    <li>
+                                                                        <button
+                                                                            className="dropdown-item text-danger"
+                                                                            onClick={() => deleteAdsSection(adsSection._id)}
+                                                                        >
+                                                                            <i className="fas fa-trash me-2"></i>Delete
+                                                                        </button>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    {adsSection.hashtag && (
-                                                        <span className="badge bg-primary mb-2">#{adsSection.hashtag}</span>
-                                                    )}
+                                                        {adsSection.hashtag && (
+                                                            <span className="badge bg-primary mb-2" style={{ fontSize: '0.95rem', background: isDarkMode ? '#ffe066' : '#007bff', color: isDarkMode ? '#222' : '#fff' }}>#{adsSection.hashtag}</span>
+                                                        )}
 
-                                                    {(adsSection.imageUrl || adsSection.image || adsSection.link) && (
-                                                        <div className="mb-2">
-                                                            <img
-                                                                src={
-                                                                    // Handle both new and old field names
-                                                                    (adsSection.imageUrl && adsSection.imageUrl.startsWith('/uploads')
-                                                                        ? `http://localhost:8000${adsSection.imageUrl}`
-                                                                        : adsSection.imageUrl) ||
-                                                                    adsSection.image ||
-                                                                    adsSection.link
-                                                                }
-                                                                alt={adsSection.title}
-                                                                className="img-fluid rounded"
-                                                                style={{ maxHeight: '120px', width: '100%', objectFit: 'cover' }}
-                                                                onError={(e) => {
-                                                                    e.target.style.display = 'none';
-                                                                }}
-                                                            />
+                                                        {(adsSection.imageUrl || adsSection.image || adsSection.link) && (
+                                                            <div className="mb-2">
+                                                                <img
+                                                                    src={
+                                                                        (adsSection.imageUrl && adsSection.imageUrl.startsWith('/uploads')
+                                                                            ? `http://localhost:8000${adsSection.imageUrl}`
+                                                                            : adsSection.imageUrl) ||
+                                                                        adsSection.image ||
+                                                                        adsSection.link
+                                                                    }
+                                                                    alt={adsSection.title}
+                                                                    className="img-fluid rounded"
+                                                                    style={{ maxHeight: '120px', width: '100%', objectFit: 'cover', boxShadow: isDarkMode ? '0 2px 8px #000' : '0 2px 8px #ccc' }}
+                                                                    onError={(e) => {
+                                                                        e.target.style.display = 'none';
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        )}
+
+                                                        <div
+                                                            className="card-text"
+                                                            dangerouslySetInnerHTML={{ __html: adsSection.description }}
+                                                            style={{ maxHeight: '100px', overflow: 'hidden', fontSize: '1.05rem' }}
+                                                        />
+
+                                                        {(adsSection.linkUrl || (!adsSection.imageUrl && !adsSection.image && adsSection.link)) && (
+                                                            <div className="mt-2">
+                                                                <a
+                                                                    href={adsSection.linkUrl || adsSection.link}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="btn btn-sm btn-outline-primary"
+                                                                    style={{ fontWeight: 600 }}
+                                                                >
+                                                                    <i className="fas fa-external-link-alt me-1"></i>
+                                                                    Visit Link
+                                                                </a>
+                                                            </div>
+                                                        )}
+
+                                                        <div className="mt-2 d-flex justify-content-between align-items-center">
+                                                            <small className="text-muted" style={{ color: isDarkMode ? '#ffe066' : '#6c757d' }}>
+                                                                Created: {new Date(adsSection.createdAt).toLocaleDateString()}
+                                                            </small>
+                                                            <span className={`badge ${adsSection.isVisible ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '0.95rem', background: adsSection.isVisible ? (isDarkMode ? '#28a745' : '#28a745') : (isDarkMode ? '#444' : '#6c757d'), color: '#fff' }}>
+                                                                {adsSection.isVisible ? 'Visible' : 'Hidden'}
+                                                            </span>
                                                         </div>
-                                                    )}
-
-                                                    <div
-                                                        className="card-text"
-                                                        dangerouslySetInnerHTML={{ __html: adsSection.description }}
-                                                        style={{ maxHeight: '100px', overflow: 'hidden' }}
-                                                    />
-
-                                                    {(adsSection.linkUrl || (!adsSection.imageUrl && !adsSection.image && adsSection.link)) && (
-                                                        <div className="mt-2">
-                                                            <a
-                                                                href={adsSection.linkUrl || adsSection.link}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="btn btn-sm btn-outline-primary"
-                                                            >
-                                                                <i className="fas fa-external-link-alt me-1"></i>
-                                                                Visit Link
-                                                            </a>
-                                                        </div>
-                                                    )}
-
-                                                    <div className="mt-2 d-flex justify-content-between align-items-center">
-                                                        <small className="text-muted">
-                                                            Created: {new Date(adsSection.createdAt).toLocaleDateString()}
-                                                        </small>
-                                                        <span className={`badge ${adsSection.isVisible ? 'bg-success' : 'bg-secondary'}`}>
-                                                            {adsSection.isVisible ? 'Visible' : 'Hidden'}
-                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
