@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { inquiryAPI, careerAPI } from '../services/api';
 import { LoginForm, RegisterForm, AdminNavbar } from '../components/admin-forms';
+import OtpModal from '../components/admin-forms/OtpModal';
 import { useAuth } from '../contexts/AuthContext';
 import Alert from '../components/Alert';
 
 const Dashboard = () => {
     const { admin, isAuthenticated, login, register, logout } = useAuth();
 
-    const [stats, setStats] = useState({
-        totalInquiries: 0,
-        totalApplications: 0,
-        pendingInquiries: 0,
-        pendingApplications: 0
-    });
     const [loading, setLoading] = useState(true);
 
     // Auth states
@@ -20,33 +14,13 @@ const Dashboard = () => {
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [authLoading, setAuthLoading] = useState(false);
     const [authMessage, setAuthMessage] = useState('');
+    // OTP registration states
+    const [showOtpModal, setShowOtpModal] = useState(false);
+    const [pendingOtpEmail, setPendingOtpEmail] = useState('');
 
     useEffect(() => {
-        fetchStats();
+        setLoading(false);
     }, []);
-
-    const fetchStats = async () => {
-        try {
-            const [inquiriesRes, applicationsRes] = await Promise.all([
-                inquiryAPI.getAll().catch(() => ({ data: [] })),
-                careerAPI.getAll().catch(() => ({ data: [] }))
-            ]);
-
-            const inquiries = inquiriesRes.data || [];
-            const applications = applicationsRes.data || [];
-
-            setStats({
-                totalInquiries: inquiries.length,
-                totalApplications: applications.length,
-                pendingInquiries: inquiries.filter(item => item.status === 'pending').length,
-                pendingApplications: applications.filter(item => item.status === 'pending').length
-            });
-        } catch (error) {
-            console.error('Error fetching stats:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Auth handlers
     const handleLogin = async (loginData) => {
@@ -65,19 +39,49 @@ const Dashboard = () => {
         setAuthLoading(false);
     };
 
+
     const handleRegister = async (registerData) => {
         setAuthLoading(true);
         setAuthMessage('');
 
         const result = await register(registerData);
 
-        if (result.success) {
+        if (result.success && result.admin) {
             setAuthMessage('✅ Admin registered successfully!');
             setShowRegisterModal(false);
+        } else if (result.success && !result.admin) {
+            // OTP flow triggered
+            setPendingOtpEmail(registerData.email);
+            setShowRegisterModal(false);
+            setShowOtpModal(true);
+            setAuthMessage('OTP sent to super admin. Please enter OTP to complete registration.');
         } else {
             setAuthMessage(`❌ ${result.error}`);
         }
 
+        setAuthLoading(false);
+    };
+
+    // OTP verification handler
+    const handleVerifyOtp = async ({ email, otp }) => {
+        setAuthLoading(true);
+        setAuthMessage('');
+        try {
+            const res = await fetch('http://localhost:8000/api/admin/auth/verify-admin-registration', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setAuthMessage('✅ Admin registered successfully!');
+                setShowOtpModal(false);
+            } else {
+                setAuthMessage(`❌ ${data.message}`);
+            }
+        } catch (err) {
+            setAuthMessage('❌ OTP verification failed.');
+        }
         setAuthLoading(false);
     };
 
@@ -118,6 +122,13 @@ const Dashboard = () => {
                     onRegister={handleRegister}
                     loading={authLoading}
                 />
+                <OtpModal
+                    show={showOtpModal}
+                    onClose={() => setShowOtpModal(false)}
+                    onVerify={handleVerifyOtp}
+                    loading={authLoading}
+                    email={pendingOtpEmail}
+                />
             </>
         );
     }
@@ -151,6 +162,25 @@ const Dashboard = () => {
                     </div>
                 </div>
                 {/* dashboard content */}
+                {!isAuthenticated && (
+                    <div className="alert alert-warning d-flex align-items-center justify-content-between" style={{ gap: '1rem' }}>
+                        <div>
+                            <strong>Note:</strong> You are viewing as a guest. Please log in as admin to perform actions.
+                        </div>
+                        <div>
+                            <button className="btn btn-primary btn-sm me-2" onClick={() => setShowLoginModal(true)}>
+                                <i className="bi bi-box-arrow-in-right me-1"></i> Login
+                            </button>
+                            <button className="btn btn-success btn-sm" onClick={() => setShowRegisterModal(true)}>
+                                <i className="bi bi-person-plus me-1"></i> Register
+                            </button>
+                        </div>
+                    </div>
+                )}
+                {/* Example: Disable or hide action buttons if not authenticated */}
+                {/*
+                <button className="btn btn-primary" disabled={!isAuthenticated}>Add Something</button>
+                */}
             </div>
 
             <LoginForm

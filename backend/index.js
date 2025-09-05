@@ -65,7 +65,12 @@ app.get('/health', (req, res) => {
 app.use('/api', routes);
 
 // Connect to MongoDB
-connectDB();
+
+import { seedSuperAdmin } from './src/adminAuth/models/Admin.js';
+
+connectDB().then(async () => {
+    await seedSuperAdmin();
+});
 
 // More explicit server binding
 const server = app.listen(config.PORT, () => {

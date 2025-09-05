@@ -25,24 +25,35 @@ import Reviews from './pages/sections/Reviews';
 import Ads from './pages/sections/Ads';
 import AdminFooter from './pages/sections/AdminFooter';
 import LoginForm from './components/admin-forms/LoginForm';
-import RegisterForm from './components/admin-forms/RegisterForm';
+import AdminRegisterPage from './pages/AdminRegisterPage';
 import ServicesSections from './pages/service pages/ServicesSections';
 import Calculators from './pages/calculators/Calculators';
 import CalculatorPage from './pages/calculators/CalculatorPage';
 
-// Component to handle layout with conditional sidebar
+// Component to handle layout with conditional sidebar and global sidebar toggle
 const AppLayout = () => {
     const location = useLocation();
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
 
     // Pages that should not show the sidebar
     const noSidebarPages = ['/login', '/admin/login', '/admin/register', '/public-career'];
     const showSidebar = !noSidebarPages.includes(location.pathname);
 
+    // Sidebar width (should match Sidebar.js)
+    const sidebarWidth = isSidebarOpen && showSidebar ? 260 : showSidebar ? 60 : 0;
+
     return (
         <div className="d-flex flex-column min-vh-100">
             <div className="d-flex flex-fill">
-                {showSidebar && <Sidebar />}
-                <div className={`app-content ${showSidebar ? 'flex-fill' : 'w-100'} d-flex flex-column`}>
+                {showSidebar && <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />}
+                <div
+                    className={`app-content d-flex flex-column`}
+                    style={{
+                        marginLeft: showSidebar ? sidebarWidth : 0,
+                        transition: 'margin-left 0.3s',
+                        width: '100%'
+                    }}
+                >
                     <main className="flex-fill">
                         <Routes>
                             <Route path="/" element={
@@ -94,7 +105,7 @@ const AppLayout = () => {
                             <Route path="/admin/dashboard" element={<Dashboard />} />
                             <Route path="/admin/login" element={<LoginForm />} />
                             <Route path="/login" element={<LoginForm />} />
-                            <Route path="/admin/register" element={<RegisterForm />} />
+                            <Route path="/admin/register" element={<AdminRegisterPage />} />
                             <Route path="/services-sections" element={<ServicesSections />} />
                             <Route path="/calculators" element={<Calculators />} />
                             <Route path="/calculators/:slug" element={<CalculatorPage />} />

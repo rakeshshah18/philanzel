@@ -113,4 +113,25 @@ adminSchema.methods.toJSON = function () {
     return admin;
 };
 
-export default mongoose.model('Admin', adminSchema);
+const AdminModel = mongoose.model('Admin', adminSchema);
+
+// Seed default super_admin if not exists
+async function seedSuperAdmin() {
+    const defaultEmail = '21amtics464@gmail.com';
+    const defaultPassword = 'Rakesh@125';
+    const defaultName = 'Super Admin';
+    const existing = await AdminModel.findOne({ role: 'super_admin' });
+    if (!existing) {
+        const admin = new AdminModel({
+            name: defaultName,
+            email: defaultEmail,
+            password: defaultPassword,
+            role: 'super_admin',
+            isActive: true
+        });
+        await admin.save();
+        console.log('Default super_admin seeded.');
+    }
+}
+
+export { AdminModel as default, seedSuperAdmin };

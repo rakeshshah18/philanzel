@@ -25,16 +25,29 @@ export const AuthProvider = ({ children }) => {
 
     const checkAuthStatus = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
-            // Check for token existence and expiration
+            let token = localStorage.getItem('adminToken');
             const { isJwtExpired } = require('../utils/jwt');
             if (!token || isJwtExpired(token)) {
-                localStorage.removeItem('adminToken');
-                setAdmin(null);
-                setIsAuthenticated(false);
-                setAlert({ show: true, message: 'Session expired. Please log in again.', type: 'warning' });
-                setLoading(false);
-                return;
+                // Try to refresh the access token using refresh token cookie
+                try {
+                    const refreshResponse = await adminAuthAPI.refreshToken();
+                    const newAccessToken = refreshResponse.data.accessToken;
+                    if (newAccessToken) {
+                        localStorage.setItem('adminToken', newAccessToken);
+                        token = newAccessToken;
+                    } else {
+                        // If no access token returned, treat as failed refresh
+                        throw new Error('No access token returned from refresh');
+                    }
+                } catch (refreshError) {
+                    // Prevent infinite loop: only log out and do not retry
+                    localStorage.removeItem('adminToken');
+                    setAdmin(null);
+                    setIsAuthenticated(false);
+                    setAlert({ show: true, message: 'Session expired. Please log in again.', type: 'warning' });
+                    setLoading(false);
+                    return;
+                }
             }
 
             // Verify token by getting profile
@@ -83,15 +96,16 @@ export const AuthProvider = ({ children }) => {
             console.log('Registration attempt:', registerData);
             const response = await adminAuthAPI.register(registerData);
             console.log('Registration response:', response);
+            // If OTP flow, backend returns no admin object
+            if (response.data.message && response.data.message.includes('OTP')) {
+                return { success: true };
+            }
             const { admin: adminData, accessToken } = response.data.data;
-
             // Store token
             localStorage.setItem('adminToken', accessToken);
-
             // Update state
             setAdmin(adminData);
             setIsAuthenticated(true);
-
             return { success: true, admin: adminData };
         } catch (error) {
             console.error('Registration error:', error);

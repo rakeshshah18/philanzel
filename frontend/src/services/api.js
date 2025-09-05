@@ -43,21 +43,6 @@ export const homePageAPI = {
     delete: (id) => API.delete(`/admin/homepage/${id}`)
 };
 
-// Inquiry API
-export const inquiryAPI = {
-    // Submit new user inquiry
-    submit: (data) => API.post('/inquiry', data),
-    // Get all inquiries (admin)
-    getAll: () => API.get('/inquiry'),
-    // Get inquiry by ID
-    getById: (id) => API.get(`/inquiry/${id}`),
-    // Update inquiry status
-    updateStatus: (id, status) => API.put(`/inquiry/${id}/status`, { status }),
-    // Delete inquiry
-    delete: (id) => API.delete(`/inquiry/${id}`)
-};
-// ...existing code...
-
 // Create axios instance with base configuration
 const API = axios.create({
     baseURL: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:8000/api',
@@ -115,7 +100,8 @@ API.interceptors.response.use(
             if (!isRefreshing) {
                 isRefreshing = true;
                 try {
-                    const { data } = await axios.post('/api/auth/refresh', {}, { withCredentials: true });
+                    // Use the same endpoint as adminAuthAPI.refreshToken
+                    const { data } = await API.post('/admin/auth/refresh-token');
                     API.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
                     localStorage.setItem('adminToken', data.accessToken);
                     processQueue(null, data.accessToken);

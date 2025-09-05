@@ -12,6 +12,7 @@ import {
 
 // Public routes (no authentication required)
 router.post('/register', validateRegister, adminAuthController.register);
+router.post('/verify-admin-registration', adminAuthController.verifyAdminRegistration);
 router.post('/login', validateLogin, adminAuthController.login);
 router.post('/refresh-token', adminAuthController.refreshToken);
 router.post('/clear-tokens', adminAuthController.clearAllTokens); // Emergency route to fix JWT issues

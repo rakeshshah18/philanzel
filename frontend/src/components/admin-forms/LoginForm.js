@@ -133,9 +133,9 @@ const LoginForm = ({ show, onClose, onLogin, loading }) => {
                                         <button
                                             type="button"
                                             className="btn btn-outline-secondary"
-                                            onClick={handleBackToDashboard}
+                                            onClick={() => navigate('/admin/register')}
                                         >
-                                            Back to Dashboard
+                                            Register
                                         </button>
                                     </div>
                                 </form>

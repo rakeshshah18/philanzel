@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { servicesAPI, calculatorPagesAPI } from '../services/api';
 import { Link, useLocation } from 'react-router-dom';
 
-const Sidebar = () => {
+const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const location = useLocation();
     const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
     const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
@@ -90,14 +90,22 @@ const Sidebar = () => {
     };
 
     return (
-        <div className="app-sidebar">
-            <div className="app-header">
-                <h4 className="mb-0">
+        <div className={`app-sidebar${isSidebarOpen ? '' : ' collapsed'}`} style={{ width: isSidebarOpen ? 260 : 60, transition: 'width 0.3s', overflow: 'hidden' }}>
+            <div className="app-header d-flex align-items-center justify-content-between px-2" style={{ minHeight: 56 }}>
+                <h4 className="mb-0" style={{ fontSize: isSidebarOpen ? '1.25rem' : '1.5rem', transition: 'font-size 0.3s' }}>
                     <i className="fas fa-chart-line me-2"></i>
-                    Philanzel
+                    {isSidebarOpen && 'Philanzel'}
                 </h4>
+                <button
+                    className="btn btn-sm btn-outline-secondary ms-2"
+                    style={{ minWidth: 32, minHeight: 32, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    onClick={() => setIsSidebarOpen(v => !v)}
+                    title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+                >
+                    <i className={`bi ${isSidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
+                </button>
             </div>
-            <nav className="nav flex-column p-3">
+            <nav className="nav flex-column p-3" style={{ display: isSidebarOpen ? 'block' : 'none', transition: 'display 0.3s' }}>
                 <Link
                     to="/dashboard"
                     className={`nav-link ${isActive('/') || isActive('/dashboard') ? 'active' : ''}`}
@@ -366,8 +374,8 @@ const Sidebar = () => {
                     </button>
                 </div>
 
-            </nav >
-        </div >
+            </nav>
+        </div>
     );
 };
 

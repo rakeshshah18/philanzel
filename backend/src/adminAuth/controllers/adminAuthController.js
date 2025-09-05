@@ -1,12 +1,12 @@
+import { generateOTP, saveOTP, verifyOTP } from '../utils/otpStore.js';
+import { sendMail } from '../utils/mailer.js';
 import Admin from '../models/Admin.js';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 
 class AdminAuthController {
-    // Register new admin
     async register(req, res) {
         try {
-            // Check validation errors
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({
@@ -15,10 +15,36 @@ class AdminAuthController {
                     errors: errors.array()
                 });
             }
-
             const { name, email, password, role } = req.body;
-
-            // Check if admin already exists
+            if (role === 'super_admin') {
+                const superAdminExists = await Admin.findOne({ role: 'super_admin' });
+                if (superAdminExists) {
+                    return res.status(403).json({
+                        success: false,
+                        message: 'Super admin already exists. Cannot register another.'
+                    });
+                }
+                // Allow direct registration for the first super_admin
+                const admin = new Admin({ name, email, password, role: 'super_admin' });
+                await admin.save();
+                const accessToken = admin.generateAccessToken();
+                const refreshToken = admin.generateRefreshToken();
+                admin.refreshToken = refreshToken;
+                await admin.save();
+                res.cookie('refreshToken', refreshToken, {
+                    httpOnly: true,
+                    secure: false, // Always false for localhost (HTTP)
+                    sameSite: 'lax', // More permissive for local dev
+                    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+                });
+                console.log('[COOKIE SET] refreshToken set for admin:', admin.email);
+                return res.status(201).json({
+                    success: true,
+                    message: 'Super admin registered successfully',
+                    admin,
+                    accessToken
+                });
+            }
             const existingAdmin = await Admin.findOne({ email });
             if (existingAdmin) {
                 return res.status(409).json({
@@ -26,46 +52,25 @@ class AdminAuthController {
                     message: 'Admin with this email already exists'
                 });
             }
-
-            // Create new admin
-            const admin = new Admin({
-                name,
-                email,
-                password,
-                role: role || 'admin'
+            // For normal admin, require OTP approval
+            const superAdmin = await Admin.findOne({ role: 'super_admin' });
+            if (!superAdmin) {
+                return res.status(500).json({ success: false, message: 'Super admin not found for OTP approval.' });
+            }
+            const otp = generateOTP();
+            saveOTP(superAdmin.email, otp);
+            global.pendingAdminRegs = global.pendingAdminRegs || {};
+            global.pendingAdminRegs[email] = { name, email, password, role: role || 'admin' };
+            await sendMail({
+                to: superAdmin.email,
+                subject: 'OTP for New Admin Registration',
+                text: `OTP for approving new admin (${email}): ${otp}`,
+                html: `<p>OTP for approving new admin (<b>${email}</b>): <b>${otp}</b></p>`
             });
-
-            await admin.save();
-
-            // Generate tokens
-            const accessToken = admin.generateAccessToken();
-            const refreshToken = admin.generateRefreshToken();
-
-            // Save refresh token
-            admin.refreshToken = refreshToken;
-            await admin.save();
-
-            // Set cookie for refresh token
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-            });
-
-            res.status(201).json({
-                success: true,
-                message: 'Admin registered successfully',
-                data: {
-                    admin,
-                    accessToken
-                }
-            });
-
+            // Only return success, no admin object, to trigger OTP modal in frontend
+            return res.status(200).json({ success: true, message: 'OTP sent to super admin for approval.' });
         } catch (error) {
             console.error('Registration error:', error);
-
-            // Handle specific MongoDB connection errors
             if (error.name === 'MongooseError' && error.message.includes('buffering timed out')) {
                 return res.status(503).json({
                     success: false,
@@ -73,7 +78,6 @@ class AdminAuthController {
                     error: 'Database temporarily unavailable'
                 });
             }
-
             res.status(500).json({
                 success: false,
                 message: 'Internal server error',
@@ -82,77 +86,82 @@ class AdminAuthController {
         }
     }
 
-    // Login admin
+    async verifyAdminRegistration(req, res) {
+        try {
+            const { email, otp } = req.body;
+            if (!email || !otp) {
+                return res.status(400).json({ success: false, message: 'Email and OTP are required.' });
+            }
+            const superAdmin = await Admin.findOne({ role: 'super_admin' });
+            if (!superAdmin) {
+                return res.status(500).json({ success: false, message: 'Super admin not found.' });
+            }
+            const valid = verifyOTP(superAdmin.email, otp);
+            if (!valid) {
+                return res.status(400).json({ success: false, message: 'Invalid or expired OTP.' });
+            }
+            const regData = global.pendingAdminRegs && global.pendingAdminRegs[email];
+            if (!regData) {
+                return res.status(400).json({ success: false, message: 'No pending registration for this email.' });
+            }
+            const admin = new Admin(regData);
+            await admin.save();
+            const accessToken = admin.generateAccessToken();
+            const refreshToken = admin.generateRefreshToken();
+            admin.refreshToken = refreshToken;
+            await admin.save();
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: false, // Always false for localhost (HTTP)
+                sameSite: 'lax', // More permissive for local dev
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            });
+            console.log('[COOKIE SET] refreshToken set for admin:', admin.email);
+            delete global.pendingAdminRegs[email];
+            return res.status(201).json({
+                success: true,
+                message: 'Admin registered successfully',
+                data: {
+                    admin,
+                    accessToken
+                }
+            });
+        } catch (error) {
+            console.error('OTP verification error:', error);
+            res.status(500).json({ success: false, message: 'Internal server error' });
+        }
+    }
+
     async login(req, res) {
         try {
-            console.log('🔑 Login attempt received');
-            console.log('📧 Request body:', req.body);
-
-            // Check validation errors
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                console.log('❌ Validation errors:', errors.array());
-                return res.status(400).json({
-                    success: false,
-                    message: 'Validation failed',
-                    errors: errors.array()
-                });
-            }
-
             const { email, password } = req.body;
-            console.log('🔍 Looking for admin with email:', email);
-
-            // Find admin by email
+            if (!email || !password) {
+                return res.status(400).json({ success: false, message: 'Email and password are required.' });
+            }
             const admin = await Admin.findOne({ email });
             if (!admin) {
-                console.log('❌ No admin found with email:', email);
-                return res.status(401).json({
-                    success: false,
-                    message: 'Invalid credentials'
-                });
+                return res.status(401).json({ success: false, message: 'Invalid email or password.' });
             }
-
-            console.log('✅ Admin found:', admin.name);
-
-            // Check if admin is active
+            const isMatch = await admin.comparePassword(password);
+            if (!isMatch) {
+                return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+            }
             if (!admin.isActive) {
-                console.log('❌ Admin account is deactivated');
-                return res.status(401).json({
-                    success: false,
-                    message: 'Account is deactivated. Please contact super admin.'
-                });
+                return res.status(403).json({ success: false, message: 'Account is deactivated. Please contact super admin.' });
             }
-
-            console.log('🔐 Checking password...');
-            // Check password
-            const isPasswordValid = await admin.comparePassword(password);
-            if (!isPasswordValid) {
-                console.log('❌ Invalid password');
-                return res.status(401).json({
-                    success: false,
-                    message: 'Invalid credentials'
-                });
-            }
-
-            console.log('✅ Password valid, generating tokens...');
             // Generate tokens
             const accessToken = admin.generateAccessToken();
             const refreshToken = admin.generateRefreshToken();
-
-            // Save refresh token and update last login
             admin.refreshToken = refreshToken;
-            await admin.updateLastLogin();
-
-            // Set cookie for refresh token
+            await admin.save();
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
+                secure: false, // Always false for localhost (HTTP)
+                sameSite: 'lax', // More permissive for local dev
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             });
-
-            console.log('✅ Login successful for:', admin.name);
-            res.status(200).json({
+            console.log('[COOKIE SET] refreshToken set for admin:', admin.email);
+            return res.status(200).json({
                 success: true,
                 message: 'Login successful',
                 data: {
@@ -160,358 +169,91 @@ class AdminAuthController {
                     accessToken
                 }
             });
-
         } catch (error) {
-            console.error('❌ Login error:', error);
-            console.error('❌ Error stack:', error.stack);
-
-            // Handle specific MongoDB connection errors
-            if (error.name === 'MongooseError' && error.message.includes('buffering timed out')) {
-                return res.status(503).json({
-                    success: false,
-                    message: 'Database connection timeout. Please try again later.',
-                    error: 'Database temporarily unavailable'
-                });
-            }
-
-            res.status(500).json({
-                success: false,
-                message: 'Internal server error during login',
-                error: process.env.NODE_ENV === 'development' ? error.message : undefined
-            });
+            console.error('Login error:', error);
+            res.status(500).json({ success: false, message: 'Internal server error' });
         }
     }
 
-    // Refresh access token
     async refreshToken(req, res) {
         try {
-            const { refreshToken } = req.cookies;
-            const { blacklistToken } = await import('../utils/tokenBlacklist.js');
-
-            if (!refreshToken) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Refresh token not provided'
-                });
+            const oldRefreshToken = req.cookies.refreshToken;
+            if (!oldRefreshToken) {
+                return res.status(401).json({ success: false, message: 'No refresh token provided' });
             }
 
-            // Verify refresh token with proper secret
-            const refreshSecret = process.env.JWT_REFRESH_SECRET;
-            if (!refreshSecret) {
-                console.error('JWT_REFRESH_SECRET environment variable is not set');
-                return res.status(500).json({
-                    success: false,
-                    message: 'Server configuration error'
-                });
+            // Find admin with this refresh token
+            const admin = await Admin.findOne({ refreshToken: oldRefreshToken });
+            if (!admin) {
+                return res.status(403).json({ success: false, message: 'Invalid refresh token' });
             }
 
-            let decoded;
+            // Verify old refresh token
+            let payload;
             try {
-                decoded = jwt.verify(refreshToken, refreshSecret);
-            } catch (jwtError) {
-                console.error('JWT verification failed:', jwtError.message);
-
-                // Clear the invalid refresh token cookie
-                res.clearCookie('refreshToken');
-
-                return res.status(401).json({
-                    success: false,
-                    message: 'Invalid or expired refresh token. Please login again.',
-                    error: 'TOKEN_INVALID'
-                });
+                payload = jwt.verify(oldRefreshToken, process.env.JWT_REFRESH_SECRET || 'refresh_secret');
+            } catch (err) {
+                return res.status(403).json({ success: false, message: 'Invalid or expired refresh token' });
             }
 
-            // Find admin
-            const admin = await Admin.findById(decoded.id);
-            if (!admin || admin.refreshToken !== refreshToken) {
-                // Clear the invalid refresh token cookie
-                res.clearCookie('refreshToken');
-
-                return res.status(401).json({
-                    success: false,
-                    message: 'Invalid refresh token. Please login again.',
-                    error: 'TOKEN_MISMATCH'
-                });
-            }
-
-            // Check if admin is still active
-            if (!admin.isActive) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Account is deactivated. Please contact super admin.',
-                    error: 'ACCOUNT_DEACTIVATED'
-                });
-            }
-
-            // Rotate refresh token
+            // Rotate refresh token: generate new, save, set cookie
             const newRefreshToken = admin.generateRefreshToken();
             admin.refreshToken = newRefreshToken;
             await admin.save();
             res.cookie('refreshToken', newRefreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+                secure: false, // Always false for localhost (HTTP)
+                sameSite: 'lax',
+                maxAge: 7 * 24 * 60 * 60 * 1000
             });
+            console.log('[COOKIE ROTATE] refreshToken rotated for admin:', admin.email);
 
-            // Generate new access token
-            const newAccessToken = admin.generateAccessToken();
-
-            res.status(200).json({
-                success: true,
-                message: 'Token refreshed successfully',
-                data: {
-                    accessToken: newAccessToken
-                }
-            });
-
+            // Issue new access token
+            const accessToken = admin.generateAccessToken();
+            return res.status(200).json({ success: true, accessToken });
         } catch (error) {
             console.error('Refresh token error:', error);
-            res.status(401).json({
-                success: false,
-                message: 'Invalid refresh token'
-            });
+            res.status(500).json({ success: false, message: 'Internal server error' });
         }
     }
 
-    // Logout admin
     async logout(req, res) {
-        try {
-            const { refreshToken } = req.cookies;
-            const authHeader = req.headers.authorization;
-            const accessToken = authHeader && authHeader.startsWith('Bearer ')
-                ? authHeader.substring(7)
-                : null;
-            const { blacklistToken } = await import('../utils/tokenBlacklist.js');
-
-            if (accessToken) {
-                blacklistToken(accessToken);
-            }
-
-            if (refreshToken) {
-                // Remove refresh token from database
-                await Admin.findOneAndUpdate(
-                    { refreshToken },
-                    { refreshToken: null }
-                );
-            }
-
-            // Clear cookie
-            res.clearCookie('refreshToken');
-
-            res.status(200).json({
-                success: true,
-                message: 'Logged out successfully'
-            });
-
-        } catch (error) {
-            console.error('Logout error:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Internal server error'
-            });
-        }
+        res.clearCookie('refreshToken');
+        console.log('[COOKIE CLEARED] refreshToken cleared on logout');
+        return res.status(200).json({ success: true, message: 'Logged out' });
     }
 
-    // Clear all tokens (for fixing JWT secret issues)
     async clearAllTokens(req, res) {
-        try {
-            // Clear all refresh tokens from database
-            await Admin.updateMany(
-                {},
-                { refreshToken: null }
-            );
-
-            res.status(200).json({
-                success: true,
-                message: 'All refresh tokens cleared. All users need to login again.'
-            });
-
-        } catch (error) {
-            console.error('Clear tokens error:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Internal server error'
-            });
-        }
+        return res.status(501).json({ success: false, message: 'Not implemented' });
     }
 
-    // Get current admin profile
     async getProfile(req, res) {
         try {
-            const admin = await Admin.findById(req.admin.id);
-
-            if (!admin) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Admin not found'
-                });
+            // req.admin is set by verifyToken middleware
+            if (!req.admin || !req.admin.id) {
+                return res.status(401).json({ success: false, message: 'Unauthorized' });
             }
-
-            res.status(200).json({
-                success: true,
-                data: admin
-            });
-
+            const admin = await Admin.findById(req.admin.id).select('-password -refreshToken');
+            if (!admin) {
+                return res.status(404).json({ success: false, message: 'Admin not found' });
+            }
+            return res.status(200).json({ success: true, data: admin });
         } catch (error) {
             console.error('Get profile error:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Internal server error'
-            });
+            return res.status(500).json({ success: false, message: 'Internal server error' });
         }
     }
 
-    // Update admin profile
     async updateProfile(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Validation failed',
-                    errors: errors.array()
-                });
-            }
-
-            const { name, email } = req.body;
-            const adminId = req.admin.id;
-
-            // Check if email is already taken by another admin
-            if (email) {
-                const existingAdmin = await Admin.findOne({
-                    email,
-                    _id: { $ne: adminId }
-                });
-
-                if (existingAdmin) {
-                    return res.status(409).json({
-                        success: false,
-                        message: 'Email is already taken'
-                    });
-                }
-            }
-
-            // Update admin
-            const updatedAdmin = await Admin.findByIdAndUpdate(
-                adminId,
-                { name, email },
-                { new: true, runValidators: true }
-            );
-
-            res.status(200).json({
-                success: true,
-                message: 'Profile updated successfully',
-                data: updatedAdmin
-            });
-
-        } catch (error) {
-            console.error('Update profile error:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Internal server error'
-            });
-        }
+        return res.status(501).json({ success: false, message: 'Not implemented' });
     }
 
-    // Change password
     async changePassword(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Validation failed',
-                    errors: errors.array()
-                });
-            }
-
-            const { currentPassword, newPassword } = req.body;
-            const adminId = req.admin.id;
-
-            // Find admin
-            const admin = await Admin.findById(adminId);
-            if (!admin) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Admin not found'
-                });
-            }
-
-            // Verify current password
-            const isCurrentPasswordValid = await admin.comparePassword(currentPassword);
-            if (!isCurrentPasswordValid) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Current password is incorrect'
-                });
-            }
-
-            // Update password
-            admin.password = newPassword;
-            await admin.save();
-
-            res.status(200).json({
-                success: true,
-                message: 'Password changed successfully'
-            });
-
-        } catch (error) {
-            console.error('Change password error:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Internal server error'
-            });
-        }
+        return res.status(501).json({ success: false, message: 'Not implemented' });
     }
 
-    // Get all admins (super admin only)
     async getAllAdmins(req, res) {
-        try {
-            const { page = 1, limit = 10, search = '' } = req.query;
-
-            const query = {};
-            if (search) {
-                query.$or = [
-                    { name: { $regex: search, $options: 'i' } },
-                    { email: { $regex: search, $options: 'i' } }
-                ];
-            }
-
-            const options = {
-                page: parseInt(page),
-                limit: parseInt(limit),
-                sort: { createdAt: -1 }
-            };
-
-            const admins = await Admin.find(query)
-                .select('-password -refreshToken')
-                .sort(options.sort)
-                .limit(options.limit * 1)
-                .skip((options.page - 1) * options.limit);
-
-            const total = await Admin.countDocuments(query);
-
-            res.status(200).json({
-                success: true,
-                data: {
-                    admins,
-                    pagination: {
-                        page: options.page,
-                        limit: options.limit,
-                        total,
-                        pages: Math.ceil(total / options.limit)
-                    }
-                }
-            });
-
-        } catch (error) {
-            console.error('Get all admins error:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Internal server error'
-            });
-        }
+        return res.status(501).json({ success: false, message: 'Not implemented' });
     }
 }
 

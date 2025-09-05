@@ -283,7 +283,7 @@ const Ads = () => {
                     <div className="card shadow-sm">
                         <div className="card-header text-dark d-flex justify-content-between align-items-center"
                             style={{
-                                background: document.body.classList.contains('dark-mode') ? '#222' : '#ff9f31ff',
+                                background: document.body.classList.contains('dark-mode') ? '#ff9f31ff' : '#ff9f31ff',
                             }}
                         >
                             <h4 className="mb-0">
@@ -302,7 +302,7 @@ const Ads = () => {
 
                         <div className="card-body"
                             style={{
-                                background: document.body.classList.contains('dark-mode') ? '#222' : 'linear-gradient(135deg, #e0d4abff 0%, #dab183ff 100%)',
+                                background: document.body.classList.contains('dark-mode') ? 'linear-gradient(135deg, #e0d4abff 0%, #dab183ff 100%)' : 'linear-gradient(135deg, #e0d4abff 0%, #dab183ff 100%)',
                             }}
                         >
                             {/* Search Bar */}
@@ -314,7 +314,7 @@ const Ads = () => {
                                             className="form-control"
                                             placeholder="Search by title, hashtag..."
                                             style={{
-                                                backgroundColor: document.body.classList.contains('dark-mode') ? '#333' : '#d3c29fff'
+                                                backgroundColor: document.body.classList.contains('dark-mode') ? '#d3c29fff' : '#d3c29fff'
                                             }}
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -327,7 +327,7 @@ const Ads = () => {
                                         >
                                             <i className="bi bi-search"
                                                 style={{
-                                                    backgroundColor: document.body.classList.contains('dark-mode') ? '#333' : '#d3c29fff'
+                                                    backgroundColor: document.body.classList.contains('dark-mode') ? '#d3c29fff' : '#d3c29fff'
                                                 }}
                                             ></i>
                                         </button>
