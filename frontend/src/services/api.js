@@ -44,8 +44,8 @@ export const homePageAPI = {
 };
 
 // Create axios instance with base configuration
-const API = axios.create({
-    baseURL: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:8000/api',
+const API = axios.create({ 
+    baseURL: process.env.NODE_ENV === 'production' ? '/api' : 'http://philanzel-54pd.vercel.app/api',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
