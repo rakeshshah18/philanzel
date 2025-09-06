@@ -4,7 +4,7 @@ import api from '../../services/api';
 
 // Helper function to get the correct image URL
 const getImageURL = (filename) => {
-    const baseURL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8000';
+    const baseURL = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000';
     return `${baseURL}/uploads/images/${filename}`;
 };
 

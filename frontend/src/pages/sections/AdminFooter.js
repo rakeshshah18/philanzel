@@ -436,7 +436,7 @@ const AdminFooter = () => {
         try {
             setSaving(true);
             let updatedSocialLinks = [...(footerData.contactUs?.followUs?.socialLinks || [])];
-            
+
             if (editingSocial !== null) {
                 // Update existing social link
                 updatedSocialLinks[editingSocial] = { ...socialForm };
@@ -444,7 +444,7 @@ const AdminFooter = () => {
                 // Add new social link
                 updatedSocialLinks.push({ ...socialForm });
             }
-            
+
             const response = await footerAPI.admin.update({
                 contactUs: {
                     ...footerData.contactUs,
@@ -454,7 +454,7 @@ const AdminFooter = () => {
                     }
                 }
             });
-            
+
             if (response.data.success) {
                 setFooterData(response.data.data);
                 showMessage('success', editingSocial !== null ? 'Social link updated successfully!' : 'Social link added successfully!');
@@ -596,7 +596,7 @@ const AdminFooter = () => {
                 // Since we don't have a delete endpoint, we'll update the entire social links array
                 const updatedSocialLinks = [...footerData.contactUs.followUs.socialLinks];
                 updatedSocialLinks.splice(index, 1);
-                
+
                 const response = await footerAPI.admin.update({
                     contactUs: {
                         ...footerData.contactUs,
@@ -2188,7 +2188,7 @@ const AdminFooter = () => {
                                         onChange={(e) => {
                                             const platform = e.target.value;
                                             let icon;
-                                            switch(platform) {
+                                            switch (platform) {
                                                 case 'Facebook': icon = 'fab fa-facebook'; break;
                                                 case 'Instagram': icon = 'fab fa-instagram'; break;
                                                 case 'LinkedIn': icon = 'fab fa-linkedin'; break;

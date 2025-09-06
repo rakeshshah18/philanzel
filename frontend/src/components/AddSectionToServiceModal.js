@@ -10,9 +10,12 @@ const AddSectionToServiceModal = ({ serviceId, show, onClose, onSectionAdded }) 
         if (show) fetchSections();
     }, [show]);
 
+    const API_BASE = process.env.NODE_ENV === 'production'
+        ? 'https://philanzel-backend.vercel.app/api'
+        : 'http://localhost:8000/api';
     const fetchSections = async () => {
         try {
-            const res = await fetch('http://localhost:8000/api/sections');
+            const res = await fetch(`${API_BASE}/sections`);
             const data = await res.json();
             setSections(data.data || []);
         } catch {
@@ -24,7 +27,7 @@ const AddSectionToServiceModal = ({ serviceId, show, onClose, onSectionAdded }) 
         if (!selectedSectionId) return;
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8000/api/services/${serviceId}/sections`, {
+            const res = await fetch(`${API_BASE}/services/${serviceId}/sections`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

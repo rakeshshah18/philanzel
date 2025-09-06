@@ -51,7 +51,8 @@ const ServicePage = () => {
         if (editingSectionIdx === null) return;
         try {
             const token = localStorage.getItem('adminToken');
-            await axios.put(`http://localhost:8000/api/services/${service._id}/sections/${editingSectionIdx}`, editingSectionData, {
+            const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
+            await axios.put(`${API_BASE}/services/${service._id}/sections/${editingSectionIdx}`, editingSectionData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setShowEditModal(false);
@@ -77,7 +78,8 @@ const ServicePage = () => {
         if (!window.confirm('Are you sure you want to delete this section?')) return;
         try {
             const token = localStorage.getItem('adminToken');
-            await axios.delete(`http://localhost:8000/api/services/${service._id}/sections/${idx}`, {
+            const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
+            await axios.delete(`${API_BASE}/services/${service._id}/sections/${idx}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             // Refresh service data
@@ -93,7 +95,8 @@ const ServicePage = () => {
     // Fetch available AboutService sections for modal
     useEffect(() => {
         if (showAddSectionModal) {
-            axios.get('http://localhost:8000/api/sections')
+            const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
+            axios.get(`${API_BASE}/sections`)
                 .then(res => setAvailableSections(res.data.data || []))
                 .catch(() => setAvailableSections([]));
         }
@@ -370,7 +373,8 @@ const ServicePage = () => {
                                         };
                                         console.log('DEBUG: Add Section Request Headers:', headers);
                                         console.log('DEBUG: Token value:', token);
-                                        await axios.post(`http://localhost:8000/api/services/${service._id}/sections`, { sectionId: selectedSectionId }, {
+                                        const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
+                                        await axios.post(`${API_BASE}/services/${service._id}/sections`, { sectionId: selectedSectionId }, {
                                             headers,
                                         });
                                         setShowAddSectionModal(false);

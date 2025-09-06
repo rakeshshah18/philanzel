@@ -4,9 +4,7 @@ class HelpedIndustriesController {
     // Get all helped industries
     async getAll(req, res) {
         try {
-            console.log('📍 GET /admin/helped-industries - request received');
             const helpedIndustries = await HelpedIndustries.find().sort({ createdAt: -1 });
-            console.log('📍 Found helped industries:', helpedIndustries.length);
 
             res.status(200).json({
                 success: true,
@@ -52,7 +50,6 @@ class HelpedIndustriesController {
     // Create new helped industries
     async create(req, res) {
         try {
-            console.log('📍 POST /admin/helped-industries - request received');
             console.log('📍 Request body:', req.body);
 
             const { heading, description, industries } = req.body;

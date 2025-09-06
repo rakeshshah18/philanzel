@@ -111,7 +111,6 @@ function AdminPartner() {
     const fetchPartnerPost = async () => {
         try {
             const response = await api.get('/admin/partner-posts');
-            console.log('Partner posts response:', response.data);
             const list = response.data?.data || response.data || [];
             if (Array.isArray(list) && list.length > 0) {
                 const post = list[0];
@@ -130,7 +129,6 @@ function AdminPartner() {
     const fetchApplications = async () => {
         try {
             const response = await api.get('/user/partner-applications');
-            console.log('Partner applications response:', response.data);
             setApplications(response.data?.data || response.data || []);
         } catch (error) {
             console.error('Error fetching applications:', error);
@@ -176,16 +174,12 @@ function AdminPartner() {
                 description: partnerPost.description
             };
 
-            console.log('Submitting partner post:', requestData);
-
             let response;
             if (postId) {
                 response = await api.put(`/admin/partner-posts/${postId}`, requestData);
             } else {
                 response = await api.post('/admin/partner-posts', requestData);
             }
-
-            console.log('Response received:', response.data);
 
             if (response.data && response.data.data) {
                 const savedData = response.data.data;
@@ -381,7 +375,7 @@ function AdminPartner() {
                                                 {partnerImages.map((img) => (
                                                     <div key={img._id} className="position-relative" style={{ minWidth: '120px', minHeight: '120px' }}>
                                                         <img
-                                                            src={img.url?.startsWith('http') ? img.url : `http://localhost:8000${img.url}`}
+                                                            src={img.url?.startsWith('http') ? img.url : `${process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000'}${img.url}`}
                                                             alt={img.alt || 'Association'}
                                                             style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #ddd' }}
                                                         />

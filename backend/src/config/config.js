@@ -7,6 +7,5 @@ const config = {
     SECRET_CAPTCHA_KEY: process.env.SECRET_CAPTCHA_KEY || "secretCaptchaKey123"
 }
 
-console.log('🔧 Config loaded - PORT:', config.PORT);
 
 export default config;

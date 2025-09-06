@@ -3,15 +3,11 @@ import mongoose from 'mongoose';
 import fs from 'fs';
 import path from 'path';
 
-console.log('🎯 partnerPostController.js loaded successfully');
 
 // Get all partner posts
 export const getAllPartnerPosts = async (req, res) => {
     try {
-        console.log('📋 Fetching all partner posts...');
-
         if (mongoose.connection.readyState !== 1) {
-            console.log('❌ Database connection not available');
             return res.status(503).json({
                 status: 'error',
                 message: 'Database connection not available'
@@ -19,7 +15,6 @@ export const getAllPartnerPosts = async (req, res) => {
         }
 
         const partnerPosts = await PartnerPost.find().sort({ createdAt: -1 });
-        console.log(`✅ Found ${partnerPosts.length} partner posts`);
 
         res.status(200).json({
             status: 'success',

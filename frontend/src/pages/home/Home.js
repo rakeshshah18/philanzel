@@ -15,7 +15,7 @@ const getImageUrl = (imageUrl) => {
 
     // If it's a relative URL from backend, prepend the base URL
     const baseUrl = process.env.NODE_ENV === 'production'
-        ? ''
+        ? 'https://philanzel-backend.vercel.app'
         : 'http://localhost:8000';
 
     // Handle backend upload paths correctly

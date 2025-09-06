@@ -14,10 +14,8 @@ export const createPotentialGrowth = async (req, res) => {
 
 // Get all PotentialGrowth documents
 export const getAllPotentialGrowth = async (req, res) => {
-    console.log('Received request for PotentialGrowth');
     try {
         const potentialGrowths = await PotentialGrowth.find();
-        console.log('PotentialGrowths found:', JSON.stringify(potentialGrowths, null, 2));
         res.json(potentialGrowths);
     } catch (error) {
         console.error('PotentialGrowth fetch error:', error);

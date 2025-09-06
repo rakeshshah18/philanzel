@@ -6,9 +6,7 @@ class OurAssociationController {
     // Get all our association entries
     async getAll(req, res) {
         try {
-            console.log('📍 GET /admin/our-association - request received');
             const ourAssociation = await OurAssociation.find().sort({ createdAt: -1 });
-            console.log('📍 Found our association entries:', ourAssociation.length);
 
             res.status(200).json({
                 success: true,
@@ -54,7 +52,6 @@ class OurAssociationController {
     // Create new our association entry
     async create(req, res) {
         try {
-            console.log('📍 POST /admin/our-association - request received');
             console.log('📍 Request body:', req.body);
             console.log('📍 Request files:', req.files);
 
@@ -154,7 +151,6 @@ class OurAssociationController {
     // Update our association entry
     async update(req, res) {
         try {
-            console.log('📍 PUT /admin/our-association/:id - request received');
             const { id } = req.params;
             const { heading, description, button, rowOneData, rowTwoData, rowThreeData } = req.body;
 
@@ -260,7 +256,6 @@ class OurAssociationController {
     // Delete our association entry
     async delete(req, res) {
         try {
-            console.log('📍 DELETE /admin/our-association/:id - request received');
             const { id } = req.params;
 
             const existingEntry = await OurAssociation.findById(id);

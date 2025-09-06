@@ -36,7 +36,8 @@ const AdminRegisterPage = () => {
         setLoading(true);
         setAuthMessage('');
         try {
-            const res = await fetch('http://localhost:8000/api/admin/auth/verify-admin-registration', {
+            const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
+            const res = await fetch(`${API_BASE}/admin/auth/verify-admin-registration`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp })

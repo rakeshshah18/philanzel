@@ -79,11 +79,9 @@ const getOrCreateFooter = async () => {
 // Get footer data
 const getFooter = async (req, res) => {
     try {
-        console.log('📊 Fetching footer data...');
 
         const footer = await getOrCreateFooter();
 
-        console.log('✅ Footer data retrieved successfully');
 
         res.status(200).json({
             success: true,
@@ -144,12 +142,10 @@ const updateFooter = async (req, res) => {
 // Get all optimize strategies
 const getAllOptimizeStrategies = async (req, res) => {
     try {
-        console.log('📊 Fetching all optimize strategies...');
 
         const footer = await getOrCreateFooter();
         const strategies = footer.getAllOptimizeStrategies();
 
-        console.log(`✅ Found ${strategies.length} strategies`);
 
         res.status(200).json({
             success: true,
@@ -174,7 +170,6 @@ const getPaginatedOptimizeStrategies = async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        console.log(`📊 Fetching paginated strategies - Page: ${page}, Limit: ${limit}`);
 
         const footer = await getOrCreateFooter();
         const allStrategies = footer.getAllOptimizeStrategies();
@@ -183,7 +178,6 @@ const getPaginatedOptimizeStrategies = async (req, res) => {
         const total = allStrategies.length;
         const totalPages = Math.ceil(total / limit);
 
-        console.log(`✅ Found ${strategies.length} strategies (Page ${page}/${totalPages})`);
 
         res.status(200).json({
             success: true,
@@ -220,12 +214,10 @@ const searchOptimizeStrategies = async (req, res) => {
             });
         }
 
-        console.log(`🔍 Searching strategies with query: "${query}"`);
 
         const footer = await getOrCreateFooter();
         const strategies = footer.searchOptimizeStrategies(query);
 
-        console.log(`✅ Found ${strategies.length} strategies matching "${query}"`);
 
         res.status(200).json({
             success: true,
@@ -256,7 +248,6 @@ const getOptimizeStrategyById = async (req, res) => {
             });
         }
 
-        console.log(`🔍 Fetching strategy at index: ${id}`);
 
         const footer = await getOrCreateFooter();
         const strategies = footer.getAllOptimizeStrategies();
@@ -271,7 +262,6 @@ const getOptimizeStrategyById = async (req, res) => {
 
         const strategy = strategies[strategyIndex];
 
-        console.log(`✅ Strategy found: ${strategy.heading}`);
 
         res.status(200).json({
             success: true,
@@ -292,7 +282,6 @@ const getOptimizeStrategyById = async (req, res) => {
 // Create new optimize strategy
 const createOptimizeStrategy = async (req, res) => {
     try {
-        console.log('📝 Creating new optimize strategy...');
         console.log('Request body:', req.body);
 
         const {
@@ -346,7 +335,6 @@ const createOptimizeStrategy = async (req, res) => {
 
         const strategyIndex = footer.optimizeStrategy.strategies.length - 1;
 
-        console.log(`✅ Strategy created successfully: ${heading}`);
 
         res.status(201).json({
             success: true,
@@ -387,7 +375,6 @@ const updateOptimizeStrategy = async (req, res) => {
             });
         }
 
-        console.log(`📝 Updating strategy with ID: ${id}`);
 
         const footer = await getOrCreateFooter();
         const strategies = footer.optimizeStrategy.strategies;
@@ -416,7 +403,6 @@ const updateOptimizeStrategy = async (req, res) => {
 
         await footer.save();
 
-        console.log(`✅ Strategy updated successfully: ${strategy.heading}`);
 
         res.status(200).json({
             success: true,
@@ -455,7 +441,6 @@ const deleteOptimizeStrategy = async (req, res) => {
             });
         }
 
-        console.log(`🗑️ Deleting strategy with ID: ${id}`);
 
         const footer = await getOrCreateFooter();
         const strategies = footer.optimizeStrategy.strategies;
@@ -477,7 +462,6 @@ const deleteOptimizeStrategy = async (req, res) => {
 
         await footer.save();
 
-        console.log(`✅ Strategy deleted successfully: ${deletedStrategyHeading}`);
 
         res.status(200).json({
             success: true,
@@ -497,7 +481,6 @@ const deleteOptimizeStrategy = async (req, res) => {
 // Get active optimize strategy for public display
 const getActiveOptimizeStrategy = async (req, res) => {
     try {
-        console.log('🎯 Fetching active strategy for public display...');
 
         const footer = await getOrCreateFooter();
         const activeStrategy = footer.getActiveOptimizeStrategy();
@@ -509,7 +492,6 @@ const getActiveOptimizeStrategy = async (req, res) => {
             });
         }
 
-        console.log(`✅ Active strategy found: ${activeStrategy.heading}`);
 
         res.status(200).json({
             success: true,
@@ -944,7 +926,6 @@ const addSocialLink = async (req, res) => {
 // Get public footer data (no authentication required)
 const getPublicFooter = async (req, res) => {
     try {
-        console.log('📊 Fetching public footer data...');
 
         const footer = await getOrCreateFooter();
 
@@ -997,7 +978,6 @@ const getPublicFooter = async (req, res) => {
             }
         };
 
-        console.log('✅ Public footer data retrieved successfully');
 
         res.status(200).json({
             success: true,

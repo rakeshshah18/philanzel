@@ -6,9 +6,7 @@ class WhyChooseUsController {
     // Get all why choose us entries
     async getAll(req, res) {
         try {
-            console.log('📍 GET /admin/why-choose-us - request received');
             const whyChooseUs = await WhyChooseUs.find().sort({ createdAt: -1 });
-            console.log('📍 Found why choose us entries:', whyChooseUs.length);
 
             res.status(200).json({
                 success: true,
@@ -54,7 +52,6 @@ class WhyChooseUsController {
     // Create new why choose us entry
     async create(req, res) {
         try {
-            console.log('📍 POST /admin/why-choose-us - request received');
             console.log('📍 Request body:', req.body);
             console.log('📍 Request file:', req.file);
 
@@ -134,7 +131,6 @@ class WhyChooseUsController {
     // Update why choose us entry
     async update(req, res) {
         try {
-            console.log('📍 PUT /admin/why-choose-us/:id - request received');
             const { id } = req.params;
             const { heading, description, points, button } = req.body;
 
@@ -214,7 +210,6 @@ class WhyChooseUsController {
     // Delete why choose us entry
     async delete(req, res) {
         try {
-            console.log('📍 DELETE /admin/why-choose-us/:id - request received');
             const { id } = req.params;
 
             const existingEntry = await WhyChooseUs.findById(id);

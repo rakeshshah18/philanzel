@@ -6,9 +6,7 @@ class OurFounderController {
     // Get all founders
     async getAll(req, res) {
         try {
-            console.log('📍 GET /about/our-founder - request received');
             const founders = await OurFounder.find().sort({ createdAt: -1 });
-            console.log('📍 Found our founder entries:', founders.length);
 
             res.status(200).json({
                 success: true,

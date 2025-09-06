@@ -7,7 +7,6 @@ import {
     deletePartnerPost
 } from '../../controllers/partner/partnerPostController.js';
 
-console.log('🎯 partnerPostRoutes.js loaded successfully');
 
 const router = express.Router();
 
@@ -18,6 +17,5 @@ router.post('/', createPartnerPost);
 router.put('/:id', updatePartnerPost);
 router.delete('/:id', deletePartnerPost);
 
-console.log('🎯 Partner routes configured:', router.stack.length, 'routes');
 
 export default router;

@@ -57,7 +57,6 @@ if (process.env.NODE_ENV === 'production') {
 
 // Add health check endpoint BEFORE API routes
 app.get('/health', (req, res) => {
-    console.log('🏥 Health check requested');
     res.json({ status: 'OK', message: 'Server is running', timestamp: new Date() });
 });
 
@@ -74,10 +73,6 @@ connectDB().then(async () => {
 
 // More explicit server binding
 const server = app.listen(config.PORT, () => {
-    console.log(`Server is running on port ${config.PORT}`);
-    console.log(`🌐 Server accessible at: http://localhost:${config.PORT}`);
-    console.log(`🏥 Health check: http://localhost:${config.PORT}/health`);
-    console.log(`📁 File uploads accessible at: http://localhost:${config.PORT}/uploads/`);
     console.log(`📍 Server bound to: 127.0.0.1:${config.PORT}`);
 });
 

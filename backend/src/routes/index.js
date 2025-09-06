@@ -37,13 +37,8 @@ import serviceRoutes from './all services/serviceRoutes.js';
 // Dynamic services API
 router.use('/services', serviceRoutes);
 
-console.log('🔧 Routes index.js loading...');
 
-// Add logging middleware to debug routes
-router.use((req, res, next) => {
-    console.log(`🌐 Request: ${req.method} ${req.path}`);
-    next();
-});
+// Debug logging middleware removed for production
 
 router.use('/user', newInquiryRoute);
 router.use('/user', careerInquery);

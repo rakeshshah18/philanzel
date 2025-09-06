@@ -39,7 +39,10 @@ const AdminApplications = () => {
             return;
         }
 
-        const downloadUrl = `http://localhost:8000/uploads/${resume.filename}`;
+        const baseURL = process.env.NODE_ENV === 'production'
+            ? 'https://philanzel-backend.vercel.app'
+            : 'http://localhost:8000';
+        const downloadUrl = `${baseURL}/uploads/${resume.filename}`;
 
         // Create a temporary link element and trigger download
         const link = document.createElement('a');

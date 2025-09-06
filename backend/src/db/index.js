@@ -20,8 +20,6 @@ const connectDB = async () => {
         });
 
         console.log(`\n✅ MongoDB connected successfully!`);
-        console.log(`🔗 DB HOST: ${connectionInstance.connection.host}`);
-        console.log(`📊 Database: ${connectionInstance.connection.name}`);
 
         // Handle connection events
         mongoose.connection.on('error', (err) => {

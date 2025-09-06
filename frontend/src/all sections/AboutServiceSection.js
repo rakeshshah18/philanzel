@@ -4,7 +4,9 @@ import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { Modal, Button, Form } from 'react-bootstrap';
 
-const API_URL = 'http://localhost:8000/api/sections';
+const API_URL = process.env.NODE_ENV === 'production'
+    ? 'https://philanzel-backend.vercel.app/api/sections'
+    : 'http://localhost:8000/api/sections';
 
 const SERVICE_PAGES = [
     'Retirement Solutions',

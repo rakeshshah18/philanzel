@@ -16,7 +16,7 @@ const getImageUrl = (imageUrl) => {
 
     // If it's a relative URL from backend, prepend the base URL
     const baseUrl = process.env.NODE_ENV === 'production'
-        ? ''
+        ? 'https://philanzel-backend.vercel.app'
         : 'http://localhost:8000';
 
     // Handle backend upload paths correctly
@@ -1280,8 +1280,8 @@ const AboutUs = () => {
                                                             src={(() => {
                                                                 const url = typeof item.image === 'string' ? item.image : item.image.url;
                                                                 return url && url.startsWith('/uploads/images/')
-                                                                    ? `http://localhost:8000${url}`
-                                                                    : `http://localhost:3000${url}`;
+                                                                    ? `${process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000'}${url}`
+                                                                    : `${window.location.origin}${url}`;
                                                             })()}
                                                             alt={item.heading}
                                                             className="img-fluid rounded"
