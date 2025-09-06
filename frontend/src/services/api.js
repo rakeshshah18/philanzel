@@ -46,7 +46,7 @@ export const homePageAPI = {
 // Create axios instance with base configuration
 const API = axios.create({
     baseURL: process.env.NODE_ENV === 'production'
-        ? 'https://philanzel-backend.vercel.app/api' // <-- replace with your actual backend URL
+        ? 'https://philanzel-54pd.vercel.app/api' // <-- replace with your actual backend URL
         : 'http://localhost:8000/api',
     timeout: 10000,
     headers: {
@@ -54,7 +54,7 @@ const API = axios.create({
     },
     withCredentials: true, // Enable cookies for refresh tokens
 });
-
+// philanzel-54pd.vercel.app
 // GLOBAL REFRESH LOGIC
 let isRefreshing = false;
 let failedQueue = [];
