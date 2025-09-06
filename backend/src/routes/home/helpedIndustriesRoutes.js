@@ -5,18 +5,18 @@ import helpedIndustriesController from '../../controllers/home/helpedIndustriesC
 const router = express.Router();
 
 // Get all helped industries
-router.get('/', verifyToken, requireRole('admin'), helpedIndustriesController.getAll);
+router.get('/', verifyToken, requireRole(['admin', 'super_admin']), helpedIndustriesController.getAll);
 
 // Get single helped industries by ID
-router.get('/:id', verifyToken, requireRole('admin'), helpedIndustriesController.getById);
+router.get('/:id', verifyToken, requireRole(['admin', 'super_admin']), helpedIndustriesController.getById);
 
 // Create new helped industries
-router.post('/', verifyToken, requireRole('admin'), helpedIndustriesController.create);
+router.post('/', verifyToken, requireRole(['admin', 'super_admin']), helpedIndustriesController.create);
 
 // Update helped industries
-router.put('/:id', verifyToken, requireRole('admin'), helpedIndustriesController.update);
+router.put('/:id', verifyToken, requireRole(['admin', 'super_admin']), helpedIndustriesController.update);
 
 // Delete helped industries
-router.delete('/:id', verifyToken, requireRole('admin'), helpedIndustriesController.delete);
+router.delete('/:id', verifyToken, requireRole(['admin', 'super_admin']), helpedIndustriesController.delete);
 
 export default router;

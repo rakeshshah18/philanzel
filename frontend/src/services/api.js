@@ -300,7 +300,10 @@ export const adminAuthAPI = {
     changePassword: (data) => API.put('/admin/auth/change-password', data),
 
     // Get all admins (super admin only)
-    getAllAdmins: (params = {}) => API.get('/admin/auth/all', { params })
+    getAllAdmins: (params = {}) => API.get('/admin/auth/all', { params }),
+
+    // Delete admin (super admin only)
+    deleteAdmin: (id) => API.delete(`/admin/auth/${id}`)
 };
 
 // OurTrack API

@@ -1,3 +1,4 @@
+
 import express from 'express';
 const router = express.Router();
 
@@ -9,6 +10,9 @@ import {
     validateProfileUpdate,
     validatePasswordChange
 } from '../validators/authValidators.js';
+
+// Super admin can delete admin by ID
+router.delete('/:id', verifyToken, requireSuperAdmin, adminAuthController.deleteAdmin);
 
 // Public routes (no authentication required)
 router.post('/register', validateRegister, adminAuthController.register);

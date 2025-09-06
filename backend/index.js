@@ -3,11 +3,14 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import routes from './src/routes/index.js'
+// Suppress dotenv logs
+process.env.DOTENV_CONFIG_SILENT = 'true';
 import dotenv from 'dotenv'
 import path from "path";
 import { fileURLToPath } from 'url';
 import connectDB from './src/db/index.js';
 import config from './src/config/config.js';
+dotenv.config({ quiet: true })
 
 // Create __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -33,10 +36,6 @@ app.use(cookieParser());
 // Debug middleware to log request details
 app.use((req, res, next) => {
     if (req.method === 'POST' && req.url.includes('/auth/login')) {
-        console.log('🔍 Raw request debugging:');
-        console.log('  - Content-Type:', req.headers['content-type']);
-        console.log('  - Body before parsing:', req.body);
-        console.log('  - Raw body keys:', Object.keys(req.body || {}));
     }
     next();
 });

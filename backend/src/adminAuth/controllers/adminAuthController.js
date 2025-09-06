@@ -5,6 +5,30 @@ import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 
 class AdminAuthController {
+    async deleteAdmin(req, res) {
+        try {
+            const { id } = req.params;
+            const requestingAdmin = req.admin; // set by verifyToken
+            if (!requestingAdmin || requestingAdmin.role !== 'super_admin') {
+                return res.status(403).json({ success: false, message: 'Only super admin can delete admins.' });
+            }
+            if (requestingAdmin.id.toString() === id) {
+                return res.status(400).json({ success: false, message: 'Super admin cannot delete themselves.' });
+            }
+            const adminToDelete = await Admin.findById(id);
+            if (!adminToDelete) {
+                return res.status(404).json({ success: false, message: 'Admin not found.' });
+            }
+            if (adminToDelete.role === 'super_admin') {
+                return res.status(400).json({ success: false, message: 'Cannot delete another super admin.' });
+            }
+            await Admin.findByIdAndDelete(id);
+            return res.status(200).json({ success: true, message: 'Admin deleted successfully.' });
+        } catch (error) {
+            console.error('Delete admin error:', error);
+            return res.status(500).json({ success: false, message: 'Internal server error' });
+        }
+    }
     async register(req, res) {
         try {
             const errors = validationResult(req);
@@ -37,7 +61,6 @@ class AdminAuthController {
                     sameSite: 'lax', // More permissive for local dev
                     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
                 });
-                console.log('[COOKIE SET] refreshToken set for admin:', admin.email);
                 return res.status(201).json({
                     success: true,
                     message: 'Super admin registered successfully',
@@ -116,7 +139,6 @@ class AdminAuthController {
                 sameSite: 'lax', // More permissive for local dev
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             });
-            console.log('[COOKIE SET] refreshToken set for admin:', admin.email);
             delete global.pendingAdminRegs[email];
             return res.status(201).json({
                 success: true,
@@ -160,7 +182,6 @@ class AdminAuthController {
                 sameSite: 'lax', // More permissive for local dev
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             });
-            console.log('[COOKIE SET] refreshToken set for admin:', admin.email);
             return res.status(200).json({
                 success: true,
                 message: 'Login successful',
@@ -206,7 +227,6 @@ class AdminAuthController {
                 sameSite: 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
-            console.log('[COOKIE ROTATE] refreshToken rotated for admin:', admin.email);
 
             // Issue new access token
             const accessToken = admin.generateAccessToken();
@@ -219,7 +239,6 @@ class AdminAuthController {
 
     async logout(req, res) {
         res.clearCookie('refreshToken');
-        console.log('[COOKIE CLEARED] refreshToken cleared on logout');
         return res.status(200).json({ success: true, message: 'Logged out' });
     }
 
@@ -253,7 +272,14 @@ class AdminAuthController {
     }
 
     async getAllAdmins(req, res) {
-        return res.status(501).json({ success: false, message: 'Not implemented' });
+        try {
+            // Only super_admin can access (already checked by middleware)
+            const admins = await Admin.find({}, '-password -refreshToken');
+            return res.status(200).json({ success: true, data: admins });
+        } catch (error) {
+            console.error('Get all admins error:', error);
+            return res.status(500).json({ success: false, message: 'Internal server error' });
+        }
     }
 }
 

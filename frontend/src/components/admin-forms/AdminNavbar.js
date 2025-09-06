@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const AdminNavbar = ({ onLoginClick, onRegisterClick, isAuthenticated, admin, onLogout }) => {
+const AdminNavbar = ({ onLoginClick, onRegisterClick, isAuthenticated, admin, onLogout, onDeleteAdminClick }) => {
     const navigate = useNavigate();
 
     const handleLoginClick = () => {
@@ -19,11 +19,19 @@ const AdminNavbar = ({ onLoginClick, onRegisterClick, isAuthenticated, admin, on
                                 Welcome, {admin?.name}
                             </span>
                             <button
-                                className="btn btn-outline-light"
+                                className="btn btn-outline-light me-2"
                                 onClick={onLogout}
                             >
                                 Logout
                             </button>
+                            {admin?.role === 'super_admin' && (
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={onDeleteAdminClick}
+                                >
+                                    Delete Admin
+                                </button>
+                            )}
                         </>
                     ) : (
                         <>
