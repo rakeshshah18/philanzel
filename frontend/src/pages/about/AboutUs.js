@@ -34,12 +34,12 @@ const getImageUrl = (imageUrl) => {
 };
 
 const AboutUs = () => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, loading } = useAuth();
     const [aboutPages, setAboutPages] = useState([]);
     const [journeyData, setJourneyData] = useState([]);
     const [whyChooseUsData, setWhyChooseUsData] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [fetchLoading, setFetchLoading] = useState(false);
+    const [fetchLoading, setFetchLoading] = useState(false); // for data fetches
+    const [actionLoading, setActionLoading] = useState(false); // for create/edit actions
     const [message, setMessage] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -83,11 +83,13 @@ const AboutUs = () => {
     });
 
     useEffect(() => {
-        fetchAboutData();
-        fetchJourneyData();
-        fetchWhyChooseUsData();
-        fetchOurFounderData();
-    }, []);
+        if (!loading && isAuthenticated) {
+            fetchAboutData();
+            fetchJourneyData();
+            fetchWhyChooseUsData();
+            fetchOurFounderData();
+        }
+    }, [loading, isAuthenticated]);
 
     const fetchAboutData = async () => {
         setFetchLoading(true);
@@ -154,19 +156,19 @@ const AboutUs = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
+        setActionLoading(true);
         setMessage('');
 
         // Validate required fields
         if (!formData.heading.trim()) {
             setMessage('❌ Title is required.');
-            setLoading(false);
+            setActionLoading(false);
             return;
         }
 
         if (!formData.description.trim() || formData.description === '<p><br></p>') {
             setMessage('❌ Description is required.');
-            setLoading(false);
+            setActionLoading(false);
             return;
         }
 
@@ -199,7 +201,7 @@ const AboutUs = () => {
             console.error('Error saving about us content:', error);
             setMessage(error.response?.data?.message || '❌ Failed to save about us content.');
         } finally {
-            setLoading(false);
+            setActionLoading(false);
         }
     };
 
@@ -791,15 +793,15 @@ const AboutUs = () => {
                                 <button
                                     type="submit"
                                     className="btn btn-primary"
-                                    disabled={loading}
+                                    disabled={actionLoading}
                                 >
-                                    {loading ? 'Saving...' : (isEditing ? 'Update' : 'Create')}
+                                    {actionLoading ? 'Saving...' : (isEditing ? 'Update' : 'Create')}
                                 </button>
                                 <button
                                     type="button"
                                     className="btn btn-secondary"
                                     onClick={resetForm}
-                                    disabled={loading}
+                                    disabled={actionLoading}
                                 >
                                     Cancel
                                 </button>

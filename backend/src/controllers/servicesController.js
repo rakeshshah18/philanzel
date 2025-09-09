@@ -1,3 +1,16 @@
+// Get a service by slug (public)
+const getServiceBySlug = async (req, res) => {
+    try {
+        const { slug } = req.params;
+        const service = await OurServices.findOne({ slug, isActive: true });
+        if (!service) {
+            return res.status(404).json({ success: false, message: 'Service not found' });
+        }
+        res.status(200).json({ success: true, data: service });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to fetch service', error: error.message });
+    }
+};
 // Edit a section in a service
 export const updateServiceSection = async (req, res) => {
     try {
@@ -138,6 +151,8 @@ const createServices = async (req, res) => {
 //get all services
 const getAllServices = async (req, res) => {
     try {
+        console.log('--- getAllServices controller START ---');
+        console.log('req.admin at controller:', req.admin);
         const services = await OurServices.find({ isActive: true }).sort({ order: 1, createdAt: 1 });
         res.status(200).json({
             status: 'success',
@@ -262,7 +277,8 @@ export {
     createServices,
     getAllServices,
     updateServices,
-    deleteServices
+    deleteServices,
+    getServiceBySlug
 };
 
 // Test function to create a default service for debugging

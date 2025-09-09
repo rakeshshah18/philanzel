@@ -1,4 +1,3 @@
-
 import express from 'express';
 const router = express.Router();
 
@@ -29,5 +28,10 @@ router.put('/change-password', verifyToken, validatePasswordChange, adminAuthCon
 
 // Super admin only routes
 router.get('/all', verifyToken, requireSuperAdmin, adminAuthController.getAllAdmins);
+// Super admin: assign/retrieve allowedPages for admin
+router.put('/:id/assign-pages', verifyToken, requireSuperAdmin, adminAuthController.assignPages);
+router.get('/:id/assigned-pages', verifyToken, requireSuperAdmin, adminAuthController.getAssignedPages);
+// Super admin: get all assigned pages for all admins
+router.get('/all-assigned-pages', verifyToken, requireSuperAdmin, adminAuthController.getAllAssignedPages);
 
 export default router;

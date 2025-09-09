@@ -28,6 +28,10 @@ const adminSchema = new mongoose.Schema({
         enum: ['admin', 'super_admin'],
         default: 'admin'
     },
+    allowedPages: {
+        type: [String],
+        default: []
+    },
     isActive: {
         type: Boolean,
         default: true

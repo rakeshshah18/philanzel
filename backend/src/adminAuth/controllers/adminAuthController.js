@@ -248,14 +248,23 @@ class AdminAuthController {
 
     async getProfile(req, res) {
         try {
+            console.log('--- getProfile called ---');
+            if (!req.admin) {
+                console.log('No req.admin in getProfile');
+            } else {
+                console.log('req.admin:', req.admin);
+            }
             // req.admin is set by verifyToken middleware
             if (!req.admin || !req.admin.id) {
+                console.log('getProfile: Unauthorized - missing req.admin or id');
                 return res.status(401).json({ success: false, message: 'Unauthorized' });
             }
             const admin = await Admin.findById(req.admin.id).select('-password -refreshToken');
             if (!admin) {
+                console.log('getProfile: Admin not found for id', req.admin.id);
                 return res.status(404).json({ success: false, message: 'Admin not found' });
             }
+            console.log('getProfile: Success, returning admin:', admin.email);
             return res.status(200).json({ success: true, data: admin });
         } catch (error) {
             console.error('Get profile error:', error);
@@ -273,11 +282,83 @@ class AdminAuthController {
 
     async getAllAdmins(req, res) {
         try {
-            // Only super_admin can access (already checked by middleware)
+            console.log('--- getAllAdmins called ---');
+            if (!req.admin) {
+                console.log('No req.admin in getAllAdmins');
+            } else {
+                console.log('Requesting admin:', req.admin);
+            }
             const admins = await Admin.find({}, '-password -refreshToken');
+            console.log('Admins returned:', admins.length);
             return res.status(200).json({ success: true, data: admins });
         } catch (error) {
             console.error('Get all admins error:', error);
+            return res.status(500).json({ success: false, message: 'Internal server error' });
+        }
+    }
+
+    // Super admin: assign allowedPages to admin
+    async assignPages(req, res) {
+        try {
+            const { id } = req.params; // admin user id
+            const { allowedPages } = req.body; // array of page names/IDs
+            const requestingAdmin = req.admin;
+            if (!requestingAdmin || requestingAdmin.role !== 'super_admin') {
+                return res.status(403).json({ success: false, message: 'Only super admin can assign pages.' });
+            }
+            const admin = await Admin.findById(id);
+            if (!admin) {
+                return res.status(404).json({ success: false, message: 'Admin not found.' });
+            }
+            if (admin.role === 'super_admin') {
+                return res.status(400).json({ success: false, message: 'Cannot assign pages to super admin.' });
+            }
+            admin.allowedPages = allowedPages;
+            await admin.save();
+            return res.status(200).json({ success: true, message: 'Pages assigned successfully.', allowedPages });
+        } catch (error) {
+            console.error('Assign pages error:', error);
+            return res.status(500).json({ success: false, message: 'Internal server error' });
+        }
+    }
+
+    // Super admin: get allowedPages for admin
+    async getAssignedPages(req, res) {
+        try {
+            const { id } = req.params;
+            const requestingAdmin = req.admin;
+            if (!requestingAdmin || requestingAdmin.role !== 'super_admin') {
+                return res.status(403).json({ success: false, message: 'Only super admin can view assigned pages.' });
+            }
+            const admin = await Admin.findById(id);
+            if (!admin) {
+                return res.status(404).json({ success: false, message: 'Admin not found.' });
+            }
+            return res.status(200).json({ success: true, allowedPages: admin.allowedPages });
+        } catch (error) {
+            console.error('Get assigned pages error:', error);
+            return res.status(500).json({ success: false, message: 'Internal server error' });
+        }
+    }
+
+    // Super admin: get all assigned pages for all admins
+    async getAllAssignedPages(req, res) {
+        try {
+            const requestingAdmin = req.admin;
+            if (!requestingAdmin || requestingAdmin.role !== 'super_admin') {
+                return res.status(403).json({ success: false, message: 'Only super admin can view assigned pages.' });
+            }
+            const admins = await Admin.find({ role: 'admin' }, 'email name allowedPages');
+            // Flatten all assigned pages
+            const assignedPages = admins.reduce((acc, admin) => {
+                admin.allowedPages.forEach(page => {
+                    if (!acc.includes(page)) acc.push(page);
+                });
+                return acc;
+            }, []);
+            return res.status(200).json({ success: true, assignedPages, admins });
+        } catch (error) {
+            console.error('Get all assigned pages error:', error);
             return res.status(500).json({ success: false, message: 'Internal server error' });
         }
     }

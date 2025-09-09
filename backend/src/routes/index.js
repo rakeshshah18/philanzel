@@ -1,4 +1,7 @@
+// ...existing code...
+// ...existing code...
 import sectionRoutes from './all services/sectionRoutes.js';
+// import serviceRoutes from './all services/serviceRoutes.js';
 import partnerAssociationImageRoutes from './partner/partnerAssociationImageRoutes.js';
 import contactUsRoutes from './contactUs/contactUsRoutes.js';
 import whyChoosePhilanzelRoutes from './partner/whyChoosePhilanzel.js';
@@ -14,6 +17,7 @@ import aboutUsRoutes from './about/aboutUsRoutes.js';
 import ourJourneyRoutes from './about/ourJourneyRoutes.js';
 import ourFounderRoutes from './about/ourFounderRoutes.js';
 import { routes as adminAuthRoutes } from '../adminAuth/index.js';
+import { restrictToAllowedPages } from '../adminAuth/middleware/authMiddleware.js';
 import ourTrackRoutes from './home/ourTrackRoutes.js';
 import servicesRoutes from './servicesRoutes.js';
 import tabbingServicesSettingsRoutes from './tabbingServicesSettingsRoutes.js';
@@ -22,6 +26,7 @@ import whyChooseUsRoutes from './home/whyChooseUsRoutes.js';
 import ourAssociationRoutes from './home/ourAssociationRoutes.js';
 import homeFAQsRoutes from './home/homeFAQsRoutes.js';
 import reviewSectionRoutes from './sections/reviewSectionRoutes.js';
+
 import adsSectionRoutes from './sections/adsRoute.js';
 import footerRoutes from './sections/footerRoutes.js';
 import empoweringIndividual from './partner/empoweringIndividualRoutes.js';
@@ -33,10 +38,15 @@ import calculatorPagesRoutes from './calculators/pagesRoutes.js';
 import calculatorSectionRoutes from './calculators/sectionRoutes.js';
 
 const router = express.Router();
-import serviceRoutes from './all services/serviceRoutes.js';
-// Dynamic services API
-router.use('/services', serviceRoutes);
 
+// Public review sections routes (after router is initialized)
+router.use('/review-sections', reviewSectionRoutes);
+// Public ads sections routes (after router is initialized)
+router.use('/ads-sections', adsSectionRoutes);
+
+// Dynamic services API
+// Only use one /services route registration to avoid conflicts
+router.use('/services', servicesRoutes);
 
 // Debug logging middleware removed for production
 
@@ -49,7 +59,6 @@ router.use('/career-posts', careerPostRoutes);
 // Specific admin routes
 router.use('/admin/tabbing-services', tabbingServicesSettingsRoutes);
 router.use('/admin/services', servicesRoutes);
-router.use('/services', servicesRoutes);
 router.use('/admin/helped-industries', helpedIndustriesRoutes);
 router.use('/admin/why-choose-us', whyChooseUsRoutes);
 router.use('/admin/our-association', ourAssociationRoutes);
@@ -92,10 +101,19 @@ router.use('/calculators/pages', calculatorPagesRoutes);
 router.use('/calculators/sections', calculatorSectionRoutes);
 
 // General /admin routes MUST come LAST
-router.use('/admin', homePageRoutes);
-router.use('/admin', aboutUsRoutes);
-router.use('/admin', ourJourneyRoutes);
-router.use('/admin/services-sections/about-service', aboutServiceRoutes);
+// Public homepage routes (GET /homepage, GET /homepage/:id)
+router.use(homePageRoutes);
+// Admin homepage routes
+router.use('/admin', restrictToAllowedPages, homePageRoutes);
+
+// Public about us routes (GET /about-us, GET /about-us/:id)
+router.use(aboutUsRoutes);
+
+// Public our journey routes (GET /our-journey, GET /our-journey/:id)
+router.use(ourJourneyRoutes);
+router.use('/admin', restrictToAllowedPages, aboutUsRoutes);
+router.use('/admin', restrictToAllowedPages, ourJourneyRoutes);
+router.use('/admin/services-sections/about-service', restrictToAllowedPages, aboutServiceRoutes);
 // Flexible section API for all services
 router.use('/sections', sectionRoutes);
 

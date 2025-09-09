@@ -41,16 +41,30 @@ app.use((req, res, next) => {
 });
 
 // Serve uploaded files statically
+app.use((req, res, next) => {
+    // Capture the original send method
+    const originalSend = res.send;
+    res.send = function (body) {
+        if (res.statusCode === 401 || res.statusCode === 403) {
+            console.log('--- 401/403 Response Debug ---');
+            console.log('Request URL:', req.originalUrl);
+            console.log('Request Method:', req.method);
+            console.log('Response Body:', body);
+        }
+        return originalSend.call(this, body);
+    };
+    next();
+});
 app.use("/uploads", express.static(path.join(__dirname, "./src/career/documents")));
 app.use("/uploads/images", express.static(path.join(__dirname, "./src/uploads/images")));
 app.use("/uploads/empowering-individuals", express.static(path.join(__dirname, "./uploads/empowering-individuals")));
 
 // Serve React app in production
 if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, 'frontend/build')));
+    app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+    app.get(/^((?!api).)*$/, (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
     });
 }
 

@@ -81,7 +81,7 @@ const createHomePage = async (req, res) => {
                 heading: newHomePage.heading,
                 description: newHomePage.description,
                 button: newHomePage.button,
-                image: newHomePage.ijmage,
+                image: newHomePage.image,
                 createdAt: newHomePage.createdAt
             }
         });

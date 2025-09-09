@@ -27,8 +27,8 @@ export const homePageAPI = {
             'Content-Type': 'multipart/form-data',
         },
     }),
-    // Get all homepage content
-    getAll: () => API.get('/admin/homepage'),
+    // Get all homepage content (public endpoint, use 'homepage' so baseURL + 'homepage' = /api/homepage)
+    getAll: () => API.get('homepage'),
     // Get homepage content by ID
     getById: (id) => API.get(`/admin/homepage/${id}`),
     // Update homepage content
@@ -94,8 +94,12 @@ API.interceptors.response.use(
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             if (globalRefreshRetryCount >= MAX_GLOBAL_REFRESH_RETRIES) {
-                // Only redirect after refresh attempts fail
-                window.location.href = '/login';
+                // Only redirect to login if not already on login page and the request was to an /admin/ endpoint
+                if (originalRequest && originalRequest.url && /\/admin\//.test(originalRequest.url)) {
+                    if (window.location.pathname !== '/login') {
+                        window.location.href = '/login';
+                    }
+                }
                 return Promise.reject(error);
             }
             globalRefreshRetryCount++;
@@ -110,8 +114,12 @@ API.interceptors.response.use(
                     return API(originalRequest);
                 } catch (err) {
                     processQueue(err, null);
-                    // Only redirect after refresh fails
-                    window.location.href = '/login';
+                    // Only redirect after refresh fails and not already on login page
+                    if (originalRequest && originalRequest.url && /\/admin\//.test(originalRequest.url)) {
+                        if (window.location.pathname !== '/login') {
+                            window.location.href = '/login';
+                        }
+                    }
                     return Promise.reject(err);
                 } finally {
                     isRefreshing = false;
@@ -125,8 +133,11 @@ API.interceptors.response.use(
                     return API(originalRequest);
                 })
                 .catch(err => {
-                    // Only redirect after refresh fails
-                    window.location.href = '/login';
+                    // Only redirect after refresh fails and not already on login page
+                    if (window.location.pathname !== '/login') {
+                        window.location.href = '/login';
+                    }
+                    console.error('Auth failure after refresh attempt:', err);
                     return Promise.reject(err);
                 });
         }
@@ -145,11 +156,11 @@ export const aboutUsAPI = {
         },
     }),
 
-    // Get all about us content
-    getAll: (params = {}) => API.get('/admin/about-us', { params }),
+    // Get all about us content (public endpoint, baseURL=/api)
+    getAll: (params = {}) => API.get('about-us', { params }),
 
-    // Get about us content by ID
-    getById: (id) => API.get(`/admin/about-us/${id}`),
+    // Get about us content by ID (public endpoint, baseURL=/api)
+    getById: (id) => API.get(`about-us/${id}`),
 
     // Update about us content
     update: (id, formData) => API.put(`/admin/about-us/${id}`, formData, {
@@ -164,25 +175,25 @@ export const aboutUsAPI = {
 
 export const ourJourneyAPI = {
     // Create our journey content
-    create: (data) => API.post('/admin/our-journey', data),
+    create: (data) => API.post('admin/our-journey', data),
 
-    // Get all our journey content
-    getAll: (params = {}) => API.get('/admin/our-journey', { params }),
+    // Get all our journey content (public endpoint, baseURL=/api)
+    getAll: (params = {}) => API.get('our-journey', { params }),
 
-    // Get our journey content by ID
-    getById: (id) => API.get(`/admin/our-journey/${id}`),
+    // Get our journey content by ID (public endpoint, baseURL=/api)
+    getById: (id) => API.get(`our-journey/${id}`),
 
     // Update our journey content
-    update: (id, data) => API.put(`/admin/our-journey/${id}`, data),
+    update: (id, data) => API.put(`admin/our-journey/${id}`, data),
 
     // Delete our journey content
-    delete: (id) => API.delete(`/admin/our-journey/${id}`),
+    delete: (id) => API.delete(`admin/our-journey/${id}`),
 
     // Add card to our journey
-    addCard: (id, cardData) => API.post(`/admin/our-journey/${id}/cards`, cardData),
+    addCard: (id, cardData) => API.post(`admin/our-journey/${id}/cards`, cardData),
 
     // Remove card from our journey
-    removeCard: (id, cardIndex) => API.delete(`/admin/our-journey/${id}/cards/${cardIndex}`)
+    removeCard: (id, cardIndex) => API.delete(`admin/our-journey/${id}/cards/${cardIndex}`)
 };
 
 export const ourFounderAPI = {
@@ -303,7 +314,13 @@ export const adminAuthAPI = {
     getAllAdmins: (params = {}) => API.get('/admin/auth/all', { params }),
 
     // Delete admin (super admin only)
-    deleteAdmin: (id) => API.delete(`/admin/auth/${id}`)
+    deleteAdmin: (id) => API.delete(`/admin/auth/${id}`),
+
+    // Get allowed pages for an admin (super admin only)
+    getAssignedPages: (adminId) => API.get(`/admin/auth/${adminId}/assigned-pages`),
+
+    // Assign allowed pages to an admin (super admin only)
+    assignPages: (adminId, allowedPages) => API.put(`/admin/auth/${adminId}/assign-pages`, { allowedPages }),
 };
 
 // OurTrack API
@@ -479,11 +496,12 @@ export const homeFAQsAPI = {
 
 // Review Sections API endpoints
 export const reviewSectionsAPI = {
-    // Get all review sections
-    getAll: () => API.get('/admin/review-sections'),
 
-    // Get active review sections (public)
-    getActive: () => API.get('/admin/review-sections/active'),
+    // Get all review sections (public)
+    getAll: () => API.get('/review-sections/active'),
+
+    // Get active review sections (alias for getAll)
+    getActive: () => API.get('/review-sections/active'),
 
     // Get single review section by ID
     getById: (id) => API.get(`/admin/review-sections/${id}`),
@@ -506,39 +524,26 @@ export const reviewSectionsAPI = {
 
 // Ads Sections API endpoints
 export const adsSectionsAPI = {
-    // Get all ads sections
-    getAll: () => API.get('/admin/ads-sections'),
+    // Get all visible ads sections (public)
+    getAll: () => API.get('/ads-sections/active'),
 
-    // Get ads sections with pagination
+    // Admin endpoints (unchanged, but use only in admin context)
+    getAllAdmin: () => API.get('/admin/ads-sections'),
     getPaginated: (page = 1, limit = 10) => API.get(`/admin/ads-sections/paginated?page=${page}&limit=${limit}`),
-
-    // Search ads sections
     search: (query) => API.get(`/admin/ads-sections/search?query=${encodeURIComponent(query)}`),
-
-    // Get single ads section by ID
     getById: (id) => API.get(`/admin/ads-sections/${id}`),
-
-    // Create new ads section
     create: (data) => API.post('/admin/ads-sections', data),
-
-    // Create new ads section with file upload
     createWithFile: (formData) => API.post('/admin/ads-sections', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-
-    // Update ads section
     update: (id, data) => API.put(`/admin/ads-sections/${id}`, data),
-
-    // Update ads section with file upload
     updateWithFile: (id, formData) => API.put(`/admin/ads-sections/${id}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-
-    // Delete ads section
     delete: (id) => API.delete(`/admin/ads-sections/${id}`)
 };
 

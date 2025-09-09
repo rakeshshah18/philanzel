@@ -53,10 +53,18 @@ const Ads = () => {
         fetchAdsSections();
     }, []);
 
+    // Fetch all ads sections (admin or public)
     const fetchAdsSections = async () => {
         try {
             setLoading(true);
-            const response = await adsSectionsAPI.getAll();
+            let response;
+            // If admin token exists, use admin endpoint, else use public
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                response = await adsSectionsAPI.getAllAdmin();
+            } else {
+                response = await adsSectionsAPI.getAll();
+            }
             setAdsSections(response.data.data || []);
         } catch (error) {
             console.error('Error fetching ads sections:', error);
@@ -69,6 +77,12 @@ const Ads = () => {
     const fetchWithPagination = async (page = 1) => {
         try {
             setLoading(true);
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                setMessage('❌ Pagination is only available for admins.');
+                setLoading(false);
+                return;
+            }
             const response = await adsSectionsAPI.getPaginated(page, pagination.limit);
             setAdsSections(response.data.data || []);
             setPagination({

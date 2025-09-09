@@ -3,16 +3,24 @@ import Admin from '../models/Admin.js';
 
 // Verify JWT token middleware
 const verifyToken = async (req, res, next) => {
+    console.log('--- verifyToken: Incoming request headers ---');
+    console.log(req.headers);
     try {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.startsWith('Bearer ')
             ? authHeader.substring(7)
             : null;
 
+        console.log('--- verifyToken middleware ---');
+        console.log('Authorization header:', authHeader);
+        console.log('Extracted token:', token);
+
         if (!token) {
+            console.log('No access token provided');
             return res.status(401).json({
                 success: false,
-                message: 'Access token required'
+                message: 'Access token required',
+                debug: 'No token in Authorization header'
             });
         }
 
@@ -22,17 +30,20 @@ const verifyToken = async (req, res, next) => {
             console.error('JWT_ACCESS_SECRET environment variable is not set');
             return res.status(500).json({
                 success: false,
-                message: 'Server configuration error'
+                message: 'Server configuration error',
+                debug: 'Missing JWT_ACCESS_SECRET env var'
             });
         }
 
         // Check blacklist
         const { isTokenBlacklisted } = await import('../utils/tokenBlacklist.js');
         if (isTokenBlacklisted(token)) {
+            console.log('Token is blacklisted');
             return res.status(401).json({
                 success: false,
                 message: 'Token has been revoked. Please login again.',
-                error: 'TOKEN_BLACKLISTED'
+                error: 'TOKEN_BLACKLISTED',
+                debug: 'Token found in blacklist'
             });
         }
 
@@ -40,26 +51,33 @@ const verifyToken = async (req, res, next) => {
         let decoded;
         try {
             decoded = jwt.verify(token, accessSecret);
+            console.log('Decoded JWT payload:', decoded);
         } catch (jwtError) {
             console.error('JWT verification failed:', jwtError.message);
 
             if (jwtError.name === 'TokenExpiredError') {
+                console.log('Token expired');
                 return res.status(401).json({
                     success: false,
                     message: 'Token expired',
-                    error: 'TOKEN_EXPIRED'
+                    error: 'TOKEN_EXPIRED',
+                    debug: 'JWT token expired'
                 });
             } else if (jwtError.name === 'JsonWebTokenError') {
+                console.log('Invalid JWT token');
                 return res.status(401).json({
                     success: false,
                     message: 'Invalid token',
-                    error: 'TOKEN_INVALID'
+                    error: 'TOKEN_INVALID',
+                    debug: 'JWT token invalid'
                 });
             } else {
+                console.log('Token verification failed for unknown reason');
                 return res.status(401).json({
                     success: false,
                     message: 'Token verification failed',
-                    error: 'TOKEN_ERROR'
+                    error: 'TOKEN_ERROR',
+                    debug: jwtError.message
                 });
             }
         }
@@ -67,9 +85,12 @@ const verifyToken = async (req, res, next) => {
         // Check if admin exists and is active
         const admin = await Admin.findById(decoded.id);
         if (!admin || !admin.isActive) {
+            console.log('Admin not found or inactive for token:', decoded.id);
             return res.status(401).json({
                 success: false,
-                message: 'Invalid token or inactive account'
+                message: 'Invalid token or inactive account',
+                debug: 'Admin not found or inactive',
+                adminId: decoded.id
             });
         }
 
@@ -80,7 +101,9 @@ const verifyToken = async (req, res, next) => {
             name: decoded.name,
             role: decoded.role
         };
+        console.log('Token verified, admin:', req.admin);
 
+        console.log('Token verified, admin:', req.admin);
         next();
 
     } catch (error) {
@@ -103,23 +126,30 @@ const verifyToken = async (req, res, next) => {
 // Check if admin has required role
 const requireRole = (roles) => {
     return (req, res, next) => {
+        console.log('--- requireRole middleware ---');
+        console.log('req.admin:', req.admin);
+        const adminRole = req.admin ? req.admin.role : null;
+        const allowedRoles = Array.isArray(roles) ? roles : [roles];
+        console.log('Required roles:', allowedRoles, 'Admin role:', adminRole);
         if (!req.admin) {
+            console.log('requireRole: req.admin missing, sending 401');
             return res.status(401).json({
                 success: false,
-                message: 'Authentication required'
+                message: 'Authentication required',
+                debug: 'requireRole: req.admin missing'
             });
         }
-
-        const adminRole = req.admin.role;
-        const allowedRoles = Array.isArray(roles) ? roles : [roles];
-
         if (!allowedRoles.includes(adminRole)) {
+            console.log('requireRole: insufficient permissions, sending 403');
             return res.status(403).json({
                 success: false,
-                message: 'Insufficient permissions'
+                message: 'Insufficient permissions',
+                debug: 'requireRole: role not allowed',
+                adminRole,
+                allowedRoles
             });
         }
-
+        console.log('requireRole: role allowed, proceeding');
         next();
     };
 };
@@ -130,9 +160,42 @@ const requireSuperAdmin = requireRole('super_admin');
 // Admin or super admin middleware
 const requireAdmin = requireRole(['admin', 'super_admin']);
 
+// Restrict admin access to allowedPages
+const restrictToAllowedPages = (req, res, next) => {
+    if (!req.admin) {
+        return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    // Only restrict admins, not super_admin
+    if (req.admin.role === 'super_admin') return next();
+    // Get the requested route path (e.g., '/admin/services')
+    const path = req.baseUrl + req.path;
+    // Normalize path (remove trailing slash)
+    const normalizedPath = path.replace(/\/$/, '');
+    // Fetch allowedPages from DB (in case of stale token)
+    Admin.findById(req.admin.id).then(admin => {
+        if (!admin) {
+            return res.status(401).json({ success: false, message: 'Invalid admin' });
+        }
+        // If allowedPages is empty, deny all
+        if (!admin.allowedPages || admin.allowedPages.length === 0) {
+            return res.status(403).json({ success: false, message: 'No pages assigned. Contact super admin.' });
+        }
+        // Allow if the normalized path matches any allowed page (exact match or startsWith)
+        const allowed = admin.allowedPages.some(page => normalizedPath === page || normalizedPath.startsWith(page));
+        if (!allowed) {
+            return res.status(403).json({ success: false, message: 'Access to this page is not allowed.' });
+        }
+        next();
+    }).catch(err => {
+        console.error('Allowed pages check error:', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    });
+};
+
 export {
     verifyToken,
     requireRole,
     requireSuperAdmin,
-    requireAdmin
+    requireAdmin,
+    restrictToAllowedPages
 };

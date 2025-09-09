@@ -1,3 +1,29 @@
+// Get all visible ads sections (public)
+const getActiveAdsSections = async (req, res) => {
+    try {
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({
+                status: 'error',
+                message: 'Database connection not available. Please check server logs.'
+            });
+        }
+        // Only return ads where isVisible is true
+        const adsSections = await AdsSection.find({ isVisible: true }).sort({ createdAt: -1 });
+        res.status(200).json({
+            status: 'success',
+            message: 'Active ads sections retrieved successfully',
+            data: adsSections,
+            count: adsSections.length
+        });
+    } catch (error) {
+        console.error('Error fetching active ads sections:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to retrieve active ads sections',
+            error: error.message
+        });
+    }
+};
 import AdsSection from '../../models/sections/adsSection.js';
 import mongoose from 'mongoose';
 
@@ -424,4 +450,5 @@ export {
     deleteAdsSection,
     getAdsSectionsWithPagination,
     searchAdsSections
+    , getActiveAdsSections
 };

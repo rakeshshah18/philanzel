@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import Alert from '../../components/Alert';
 import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI, helpedIndustriesAPI, whyChooseUsAPI, ourAssociationAPI, homeFAQsAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
@@ -101,24 +102,24 @@ const Home = () => {
         description: ''
     });
 
+    const { isAuthenticated, loading: authLoading } = useAuth();
     useEffect(() => {
-        // Add a small delay to ensure backend is ready and DOM is mounted
-        const initializeData = async () => {
-            try {
-                // Wait for component to mount properly
-                await new Promise(resolve => setTimeout(resolve, 100));
-                await fetchHomePages();
-                // Wait a bit before fetching track data to avoid overwhelming the API
-                setTimeout(() => {
-                    fetchTrackData();
-                }, 300);
-            } catch (error) {
-                console.error('Error initializing data:', error);
-            }
-        };
-
-        initializeData();
-    }, []); const fetchHomePages = async () => {
+        if (!authLoading && isAuthenticated) {
+            const initializeData = async () => {
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await fetchHomePages();
+                    setTimeout(() => {
+                        fetchTrackData();
+                    }, 300);
+                } catch (error) {
+                    console.error('Error initializing data:', error);
+                }
+            };
+            initializeData();
+        }
+    }, [authLoading, isAuthenticated]);
+    const fetchHomePages = async () => {
         setFetchLoading(true);
         try {
             console.log('Fetching homepage data...');
@@ -126,7 +127,7 @@ const Home = () => {
             console.log('Homepage API response:', response);
             if (response.data && response.data.data) {
                 setHomePages(response.data.data);
-                console.log('Homepage data loaded successfully:', response.data.data.length, 'items');
+                console.log('Homepage data loaded successfully:', response.data.data.length, 'items', response.data.data);
             }
         } catch (error) {
             console.error('Error fetching homepage content:', error);
