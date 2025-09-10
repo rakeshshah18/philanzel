@@ -316,11 +316,6 @@ export const adminAuthAPI = {
     // Delete admin (super admin only)
     deleteAdmin: (id) => API.delete(`/admin/auth/${id}`),
 
-    // Get allowed pages for an admin (super admin only)
-    getAssignedPages: (adminId) => API.get(`/admin/auth/${adminId}/assigned-pages`),
-
-    // Assign allowed pages to an admin (super admin only)
-    assignPages: (adminId, allowedPages) => API.put(`/admin/auth/${adminId}/assign-pages`, { allowedPages }),
 };
 
 // OurTrack API

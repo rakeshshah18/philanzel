@@ -8,10 +8,10 @@ const router = express.Router();
 // Get all images
 router.get('/', getAll);
 
-// Add new image (admin only)
-router.post('/', verifyToken, requireRole('admin'), imageUpload.single('image'), create);
+// Add new image (admin and super_admin)
+router.post('/', verifyToken, requireRole(['admin', 'super_admin']), imageUpload.single('image'), create);
 
-// Delete image (admin only)
-router.delete('/:id', verifyToken, requireRole('admin'), deleteImage);
+// Delete image (admin and super_admin)
+router.delete('/:id', verifyToken, requireRole(['admin', 'super_admin']), deleteImage);
 
 export default router;

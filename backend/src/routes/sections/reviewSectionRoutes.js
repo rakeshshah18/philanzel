@@ -12,22 +12,22 @@ router.get('/active', reviewSectionController.getActive);
 router.get('/:id', reviewSectionController.getById);
 
 // Admin routes (protected)
-// Get all review sections (admin only)
-router.get('/', verifyToken, requireRole('admin'), reviewSectionController.getAll);
+// Get all review sections (admin and super_admin)
+router.get('/', verifyToken, requireRole(['admin', 'super_admin']), reviewSectionController.getAll);
 
-// Create new review section (admin only)
-router.post('/', verifyToken, requireRole('admin'), reviewSectionController.create);
+// Create new review section (admin and super_admin)
+router.post('/', verifyToken, requireRole(['admin', 'super_admin']), reviewSectionController.create);
 
-// Update review section (admin only)
-router.put('/:id', verifyToken, requireRole('admin'), reviewSectionController.update);
+// Update review section (admin and super_admin)
+router.put('/:id', verifyToken, requireRole(['admin', 'super_admin']), reviewSectionController.update);
 
-// Add review to existing section (admin only)
-router.post('/:id/reviews', verifyToken, requireRole('admin'), reviewSectionController.addReview);
+// Add review to existing section (admin and super_admin)
+router.post('/:id/reviews', verifyToken, requireRole(['admin', 'super_admin']), reviewSectionController.addReview);
 
-// Recalculate all ratings (admin only)
-router.post('/recalculate/ratings', verifyToken, requireRole('admin'), reviewSectionController.recalculateRatings);
+// Recalculate all ratings (admin and super_admin)
+router.post('/recalculate/ratings', verifyToken, requireRole(['admin', 'super_admin']), reviewSectionController.recalculateRatings);
 
-// Delete review section (admin only)
-router.delete('/:id', verifyToken, requireRole('admin'), reviewSectionController.delete);
+// Delete review section (admin and super_admin)
+router.delete('/:id', verifyToken, requireRole(['admin', 'super_admin']), reviewSectionController.delete);
 
 export default router;

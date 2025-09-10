@@ -160,42 +160,10 @@ const requireSuperAdmin = requireRole('super_admin');
 // Admin or super admin middleware
 const requireAdmin = requireRole(['admin', 'super_admin']);
 
-// Restrict admin access to allowedPages
-const restrictToAllowedPages = (req, res, next) => {
-    if (!req.admin) {
-        return res.status(401).json({ success: false, message: 'Authentication required' });
-    }
-    // Only restrict admins, not super_admin
-    if (req.admin.role === 'super_admin') return next();
-    // Get the requested route path (e.g., '/admin/services')
-    const path = req.baseUrl + req.path;
-    // Normalize path (remove trailing slash)
-    const normalizedPath = path.replace(/\/$/, '');
-    // Fetch allowedPages from DB (in case of stale token)
-    Admin.findById(req.admin.id).then(admin => {
-        if (!admin) {
-            return res.status(401).json({ success: false, message: 'Invalid admin' });
-        }
-        // If allowedPages is empty, deny all
-        if (!admin.allowedPages || admin.allowedPages.length === 0) {
-            return res.status(403).json({ success: false, message: 'No pages assigned. Contact super admin.' });
-        }
-        // Allow if the normalized path matches any allowed page (exact match or startsWith)
-        const allowed = admin.allowedPages.some(page => normalizedPath === page || normalizedPath.startsWith(page));
-        if (!allowed) {
-            return res.status(403).json({ success: false, message: 'Access to this page is not allowed.' });
-        }
-        next();
-    }).catch(err => {
-        console.error('Allowed pages check error:', err);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
-    });
-};
 
 export {
     verifyToken,
     requireRole,
     requireSuperAdmin,
     requireAdmin,
-    restrictToAllowedPages
 };

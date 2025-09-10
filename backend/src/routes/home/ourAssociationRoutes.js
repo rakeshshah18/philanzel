@@ -14,13 +14,13 @@ router.get('/', ourAssociationController.getAll);
 // Get single our association entry by ID (public)
 router.get('/:id', ourAssociationController.getById);
 
-// Create new our association entry (admin only)
-router.post('/', verifyToken, requireRole('admin'), customImageUpload, ourAssociationController.create);
+// Create new our association entry (admin and super_admin)
+router.post('/', verifyToken, requireRole(['admin', 'super_admin']), customImageUpload, ourAssociationController.create);
 
-// Update our association entry (admin only)
-router.put('/:id', verifyToken, requireRole('admin'), customImageUpload, ourAssociationController.update);
+// Update our association entry (admin and super_admin)
+router.put('/:id', verifyToken, requireRole(['admin', 'super_admin']), customImageUpload, ourAssociationController.update);
 
-// Delete our association entry (admin only)
-router.delete('/:id', verifyToken, requireRole('admin'), ourAssociationController.delete);
+// Delete our association entry (admin and super_admin)
+router.delete('/:id', verifyToken, requireRole(['admin', 'super_admin']), ourAssociationController.delete);
 
 export default router;

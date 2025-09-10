@@ -16,18 +16,7 @@ const Dashboard = () => {
     const [adminsError, setAdminsError] = useState('');
     const [deleteLoading, setDeleteLoading] = useState(false);
 
-    // Assign Pages modal state
-    const [showAssignModal, setShowAssignModal] = useState(false);
-    const [assignAdminId, setAssignAdminId] = useState(null);
-    const [assignLoading, setAssignLoading] = useState(false);
-    const [selectedPages, setSelectedPages] = useState([]);
-    const [selectedAdminId, setSelectedAdminId] = useState(null);
 
-    // View Allowed Pages modal state
-    const [showAllowedPagesModal, setShowAllowedPagesModal] = useState(false);
-    const [viewAdminId, setViewAdminId] = useState(null);
-    const [viewAllowedPages, setViewAllowedPages] = useState([]);
-    const [viewLoading, setViewLoading] = useState(false);
 
     // Auth modals and state
     const [showLoginModal, setShowLoginModal] = useState(false);
@@ -53,65 +42,7 @@ const Dashboard = () => {
     // Handler stubs (implement as needed)
     const handleDeleteAdmin = () => { };
 
-    // View allowed pages for an admin
-    const handleViewAllowedPages = (adminId) => {
-        setViewAdminId(adminId);
-        setShowAllowedPagesModal(true);
-        setViewLoading(true);
-        setViewAllowedPages([]);
-        adminAuthAPI.getAssignedPages(adminId)
-            .then(res => setViewAllowedPages(res.data.allowedPages || []))
-            .catch(() => setViewAllowedPages([]))
-            .finally(() => setViewLoading(false));
-    };
 
-    // Remove a page restriction for an admin
-    const handleRemovePageRestriction = (pageKey) => {
-        if (!viewAdminId) return;
-        const updatedPages = viewAllowedPages.filter(p => p !== pageKey);
-        setViewLoading(true);
-        adminAuthAPI.assignPages(viewAdminId, updatedPages)
-            .then(() => {
-                setViewAllowedPages(updatedPages);
-                setAuthMessage('✅ Page restriction removed!');
-            })
-            .catch(() => setAuthMessage('Failed to remove page restriction.'))
-            .finally(() => setViewLoading(false));
-    };
-    const handleAssignPages = (adminId) => {
-        setAssignAdminId(adminId);
-        setSelectedAdminId(adminId);
-        setSelectedPages([]);
-        setShowAssignModal(true);
-    };
-
-    // Handler for changing selected admin in modal
-    const handleSelectAdmin = (e) => {
-        setSelectedAdminId(e.target.value);
-        setSelectedPages([]);
-    };
-
-    // Handler for changing selected pages
-    const handleSelectPages = (e) => {
-        const options = Array.from(e.target.options);
-        setSelectedPages(options.filter(o => o.selected).map(o => o.value));
-    };
-
-    // Handler for submitting page assignment (stub)
-    const handleSubmitAssignPages = (e) => {
-        e.preventDefault();
-        // TODO: Implement API call to assign selectedPages to selectedAdminId
-        setAssignLoading(true);
-        setTimeout(() => {
-            setAssignLoading(false);
-            setShowAssignModal(false);
-            setSelectedPages([]);
-            setSelectedAdminId(null);
-            setAssignAdminId(null);
-            // Show success message (replace with real API response)
-            setAuthMessage('✅ Pages assigned successfully!');
-        }, 1000);
-    };
     const handleLogin = () => { };
     const handleRegister = () => { };
     const handleVerifyOtp = () => { };
@@ -167,48 +98,7 @@ const Dashboard = () => {
                                                                     <button className="btn btn-danger btn-sm me-2" onClick={() => handleDeleteAdmin(a._id, a.email)} disabled={deleteLoading}>
                                                                         <i className="bi bi-trash"></i> {deleteLoading ? 'Deleting...' : 'Delete'}
                                                                     </button>
-                                                                    <button className="btn btn-primary btn-sm me-2" onClick={() => handleAssignPages(a._id)} disabled={assignLoading}>
-                                                                        <i className="bi bi-file-earmark-text"></i> {assignLoading ? 'Assigning...' : 'Assign Pages'}
-                                                                    </button>
-                                                                    <button className="btn btn-outline-secondary btn-sm" title="View Allowed Pages" onClick={() => handleViewAllowedPages(a._id)}>
-                                                                        <i className="bi bi-eye"></i>
-                                                                    </button>
-                                                                    {/* Allowed Pages Modal */}
-                                                                    {showAllowedPagesModal && (
-                                                                        <div className="modal fade show" style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }} tabIndex="-1">
-                                                                            <div className="modal-dialog">
-                                                                                <div className="modal-content">
-                                                                                    <div className="modal-header">
-                                                                                        <h5 className="modal-title">Allowed Pages</h5>
-                                                                                        <button type="button" className="btn-close" onClick={() => setShowAllowedPagesModal(false)}></button>
-                                                                                    </div>
-                                                                                    <div className="modal-body">
-                                                                                        {viewLoading ? (
-                                                                                            <div>Loading...</div>
-                                                                                        ) : (
-                                                                                            <ul className="list-group">
-                                                                                                {viewAllowedPages.length === 0 && <li className="list-group-item">No pages assigned.</li>}
-                                                                                                {viewAllowedPages.map(pageKey => {
-                                                                                                    const pageObj = ASSIGNABLE_PAGES.find(p => p.key === pageKey);
-                                                                                                    return (
-                                                                                                        <li key={pageKey} className="list-group-item d-flex justify-content-between align-items-center">
-                                                                                                            {pageObj ? pageObj.label : pageKey}
-                                                                                                            <button className="btn btn-sm btn-danger" title="Remove Restriction" onClick={() => handleRemovePageRestriction(pageKey)} disabled={viewLoading}>
-                                                                                                                <i className="bi bi-trash"></i>
-                                                                                                            </button>
-                                                                                                        </li>
-                                                                                                    );
-                                                                                                })}
-                                                                                            </ul>
-                                                                                        )}
-                                                                                    </div>
-                                                                                    <div className="modal-footer">
-                                                                                        <button type="button" className="btn btn-secondary" onClick={() => setShowAllowedPagesModal(false)}>Close</button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
+
                                                                 </>
                                                             )}
                                                         </td>
@@ -227,61 +117,7 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Assign Pages Modal */}
-            {showAssignModal && (
-                <div className="modal fade show" style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }} tabIndex="-1">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Assign Pages to Admin</h5>
-                                <button type="button" className="btn-close" onClick={() => setShowAssignModal(false)}></button>
-                            </div>
-                            <form onSubmit={handleSubmitAssignPages}>
-                                <div className="modal-body">
-                                    <div className="mb-3">
-                                        <label htmlFor="adminSelect" className="form-label"><strong>Select Admin</strong></label>
-                                        <select
-                                            id="adminSelect"
-                                            className="form-select"
-                                            value={selectedAdminId || ''}
-                                            onChange={handleSelectAdmin}
-                                            required
-                                        >
-                                            <option value="" disabled>Select an admin</option>
-                                            {admins.map(a => (
-                                                <option key={a._id} value={a._id}>{a.name} ({a.email})</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="pagesSelect" className="form-label"><strong>Select Pages</strong></label>
-                                        <select
-                                            id="pagesSelect"
-                                            className="form-select"
-                                            multiple
-                                            value={selectedPages}
-                                            onChange={handleSelectPages}
-                                            required
-                                            size={Math.min(ASSIGNABLE_PAGES.length, 8)}
-                                        >
-                                            {ASSIGNABLE_PAGES.map(page => (
-                                                <option key={page.key} value={page.key}>{page.label}</option>
-                                            ))}
-                                        </select>
-                                        <div className="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple pages.</div>
-                                    </div>
-                                </div>
-                                <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary" onClick={() => setShowAssignModal(false)}>Cancel</button>
-                                    <button type="submit" className="btn btn-primary" disabled={assignLoading || !selectedAdminId || selectedPages.length === 0}>
-                                        {assignLoading ? 'Assigning...' : 'Assign Pages'}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            )}
+
 
             {/* Success/Error Messages */}
             {authMessage && (

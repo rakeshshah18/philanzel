@@ -24,13 +24,13 @@ router.get('/search', searchHomeFAQs);
 // Get single FAQ by ID (public)
 router.get('/:id', getHomeFAQById);
 
-// Create new FAQ (admin only)
-router.post('/', verifyToken, requireRole('admin'), createHomeFAQ);
+// Create new FAQ (admin and super_admin)
+router.post('/', verifyToken, requireRole(['admin', 'super_admin']), createHomeFAQ);
 
-// Update FAQ (admin only)
-router.put('/:id', verifyToken, requireRole('admin'), updateHomeFAQ);
+// Update FAQ (admin and super_admin)
+router.put('/:id', verifyToken, requireRole(['admin', 'super_admin']), updateHomeFAQ);
 
-// Delete FAQ (admin only)
-router.delete('/:id', verifyToken, requireRole('admin'), deleteHomeFAQ);
+// Delete FAQ (admin and super_admin)
+router.delete('/:id', verifyToken, requireRole(['admin', 'super_admin']), deleteHomeFAQ);
 
 export default router;
