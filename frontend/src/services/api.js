@@ -316,6 +316,12 @@ export const adminAuthAPI = {
     // Delete admin (super admin only)
     deleteAdmin: (id) => API.delete(`/admin/auth/${id}`),
 
+    // Super admin: assign allowedTabs to an admin
+    assignTabs: (adminId, allowedTabs) => API.put(`/admin/auth/${adminId}/assign-tabs`, { allowedTabs }),
+    // Super admin: get allowedTabs for an admin
+    getAssignedTabs: (adminId) => API.get(`/admin/auth/${adminId}/assigned-tabs`),
+    // Super admin: get all assigned tabs for all admins
+    getAllAssignedTabs: () => API.get('/admin/auth/all-assigned-tabs'),
 };
 
 // OurTrack API

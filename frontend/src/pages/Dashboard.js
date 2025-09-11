@@ -39,10 +39,68 @@ const Dashboard = () => {
         }
     }, [admin]);
 
-    // Handler stubs (implement as needed)
-    const handleDeleteAdmin = () => { };
 
 
+    // Allowed tabs management (backend-driven)
+    const ALL_TABS = ["pages", "services", "calculators", "sections"];
+    const [tabSelections, setTabSelections] = useState({}); // { adminId: ["pages", ...] }
+
+    // Load allowedTabs for all admins from backend on mount
+    useEffect(() => {
+        const fetchAllowedTabs = async () => {
+            if (admins.length > 0) {
+                const selections = {};
+                await Promise.all(admins.map(async (a) => {
+                    if (a.role === 'super_admin') return;
+                    try {
+                        const res = await adminAuthAPI.getAssignedTabs(a._id);
+                        selections[a._id] = Array.isArray(res.data.allowedTabs) && res.data.allowedTabs.length > 0 ? res.data.allowedTabs : [...ALL_TABS];
+                    } catch {
+                        selections[a._id] = [...ALL_TABS];
+                    }
+                }));
+                setTabSelections(selections);
+            }
+        };
+        fetchAllowedTabs();
+    }, [admins]);
+
+    // Handle checkbox change (update backend)
+    const handleTabCheckbox = async (adminId, tabKey) => {
+        setTabSelections(prev => {
+            const current = prev[adminId] || [];
+            let updated;
+            if (current.includes(tabKey)) {
+                updated = current.filter(t => t !== tabKey);
+            } else {
+                updated = [...current, tabKey];
+            }
+            // Update backend
+            adminAuthAPI.assignTabs(adminId, updated);
+            return { ...prev, [adminId]: updated };
+        });
+    };
+
+
+
+    // Handle deleting an admin (frontend-only)
+    const handleDeleteAdmin = async (adminId, email) => {
+        if (!window.confirm(`Are you sure you want to delete admin ${email}? This cannot be undone.`)) return;
+        setDeleteLoading(true);
+        try {
+            // Remove from localStorage (allowedTabs)
+            localStorage.removeItem(`allowedTabs_${adminId}`);
+            // Remove from admins list (frontend-only)
+            setAdmins(prev => prev.filter(a => a._id !== adminId));
+            setAuthMessage(`✅ Admin ${email} deleted successfully (frontend only)`);
+        } catch (err) {
+            setAuthMessage(`Failed to delete admin ${email}`);
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
+
+    // Dummy handlers for forms (frontend-only)
     const handleLogin = () => { };
     const handleRegister = () => { };
     const handleVerifyOtp = () => { };
@@ -98,7 +156,23 @@ const Dashboard = () => {
                                                                     <button className="btn btn-danger btn-sm me-2" onClick={() => handleDeleteAdmin(a._id, a.email)} disabled={deleteLoading}>
                                                                         <i className="bi bi-trash"></i> {deleteLoading ? 'Deleting...' : 'Delete'}
                                                                     </button>
-
+                                                                    {/* Allowed Tabs checkboxes */}
+                                                                    <div style={{ marginTop: 8 }}>
+                                                                        <strong>Allowed Tabs:</strong>
+                                                                        <div style={{ display: 'flex', gap: 8 }}>
+                                                                            {ALL_TABS.map(tab => (
+                                                                                <label key={tab} style={{ fontWeight: 400, fontSize: 13 }}>
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        checked={tabSelections[a._id]?.includes(tab) ?? true}
+                                                                                        onChange={() => handleTabCheckbox(a._id, tab)}
+                                                                                        style={{ marginRight: 4 }}
+                                                                                    />
+                                                                                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                                                                                </label>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
                                                                 </>
                                                             )}
                                                         </td>

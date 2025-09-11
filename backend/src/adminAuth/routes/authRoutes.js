@@ -28,10 +28,11 @@ router.put('/change-password', verifyToken, validatePasswordChange, adminAuthCon
 
 // Super admin only routes
 router.get('/all', verifyToken, requireSuperAdmin, adminAuthController.getAllAdmins);
-// Super admin: assign/retrieve allowedPages for admin
-router.put('/:id/assign-pages', verifyToken, requireSuperAdmin, adminAuthController.assignPages);
-router.get('/:id/assigned-pages', verifyToken, requireSuperAdmin, adminAuthController.getAssignedPages);
-// Super admin: get all assigned pages for all admins
-router.get('/all-assigned-pages', verifyToken, requireSuperAdmin, adminAuthController.getAllAssignedPages);
+
+// Super admin: assign/retrieve allowedTabs for admin
+router.put('/:id/assign-tabs', verifyToken, requireSuperAdmin, adminAuthController.assignTabs);
+router.get('/:id/assigned-tabs', verifyToken, adminAuthController.getAssignedTabs);
+// Super admin: get all assigned tabs for all admins
+router.get('/all-assigned-tabs', verifyToken, requireSuperAdmin, adminAuthController.getAllAssignedTabs);
 
 export default router;

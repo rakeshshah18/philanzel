@@ -298,67 +298,75 @@ class AdminAuthController {
     }
 
     // Super admin: assign allowedPages to admin
-    async assignPages(req, res) {
+
+    async assignTabs(req, res) {
         try {
             const { id } = req.params; // admin user id
-            const { allowedPages } = req.body; // array of page names/IDs
+            let { allowedTabs } = req.body; // array of tab names
+            // Ensure allowedTabs is always an array (never null/undefined)
+            if (!Array.isArray(allowedTabs)) allowedTabs = [];
             const requestingAdmin = req.admin;
             if (!requestingAdmin || requestingAdmin.role !== 'super_admin') {
-                return res.status(403).json({ success: false, message: 'Only super admin can assign pages.' });
+                return res.status(403).json({ success: false, message: 'Only super admin can assign tabs.' });
             }
             const admin = await Admin.findById(id);
             if (!admin) {
                 return res.status(404).json({ success: false, message: 'Admin not found.' });
             }
             if (admin.role === 'super_admin') {
-                return res.status(400).json({ success: false, message: 'Cannot assign pages to super admin.' });
+                return res.status(400).json({ success: false, message: 'Cannot assign tabs to super admin.' });
             }
-            admin.allowedPages = allowedPages;
-            await admin.save();
-            return res.status(200).json({ success: true, message: 'Pages assigned successfully.', allowedPages });
+            // Use findByIdAndUpdate to avoid VersionError
+            await Admin.findByIdAndUpdate(id, { allowedTabs }, { new: true });
+            return res.status(200).json({ success: true, message: 'Tabs assigned successfully.', allowedTabs });
         } catch (error) {
-            console.error('Assign pages error:', error);
-            return res.status(500).json({ success: false, message: 'Internal server error' });
+            console.error('Assign tabs error:', error);
+            console.error('Error stack:', error.stack);
+            console.error('Request allowedTabs value:', req.body.allowedTabs);
+            return res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
         }
     }
 
     // Super admin: get allowedPages for admin
-    async getAssignedPages(req, res) {
+
+    async getAssignedTabs(req, res) {
         try {
             const { id } = req.params;
             const requestingAdmin = req.admin;
-            if (!requestingAdmin || requestingAdmin.role !== 'super_admin') {
-                return res.status(403).json({ success: false, message: 'Only super admin can view assigned pages.' });
+            // Allow super admin to fetch for anyone, or admin to fetch their own
+            if (!requestingAdmin || (requestingAdmin.role !== 'super_admin' && requestingAdmin.id !== id)) {
+                return res.status(403).json({ success: false, message: 'Insufficient permissions' });
             }
             const admin = await Admin.findById(id);
             if (!admin) {
                 return res.status(404).json({ success: false, message: 'Admin not found.' });
             }
-            return res.status(200).json({ success: true, allowedPages: admin.allowedPages });
+            return res.status(200).json({ success: true, allowedTabs: admin.allowedTabs });
         } catch (error) {
-            console.error('Get assigned pages error:', error);
+            console.error('Get assigned tabs error:', error);
             return res.status(500).json({ success: false, message: 'Internal server error' });
         }
     }
 
     // Super admin: get all assigned pages for all admins
-    async getAllAssignedPages(req, res) {
+
+    async getAllAssignedTabs(req, res) {
         try {
             const requestingAdmin = req.admin;
             if (!requestingAdmin || requestingAdmin.role !== 'super_admin') {
-                return res.status(403).json({ success: false, message: 'Only super admin can view assigned pages.' });
+                return res.status(403).json({ success: false, message: 'Only super admin can view assigned tabs.' });
             }
-            const admins = await Admin.find({ role: 'admin' }, 'email name allowedPages');
-            // Flatten all assigned pages
-            const assignedPages = admins.reduce((acc, admin) => {
-                admin.allowedPages.forEach(page => {
-                    if (!acc.includes(page)) acc.push(page);
+            const admins = await Admin.find({ role: 'admin' }, 'email name allowedTabs');
+            // Flatten all assigned tabs
+            const assignedTabs = admins.reduce((acc, admin) => {
+                (admin.allowedTabs || []).forEach(tab => {
+                    if (!acc.includes(tab)) acc.push(tab);
                 });
                 return acc;
             }, []);
-            return res.status(200).json({ success: true, assignedPages, admins });
+            return res.status(200).json({ success: true, assignedTabs, admins });
         } catch (error) {
-            console.error('Get all assigned pages error:', error);
+            console.error('Get all assigned tabs error:', error);
             return res.status(500).json({ success: false, message: 'Internal server error' });
         }
     }

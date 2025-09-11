@@ -32,6 +32,11 @@ const adminSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    // Allowed sidebar tabs for this admin (set by super_admin)
+    allowedTabs: {
+        type: [String],
+        default: [], // empty array means no tabs allowed, undefined means all tabs allowed
+    },
     lastLogin: {
         type: Date
     },
