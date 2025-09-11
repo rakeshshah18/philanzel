@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import NotAllowed from '../pages/NotAllowed';
 import Alert from './Alert';
 
 const ProtectedRoute = ({
     children,
     requiredRoles = ['admin', 'super_admin'],
+    allowedTabs = null, // e.g. ['sections']
+    tabKey = null, // e.g. 'sections', the key to check in allowedTabs
     fallback = null,
     redirectToLogin = true
 }) => {
@@ -74,6 +77,11 @@ const ProtectedRoute = ({
                 />
             </div>
         );
+    }
+
+    // Check allowedTabs if provided
+    if (allowedTabs && tabKey && Array.isArray(allowedTabs) && !allowedTabs.includes(tabKey) && admin?.role !== 'super_admin') {
+        return <NotAllowed />;
     }
 
     // User is authenticated and has required role
