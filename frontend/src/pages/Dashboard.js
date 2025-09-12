@@ -1,14 +1,63 @@
+
 import React, { useState, useEffect } from 'react';
-import { ASSIGNABLE_PAGES } from '../constants/assignablePages';
-import { adminAuthAPI } from '../services/api';
+import { adminAuthAPI, servicesAPI, calculatorPagesAPI, reviewSectionsAPI, adsSectionsAPI } from '../services/api';
 import { LoginForm, RegisterForm, AdminNavbar } from '../components/admin-forms';
 import OtpModal from '../components/admin-forms/OtpModal';
 import { useAuth } from '../contexts/AuthContext';
 import Alert from '../components/Alert';
 
 const Dashboard = () => {
-    const { admin, isAuthenticated, login, register, logout } = useAuth();
+    const { admin, isAuthenticated, logout } = useAuth();
 
+    // KPI stats state
+    const [stats, setStats] = useState({
+        services: null,
+        calculators: null,
+        reviews: null,
+        ads: null,
+    });
+    const [statsLoading, setStatsLoading] = useState(false);
+    const [statsError, setStatsError] = useState('');
+
+    // Fetch KPI stats on mount
+    useEffect(() => {
+        const fetchStats = async () => {
+            setStatsLoading(true);
+            setStatsError('');
+            try {
+                // Services count
+                const servicesRes = await servicesAPI.getAll();
+                const servicesCount = Array.isArray(servicesRes.data.data) ? servicesRes.data.data.length : 0;
+
+                // Calculators count
+                const calculatorsRes = await calculatorPagesAPI.getAll();
+                const calculatorsCount = Array.isArray(calculatorsRes.data.data) ? calculatorsRes.data.data.length : 0;
+
+                // Reviews count (sum of all reviews in all sections)
+                const reviewsRes = await reviewSectionsAPI.getAll();
+                let reviewsCount = 0;
+                if (Array.isArray(reviewsRes.data.data)) {
+                    reviewsCount = reviewsRes.data.data.reduce((sum, section) => sum + (Array.isArray(section.reviews) ? section.reviews.length : 0), 0);
+                }
+
+                // Ads count
+                const adsRes = await adsSectionsAPI.getAllAdmin();
+                const adsCount = Array.isArray(adsRes.data.data) ? adsRes.data.data.length : 0;
+
+                setStats({
+                    services: servicesCount,
+                    calculators: calculatorsCount,
+                    reviews: reviewsCount,
+                    ads: adsCount,
+                });
+            } catch (err) {
+                setStatsError('Failed to load dashboard stats');
+            } finally {
+                setStatsLoading(false);
+            }
+        };
+        fetchStats();
+    }, []);
 
     // Admin list state (for super_admin)
     const [admins, setAdmins] = useState([]);
@@ -16,19 +65,14 @@ const Dashboard = () => {
     const [adminsError, setAdminsError] = useState('');
     const [deleteLoading, setDeleteLoading] = useState(false);
 
-
-
     // Auth modals and state
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [showDeleteAdminModal, setShowDeleteAdminModal] = useState(false);
     const [showOtpModal, setShowOtpModal] = useState(false);
-    const [authLoading, setAuthLoading] = useState(false);
+    const [authLoading] = useState(false);
     const [authMessage, setAuthMessage] = useState('');
-    const [pendingOtpEmail, setPendingOtpEmail] = useState('');
-
-
-    // Fetch admins for super_admin
+    const [pendingOtpEmail] = useState('');
     useEffect(() => {
         if (admin && admin.role === 'super_admin') {
             setAdminsLoading(true);
@@ -42,7 +86,7 @@ const Dashboard = () => {
 
 
     // Allowed tabs management (backend-driven)
-    const ALL_TABS = ["pages", "services", "calculators", "sections"];
+    const ALL_TABS = React.useMemo(() => ["pages", "services", "calculators", "sections"], []);
     const [tabSelections, setTabSelections] = useState({}); // { adminId: ["pages", ...] }
 
     // Load allowedTabs for all admins from backend on mount
@@ -63,7 +107,7 @@ const Dashboard = () => {
             }
         };
         fetchAllowedTabs();
-    }, [admins]);
+    }, [admins, ALL_TABS]);
 
     // Handle checkbox change (update backend)
     const handleTabCheckbox = async (adminId, tabKey) => {
@@ -211,9 +255,80 @@ const Dashboard = () => {
                         <p className="text-muted">Welcome to Philanzel Financial Services</p>
                     </div>
                 </div>
-                {/* dashboard content */}
+
+                {/* KPI Cards */}
+                <div className="row g-4 mb-4">
+                    <div className="col-12 col-sm-6 col-lg-3">
+                        <div className="card shadow-sm dashboard-card h-100" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                            <div className="card-body d-flex flex-column align-items-center justify-content-center py-4">
+                                <i className="fas fa-cogs fa-2x mb-2 text-primary"></i>
+                                <h5 className="mb-1" style={{ fontWeight: 700 }}>Services</h5>
+                                <div className="display-6 fw-bold">
+                                    {statsLoading ? <span className="spinner-border spinner-border-sm text-primary" /> : (stats.services ?? '--')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-12 col-sm-6 col-lg-3">
+                        <div className="card shadow-sm dashboard-card h-100" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                            <div className="card-body d-flex flex-column align-items-center justify-content-center py-4">
+                                <i className="fas fa-calculator fa-2x mb-2 text-success"></i>
+                                <h5 className="mb-1" style={{ fontWeight: 700 }}>Calculators</h5>
+                                <div className="display-6 fw-bold">
+                                    {statsLoading ? <span className="spinner-border spinner-border-sm text-success" /> : (stats.calculators ?? '--')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-12 col-sm-6 col-lg-3">
+                        <div className="card shadow-sm dashboard-card h-100" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                            <div className="card-body d-flex flex-column align-items-center justify-content-center py-4">
+                                <i className="fas fa-star fa-2x mb-2 text-warning"></i>
+                                <h5 className="mb-1" style={{ fontWeight: 700 }}>Reviews</h5>
+                                <div className="display-6 fw-bold">
+                                    {statsLoading ? <span className="spinner-border spinner-border-sm text-warning" /> : (stats.reviews ?? '--')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-12 col-sm-6 col-lg-3">
+                        <div className="card shadow-sm dashboard-card h-100" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                            <div className="card-body d-flex flex-column align-items-center justify-content-center py-4">
+                                <i className="fas fa-bullhorn fa-2x mb-2 text-info"></i>
+                                <h5 className="mb-1" style={{ fontWeight: 700 }}>Ads</h5>
+                                <div className="display-6 fw-bold">
+                                    {statsLoading ? <span className="spinner-border spinner-border-sm text-info" /> : (stats.ads ?? '--')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {statsError && (
+                    <div className="alert alert-danger my-2">{statsError}</div>
+                )}
+
+                {/* Analytics & Recent Activity Placeholder */}
+                <div className="row g-4">
+                    <div className="col-12 col-lg-8">
+                        <div className="card shadow-sm dashboard-card h-100" style={{ borderRadius: 18, background: '#fff', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                            <div className="card-body py-4">
+                                <h5 className="mb-3" style={{ fontWeight: 700 }}><i className="fas fa-chart-bar me-2 text-primary"></i>Analytics Overview</h5>
+                                <div className="text-muted">(Charts and analytics coming soon...)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-12 col-lg-4">
+                        <div className="card shadow-sm dashboard-card h-100" style={{ borderRadius: 18, background: '#fff', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                            <div className="card-body py-4">
+                                <h5 className="mb-3" style={{ fontWeight: 700 }}><i className="fas fa-history me-2 text-secondary"></i>Recent Activity</h5>
+                                <div className="text-muted">(Recent activity will appear here...)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {!isAuthenticated && (
-                    <div className="alert alert-warning d-flex align-items-center justify-content-between" style={{ gap: '1rem' }}>
+                    <div className="alert alert-warning d-flex align-items-center justify-content-between mt-4" style={{ gap: '1rem' }}>
                         <div>
                             <strong>Note:</strong> You are viewing as a guest. Please log in as admin to perform actions.
                         </div>
@@ -227,8 +342,6 @@ const Dashboard = () => {
                         </div>
                     </div>
                 )}
-
-                {/* ...removed Admin Accounts card for super_admin... */}
             </div>
 
             <LoginForm
