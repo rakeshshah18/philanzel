@@ -1,0 +1,13 @@
+/backend/node_modules
+/dist
+/backend/.env
+/API_TEST_GUIDE.md
+/build
+frontend/node_modules
+/.env.example
+/.vscode
+README.md
+/API_DOCUMENTATION.md
+/src/uploads
+# /node_modules
+# /philanzel/node_modules
