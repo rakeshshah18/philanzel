@@ -720,56 +720,56 @@ const Home = () => {
 
                     {/* Track Record Display */}
                     {!showTrackForm && trackData && (
-                        <div className="row">
-                            <div className="col-md-3 mb-3">
-                                <div className="card border-success h-100">
-                                    <div className="card-body text-center">
-                                        <div className="display-4 text-success mb-2">
+                        <div className="row g-4 dashboard-track-row">
+                            <div className="col-12 col-sm-6 col-lg-3">
+                                <div className="dashboard-card h-100" style={{ background: isDarkMode ? '#1e293b' : '#e3fcec', border: 'none', borderRadius: 16, boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #b2f2e6' }}>
+                                    <div className="dashboard-card-body text-center py-4">
+                                        <div className="dashboard-icon mb-2" style={{ fontSize: 44, color: '#22c55e' }}>
                                             <i className="fas fa-calendar-alt"></i>
                                         </div>
-                                        <h3 className="display-6 fw-bold text-success">
+                                        <div className="dashboard-value fw-bold" style={{ fontSize: 32, color: '#22c55e' }}>
                                             {trackData.yearExp ? trackData.yearExp.toLocaleString() : '0'}
-                                        </h3>
-                                        <p className="card-text text-muted">Years of Experience</p>
+                                        </div>
+                                        <div className="dashboard-label text-muted mt-1">Years of Experience</div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-md-3 mb-3">
-                                <div className="card border-info h-100">
-                                    <div className="card-body text-center">
-                                        <div className="display-4 text-info mb-2">
+                            <div className="col-12 col-sm-6 col-lg-3">
+                                <div className="dashboard-card h-100" style={{ background: isDarkMode ? '#1e293b' : '#e0f2fe', border: 'none', borderRadius: 16, boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #bae6fd' }}>
+                                    <div className="dashboard-card-body text-center py-4">
+                                        <div className="dashboard-icon mb-2" style={{ fontSize: 44, color: '#0ea5e9' }}>
                                             <i className="fas fa-users"></i>
                                         </div>
-                                        <h3 className="display-6 fw-bold text-info">
+                                        <div className="dashboard-value fw-bold" style={{ fontSize: 32, color: '#0ea5e9' }}>
                                             {trackData.totalExpert ? trackData.totalExpert.toLocaleString() : '0'}
-                                        </h3>
-                                        <p className="card-text text-muted">Total Experts</p>
+                                        </div>
+                                        <div className="dashboard-label text-muted mt-1">Total Experts</div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-md-3 mb-3">
-                                <div className="card border-warning h-100">
-                                    <div className="card-body text-center">
-                                        <div className="display-4 text-warning mb-2">
+                            <div className="col-12 col-sm-6 col-lg-3">
+                                <div className="dashboard-card h-100" style={{ background: isDarkMode ? '#1e293b' : '#fff7e6', border: 'none', borderRadius: 16, boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #ffe7ba' }}>
+                                    <div className="dashboard-card-body text-center py-4">
+                                        <div className="dashboard-icon mb-2" style={{ fontSize: 44, color: '#f59e42' }}>
                                             <i className="fas fa-tasks"></i>
                                         </div>
-                                        <h3 className="display-6 fw-bold text-warning">
+                                        <div className="dashboard-value fw-bold" style={{ fontSize: 32, color: '#f59e42' }}>
                                             {trackData.planningDone ? trackData.planningDone.toLocaleString() : '0'}
-                                        </h3>
-                                        <p className="card-text text-muted">Projects Completed</p>
+                                        </div>
+                                        <div className="dashboard-label text-muted mt-1">Projects Completed</div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-md-3 mb-3">
-                                <div className="card border-danger h-100">
-                                    <div className="card-body text-center">
-                                        <div className="display-4 text-danger mb-2">
+                            <div className="col-12 col-sm-6 col-lg-3">
+                                <div className="dashboard-card h-100" style={{ background: isDarkMode ? '#1e293b' : '#ffe4e6', border: 'none', borderRadius: 16, boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #fecdd3' }}>
+                                    <div className="dashboard-card-body text-center py-4">
+                                        <div className="dashboard-icon mb-2" style={{ fontSize: 44, color: '#ef4444' }}>
                                             <i className="fas fa-smile"></i>
                                         </div>
-                                        <h3 className="display-6 fw-bold text-danger">
+                                        <div className="dashboard-value fw-bold" style={{ fontSize: 32, color: '#ef4444' }}>
                                             {trackData.happyCustomers ? trackData.happyCustomers.toLocaleString() : '0'}
-                                        </h3>
-                                        <p className="card-text text-muted">Happy Customers</p>
+                                        </div>
+                                        <div className="dashboard-label text-muted mt-1">Happy Customers</div>
                                     </div>
                                 </div>
                             </div>
@@ -902,28 +902,28 @@ const Home = () => {
                 <div className="container-fluid py-4">
                     <div className="row mb-4">
                         <div className="col-12">
-                            <div className="card shadow-sm">
-                                <div className="card-header bg-primary text-white">
-                                    <h4 className="mb-0">
+                            <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: isDarkMode ? '#23272f' : '#f8fafc', border: 'none', boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #e0e7ef' }}>
+                                <div className="dashboard-card-header px-4 py-3" style={{ background: isDarkMode ? '#1e293b' : '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                                    <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
                                         <i className="fas fa-home me-2"></i>
                                         Home Services
                                     </h4>
                                 </div>
-                                <div className="card-body">
+                                <div className="dashboard-card-body px-4 py-4">
                                     <div className="table-responsive">
-                                        <table className="table table-striped table-hover">
-                                            <thead className="table-dark">
+                                        <table className="table table-borderless align-middle dashboard-table">
+                                            <thead style={{ background: isDarkMode ? '#334155' : '#e3eafc' }}>
                                                 <tr>
-                                                    <th scope="col">#</th>
-                                                    <th scope="col">Service Name</th>
-                                                    <th scope="col">Description</th>
-                                                    <th scope="col">Actions</th>
+                                                    <th style={{ width: 40, color: isDarkMode ? '#fff' : '#333' }}>#</th>
+                                                    <th style={{ color: isDarkMode ? '#fff' : '#333' }}>Service Name</th>
+                                                    <th style={{ color: isDarkMode ? '#fff' : '#333' }}>Description</th>
+                                                    <th style={{ color: isDarkMode ? '#fff' : '#333' }}>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {homeServices.map((service, index) => (
-                                                    <tr key={service.id}>
-                                                        <td>{index + 1}</td>
+                                                    <tr key={service.id} style={{ background: isDarkMode ? (index % 2 === 0 ? '#23272f' : '#1e293b') : (index % 2 === 0 ? '#f8fafc' : '#e3eafc') }}>
+                                                        <td style={{ fontWeight: 600, color: '#1565c0' }}>{index + 1}</td>
                                                         <td>
                                                             {editingHomeService === service.id ? (
                                                                 <input
@@ -936,12 +936,12 @@ const Home = () => {
                                                                     }))}
                                                                 />
                                                             ) : (
-                                                                <strong>{service.serviceName}</strong>
+                                                                <span style={{ fontWeight: 600, color: isDarkMode ? '#fff' : '#222' }}>{service.serviceName}</span>
                                                             )}
                                                         </td>
                                                         <td>
                                                             {editingHomeService === service.id ? (
-                                                                <div style={{ minHeight: '150px' }}>
+                                                                <div style={{ minHeight: '120px' }}>
                                                                     <ReactQuill
                                                                         theme="snow"
                                                                         value={homeServiceFormData.description}
@@ -967,7 +967,7 @@ const Home = () => {
                                                                     />
                                                                 </div>
                                                             ) : (
-                                                                <div dangerouslySetInnerHTML={{ __html: service.description }} />
+                                                                <div style={{ color: isDarkMode ? '#cbd5e1' : '#444' }} dangerouslySetInnerHTML={{ __html: service.description }} />
                                                             )}
                                                         </td>
                                                         <td>
@@ -1008,9 +1008,10 @@ const Home = () => {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div className="mt-3">
+                                    <div className="mt-3 text-end">
                                         <button
-                                            className="btn btn-success"
+                                            className="btn btn-success px-4 py-2"
+                                            style={{ borderRadius: 8, fontWeight: 600, fontSize: 16 }}
                                             onClick={handleAddHomeService}
                                         >
                                             <i className="fas fa-plus me-2"></i>
@@ -1493,9 +1494,9 @@ const TabbingServices = () => {
         <div className="container-fluid py-4">
             <div className="row">
                 <div className="col-12">
-                    <div className="card shadow-sm">
-                        <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <h4 className="mb-0">
+                    <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                        <div className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                            <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
                                 <i className="fas fa-layer-group me-2"></i>
                                 Tabbing Services
                                 {fetchingServices && (
@@ -1559,7 +1560,7 @@ const TabbingServices = () => {
                                 )}
                             </div>
                         </div>
-                        <div className="card-body">
+                        <div className="dashboard-card-body px-4 py-4">
                             {/* Common Image Section */}
                             <div className="mb-4 p-3 border rounded">
                                 <div className="row align-items-center">
@@ -2327,14 +2328,14 @@ const HelpedIndustries = () => {
         <div className="container-fluid py-4">
             <div className="row mb-4">
                 <div className="col-12">
-                    <div className="card shadow-sm">
-                        <div className="card-header bg-primary text-white">
-                            <h4 className="mb-0">
+                    <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                        <div className="dashboard-card-header px-4 py-3" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                            <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
                                 <i className="fas fa-industry me-2"></i>
                                 Helped Industries
                             </h4>
                         </div>
-                        <div className="card-body">
+                        <div className="dashboard-card-body px-4 py-4">
                             {message && (
                                 <Alert
                                     message={message}
@@ -2345,13 +2346,13 @@ const HelpedIndustries = () => {
                             {/* Add/Edit Form */}
                             {showForm && (
                                 <div className="mb-4">
-                                    <div className="card border-primary">
-                                        <div className="card-header bg-light">
+                                    <div className="dashboard-card border-primary" style={{ borderRadius: 14, background: '#e3fcec' }}>
+                                        <div className="dashboard-card-header px-3 py-2" style={{ background: '#22c55e', color: '#fff', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
                                             <h5 className="mb-0">
                                                 {isEditing ? '✏️ Edit Helped Industries' : '➕ Add New Helped Industries'}
                                             </h5>
                                         </div>
-                                        <div className="card-body">
+                                        <div className="dashboard-card-body px-3 py-3">
                                             <form onSubmit={handleSubmit}>
                                                 <div className="row mb-3">
                                                     <div className="col-md-6">
@@ -2497,11 +2498,11 @@ const HelpedIndustries = () => {
                                     <p className="text-muted">No helped industries found. Click "Add New" to create one.</p>
                                 </div>
                             ) : (
-                                <div className="row">
+                                <div className="row g-4">
                                     {helpedIndustries.map((item) => (
-                                        <div key={item._id} className="col-12 mb-4">
-                                            <div className="card border-primary">
-                                                <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                        <div key={item._id} className="col-12 mb-2">
+                                            <div className="dashboard-card border-primary" style={{ borderRadius: 14, background: '#e0f2fe', border: 'none', boxShadow: '0 2px 12px #bae6fd' }}>
+                                                <div className="dashboard-card-header px-3 py-2 d-flex justify-content-between align-items-center" style={{ background: '#0ea5e9', color: '#fff', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
                                                     <h5 className="mb-0">{item.heading}</h5>
                                                     <div>
                                                         <button
@@ -2518,7 +2519,7 @@ const HelpedIndustries = () => {
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div className="card-body">
+                                                <div className="dashboard-card-body px-3 py-3">
                                                     <div className="row">
                                                         {/* Left side - Heading and Description */}
                                                         <div className="col-md-6">
@@ -2545,8 +2546,8 @@ const HelpedIndustries = () => {
 
                                                             {/* Add Industry Form */}
                                                             {showIndustryForm && addingIndustryTo === item._id && (
-                                                                <div className="card border-success mb-3">
-                                                                    <div className="card-body p-3">
+                                                                <div className="dashboard-card border-success mb-3" style={{ background: '#fff', borderRadius: 10 }}>
+                                                                    <div className="dashboard-card-body p-3">
                                                                         <div className="row">
                                                                             <div className="col-md-6">
                                                                                 <input
@@ -2590,10 +2591,10 @@ const HelpedIndustries = () => {
                                                             )}
 
                                                             {/* Industries Grid */}
-                                                            <div className="row">
+                                                            <div className="row g-3">
                                                                 {item.industries.map((industry, index) => (
-                                                                    <div key={index} className="col-md-3 col-sm-6 mb-3">
-                                                                        <div className="text-center p-3 border rounded position-relative">
+                                                                    <div key={index} className="col-md-4 col-sm-6 mb-2">
+                                                                        <div className="dashboard-card text-center p-3 position-relative" style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #bae6fd' }}>
                                                                             <button
                                                                                 type="button"
                                                                                 className="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
@@ -2603,8 +2604,10 @@ const HelpedIndustries = () => {
                                                                             >
                                                                                 <i className="bi bi-trash"></i>
                                                                             </button>
-                                                                            <i className={`${industry.icon} fa-lg text-info mb-2`}></i>
-                                                                            <h6 className="small">{industry.name}</h6>
+                                                                            <div style={{ fontSize: 36, color: '#0ea5e9', marginBottom: 8 }}>
+                                                                                <i className={`${industry.icon}`}></i>
+                                                                            </div>
+                                                                            <h6 className="small" style={{ fontWeight: 600, color: '#1565c0' }}>{industry.name}</h6>
                                                                         </div>
                                                                     </div>
                                                                 ))}
@@ -2772,24 +2775,22 @@ const WhyChooseUs = () => {
         <div className="container-fluid py-4">
             <div className="row">
                 <div className="col-12">
-                    <div className="card shadow-sm">
-                        <div className="card-header bg-primary text-white">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <h4 className="mb-0">
-                                    <i className="fas fa-star me-2"></i>
-                                    Why Choose Us Management
-                                </h4>
-                                <button
-                                    className="btn btn-light btn-sm"
-                                    onClick={() => setShowForm(!showForm)}
-                                >
-                                    <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'} me-1`}></i>
-                                    {showForm ? 'Cancel' : 'Add New'}
-                                </button>
-                            </div>
+                    <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                        <div className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                            <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
+                                <i className="fas fa-star me-2"></i>
+                                Why Choose Us Management
+                            </h4>
+                            <button
+                                className="btn btn-light btn-sm"
+                                onClick={() => setShowForm(!showForm)}
+                            >
+                                <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'} me-1`}></i>
+                                {showForm ? 'Cancel' : 'Add New'}
+                            </button>
                         </div>
 
-                        <div className="card-body">
+                        <div className="dashboard-card-body px-4 py-4">
                             {/* Alert Messages */}
                             {message && (
                                 <Alert
@@ -3286,15 +3287,15 @@ const OurAssociation = () => {
         <div className="container-fluid py-4">
             <div className="row">
                 <div className="col-12">
-                    <div className="card shadow-sm">
-                        <div className="card-header bg-primary text-white">
-                            <h4 className="mb-0">
+                    <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                        <div className="dashboard-card-header px-4 py-3" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                            <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
                                 <i className="fas fa-handshake me-2"></i>
                                 Our Association
                             </h4>
                         </div>
 
-                        <div className="card-body">
+                        <div className="dashboard-card-body px-4 py-4">
                             {/* Alert Messages */}
                             {message && (
                                 <Alert
@@ -3306,13 +3307,13 @@ const OurAssociation = () => {
 
                             {/* Add/Edit Form */}
                             {showForm && (
-                                <div className="card border-primary mb-4">
-                                    <div className="card-header bg-light">
+                                <div className="dashboard-card border-primary mb-4" style={{ borderRadius: 14, background: '#e3fcec' }}>
+                                    <div className="dashboard-card-header px-3 py-2" style={{ background: '#22c55e', color: '#fff', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
                                         <h5 className="mb-0">
                                             {isEditing ? 'Edit Our Association Entry' : 'Add New Our Association Entry'}
                                         </h5>
                                     </div>
-                                    <div className="card-body">
+                                    <div className="dashboard-card-body px-3 py-3">
                                         <form onSubmit={handleSubmit}>
                                             <div className="row">
                                                 <div className="col-md-6">
@@ -3426,11 +3427,11 @@ const OurAssociation = () => {
                                     <p className="text-muted">No our association entries found. Click "Add New" to create one.</p>
                                 </div>
                             ) : (
-                                <div className="row">
+                                <div className="row g-4">
                                     {ourAssociation.map((item) => (
-                                        <div key={item._id} className="col-12 mb-4">
-                                            <div className="card border-primary">
-                                                <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                        <div key={item._id} className="col-12 mb-2">
+                                            <div className="dashboard-card border-primary" style={{ borderRadius: 14, background: '#e0f2fe', border: 'none', boxShadow: '0 2px 12px #bae6fd' }}>
+                                                <div className="dashboard-card-header px-3 py-2 d-flex justify-content-between align-items-center" style={{ background: '#0ea5e9', color: '#fff', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
                                                     <h5 className="mb-0">{item.heading}</h5>
                                                     <div>
                                                         <button
@@ -3447,7 +3448,7 @@ const OurAssociation = () => {
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div className="card-body">
+                                                <div className="dashboard-card-body px-3 py-3">
                                                     <div className="row">
                                                         {/* Left side - Description and Button */}
                                                         <div className="col-md-4">
@@ -3478,15 +3479,15 @@ const OurAssociation = () => {
                                                             {item.rowOne && item.rowOne.length > 0 && (
                                                                 <div className="mb-3">
                                                                     <small className="text-muted">Images :</small>
-                                                                    <div className="d-flex flex-wrap gap-2 mt-1">
+                                                                    <div className="d-flex flex-wrap gap-3 mt-1">
                                                                         {item.rowOne.map((image, index) => (
-                                                                            <img
-                                                                                key={index}
-                                                                                src={getImageUrl(image.url)}
-                                                                                alt={image.alt || `Association ${index + 1}`}
-                                                                                className="rounded border"
-                                                                                style={{ height: '80px', width: '80px', objectFit: 'cover' }}
-                                                                            />
+                                                                            <div key={index} className="dashboard-card p-2 d-flex align-items-center justify-content-center" style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #bae6fd', width: 90, height: 90 }}>
+                                                                                <img
+                                                                                    src={getImageUrl(image.url)}
+                                                                                    alt={image.alt || `Association ${index + 1}`}
+                                                                                    style={{ height: '60px', width: '60px', objectFit: 'cover', borderRadius: 8 }}
+                                                                                />
+                                                                            </div>
                                                                         ))}
                                                                     </div>
                                                                 </div>
@@ -3496,15 +3497,15 @@ const OurAssociation = () => {
                                                             {item.rowTwo && item.rowTwo.length > 0 && (
                                                                 <div className="mb-3">
                                                                     <small className="text-muted">Images :</small>
-                                                                    <div className="d-flex flex-wrap gap-2 mt-1">
+                                                                    <div className="d-flex flex-wrap gap-3 mt-1">
                                                                         {item.rowTwo.map((image, index) => (
-                                                                            <img
-                                                                                key={index}
-                                                                                src={getImageUrl(image.url)}
-                                                                                alt={image.alt || `Association ${index + 1}`}
-                                                                                className="rounded border"
-                                                                                style={{ height: '80px', width: '80px', objectFit: 'cover' }}
-                                                                            />
+                                                                            <div key={index} className="dashboard-card p-2 d-flex align-items-center justify-content-center" style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #bae6fd', width: 90, height: 90 }}>
+                                                                                <img
+                                                                                    src={getImageUrl(image.url)}
+                                                                                    alt={image.alt || `Association ${index + 1}`}
+                                                                                    style={{ height: '60px', width: '60px', objectFit: 'cover', borderRadius: 8 }}
+                                                                                />
+                                                                            </div>
                                                                         ))}
                                                                     </div>
                                                                 </div>
@@ -3514,15 +3515,15 @@ const OurAssociation = () => {
                                                             {item.rowThree && item.rowThree.length > 0 && (
                                                                 <div className="mb-3">
                                                                     <small className="text-muted">Images :</small>
-                                                                    <div className="d-flex flex-wrap gap-2 mt-1">
+                                                                    <div className="d-flex flex-wrap gap-3 mt-1">
                                                                         {item.rowThree.map((image, index) => (
-                                                                            <img
-                                                                                key={index}
-                                                                                src={getImageUrl(image.url)}
-                                                                                alt={image.alt || `Association ${index + 1}`}
-                                                                                className="rounded border"
-                                                                                style={{ height: '80px', width: '80px', objectFit: 'cover' }}
-                                                                            />
+                                                                            <div key={index} className="dashboard-card p-2 d-flex align-items-center justify-content-center" style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #bae6fd', width: 90, height: 90 }}>
+                                                                                <img
+                                                                                    src={getImageUrl(image.url)}
+                                                                                    alt={image.alt || `Association ${index + 1}`}
+                                                                                    style={{ height: '60px', width: '60px', objectFit: 'cover', borderRadius: 8 }}
+                                                                                />
+                                                                            </div>
                                                                         ))}
                                                                     </div>
                                                                 </div>
@@ -3690,18 +3691,19 @@ const HomeFAQs = () => {
                 faqs: prev.faqs.filter((_, i) => i !== index)
             }));
         }
-    }; return (
+    };
+    return (
         <div className="container-fluid py-4">
             <div className="row">
                 <div className="col-12">
-                    <div className="card shadow-sm">
-                        <div className="card-header bg-primary text-white">
-                            <h4 className="mb-0">
+                    <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                        <div className="dashboard-card-header px-4 py-3" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                            <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
                                 <i className="fas fa-question-circle me-2"></i>
                                 Home FAQs
                             </h4>
                         </div>
-                        <div className="card-body">
+                        <div className="dashboard-card-body px-4 py-4">
                             {message && (
                                 <Alert
                                     message={message}

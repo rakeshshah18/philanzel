@@ -186,12 +186,11 @@ const AboutUs = () => {
                 submitData.append('image', formData.image.file);
             }
 
-            let response;
             if (isEditing) {
-                response = await aboutUsAPI.update(editingId, submitData);
+                await aboutUsAPI.update(editingId, submitData);
                 setMessage('✅ About Us content updated successfully!');
             } else {
-                response = await aboutUsAPI.create(submitData);
+                await aboutUsAPI.create(submitData);
                 setMessage('✅ About Us content created successfully!');
             }
 
@@ -331,12 +330,11 @@ const AboutUs = () => {
                 cards: journeyFormData.cards
             };
 
-            let response;
             if (isEditingJourney) {
-                response = await ourJourneyAPI.update(editingJourneyId, submitData);
+                await ourJourneyAPI.update(editingJourneyId, submitData);
                 setMessage('✅ Our Journey content updated successfully!');
             } else {
-                response = await ourJourneyAPI.create(submitData);
+                await ourJourneyAPI.create(submitData);
                 setMessage('✅ Our Journey content created successfully!');
             }
 
@@ -692,7 +690,7 @@ const AboutUs = () => {
             {/* Create/Edit Form */}
             {showForm && (
                 <div className="card mb-4">
-                    <div className="card-header">
+                    <div className="card-header" style={{ background: '#0ea5e9', color: '#fff' }}>
                         <h5 className="card-title mb-0">
                             {isEditing ? 'Edit About Content' : 'Add New About Content'}
                         </h5>
@@ -813,31 +811,31 @@ const AboutUs = () => {
 
             {/* About Us Content Display */}
             {!showForm && (
-                <div className="card shadow-sm border-info">
-                    <div className="card-header bg-info text-white">
-                        <h4 className="mb-0">
+                <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                    <div className="dashboard-card-header px-4 py-3" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                        <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
                             <i className="fas fa-info-circle me-2"></i>
                             ABOUT US CONTENT
                         </h4>
                     </div>
-                    <div className="card-body">
+                    <div className="dashboard-card-body px-4 py-4">
                         {/* Content List */}
                         {currentItems.length > 0 ? (
                             <>
                                 <div className="table-responsive">
-                                    <table className="table table-striped table-hover">
-                                        <thead className="table-dark">
+                                    <table className="table table-borderless align-middle dashboard-table">
+                                        <thead style={{ background: '#e3eafc' }}>
                                             <tr>
-                                                <th>Image</th>
-                                                <th>Title</th>
-                                                <th>Description</th>
-                                                <th>Button</th>
-                                                <th>Actions</th>
+                                                <th style={{ width: 80, color: '#1565c0' }}>Image</th>
+                                                <th style={{ color: '#1565c0' }}>Title</th>
+                                                <th style={{ color: '#1565c0' }}>Description</th>
+                                                <th style={{ color: '#1565c0' }}>Button</th>
+                                                <th style={{ color: '#1565c0' }}>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {currentItems.map((item) => (
-                                                <tr key={item._id}>
+                                                <tr key={item._id} style={{ background: '#fff' }}>
                                                     <td>
                                                         {item.image?.url ? (
                                                             <img
@@ -847,7 +845,8 @@ const AboutUs = () => {
                                                                     width: '60px',
                                                                     height: '60px',
                                                                     objectFit: 'cover',
-                                                                    borderRadius: '4px'
+                                                                    borderRadius: '8px',
+                                                                    boxShadow: '0 2px 8px #bae6fd'
                                                                 }}
                                                             />
                                                         ) : (
@@ -859,7 +858,8 @@ const AboutUs = () => {
                                                                     display: 'flex',
                                                                     alignItems: 'center',
                                                                     justifyContent: 'center',
-                                                                    borderRadius: '4px'
+                                                                    borderRadius: '8px',
+                                                                    boxShadow: '0 2px 8px #e0e7ef'
                                                                 }}
                                                             >
                                                                 <i className="fas fa-image text-muted"></i>
@@ -867,7 +867,7 @@ const AboutUs = () => {
                                                         )}
                                                     </td>
                                                     <td>
-                                                        <strong>{item.heading}</strong>
+                                                        <span style={{ fontWeight: 600, color: '#1565c0' }}>{item.heading}</span>
                                                     </td>
                                                     <td>
                                                         <div
@@ -880,7 +880,7 @@ const AboutUs = () => {
                                                     </td>
                                                     <td>
                                                         {item.button?.text && (
-                                                            <span className="badge bg-primary">
+                                                            <span className="badge bg-primary" style={{ fontSize: 14, borderRadius: 8 }}>
                                                                 {item.button.text}
                                                             </span>
                                                         )}
@@ -972,9 +972,9 @@ const AboutUs = () => {
             {/* Our Journey Section */}
             {!showForm && (
                 <div className="mt-5">
-                    <div className="card shadow-sm border-info mb-4">
-                        <div className="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                            <h4 className="mb-0">
+                    <div className="dashboard-card shadow-sm mb-4" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                        <div className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                            <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
                                 <i className="fas fa-road me-2"></i>
                                 Our Journey
                             </h4>
@@ -983,13 +983,13 @@ const AboutUs = () => {
                                     className="btn btn-light btn-sm"
                                     onClick={() => setShowJourneyForm(true)}
                                     title="Manage Our Journey Content"
-                                >
+                                    style={{ fontWeight: 600, color: '#1565c0' }}>
                                     <i className="fas fa-cog me-1"></i>
                                     Manage
                                 </button>
                             )}
                         </div>
-                        <div className="card-body">
+                        <div className="dashboard-card-body px-4 py-4">
                             {journeyData.length > 0 ? (
                                 journeyData.map((journey) => (
                                     <div key={journey._id}>
@@ -1024,14 +1024,25 @@ const AboutUs = () => {
                                                 {journey.cards
                                                     .sort((a, b) => (a.order || 0) - (b.order || 0))
                                                     .map((card, index) => (
-                                                        <div key={index} className="col-md-6 col-lg-4 mb-3">
-                                                            <div className="card border-info h-100 shadow-sm">
-                                                                <div className="card-body">
-                                                                    <div className="d-flex justify-content-between align-items-center mb-2">
-                                                                        <span className="badge bg-info fs-6">{card.year}</span>
+                                                        <div key={index} className="col-md-6 col-lg-4 mb-4">
+                                                            <div
+                                                                className="dashboard-card h-100 shadow-sm journey-card-hover"
+                                                                style={{
+                                                                    borderRadius: 16,
+                                                                    background: '#fff',
+                                                                    border: '1.5px solid #e3eafc',
+                                                                    boxShadow: '0 2px 12px #e0e7ef',
+                                                                    transition: 'transform 0.18s, box-shadow 0.18s',
+                                                                    padding: 0,
+                                                                    overflow: 'hidden',
+                                                                }}
+                                                            >
+                                                                <div className="card-body px-4 py-4">
+                                                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                                                        <span className="badge bg-info fs-6" style={{ fontSize: 17, borderRadius: 10, padding: '8px 18px', background: '#1565c0' }}>{card.year}</span>
                                                                     </div>
-                                                                    <h5 className="card-title text-info">{card.heading}</h5>
-                                                                    <p className="card-text">{card.description}</p>
+                                                                    <h5 className="card-title" style={{ fontWeight: 700, color: '#1565c0', marginBottom: 12 }}>{card.heading}</h5>
+                                                                    <p className="card-text" style={{ color: '#444', fontSize: 15, minHeight: 48 }}>{card.description}</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1042,13 +1053,13 @@ const AboutUs = () => {
                                 ))
                             ) : (
                                 <div className="text-center py-5">
-                                    <div className="text-light">
+                                    <div className="text-muted">
                                         <i className="fas fa-road display-1 mb-3 text-info"></i>
                                         <h5>No Journey Content Yet</h5>
                                         <p>Our journey story will be displayed here once content is added.</p>
                                         {isAuthenticated && (
                                             <button
-                                                className="btn btn-info"
+                                                className="btn btn-primary"
                                                 onClick={() => setShowJourneyForm(true)}
                                             >
                                                 <i className="fas fa-plus me-2"></i>
@@ -1066,7 +1077,7 @@ const AboutUs = () => {
             {/* Our Journey Form */}
             {showJourneyForm && (
                 <div className="card mb-4 mt-4">
-                    <div className="card-header">
+                    <div className="card-header" style={{ background: '#0ea5e9', color: '#fff' }}>
                         <h5 className="card-title mb-0">
                             {isEditingJourney ? 'Edit Journey Content' : 'Add New Journey Content'}
                         </h5>
@@ -1246,35 +1257,29 @@ const AboutUs = () => {
 
             {/* Why Choose Us Section */}
             {whyChooseUsData.length > 0 && (
-                <div className="card mb-4 mt-4">
-                    <div className="card-header">
-                        <div className="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h4 className="card-title mb-0">
-                                    <i className="fas fa-star me-2"></i>
-                                    Why Choose Us
-                                </h4>
-                            </div>
-                            {isAuthenticated && (
-                                <div className="btn-group">
-                                    <button
-                                        className="btn btn-outline-primary btn-sm"
-                                        onClick={() => setShowWhyChooseUsForm(true)}
-                                        title="Add New Why Choose Us Content"
-                                    >
-                                        <i className="fas fa-plus me-1"></i>
-                                        Add Content
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                <div className="dashboard-card mb-4 mt-4" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                    <div className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                        <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
+                            <i className="fas fa-star me-2"></i>
+                            Why Choose Us
+                        </h4>
+                        {isAuthenticated && (
+                            <button
+                                className="btn btn-light btn-sm"
+                                onClick={() => setShowWhyChooseUsForm(true)}
+                                title="Add New Why Choose Us Content"
+                                style={{ fontWeight: 600, color: '#1565c0' }}>
+                                <i className="fas fa-plus me-1"></i>
+                                Add Content
+                            </button>
+                        )}
                     </div>
-                    <div className="card-body">
+                    <div className="dashboard-card-body px-4 py-4">
                         <div className="row">
                             {whyChooseUsData.map((item, index) => (
                                 <div key={item._id} className="col-12 mb-4">
-                                    <div className="card border-warning">
-                                        <div className="card-body">
+                                    <div className="dashboard-card shadow-sm" style={{ borderRadius: 16, background: '#fff', border: '1.5px solid #ffe082', boxShadow: '0 2px 8px #e0e7ef', transition: 'transform 0.18s, box-shadow 0.18s', overflow: 'hidden' }}>
+                                        <div className="card-body p-4">
                                             <div className="row align-items-center">
                                                 {item.image && (
                                                     <div className="col-md-4 mb-3 mb-md-0">
@@ -1287,15 +1292,15 @@ const AboutUs = () => {
                                                             })()}
                                                             alt={item.heading}
                                                             className="img-fluid rounded"
-                                                            style={{ maxHeight: '300px', objectFit: 'cover' }}
+                                                            style={{ maxHeight: '260px', objectFit: 'cover', boxShadow: '0 2px 8px #ffe082' }}
                                                         />
                                                     </div>
                                                 )}
                                                 <div className={item.image ? 'col-md-8' : 'col-12'}>
                                                     <div className="d-flex justify-content-between align-items-start mb-3">
                                                         <div>
-                                                            <h3 className="text-warning mb-2">{item.heading}</h3>
-                                                            <div className="text-muted mb-3" dangerouslySetInnerHTML={{ __html: item.description || item.title || '' }}></div>
+                                                            <h3 className="mb-2" style={{ color: '#ffb300', fontWeight: 700 }}>{item.heading}</h3>
+                                                            <div className="text-muted mb-3" style={{ fontSize: 16 }} dangerouslySetInnerHTML={{ __html: item.description || item.title || '' }}></div>
                                                         </div>
                                                         {isAuthenticated && (
                                                             <div className="btn-group">
@@ -1321,7 +1326,7 @@ const AboutUs = () => {
                                                         <div className="mb-3">
                                                             <ul className="list-unstyled">
                                                                 {item.points.map((point, pointIndex) => (
-                                                                    <li key={pointIndex} className="mb-2">
+                                                                    <li key={pointIndex} className="mb-2" style={{ fontSize: 15 }}>
                                                                         <i className="fas fa-check-circle text-success me-2"></i>
                                                                         {typeof point === 'string' ? point : (point.text || point.title || point.description || '')}
                                                                     </li>
@@ -1331,7 +1336,7 @@ const AboutUs = () => {
                                                     )}
 
                                                     {item.button && (
-                                                        <button className="btn btn-warning">
+                                                        <button className="btn btn-warning" style={{ fontWeight: 600, borderRadius: 8, fontSize: 15 }}>
                                                             {typeof item.button === 'string' ? item.button : (item.button.text || '')}
                                                         </button>
                                                     )}
@@ -1348,7 +1353,7 @@ const AboutUs = () => {
 
             {whyChooseUsData.length === 0 && (
                 <div className="card mb-4 mt-4">
-                    <div className="card-header">
+                    <div className="card-header" style={{ background: '#0ea5e9', color: '#fff' }}>
                         <div className="d-flex justify-content-between align-items-center">
                             <h4 className="card-title mb-0">
                                 <i className="fas fa-star me-2"></i>
@@ -1388,7 +1393,7 @@ const AboutUs = () => {
             {/* Why Choose Us Form */}
             {showWhyChooseUsForm && (
                 <div className="card mb-4 mt-4">
-                    <div className="card-header">
+                    <div className="card-header" style={{ background: '#0ea5e9', color: '#fff' }}>
                         <h5 className="card-title mb-0">
                             {isEditingWhyChooseUs ? 'Edit Why Choose Us Content' : 'Add New Why Choose Us Content'}
                         </h5>
@@ -1559,37 +1564,35 @@ const AboutUs = () => {
             )}
 
             {/* Our Founder Section */}
-            <div className="card mb-4 mt-4">
-                <div className="card-header">
-                    <div className="d-flex justify-content-between align-items-center">
-                        <h4 className="card-title mb-0">
-                            <i className="fas fa-user-tie me-2 text-primary"></i>
-                            Our Founder
-                        </h4>
-                        {isAuthenticated && (
-                            <button
-                                className="btn btn-primary btn-sm"
-                                onClick={() => setShowOurFounderForm(true)}
-                                title="Add New Our Founder Content"
-                            >
-                                <i className="fas fa-plus me-2"></i>
-                                Add Content
-                            </button>
-                        )}
-                    </div>
+            <div className="dashboard-card mb-4 mt-4" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                <div className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                    <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
+                        <i className="fas fa-user-tie me-2"></i>
+                        Our Founder
+                    </h4>
+                    {isAuthenticated && (
+                        <button
+                            className="btn btn-light btn-sm"
+                            onClick={() => setShowOurFounderForm(true)}
+                            title="Add New Our Founder Content"
+                            style={{ fontWeight: 600, color: '#1565c0' }}>
+                            <i className="fas fa-plus me-2"></i>
+                            Add Content
+                        </button>
+                    )}
                 </div>
-                <div className="card-body">
+                <div className="dashboard-card-body px-4 py-4">
                     {ourFounderData.length > 0 ? (
                         <div className="row">
                             {ourFounderData.map((founder) => (
                                 <div key={founder._id} className="col-md-6 col-lg-4 mb-4">
-                                    <div className="card h-100 border-0 shadow-sm">
+                                    <div className="dashboard-card h-100 shadow-sm" style={{ borderRadius: 16, background: '#fff', border: '1.5px solid #90caf9', boxShadow: '0 2px 8px #e0e7ef', transition: 'transform 0.18s, box-shadow 0.18s', overflow: 'hidden' }}>
                                         <div className="position-relative">
                                             <img
                                                 src={founder.image?.url ? getImageUrl(founder.image.url) : '/api/placeholder/300/300'}
                                                 alt={founder.image?.altText || founder.name}
                                                 className="card-img-top"
-                                                style={{ height: '250px', width: '100%', objectFit: 'cover', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #e0e0e0' }}
+                                                style={{ height: '250px', width: '100%', objectFit: 'cover', background: '#f8f9fa', borderRadius: '12px 12px 0 0', borderBottom: '1.5px solid #e3eafc' }}
                                             />
                                             {isAuthenticated && (
                                                 <div className="position-absolute top-0 end-0 m-2">
@@ -1613,13 +1616,14 @@ const AboutUs = () => {
                                             )}
                                         </div>
                                         <div className="card-body text-center">
-                                            <h5 className="card-title text-primary">{founder.name}</h5>
-                                            <p className="text-muted mb-2">
+                                            <h5 className="card-title" style={{ color: '#1565c0', fontWeight: 700 }}>{founder.name}</h5>
+                                            <p className="text-muted mb-2" style={{ fontSize: 15 }}>
                                                 <i className="fas fa-briefcase me-1"></i>
                                                 {founder.designation}
                                             </p>
                                             <div
                                                 className="card-text text-muted small"
+                                                style={{ fontSize: 15 }}
                                                 dangerouslySetInnerHTML={{ __html: founder.description }}
                                             />
                                         </div>
@@ -1649,7 +1653,7 @@ const AboutUs = () => {
             {/* Our Founder Form */}
             {showOurFounderForm && (
                 <div className="card mb-4 mt-4">
-                    <div className="card-header">
+                    <div className="card-header" style={{ background: '#0ea5e9', color: '#fff' }}>
                         <h5 className="card-title mb-0">
                             {isEditingOurFounder ? 'Edit Our Founder Content' : 'Add New Our Founder Content'}
                         </h5>

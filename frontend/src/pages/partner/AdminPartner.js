@@ -299,23 +299,23 @@ function AdminPartner() {
                                 <Row>
                                     <Col>
                                         {/* Content Display Card */}
-                                        <Card className="mb-4 shadow-sm">
-                                            <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
-                                                <h5 className="mb-0">
+                                        <Card className="mb-4 shadow-sm dashboard-card" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                                            <Card.Header className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                                                <h5 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
                                                     <i className="fas fa-file-alt me-2"></i>
                                                     Partner Page Content
                                                 </h5>
                                                 <div>
-                                                    <Badge bg={postId ? 'success' : 'warning'} className="me-2">
+                                                    <Badge bg={postId ? 'success' : 'warning'} className="me-2" style={{ fontSize: 14, borderRadius: 8 }}>
                                                         {postId ? 'Published' : 'Draft'}
                                                     </Badge>
-                                                    <Button variant="light" size="sm" onClick={() => setShowEditModal(true)}>
+                                                    <Button variant="light" size="sm" onClick={() => setShowEditModal(true)} style={{ fontWeight: 600, color: '#1565c0' }}>
                                                         <i className="fas fa-edit me-1"></i>
                                                         {postId ? 'Edit Content' : 'Create Content'}
                                                     </Button>
                                                 </div>
                                             </Card.Header>
-                                            <Card.Body>
+                                            <Card.Body className="dashboard-card-body px-4 py-4">
                                                 {partnerPost.heading || partnerPost.thought || partnerPost.description ? (
                                                     <div>
                                                         <div className="mb-3">
@@ -364,48 +364,57 @@ function AdminPartner() {
                                 {/* Partner Association Images Row */}
                                 <Row className="mb-4">
                                     <Col>
-                                        <h5 className="mb-3">Our Association</h5>
-                                        {partnerImagesError && <Alert variant="danger">{partnerImagesError}</Alert>}
-                                        {partnerImagesLoading ? (
-                                            <div className="text-center py-3">
-                                                <span className="spinner-border text-primary" role="status"></span>
+                                        <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                                            <div className="dashboard-card-header px-4 py-3" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                                                <h5 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
+                                                    <i className="fas fa-handshake me-2"></i>
+                                                    Our Association
+                                                </h5>
                                             </div>
-                                        ) : (
-                                            <div className="d-flex flex-row align-items-center overflow-auto" style={{ gap: '1rem' }}>
-                                                {partnerImages.map((img) => (
-                                                    <div key={img._id} className="position-relative" style={{ minWidth: '120px', minHeight: '120px' }}>
-                                                        <img
-                                                            src={img.url?.startsWith('http') ? img.url : `${process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000'}${img.url}`}
-                                                            alt={img.alt || 'Association'}
-                                                            style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #ddd' }}
-                                                        />
-                                                        <Button
-                                                            variant="outline-danger"
-                                                            size="sm"
-                                                            className="position-absolute"
-                                                            style={{ top: '8px', right: '8px', zIndex: 10, borderRadius: '50%', padding: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}
-                                                            onClick={() => handleDeleteImage(img._id)}
-                                                        >
-                                                            <i className="bi bi-trash"></i>
-                                                        </Button>
+                                            <div className="dashboard-card-body px-4 py-4">
+                                                {partnerImagesError && <Alert variant="danger">{partnerImagesError}</Alert>}
+                                                {partnerImagesLoading ? (
+                                                    <div className="text-center py-3">
+                                                        <span className="spinner-border text-primary" role="status"></span>
                                                     </div>
-                                                ))}
-                                                {/* Inline Upload Field */}
-                                                <form onSubmit={handleAddImage} className="d-flex flex-column align-items-center" style={{ minWidth: '120px' }}>
-                                                    <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files[0])} style={{ marginBottom: '0.5rem' }} />
-                                                    <input
-                                                        type="text"
-                                                        className="form-control form-control-sm mb-2"
-                                                        placeholder="Alt text (optional)"
-                                                        value={newImageAlt}
-                                                        onChange={(e) => setNewImageAlt(e.target.value)}
-                                                    />
-                                                    <Button type="submit" variant="success" size="sm" disabled={!newImageFile || partnerImagesLoading}>
-                                                        <i className="fas fa-plus"></i> Add
-                                                    </Button>
-                                                </form>
+                                                ) : (
+                                                    <div className="d-flex flex-row align-items-center overflow-auto" style={{ gap: '1rem' }}>
+                                                        {partnerImages.map((img) => (
+                                                            <div key={img._id} className="position-relative dashboard-card p-2 d-flex align-items-center justify-content-center" style={{ minWidth: '120px', minHeight: '120px', background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #bae6fd' }}>
+                                                                <img
+                                                                    src={img.url?.startsWith('http') ? img.url : `${process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000'}${img.url}`}
+                                                                    alt={img.alt || 'Association'}
+                                                                    style={{ width: '90px', height: '90px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #ddd' }}
+                                                                />
+                                                                <Button
+                                                                    variant="outline-danger"
+                                                                    size="sm"
+                                                                    className="position-absolute"
+                                                                    style={{ top: '8px', right: '8px', zIndex: 10, borderRadius: '50%', padding: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}
+                                                                    onClick={() => handleDeleteImage(img._id)}
+                                                                >
+                                                                    <i className="bi bi-trash"></i>
+                                                                </Button>
+                                                            </div>
+                                                        ))}
+                                                        {/* Inline Upload Field */}
+                                                        <form onSubmit={handleAddImage} className="d-flex flex-column align-items-center dashboard-card p-2" style={{ minWidth: '120px', background: '#e3fcec', borderRadius: 10, boxShadow: '0 2px 8px #bae6fd' }}>
+                                                            <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files[0])} style={{ marginBottom: '0.5rem' }} />
+                                                            <input
+                                                                type="text"
+                                                                className="form-control form-control-sm mb-2"
+                                                                placeholder="Alt text (optional)"
+                                                                value={newImageAlt}
+                                                                onChange={(e) => setNewImageAlt(e.target.value)}
+                                                            />
+                                                            <Button type="submit" variant="success" size="sm" disabled={!newImageFile || partnerImagesLoading}>
+                                                                <i className="fas fa-plus"></i> Add
+                                                            </Button>
+                                                        </form>
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
+                                        </div>
                                     </Col>
                                 </Row>
 

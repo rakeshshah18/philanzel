@@ -74,49 +74,99 @@ const OurProcess = () => {
     };
 
     return (
-        <div className="mb-5">
-            <h3>Our Process</h3>
-            <form onSubmit={handleSubmit} className="mb-4">
-                <input name="heading" value={form.heading} onChange={handleChange} placeholder="Heading" className="form-control mb-2" required />
-                <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description" className="form-control mb-2" required />
-                <h5>Steps</h5>
-                {form.steps.map((step, idx) => (
-                    <div key={idx} className="border p-2 mb-2">
-                        <input value={step.name} onChange={e => handleChange(e, idx, 'name')} placeholder="Step Name" className="form-control mb-1" required />
-                        <input value={step.heading} onChange={e => handleChange(e, idx, 'heading')} placeholder="Step Heading" className="form-control mb-1" required />
-                        <textarea value={step.description} onChange={e => handleChange(e, idx, 'description')} placeholder="Step Description" className="form-control mb-1" required />
-                        <input type="file" accept="image/*" onChange={e => handleChange(e, idx, 'icon')} className="form-control mb-1" />
-                        <button type="button" className="btn btn-danger btn-sm" onClick={() => removeStep(idx)} disabled={form.steps.length === 1}>Remove Step</button>
+        <div className="dashboard-card shadow-sm mb-5" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+            <div className="dashboard-card-header px-4 py-3" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
+                    <i className="fas fa-cogs me-2"></i>
+                    Our Process
+                </h4>
+            </div>
+            <div className="dashboard-card-body px-4 py-4">
+                <form onSubmit={handleSubmit} className="mb-4">
+                    <div className="row">
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label">Heading *</label>
+                            <input name="heading" value={form.heading} onChange={handleChange} placeholder="Heading" className="form-control" required />
+                        </div>
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label">Description *</label>
+                            <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description" className="form-control" required />
+                        </div>
                     </div>
-                ))}
-                <div className='d-flex gap-3'>
-                    <button type="button" className="btn btn-secondary mb-2" onClick={addStep}>Add Step</button>
-                    <button type="submit" className="btn btn-primary mb-2">{editingId ? 'Update' : 'Create'} Process</button>
+                    <h5 className="mt-3">Steps</h5>
+                    {form.steps.map((step, idx) => (
+                        <div key={idx} className="dashboard-card p-3 mb-3" style={{ background: '#e0f2fe', borderRadius: 12, boxShadow: '0 2px 8px #bae6fd' }}>
+                            <div className="row align-items-end">
+                                <div className="col-md-3 mb-2">
+                                    <label className="form-label">Step Name *</label>
+                                    <input value={step.name} onChange={e => handleChange(e, idx, 'name')} placeholder="Step Name" className="form-control" required />
+                                </div>
+                                <div className="col-md-3 mb-2">
+                                    <label className="form-label">Step Heading *</label>
+                                    <input value={step.heading} onChange={e => handleChange(e, idx, 'heading')} placeholder="Step Heading" className="form-control" required />
+                                </div>
+                                <div className="col-md-4 mb-2">
+                                    <label className="form-label">Step Description *</label>
+                                    <textarea value={step.description} onChange={e => handleChange(e, idx, 'description')} placeholder="Step Description" className="form-control" required />
+                                </div>
+                                <div className="col-md-2 mb-2">
+                                    <label className="form-label">Icon</label>
+                                    <input type="file" accept="image/*" onChange={e => handleChange(e, idx, 'icon')} className="form-control" />
+                                </div>
+                            </div>
+                            <div className="d-flex justify-content-end mt-2">
+                                <button type="button" className="btn btn-danger btn-sm" onClick={() => removeStep(idx)} disabled={form.steps.length === 1}>Remove Step</button>
+                            </div>
+                        </div>
+                    ))}
+                    <div className='d-flex gap-3'>
+                        <button type="button" className="btn btn-secondary mb-2" onClick={addStep}>Add Step</button>
+                        <button type="submit" className="btn btn-primary mb-2">{editingId ? 'Update' : 'Create'} Process</button>
+                        {editingId && <button type="button" className="btn btn-warning ms-2" onClick={() => { setEditingId(null); setForm({ heading: '', description: '', steps: [{ name: '', heading: '', description: '', icon: null }] }); }}>Cancel Edit</button>}
+                    </div>
+                </form>
+                <div className="dashboard-card-header px-3 py-2 mb-3" style={{ background: '#0ea5e9', color: '#fff', borderRadius: 12, display: 'flex', alignItems: 'center' }}>
+                    <i className="fas fa-list-alt me-2"></i>
+                    <h5 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>Existing Processes</h5>
                 </div>
-                {editingId && <button type="button" className="btn btn-warning ms-2" onClick={() => { setEditingId(null); setForm({ heading: '', description: '', steps: [{ name: '', heading: '', description: '', icon: null }] }); }}>Cancel Edit</button>}
-            </form>
-            <h5>Existing Processes</h5>
-            <ul className="list-group">
-                {processes.map(proc => (
-                    <li key={proc._id} className="list-group-item">
-                        <strong>{proc.heading}</strong> - {proc.description}
-                        <ul>
-                            {proc.steps.map((step, idx) => (
-                                <li key={idx}>
-                                    {step.icon && <img src={step.icon.startsWith('/uploads/images/') ? `http://localhost:8000${step.icon}` : step.icon} alt="icon" style={{ width: 32, height: 32, marginRight: 8 }} />}
-                                    <b>{step.name}</b>: {step.heading} - {step.description}
-                                </li>
-                            ))}
-                        </ul>
-                        <button className="btn btn-sm btn-info me-2" onClick={() => handleEdit(proc)}>Edit</button>
-                        <button className="btn btn-sm btn-danger" onClick={() => handleDelete(proc._id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
-            {/* Render Empowering Individuals below Existing Processes */}
-            <EmpoweringIndividual />
-            {/* Potential Growth is part of Become a Partner, so render here only for /partner */}
-            <PotentialGrowth />
+                <div className="row mb-4">
+                    {processes.map(proc => (
+                        <div key={proc._id} className="col-12 mb-3">
+                            <div className="dashboard-card shadow-sm" style={{ borderRadius: 14, background: '#e0f2fe', border: 'none', boxShadow: '0 2px 8px #bae6fd' }}>
+                                <div className="dashboard-card-header px-3 py-2 d-flex align-items-center" style={{ background: '#0ea5e9', color: '#fff', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
+                                    <i className="fas fa-cog me-2"></i>
+                                    <h5 className="mb-0" style={{ fontWeight: 600, letterSpacing: 1 }}>{proc.heading}</h5>
+                                </div>
+                                <div className="dashboard-card-body px-3 py-3">
+                                    <div className="mb-2 text-muted">{proc.description}</div>
+                                    <ul className="mb-3">
+                                        {proc.steps.map((step, idx) => (
+                                            <li key={idx} className="mb-2 d-flex align-items-center">
+                                                {step.icon && <img src={step.icon.startsWith('/uploads/images/') ? `http://localhost:8000${step.icon}` : step.icon} alt="icon" style={{ width: 32, height: 32, marginRight: 8, borderRadius: 6, border: '1px solid #ddd' }} />}
+                                                <div>
+                                                    <b>{step.name}</b>: <span className="fw-semibold">{step.heading}</span> - {step.description}
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <div className="d-flex gap-2">
+                                        <button className="btn btn-sm btn-info" onClick={() => handleEdit(proc)}>
+                                            <i className="fas fa-edit me-1"></i>Edit
+                                        </button>
+                                        <button className="btn btn-sm btn-danger" onClick={() => handleDelete(proc._id)}>
+                                            <i className="bi bi-trash me-1"></i>Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                {/* Render Empowering Individuals below Existing Processes */}
+                <EmpoweringIndividual />
+                {/* Potential Growth is part of Become a Partner, so render here only for /partner */}
+                <PotentialGrowth />
+            </div>
         </div>
     );
 };

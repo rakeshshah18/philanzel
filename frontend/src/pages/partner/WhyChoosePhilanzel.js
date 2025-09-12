@@ -98,107 +98,110 @@ const WhyChoosePhilanzel = () => {
         }
     };
 
-    const handleDeleteAllPoints = async (item) => {
-        try {
-            await API.put(`${apiUrl}/${item._id}`, { ...item, points: [] });
-            fetchItems();
-        } catch (err) {
-            setError('Failed to delete all points');
-        }
-    };
 
     return (
         <>
             <section className="why-choose-philanzel mt-4">
-                <h2>Why Choose Philanzel</h2>
-                <div className="row">
-                    {items.map((item) => (
-                        <div className="col-md-6 mb-3" key={item._id}>
-                            <div className="card h-100">
-                                {item.image && (
-                                    <img
-                                        src={`http://localhost:8000/uploads/images/${item.image}`}
-                                        alt={item.heading}
-                                        className="card-img-top"
-                                        style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
-                                    />
-                                )}
-                                <div className="card-body">
-                                    {editingCommon ? (
-                                        <React.Fragment>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label>Heading</Form.Label>
-                                                <Form.Control name="heading" value={editForm.heading} onChange={handleCommonChange} />
-                                            </Form.Group>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label>Description</Form.Label>
-                                                <ReactQuill theme="snow" value={editForm.description} onChange={value => setEditForm({ ...editForm, description: value })} />
-                                            </Form.Group>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label>Image</Form.Label>
-                                                <Form.Control type="file" accept="image/*" onChange={e => setEditImage(e.target.files[0])} />
-                                                <small className="form-text text-muted">Upload a new image to update</small>
-                                            </Form.Group>
-                                            <Button variant="success" size="sm" onClick={() => handleCommonSave(item)}>Save</Button>{' '}
-                                            <Button variant="secondary" size="sm" onClick={() => setEditingCommon(false)}>Cancel</Button>
-                                        </React.Fragment>
-                                    ) : (
-                                        <React.Fragment>
-                                            <Button variant="outline-primary" size="sm" onClick={() => handleCommonEdit(item)}>Edit</Button>
-                                            <h5 className="card-title">{item.heading}</h5>
-                                            <div className="card-text" dangerouslySetInnerHTML={{ __html: item.description }} />
-
-                                        </React.Fragment>
-                                    )}
-                                    {item.points && Array.isArray(item.points) && (
-                                        <React.Fragment>
-                                            {editingPoints ? (
-                                                <Form>
-                                                    <ul>
-                                                        {editPointsForm.map((desc, idx) => (
-                                                            <li key={idx} className="mb-2 d-flex align-items-center">
-                                                                <ReactQuill
-                                                                    theme="snow"
-                                                                    value={desc}
-                                                                    onChange={value => handleEditPointsChange(idx, value)}
-                                                                    className="flex-grow-1"
-                                                                />
-                                                                <Button
-                                                                    variant="outline-danger"
-                                                                    size="sm"
-                                                                    className="ms-2"
-                                                                    onClick={() => {
-                                                                        const updated = [...editPointsForm];
-                                                                        updated.splice(idx, 1);
-                                                                        setEditPointsForm(updated);
-                                                                    }}
-                                                                    title="Delete Point"
-                                                                >
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </Button>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                    <Button variant="outline-success" size="sm" onClick={() => setEditPointsForm([...editPointsForm, ""])}>+ Add Point</Button>{' '}
-                                                    <Button variant="success" size="sm" onClick={() => handleEditPointsSave(item)}>Save Points</Button>{' '}
-                                                    <Button variant="secondary" size="sm" onClick={() => setEditingPoints(false)}>Cancel</Button>
-                                                </Form>
+                <div className="dashboard-card shadow-sm mb-4" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+                    <div className="dashboard-card-header px-4 py-3" style={{ background: '#0ea5e9', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18, display: 'flex', alignItems: 'center' }}>
+                        <i className="fas fa-thumbs-up me-2"></i>
+                        <h3 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>Why Choose Philanzel</h3>
+                    </div>
+                    <div className="dashboard-card-body px-4 py-4">
+                        <div className="row">
+                            {items.map((item) => (
+                                <div className="col-md-6 mb-3" key={item._id}>
+                                    <div className="dashboard-card h-100" style={{ borderRadius: 14, background: '#e0f2fe', border: 'none', boxShadow: '0 2px 8px #bae6fd' }}>
+                                        {item.image && (
+                                            <img
+                                                src={`http://localhost:8000/uploads/images/${item.image}`}
+                                                alt={item.heading}
+                                                className="card-img-top"
+                                                style={{ width: '100%', height: 'auto', objectFit: 'contain', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}
+                                            />
+                                        )}
+                                        <div className="dashboard-card-header px-3 py-2 d-flex align-items-center" style={{ background: '#0ea5e9', color: '#fff', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
+                                            <i className="fas fa-star me-2"></i>
+                                            <h5 className="mb-0" style={{ fontWeight: 600, letterSpacing: 1 }}>{item.heading}</h5>
+                                        </div>
+                                        <div className="dashboard-card-body p-3">
+                                            {editingCommon ? (
+                                                <React.Fragment>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label>Heading</Form.Label>
+                                                        <Form.Control name="heading" value={editForm.heading} onChange={handleCommonChange} />
+                                                    </Form.Group>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label>Description</Form.Label>
+                                                        <ReactQuill theme="snow" value={editForm.description} onChange={value => setEditForm({ ...editForm, description: value })} />
+                                                    </Form.Group>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label>Image</Form.Label>
+                                                        <Form.Control type="file" accept="image/*" onChange={e => setEditImage(e.target.files[0])} />
+                                                        <small className="form-text text-muted">Upload a new image to update</small>
+                                                    </Form.Group>
+                                                    <Button variant="success" size="sm" onClick={() => handleCommonSave(item)}>Save</Button>{' '}
+                                                    <Button variant="secondary" size="sm" onClick={() => setEditingCommon(false)}>Cancel</Button>
+                                                </React.Fragment>
                                             ) : (
                                                 <React.Fragment>
-                                                    <ul>
-                                                        {item.points.map((point, idx) => (
-                                                            <li key={idx}>{point.description}</li>
-                                                        ))}
-                                                    </ul>
-                                                    <Button variant="outline-primary" size="sm" onClick={() => handleEditPointsClick(item)}>Edit Points</Button>
+                                                    <Button variant="outline-primary" size="sm" onClick={() => handleCommonEdit(item)}>Edit</Button>
+                                                    <h5 className="card-title">{item.heading}</h5>
+                                                    <div className="card-text" dangerouslySetInnerHTML={{ __html: item.description }} />
+
                                                 </React.Fragment>
                                             )}
-                                        </React.Fragment>
-                                    )}
+                                            {item.points && Array.isArray(item.points) && (
+                                                <React.Fragment>
+                                                    {editingPoints ? (
+                                                        <Form>
+                                                            <ul>
+                                                                {editPointsForm.map((desc, idx) => (
+                                                                    <li key={idx} className="mb-2 d-flex align-items-center">
+                                                                        <ReactQuill
+                                                                            theme="snow"
+                                                                            value={desc}
+                                                                            onChange={value => handleEditPointsChange(idx, value)}
+                                                                            className="flex-grow-1"
+                                                                        />
+                                                                        <Button
+                                                                            variant="outline-danger"
+                                                                            size="sm"
+                                                                            className="ms-2"
+                                                                            onClick={() => {
+                                                                                const updated = [...editPointsForm];
+                                                                                updated.splice(idx, 1);
+                                                                                setEditPointsForm(updated);
+                                                                            }}
+                                                                            title="Delete Point"
+                                                                        >
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </Button>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                            <Button variant="outline-success" size="sm" onClick={() => setEditPointsForm([...editPointsForm, ""])}>+ Add Point</Button>{' '}
+                                                            <Button variant="success" size="sm" onClick={() => handleEditPointsSave(item)}>Save Points</Button>{' '}
+                                                            <Button variant="secondary" size="sm" onClick={() => setEditingPoints(false)}>Cancel</Button>
+                                                        </Form>
+                                                    ) : (
+                                                        <React.Fragment>
+                                                            <ul>
+                                                                {item.points.map((point, idx) => (
+                                                                    <li key={idx}>{point.description}</li>
+                                                                ))}
+                                                            </ul>
+                                                            <Button variant="outline-primary" size="sm" onClick={() => handleEditPointsClick(item)}>Edit Points</Button>
+                                                        </React.Fragment>
+                                                    )}
+                                                </React.Fragment>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
-                    ))}
+                    </div>
                 </div>
             </section>
             <PartnerFAQs />

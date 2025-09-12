@@ -7,7 +7,139 @@ import './Calculators.css';
 import 'katex/dist/katex.min.css';
 
 const Calculators = () => {
-    // Dark mode detection
+    // Utility to check if content is HTML
+    const isHtmlContent = content => /<\/?[a-z][\s\S]*>/i.test(content);
+
+    // Delete a section
+    const handleDeleteSection = async (id) => {
+        if (!window.confirm('Delete this section?')) return;
+        setLoadingSections(true);
+        setSectionError("");
+        try {
+            await calculatorSectionsAPI.delete(id);
+            fetchSections();
+        } catch (err) {
+            setSectionError('Failed to delete section');
+        } finally {
+            setLoadingSections(false);
+        }
+    };
+    // Fetch all calculator pages
+    const fetchCalculatorPages = async () => {
+        try {
+            const res = await calculatorPagesAPI.getAll();
+            setCalculatorPages(res.data || []);
+        } catch (err) {
+            setError('Failed to fetch calculators');
+        }
+    };
+
+    // Fetch all calculator sections
+    const fetchSections = async () => {
+        setLoadingSections(true);
+        setSectionError("");
+        try {
+            const res = await calculatorSectionsAPI.getAll();
+            setSections(res.data || []);
+        } catch (err) {
+            setSectionError('Failed to fetch sections');
+        } finally {
+            setLoadingSections(false);
+        }
+    };
+
+    // Add a new calculator
+    const handleAddCalculator = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
+        setSuccess("");
+        try {
+            await calculatorPagesAPI.create({ name });
+            setSuccess('Calculator added');
+            setShowAddModal(false);
+            setName("");
+            fetchCalculatorPages();
+        } catch (err) {
+            setError('Failed to add calculator');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Edit calculator name (open modal)
+    const handleEditClick = (id, name) => {
+        setEditId(id);
+        setEditName(name);
+        setShowEditModal(true);
+    };
+
+    // Save edited calculator name
+    const handleEditCalculator = async (e) => {
+        e.preventDefault();
+        setEditLoading(true);
+        setError("");
+        setSuccess("");
+        try {
+            await calculatorPagesAPI.update(editId, { name: editName });
+            setSuccess('Calculator updated');
+            setShowEditModal(false);
+            setEditId(null);
+            setEditName("");
+            fetchCalculatorPages();
+        } catch (err) {
+            setError('Failed to update calculator');
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
+    // Delete a calculator
+    const handleDeleteCalculator = async (id) => {
+        if (!window.confirm('Delete this calculator?')) return;
+        setDeleteLoading(true);
+        setDeleteError("");
+        try {
+            await calculatorPagesAPI.delete(id);
+            setDeleteError("");
+            fetchCalculatorPages();
+        } catch (err) {
+            setDeleteError('Failed to delete calculator');
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
+
+    // Edit a section (open modal)
+    const handleEditSection = (section) => {
+        setEditSectionId(section._id);
+        setEditSectionForm({
+            sectionName: section.sectionName || '',
+            heading: section.heading || '',
+            content: section.content || '',
+            faqs: section.faqs || [],
+        });
+        setEditSectionModal(true);
+    };
+
+    // Save edited section
+    const handleEditSectionSubmit = async (e) => {
+        e.preventDefault();
+        setEditSectionLoading(true);
+        setEditSectionError("");
+        try {
+            await calculatorSectionsAPI.update(editSectionId, editSectionForm);
+            setEditSectionModal(false);
+            setEditSectionId(null);
+            setEditSectionForm({ sectionName: '', heading: '', content: '', faqs: [] });
+            fetchSections();
+        } catch (err) {
+            setEditSectionError('Failed to update section');
+        } finally {
+            setEditSectionLoading(false);
+        }
+    };
+    // ...existing state and effect hooks...
     const [isDarkMode, setIsDarkMode] = useState(false);
     useEffect(() => {
         const checkDarkMode = () => {
@@ -32,7 +164,6 @@ const Calculators = () => {
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [deleteError, setDeleteError] = useState('');
     const [calculatorPages, setCalculatorPages] = useState([]);
-    const [sectionName, setSectionName] = useState("");
     const [sections, setSections] = useState([]);
     const [loadingSections, setLoadingSections] = useState(false);
     const [sectionError, setSectionError] = useState("");
@@ -41,175 +172,34 @@ const Calculators = () => {
     const [editSectionId, setEditSectionId] = useState(null);
     const [editSectionError, setEditSectionError] = useState("");
     const [editSectionLoading, setEditSectionLoading] = useState(false);
-    const [newSectionForm, setNewSectionForm] = useState({ sectionName: '', heading: '', content: '', faqs: [] });
+    // Removed unused newSectionForm state
 
     useEffect(() => {
         fetchCalculatorPages();
     }, [showDeleteModal, showAddModal]);
-
-    // Fetch all sections for display below buttons
-    const fetchSections = async () => {
-        setLoadingSections(true);
-        try {
-            const res = await calculatorSectionsAPI.getAll();
-            setSections(res.data);
-            setSectionError("");
-        } catch (err) {
-            setSectionError("Failed to fetch sections");
-        } finally {
-            setLoadingSections(false);
-        }
-    };
-
-    const fetchCalculatorPages = async () => {
-        try {
-            const response = await calculatorPagesAPI.getAll();
-            setCalculatorPages(response.data.data || []);
-        } catch {
-            setCalculatorPages([]);
-        }
-    };
-
-    const handleAddCalculator = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-        setSuccess('');
-        try {
-            await calculatorPagesAPI.create({ name });
-            setSuccess('Calculator added successfully!');
-            setName('');
-            setShowAddModal(false);
-        } catch (err) {
-            setError(err?.response?.data?.message || 'Failed to add calculator');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleEditClick = (id, name) => {
-        setEditId(id);
-        setEditName(name);
-        setShowEditModal(true);
-        setError('');
-        setSuccess('');
-    };
-
-    const handleEditCalculator = async (e) => {
-        e.preventDefault();
-        setEditLoading(true);
-        setError('');
-        setSuccess('');
-        try {
-            await calculatorPagesAPI.update(editId, { name: editName });
-            setSuccess('Calculator updated successfully!');
-            setShowEditModal(false);
-            setEditId(null);
-            setEditName('');
-            fetchCalculatorPages();
-        } catch (err) {
-            setError('Failed to update calculator');
-        } finally {
-            setEditLoading(false);
-        }
-    };
-
-    const handleDeleteCalculator = async (id) => {
-        setDeleteLoading(true);
-        setDeleteError('');
-        try {
-            await calculatorPagesAPI.delete(id);
-            setCalculatorPages(calculatorPages.filter(page => page._id !== id));
-        } catch (err) {
-            setDeleteError('Failed to delete calculator');
-        } finally {
-            setDeleteLoading(false);
-        }
-    };
-
     useEffect(() => {
         fetchSections();
     }, []);
 
-    // Add handlers for edit and delete
-    const handleEditSection = (section) => {
-        setEditSectionId(section._id);
-        setEditSectionForm({
-            sectionName: section.sectionName,
-            heading: section.heading,
-            content: section.content,
-            faqs: section.faqs || []
-        });
-        setEditSectionModal(true);
-        setEditSectionError("");
-    };
-
-    const handleEditSectionSubmit = async (e) => {
-        e.preventDefault();
-        setEditSectionLoading(true);
-        setEditSectionError("");
-        try {
-            await calculatorSectionsAPI.update(editSectionId, editSectionForm);
-            setEditSectionModal(false);
-            setEditSectionId(null);
-            setEditSectionForm({ sectionName: '', heading: '', content: '', faqs: [] });
-            fetchSections();
-        } catch (err) {
-            setEditSectionError(err?.response?.data?.error || "Failed to update section");
-        } finally {
-            setEditSectionLoading(false);
-        }
-    };
-
-    const handleSubmitSection = async (e) => {
-        e.preventDefault();
-        setLoadingSections(true);
-        setSectionError("");
-        try {
-            await calculatorSectionsAPI.create(newSectionForm);
-            fetchSections();
-            setNewSectionForm({ sectionName: '', heading: '', content: '', faqs: [] });
-        } catch (err) {
-            setSectionError(err?.response?.data?.error || "Failed to save section");
-        } finally {
-            setLoadingSections(false);
-        }
-    };
-
-    const handleDeleteSection = async (id) => {
-        if (!window.confirm("Delete this section?")) return;
-        try {
-            await calculatorSectionsAPI.delete(id);
-            fetchSections();
-        } catch (err) {
-            setSectionError("Failed to delete section");
-        }
-    };
-
-    // Helper to check if content is HTML
-    const isHtmlContent = content => /<\/?[a-z][\s\S]*>/i.test(content);
-
     return (
         <div className="container-fluid py-4" style={{ background: isDarkMode ? '#181818' : 'linear-gradient(135deg, #b6b2efff 0%, #dfccf0ff 100%)', minHeight: '100vh' }}>
-            <h2 className="mb-2">Calculators</h2>
+            <h2 className="mb-4" style={{ fontWeight: 700, background: isDarkMode ? '#222' : '#c5bde5ff', color: isDarkMode ? '#dfd0d0ff' : '#212529', borderRadius: '12px', padding: '0.75rem 2rem', display: 'inline-block', boxShadow: '0 2px 8px #b6b2ef44' }}>Calculators</h2>
             <div className="d-flex gap-2 mb-3">
                 <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-                    Add Calculator
+                    <i className="bi bi-plus-circle me-1"></i> Add Calculator
                 </button>
                 <button className="btn btn-danger" onClick={() => setShowDeleteModal(true)}>
-                    Delete Calculator
+                    <i className="bi bi-trash me-1"></i> Delete Calculator
                 </button>
                 <button className="btn btn-success" onClick={() => setShowSectionModal(true)}>
-                    Create Section
+                    <i className="bi bi-plus-square me-1"></i> Create Section
                 </button>
                 <button className="btn btn-outline-secondary" onClick={fetchSections} title="Refresh Sections">
                     <i className="bi bi-arrow-clockwise"></i>
                 </button>
             </div>
-
-            {/* Section List Below Buttons */}
             <div className="mt-4">
-                <h4>Calculator Sections</h4>
+                <h4 style={{ fontWeight: 700, background: isDarkMode ? '#222' : '#e9e6f7', color: isDarkMode ? '#fff' : '#212529', borderRadius: '8px', padding: '0.5rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>Calculator Sections</h4>
                 {sectionError && <div className="alert alert-danger">{sectionError}</div>}
                 {loadingSections ? (
                     <div>Loading sections...</div>
@@ -223,25 +213,49 @@ const Calculators = () => {
                                     const htmlContent = isHtmlContent(section.content);
                                     return (
                                         <div className="col-12 col-sm-6 mb-4 d-flex justify-content-center" key={section._id}>
-                                            <div className="card shadow-sm h-100 w-100" style={{
+                                            <div className="dashboard-card shadow-sm h-100 w-100" style={{
                                                 borderRadius: '16px',
-                                                background: isDarkMode ? '#000' : 'linear-gradient(135deg, #9c98d3ff 0%, #b89bd3ff 100%)',
-                                                color: isDarkMode ? '#fff' : '#212529',
+                                                background: isDarkMode ? '#23272f' : '#fff',
+                                                color: isDarkMode ? '#fff' : '#23272f',
                                                 minWidth: 340,
-                                                maxWidth: 800
+                                                maxWidth: 800,
+                                                boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #e0e7ef',
+                                                border: isDarkMode ? '1px solid #444' : '1px solid #e0e7ef',
+                                                padding: 0
                                             }}>
-                                                <div className="card-body d-flex flex-column" style={{ color: isDarkMode ? '#fff' : '#212529' }}>
-                                                    <h5 className="card-title" style={{
-                                                        fontWeight: 700,
-                                                        background: isDarkMode ? '#222' : '#c5bde5ff',
-                                                        color: isDarkMode ? '#dfd0d0ff' : '#212529',
+                                                <div className="d-flex align-items-center justify-content-between" style={{
+                                                    borderTopLeftRadius: '16px',
+                                                    borderTopRightRadius: '16px',
+                                                    background: 'none',
+                                                    padding: '1rem 1.25rem 1rem 1.25rem',
+                                                    borderBottom: isDarkMode ? '1px solid #444' : '1px solid #e0e7ef',
+                                                    marginBottom: 0
+                                                }}>
+                                                    <h5 className="card-title mb-0" style={{
+                                                        fontWeight: 800,
+                                                        fontSize: '1.35rem',
+                                                        letterSpacing: 0.5,
+                                                        color: isDarkMode ? '#f8fafc' : '#23272f',
+                                                        background: isDarkMode ? '#23272f' : '#f3f4fa',
                                                         borderRadius: '8px',
-                                                        padding: '0.5rem 1rem',
-                                                        marginBottom: '1rem',
-                                                        display: 'inline-block'
+                                                        marginBottom: 0,
+                                                        padding: '0.6rem 1.2rem',
+                                                        borderLeft: isDarkMode ? '6px solid #b6b2ef' : '6px solid #7c3aed',
+                                                        boxShadow: isDarkMode ? '0 1px 4px #0004' : '0 1px 4px #b6b2ef22',
+                                                        transition: 'background 0.3s, color 0.3s'
                                                     }}>{section.sectionName || 'No name'}</h5>
+                                                    <span style={{ marginLeft: 12, whiteSpace: 'nowrap' }}>
+                                                        <button type="button" className="btn btn-sm btn-outline-info me-2" onClick={() => handleEditSection(section)} title="Edit">
+                                                            <i className="bi bi-pencil-square"></i> Edit
+                                                        </button>
+                                                        <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteSection(section._id)} title="Delete">
+                                                            <i className="bi bi-trash"></i> Delete
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                                <div className="card-body d-flex flex-column" style={{ color: isDarkMode ? '#fff' : '#23272f', padding: '1.25rem 1.25rem' }}>
                                                     {section.heading && (
-                                                        <h6 className="card-subtitle mb-2" style={{ color: isDarkMode ? '#fff' : '#6c757d' }}>{section.heading}</h6>
+                                                        <h6 className="card-subtitle mb-2" style={{ color: isDarkMode ? '#fff' : '#6c757d', fontWeight: 600 }}>{section.heading}</h6>
                                                     )}
                                                     {htmlContent ? (
                                                         <div className="card-text" style={{ color: isDarkMode ? '#fff' : '#212529' }} dangerouslySetInnerHTML={{ __html: section.content }} />
@@ -276,7 +290,6 @@ const Calculators = () => {
                     </div>
                 )}
             </div>
-
             {/* Add Calculator Modal */}
             {showAddModal && (
                 <div className="modal show d-block" tabIndex="-1" role="dialog" style={{ background: 'rgba(0,0,0,0.3)' }}>
@@ -313,7 +326,6 @@ const Calculators = () => {
                     </div>
                 </div>
             )}
-
             {/* Delete Calculator Modal */}
             {showDeleteModal && (
                 <div className="modal show d-block" tabIndex="-1" role="dialog" style={{ background: 'rgba(0,0,0,0.3)' }}>
@@ -363,7 +375,6 @@ const Calculators = () => {
                     </div>
                 </div>
             )}
-
             {/* Edit Calculator Modal */}
             {showEditModal && (
                 <div className="modal show d-block" tabIndex="-1" role="dialog" style={{ background: 'rgba(0,0,0,0.3)' }}>
@@ -400,7 +411,6 @@ const Calculators = () => {
                     </div>
                 </div>
             )}
-
             {/* Add Section Modal */}
             {showSectionModal && (
                 <div className="modal show d-block" tabIndex="-1" role="dialog" style={{ background: 'rgba(0,0,0,0.3)' }}>
@@ -417,7 +427,6 @@ const Calculators = () => {
                     </div>
                 </div>
             )}
-
             {/* Edit Section Modal */}
             {editSectionModal && (
                 <div className="modal show d-block" tabIndex="-1" role="dialog" style={{ background: 'rgba(0,0,0,0.3)' }}>
@@ -446,8 +455,8 @@ const Calculators = () => {
                                                 toolbar: [
                                                     [{ 'header': [1, 2, false] }],
                                                     ['bold', 'italic', 'underline', 'strike'],
-                                                    [{ 'script': 'sub' }, { 'script': 'super' }], // Subscript & Superscript
-                                                    ['formula'], // Math formula button using KaTeX
+                                                    [{ 'script': 'sub' }, { 'script': 'super' }],
+                                                    ['formula'],
                                                     ['link', 'image'],
                                                     [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                                     ['clean']
@@ -510,6 +519,6 @@ const Calculators = () => {
             )}
         </div>
     );
-};
-
+    // ...existing code for modals and forms is included in the main return above...
+}
 export default Calculators;

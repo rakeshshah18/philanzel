@@ -124,78 +124,80 @@ const CalculatorPage = () => {
     };
 
     return (
-        <div className="container-fluid py-4 ps-2" style={{ paddingLeft: 0, marginLeft: 0, background: document.body.classList.contains('dark-mode') ? '#181818' : 'linear-gradient(135deg, #b6b2efff 0%, #dfccf0ff 100%)', minHeight: '100vh' }}>
-            <h2>{pageInfo ? pageInfo.name : 'Calculator Page'}</h2>
-            <div className="d-flex gap-2 mb-3">
-                <button className="btn btn-success" onClick={handleAddSectionClick}>
-                    Add Section
-                </button>
-            </div>
-            {error && <div className="alert alert-danger">{error}</div>}
-            {/* Sections List as Cards */}
-            <div>
-                <h4 style={{
-                    fontWeight: 700,
-                    background: document.body.classList.contains('dark-mode') ? '#222' : '#e9e6f7',
-                    color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529',
-                    borderRadius: '8px',
-                    padding: '0.5rem 1rem',
-                    marginBottom: '1rem',
-                    display: 'inline-block'
-                }}>Sections</h4>
-                {pageSections.length === 0 ? (
-                    <div>No sections added yet.</div>
-                ) : (
-                    <div className="row justify-content-center">
-                        {pageSections.map(section => (
-                            <div className="col-12 col-sm-6 mb-4 d-flex justify-content-center" key={section._id}>
-                                <div className="card shadow-sm h-100 w-100" style={{
-                                    borderRadius: '16px',
-                                    background: document.body.classList.contains('dark-mode') ? '#000' : 'linear-gradient(135deg, #9c98d3ff 0%, #b89bd3ff 100%)',
-                                    color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529',
-                                    minWidth: 340,
-                                    maxWidth: 800
-                                }}>
-                                    <div className="card-body d-flex flex-column" style={{ color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529' }}>
-                                        <h5 className="card-title" style={{
-                                            fontWeight: 700,
-                                            background: document.body.classList.contains('dark-mode') ? '#222' : '#c5bde5ff',
-                                            color: document.body.classList.contains('dark-mode') ? '#dfd0d0ff' : '#212529',
-                                            borderRadius: '8px',
-                                            padding: '0.5rem 1rem',
-                                            marginBottom: '1rem',
-                                            display: 'inline-block'
-                                        }}>{section.sectionName || 'No name'}</h5>
-                                        {section.heading && (
-                                            <h6 className="card-subtitle mb-2" style={{ color: document.body.classList.contains('dark-mode') ? '#fff' : '#6c757d' }}>{section.heading}</h6>
-                                        )}
-                                        {section.content && (
-                                            <div className="card-text" style={{ color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529' }} dangerouslySetInnerHTML={{ __html: section.content }} />
-                                        )}
-                                        {section.faqs && section.faqs.length > 0 && (
-                                            <div className="mt-2">
-                                                <strong style={{ color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529' }}>FAQs:</strong> <br />
-                                                <ul className="ps-3 mb-0">
-                                                    {section.faqs.map((faq, idx) => (
-                                                        <li key={idx} style={{ color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529' }}><strong>{faq.question}</strong>: {faq.description}</li>
-                                                    ))}
-                                                </ul>
+        <div className="container-fluid py-4" style={{ minHeight: '100vh' }}>
+            <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: document.body.classList.contains('dark-mode') ? '#23272f' : '#f8fafc', border: 'none', boxShadow: document.body.classList.contains('dark-mode') ? '0 2px 12px #0006' : '0 2px 12px #e0e7ef' }}>
+                <div className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center" style={{ background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                    <h1 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>{pageInfo ? pageInfo.name : 'Calculator Page'}</h1>
+                    <button className="btn btn-light btn-sm ms-2" onClick={handleAddSectionClick}>
+                        <i className="bi bi-plus-circle me-1"></i> Add Section
+                    </button>
+                </div>
+                <div className="dashboard-card-body px-4 py-4">
+                    {error && <div className="alert alert-danger">{error}</div>}
+                    <h2>Sections</h2>
+                    {pageSections.length === 0 ? (
+                        <div>No sections added yet.</div>
+                    ) : (
+                        <div className="row justify-content-center">
+                            {pageSections.map(section => (
+                                <div className="col-12 col-md-6 d-flex justify-content-center" key={section._id} style={{ paddingLeft: '0.25rem', paddingRight: '0.25rem' }}>
+                                    <div className="dashboard-card shadow-sm mb-4 flex-fill" style={{
+                                        maxWidth: 800,
+                                        minWidth: 380,
+                                        borderRadius: 16,
+                                        border: 'none',
+                                        position: 'relative',
+                                        background: document.body.classList.contains('dark-mode') ? '#23272f' : '#f8fafc',
+                                        color: document.body.classList.contains('dark-mode') ? '#fff' : '#212529',
+                                        margin: '0',
+                                        boxShadow: document.body.classList.contains('dark-mode') ? '0 2px 12px #0006' : '0 2px 12px #e0e7ef'
+                                    }}>
+                                        <div className="dashboard-card-body" style={{ padding: '1.25rem 1rem', borderRadius: 16, background: document.body.classList.contains('dark-mode') ? '#23272f' : '#f8fafc' }}>
+                                            <div className="d-flex align-items-center justify-content-between" style={{ marginBottom: 18 }}>
+                                                <h3 className="card-title mb-0" style={{
+                                                    background: document.body.classList.contains('dark-mode') ? 'linear-gradient(90deg,#23272f 60%,#2d3748 100%)' : 'linear-gradient(90deg,#b6b2ef 60%,#dfccf0 100%)',
+                                                    color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#23272f',
+                                                    padding: '0.85rem 1.5rem',
+                                                    borderRadius: '12px',
+                                                    fontWeight: 700,
+                                                    fontSize: '1.35rem',
+                                                    letterSpacing: 0.5,
+                                                    boxShadow: document.body.classList.contains('dark-mode') ? '0 2px 8px #0008' : '0 2px 8px #b6b2ef44',
+                                                    borderBottom: document.body.classList.contains('dark-mode') ? '2px solid #444' : '2px solid #b6b2ef',
+                                                    display: 'block',
+                                                    width: '100%',
+                                                    textAlign: 'left',
+                                                    transition: 'background 0.3s, color 0.3s',
+                                                    marginBottom: 0
+                                                }}>{section.sectionName || 'No name'}</h3>
+                                                <span style={{ marginLeft: 12, whiteSpace: 'nowrap' }}>
+                                                    <button className="btn btn-sm btn-outline-primary me-2" onClick={() => openEditModal(section)} title="Edit"><i className="bi bi-pencil"></i></button>
+                                                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteSection(section._id)} title="Delete"><i className="bi bi-trash"></i></button>
+                                                </span>
                                             </div>
-                                        )}
-                                        <div className="mt-auto d-flex gap-2">
-                                            <button className="btn btn-sm btn-outline-info" onClick={() => openEditModal(section)}>
-                                                Edit
-                                            </button>
-                                            <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteSection(section._id)}>
-                                                Delete
-                                            </button>
+                                            {section.heading && (
+                                                <div className="mb-2"><strong>Heading:</strong> {section.heading}</div>
+                                            )}
+                                            {section.content && (
+                                                <div className="mb-2"><strong>Content:</strong> <span dangerouslySetInnerHTML={{ __html: section.content }} /></div>
+                                            )}
+                                            {section.faqs && section.faqs.length > 0 && (
+                                                <div className="mt-2">
+                                                    <strong>FAQs:</strong> <br />
+                                                    <ul className="ps-3 mb-0">
+                                                        {section.faqs.map((faq, idx) => (
+                                                            <li key={idx}><strong>{faq.question}</strong>: {faq.description}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
             {/* Modal for section selection */}
             {showModal && (

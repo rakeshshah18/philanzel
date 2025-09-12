@@ -121,9 +121,6 @@ const PotentialGrowth = () => {
         }
     };
 
-    const removeSolution = (idx) => {
-        setForm({ ...form, solutions: form.solutions.filter((_, i) => i !== idx) });
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -160,11 +157,12 @@ const PotentialGrowth = () => {
 
 
     return (
-        <div className="card mt-4">
-            <div className="card-header bg-primary text-white">
-                <h5>Potential Growth</h5>
+        <div className="dashboard-card shadow-sm mb-5" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
+            <div className="dashboard-card-header px-4 py-3" style={{ background: '#0ea5e9', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18, display: 'flex', alignItems: 'center' }}>
+                <i className="fas fa-chart-line me-2"></i>
+                <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>Potential Growth</h4>
             </div>
-            <div className="card-body">
+            <div className="dashboard-card-body px-4 py-4">
                 <div className="d-flex mb-3">
                     <button className="btn btn-outline-secondary me-2" onClick={fetchData}>Refresh</button>
                     <button className="btn btn-success" onClick={() => setShowSolutionForm(true)}>Add New Solution</button>
@@ -173,10 +171,10 @@ const PotentialGrowth = () => {
                 {error && <div className="alert alert-danger">{error}</div>}
                 {!editMode && data && (
                     <>
-                        <div className="d-flex align-items-center justify-content-between mb-2">
-                            <div>
-                                <h6 className="mb-0">{data.commonHeading}</h6>
-                                <p className="mb-0">{data.commonDescription}</p>
+                        <div className="dashboard-card-header px-3 py-2 mb-3 d-flex align-items-center justify-content-between" style={{ background: '#16a34a', color: '#fff', borderRadius: 12 }}>
+                            <div className="d-flex align-items-center">
+                                <i className="fas fa-leaf me-2"></i>
+                                <h5 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>{data.commonHeading}</h5>
                             </div>
                             <div>
                                 <button className="btn btn-warning btn-sm me-2" onClick={() => setEditMode(true)} title="Edit Common Heading & Description">
@@ -187,67 +185,62 @@ const PotentialGrowth = () => {
                                 </button>
                             </div>
                         </div>
-                        <h6>Solutions</h6>
+                        <div className="mb-3 text-muted" style={{ fontSize: '1.1rem' }}>{data.commonDescription}</div>
                         <div className="row">
                             {data.solutions.map((sol, idx) => (
                                 <div key={idx} className="col-lg-3 col-md-4 col-sm-6 mb-3">
-                                    <div className="card h-100 shadow-sm border-0" style={{ background: 'linear-gradient(135deg, #fbfbfcff 0%, #dbe0e6ff 100%)' }}>
-                                        <div className="card-body d-flex flex-column justify-content-between">
-                                            {editSolutionIdx === idx ? (
-                                                <form onSubmit={handleUpdateSolution}>
-                                                    <input type="text" name="heading" placeholder="Heading" className="form-control mb-2" value={solutionForm.heading} onChange={handleSolutionChange} required />
-                                                    <ReactQuill theme="snow" value={solutionForm.description} onChange={value => setSolutionForm({ ...solutionForm, description: value })} className="mb-2" />
-                                                    <input type="file" name="icon" accept="image/*" className="form-control mb-2" onChange={handleSolutionChange} required />
-                                                    {solutionForm.icon && (
-                                                        <img src={solutionForm.icon.startsWith('/uploads') ? (process.env.NODE_ENV === 'production' ? solutionForm.icon : `http://localhost:8000${solutionForm.icon}`) : solutionForm.icon} alt="icon preview" style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '8px' }} />
-                                                    )}
-                                                    <button type="submit" className="btn btn-primary btn-sm me-2">Save</button>
-                                                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setEditSolutionIdx(null); setSolutionForm({ heading: '', description: '', icon: '' }); }}>Cancel</button>
-                                                </form>
-                                            ) : (
-                                                <div>
-                                                    <div className="d-flex align-items-center mb-2 justify-content-between">
-                                                        <div className="d-flex align-items-center">
-                                                            {sol.icon && sol.icon.startsWith('/uploads') ? (
-                                                                <img src={process.env.NODE_ENV === 'production' ? sol.icon : `http://localhost:8000${sol.icon}`} alt="icon" style={{ maxWidth: '40px', maxHeight: '40px', marginRight: '8px' }} />
-                                                            ) : (
-                                                                <span className="me-2" style={{ fontSize: '2rem' }}>{sol.icon}</span>
-                                                            )}
-                                                            <h5 className="card-title mb-0" style={{ fontWeight: 600 }}>{sol.heading}</h5>
-                                                        </div>
-                                                        <div>
-                                                            <span
-                                                                className="me-2 text-primary"
-                                                                style={{ cursor: 'pointer', fontSize: '1.2rem' }}
-                                                                title="Edit"
-                                                                onClick={() => handleEditSolution(idx)}
-                                                            >
-                                                                <i className="bi bi-pencil-square"></i>
-                                                            </span>
-                                                            <span
-                                                                className="text-danger"
-                                                                style={{ cursor: 'pointer', fontSize: '1.2rem' }}
-                                                                title="Delete"
-                                                                onClick={() => handleDeleteSolution(idx)}
-                                                            >
-                                                                <i className="bi bi-trash"></i>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <p className="card-text" style={{ color: '#333', fontSize: '1rem' }}>{sol.description}</p>
-                                                </div>
-                                            )}
+                                    <div className="dashboard-card h-100" style={{ background: '#e0f2fe', borderRadius: 14, boxShadow: '0 2px 8px #bae6fd' }}>
+                                        <div className="dashboard-card-header px-3 py-2 d-flex align-items-center justify-content-between" style={{ background: '#0ea5e9', color: '#fff', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
+                                            <div className="d-flex align-items-center">
+                                                {sol.icon && sol.icon.startsWith('/uploads') ? (
+                                                    <img src={process.env.NODE_ENV === 'production' ? sol.icon : `http://localhost:8000${sol.icon}`} alt="icon" style={{ maxWidth: '32px', maxHeight: '32px', marginRight: '8px', borderRadius: 6, border: '1px solid #ddd' }} />
+                                                ) : (
+                                                    <span className="me-2" style={{ fontSize: '2rem' }}><i className="fas fa-lightbulb"></i></span>
+                                                )}
+                                                <h6 className="mb-0" style={{ fontWeight: 600 }}>{sol.heading}</h6>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    className="me-2 text-primary"
+                                                    style={{ cursor: 'pointer', fontSize: '1.2rem' }}
+                                                    title="Edit"
+                                                    onClick={() => handleEditSolution(idx)}
+                                                >
+                                                    <i className="bi bi-pencil-square"></i>
+                                                </span>
+                                                <span
+                                                    className="text-danger"
+                                                    style={{ cursor: 'pointer', fontSize: '1.2rem' }}
+                                                    title="Delete"
+                                                    onClick={() => handleDeleteSolution(idx)}
+                                                >
+                                                    <i className="bi bi-trash"></i>
+                                                </span>
+                                            </div>
                                         </div>
+                                        <div className="dashboard-card-body p-3">
+                                            <div className="card-text" style={{ color: '#333', fontSize: '1rem' }}>{sol.description}</div>
+                                        </div>
+                                        {editSolutionIdx === idx && (
+                                            <form onSubmit={handleUpdateSolution} className="p-2">
+                                                <input type="text" name="heading" placeholder="Heading" className="form-control mb-2" value={solutionForm.heading} onChange={handleSolutionChange} required />
+                                                <ReactQuill theme="snow" value={solutionForm.description} onChange={value => setSolutionForm({ ...solutionForm, description: value })} className="mb-2" />
+                                                <input type="file" name="icon" accept="image/*" className="form-control mb-2" onChange={handleSolutionChange} required />
+                                                {solutionForm.icon && (
+                                                    <img src={solutionForm.icon.startsWith('/uploads') ? (process.env.NODE_ENV === 'production' ? solutionForm.icon : `http://localhost:8000${solutionForm.icon}`) : solutionForm.icon} alt="icon preview" style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '8px' }} />
+                                                )}
+                                                <button type="submit" className="btn btn-primary btn-sm me-2">Save</button>
+                                                <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setEditSolutionIdx(null); setSolutionForm({ heading: '', description: '', icon: '' }); }}>Cancel</button>
+                                            </form>
+                                        )}
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        {/* Add New Solution button moved above next to Refresh */}
-                        {/* Edit and Delete buttons moved above to only affect common heading and description */}
                     </>
                 )}
                 {showSolutionForm && (
-                    <form onSubmit={handleAddSolution} className="mt-2 p-2 border rounded bg-light">
+                    <form onSubmit={handleAddSolution} className="dashboard-card p-3 mb-4" style={{ background: '#e3fcec', borderRadius: 14, boxShadow: '0 2px 8px #bae6fd' }}>
                         <input type="text" name="heading" placeholder="Heading" className="form-control mb-2" value={solutionForm.heading} onChange={handleSolutionChange} required />
                         <ReactQuill theme="snow" value={solutionForm.description} onChange={value => setSolutionForm({ ...solutionForm, description: value })} className="mb-2" />
                         <input type="file" name="icon" accept="image/*" className="form-control mb-2" onChange={handleSolutionChange} required />
@@ -259,7 +252,7 @@ const PotentialGrowth = () => {
                     </form>
                 )}
                 {editMode && (
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} className="dashboard-card p-3 mb-4" style={{ background: '#e3fcec', borderRadius: 14, boxShadow: '0 2px 8px #bae6fd' }}>
                         <div className="mb-2">
                             <label>Common Heading</label>
                             <input type="text" name="commonHeading" className="form-control" value={form.commonHeading} onChange={handleChange} required />

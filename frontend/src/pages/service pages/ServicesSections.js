@@ -4,8 +4,6 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
 const ServicesSections = () => {
-    // Track expanded state for each card
-    const [expandedCards, setExpandedCards] = useState({});
     // Detect dark mode
     const [isDarkMode, setIsDarkMode] = useState(false);
     useEffect(() => {
@@ -18,10 +16,6 @@ const ServicesSections = () => {
         return () => observer.disconnect();
     }, []);
 
-    // Helper to toggle expanded state
-    const toggleCardExpand = (id) => {
-        setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
-    };
     const [sections, setSections] = useState([]);
     const [showEditSectionModal, setShowEditSectionModal] = useState(false);
     const [editingSection, setEditingSection] = useState(null);
@@ -166,153 +160,155 @@ const ServicesSections = () => {
         return { ...section, faqs: section.faqs.filter((_, i) => i !== idx) };
     };
     return (
-        <>
-            <div className="services-sections-container"
-                style={{
-                    overflowX: 'hidden',
-                    background: isDarkMode ? '#000' : 'linear-gradient(135deg, #b7b5d6ff 0%, #dfccf0ff 100%)',
-                }}>
-                <div className="mb-3 py-2">
-                    <button className="btn btn-success ms-1" onClick={handleCreateSection}>Create Section</button>
-                </div>
-                <div className="row mb-4 g-4" style={{ marginRight: 0, marginLeft: 0 }}>
-                    {sections.length === 0 ? (
-                        <div className="text-center text-muted">No sections found.</div>
-                    ) : (
-                        sections.map(section => (
-                            <div className="col-md-4 mb-4" key={section._id} style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }}>
-                                <div className="card h-100 border rounded-3" style={{ background: isDarkMode ? '#000' : 'linear-gradient(135deg, #9c98d3ff 0%, #b89bd3ff 100%)', transition: 'box-shadow 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                                    <div className="card-body p-3" style={{ fontFamily: 'Roboto, Arial, sans-serif', maxHeight: expandedCards[section._id] ? 'none' : '420px', overflow: expandedCards[section._id] ? 'visible' : 'hidden', position: 'relative' }}>
-                                        <div className="d-flex justify-content-between align-items-center mb-3">
-                                            <h5 className="card-title mb-0 fw-bold" style={{
-                                                fontSize: '1.15rem',
-                                                background: isDarkMode ? '#222' : '#928abcff',
-                                                color: isDarkMode ? '#ffffffff' : '#212529',
-                                                borderRadius: '8px',
-                                                padding: '6px 12px',
-                                                display: 'inline-block'
-                                            }}>
-                                                <span style={{ marginRight: 8, color: '#6366f1' }}><i className="bi bi-grid-3x3-gap"></i></span>
-                                                <span style={{
-                                                    color: isDarkMode ? '#f4ececff' : '#212529',
-                                                    background: isDarkMode ? '#222' : '#b6b0e3ff',
-                                                    borderRadius: '8px',
-                                                    padding: '6px 12px',
-                                                    display: 'inline-block'
-                                                }}>{section.name}</span>
-                                            </h5>
-                                            <div>
-                                                <button className="btn btn-sm btn-light border me-2" style={{ borderRadius: '20px' }} onClick={() => handleEditSection(section)}>
-                                                    <i className="bi bi-pencil text-primary"></i>
-                                                </button>
-                                                <button className="btn btn-sm btn-light border" style={{ borderRadius: '20px' }} onClick={() => handleDeleteSection(section._id)}>
-                                                    <i className="bi bi-trash text-danger"></i>
-                                                </button>
+        <React.Fragment>
+            <div className="container-fluid py-4">
+                <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: isDarkMode ? '#23272f' : '#f8fafc', border: 'none', boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #e0e7ef' }}>
+                    <div className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center" style={{ background: isDarkMode ? '#1e293b' : '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+                        <h2 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>Service Sections</h2>
+                        <button className="btn btn-light btn-sm ms-1" onClick={handleCreateSection}>
+                            <i className="fas fa-plus me-1"></i> Create Section
+                        </button>
+                    </div>
+                    <div className="dashboard-card-body px-4 py-4">
+                        <div className="row mb-4 g-4" style={{ marginRight: 0, marginLeft: 0 }}>
+                            {sections.length === 0 ? (
+                                <div className="text-center text-muted">No sections found.</div>
+                            ) : (
+                                sections.map(section => (
+                                    <div className="col-md-4 mb-4" key={section._id} style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }}>
+                                        <div className="dashboard-card h-100 border-0 shadow-sm d-flex flex-column" style={{ background: isDarkMode ? '#23272f' : '#f8fafc', borderRadius: 16, boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #e0e7ef', transition: 'box-shadow 0.2s' }}>
+                                            <div className="dashboard-card-header px-3 py-2 d-flex justify-content-between align-items-center" style={{ background: isDarkMode ? '#1e293b' : '#1565c0', color: '#fff', borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
+                                                <h5 className="card-title mb-0 fw-bold" style={{ fontSize: '1.15rem', letterSpacing: 1 }}>
+                                                    <span style={{ marginRight: 8, color: '#fff' }}><i className="bi bi-grid-3x3-gap"></i></span>
+                                                    {section.name}
+                                                </h5>
+                                                <div>
+                                                    <button className="btn btn-sm btn-light border me-2" style={{ borderRadius: '20px' }} onClick={() => handleEditSection(section)}>
+                                                        <i className="bi bi-pencil text-primary"></i>
+                                                    </button>
+                                                    <button className="btn btn-sm btn-light border" style={{ borderRadius: '20px' }} onClick={() => handleDeleteSection(section._id)}>
+                                                        <i className="bi bi-trash text-danger"></i>
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                        {/* Limited content rendering */}
-                                        {(() => {
-                                            const isExpanded = expandedCards[section._id];
-                                            // Helper to limit text
-                                            const limitText = (html, limit = 120) => {
-                                                const div = document.createElement('div');
-                                                div.innerHTML = html;
-                                                const text = div.textContent || div.innerText || '';
-                                                if (text.length > limit && !isExpanded) {
-                                                    return text.substring(0, limit) + '...';
-                                                }
-                                                return html;
-                                            };
-                                            return (
-                                                <>
-                                                    <div className="mb-2 pb-2 border-bottom">
-                                                        {Array.isArray(section.heading) && section.heading.length > 0 && (
-                                                            <div className="mb-1"><span className="fw-semibold text-muted"><i className="bi bi-type-bold me-1"></i>Heading:</span> <span className="text-dark">{Array.from(new Set(section.heading.filter(h => h))).join(', ')}</span></div>
-                                                        )}
-                                                        {Array.isArray(section.description) && section.description.length > 0 && (
-                                                            <div className="mb-1">
-                                                                <span className="fw-semibold text-muted"><i className="bi bi-card-text me-1"></i>Description:</span>
-                                                                {Array.from(new Set(section.description.filter(d => d))).map((d, idx) => (
-                                                                    <div key={idx} className="text-dark" dangerouslySetInnerHTML={{ __html: isExpanded ? d : limitText(d, 120) }} />
-                                                                ))}
-                                                            </div>
-                                                        )}
+                                            <div className="dashboard-card-body p-3 flex-grow-1 d-flex flex-column" style={{ fontFamily: 'Roboto, Arial, sans-serif', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, background: isDarkMode ? '#23272f' : '#f8fafc' }}>
+                                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                                    <h5 className="card-title mb-0 fw-bold" style={{
+                                                        fontSize: '1.15rem',
+                                                        background: isDarkMode ? '#222' : '#928abcff',
+                                                        color: isDarkMode ? '#ffffffff' : '#212529',
+                                                        borderRadius: '8px',
+                                                        padding: '6px 12px',
+                                                        display: 'inline-block'
+                                                    }}>
+                                                        <span style={{ marginRight: 8, color: '#6366f1' }}><i className="bi bi-grid-3x3-gap"></i></span>
+                                                        <span style={{
+                                                            color: isDarkMode ? '#f4ececff' : '#212529',
+                                                            background: isDarkMode ? '#222' : '#b6b0e3ff',
+                                                            borderRadius: '8px',
+                                                            padding: '6px 12px',
+                                                            display: 'inline-block'
+                                                        }}>{section.name}</span>
+                                                    </h5>
+                                                    <div>
+                                                        <button className="btn btn-sm btn-light border me-2" style={{ borderRadius: '20px' }} onClick={() => handleEditSection(section)}>
+                                                            <i className="bi bi-pencil text-primary"></i>
+                                                        </button>
+                                                        <button className="btn btn-sm btn-light border" style={{ borderRadius: '20px' }} onClick={() => handleDeleteSection(section._id)}>
+                                                            <i className="bi bi-trash text-danger"></i>
+                                                        </button>
                                                     </div>
-                                                    {/* Group: Sub Info */}
-                                                    {(Array.isArray(section.subheading) && section.subheading.filter(s => s).length > 0) || (Array.isArray(section.subdescription) && section.subdescription.filter(s => s).length > 0) ? (
-                                                        <div className="mb-2 pb-2 border-bottom">
-                                                            {Array.isArray(section.subheading) && section.subheading.filter(s => s).length > 0 && (
-                                                                <div className="mb-1"><span className="fw-semibold text-muted"><i className="bi bi-list-ul me-1"></i>Subheading:</span>
-                                                                    <ul className="list-unstyled mb-0 ms-2">
-                                                                        {Array.from(new Set(section.subheading.filter(s => s))).map((s, idx) => (
-                                                                            <li key={idx} className="text-dark">{isExpanded ? s : (s.length > 60 ? s.substring(0, 60) + '...' : s)}</li>
+                                                </div>
+                                                {/* Limited content rendering */}
+                                                {/* Render all content directly, no expand/collapse logic */}
+                                                {(() => {
+                                                    // Helper to limit text (not used anymore)
+                                                    return (
+                                                        <>
+                                                            <div className="mb-2 pb-2 border-bottom">
+                                                                {Array.isArray(section.heading) && section.heading.length > 0 && (
+                                                                    <div className="mb-1"><span className="fw-semibold text-muted"><i className="bi bi-type-bold me-1"></i>Heading:</span> <span className="text-dark">{Array.from(new Set(section.heading.filter(h => h))).join(', ')}</span></div>
+                                                                )}
+                                                                {Array.isArray(section.description) && section.description.length > 0 && (
+                                                                    <div className="mb-1">
+                                                                        <span className="fw-semibold text-muted"><i className="bi bi-card-text me-1"></i>Description:</span>
+                                                                        {Array.from(new Set(section.description.filter(d => d))).map((d, idx) => (
+                                                                            <div key={idx} className="text-dark" dangerouslySetInnerHTML={{ __html: d }} />
                                                                         ))}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            {/* Group: Sub Info */}
+                                                            {(Array.isArray(section.subheading) && section.subheading.filter(s => s).length > 0) || (Array.isArray(section.subdescription) && section.subdescription.filter(s => s).length > 0) ? (
+                                                                <div className="mb-2 pb-2 border-bottom">
+                                                                    {Array.isArray(section.subheading) && section.subheading.filter(s => s).length > 0 && (
+                                                                        <div className="mb-1"><span className="fw-semibold text-muted"><i className="bi bi-list-ul me-1"></i>Subheading:</span>
+                                                                            <ul className="list-unstyled mb-0 ms-2">
+                                                                                {Array.from(new Set(section.subheading.filter(s => s))).map((s, idx) => (
+                                                                                    <li key={idx} className="text-dark">{s}</li>
+                                                                                ))}
+                                                                            </ul>
+                                                                        </div>
+                                                                    )}
+                                                                    {Array.isArray(section.subdescription) && section.subdescription.filter(s => s).length > 0 && (
+                                                                        <div className="mb-1">
+                                                                            <span className="fw-semibold text-muted"><i className="bi bi-list-ul me-1"></i>Subdescription:</span>
+                                                                            {Array.from(new Set(section.subdescription.filter(s => s))).map((s, idx) => (
+                                                                                <div key={idx} className="text-dark" dangerouslySetInnerHTML={{ __html: s }} />
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            ) : null}
+                                                            {/* Group: Points & Images */}
+                                                            {(Array.isArray(section.points) && section.points.filter(p => p).length > 0) || (Array.isArray(section.images) && section.images.length > 0) ? (
+                                                                <div className="mb-2 pb-2 border-bottom">
+                                                                    {Array.isArray(section.points) && section.points.filter(p => p).length > 0 && (
+                                                                        <div className="mb-1">
+                                                                            <span className="fw-semibold text-muted"><i className="bi bi-check2-square me-1"></i>Points:</span>
+                                                                            {Array.from(new Set(section.points.filter(p => p))).map((p, idx) => (
+                                                                                <div key={idx} className="text-dark" dangerouslySetInnerHTML={{ __html: p }} />
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+                                                                    {Array.isArray(section.images) && section.images.length > 0 && (
+                                                                        <div className="mb-1"><span className="fw-semibold text-muted"><i className="bi bi-image me-1"></i>Images:</span>
+                                                                            <div className="d-flex flex-wrap gap-2 ms-2">
+                                                                                {Array.from(new Set(section.images.filter(img => img))).map((img, idx) => (
+                                                                                    <img key={idx} src={img} alt="Section" className="img-fluid mt-2 rounded-2 border" style={{ maxHeight: 70, maxWidth: 70, background: '#fff' }} />
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            ) : null}
+                                                            {/* Group: FAQs */}
+                                                            {Array.isArray(section.faqs) && section.faqs.filter(faq => faq.question || faq.answer).length > 0 && (
+                                                                <div className="mb-2">
+                                                                    <span className="fw-semibold text-muted"><i className="bi bi-question-circle me-1"></i>FAQs:</span>
+                                                                    <ul className="list-unstyled mb-0 ms-2">
+                                                                        {Array.from(new Set(section.faqs.filter(faq => faq.question || faq.answer).map(faq => JSON.stringify(faq)))).map((faqStr, idx) => {
+                                                                            const faq = JSON.parse(faqStr);
+                                                                            return <li key={idx} className="text-dark"><span className="fw-bold">Q:</span> {faq.question} <br /><span className="fw-bold">A:</span> <span dangerouslySetInnerHTML={{ __html: faq.answer }} /></li>;
+                                                                        })}
                                                                     </ul>
                                                                 </div>
                                                             )}
-                                                            {Array.isArray(section.subdescription) && section.subdescription.filter(s => s).length > 0 && (
-                                                                <div className="mb-1">
-                                                                    <span className="fw-semibold text-muted"><i className="bi bi-list-ul me-1"></i>Subdescription:</span>
-                                                                    {Array.from(new Set(section.subdescription.filter(s => s))).map((s, idx) => (
-                                                                        <div key={idx} className="text-dark" dangerouslySetInnerHTML={{ __html: isExpanded ? s : limitText(s, 80) }} />
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    ) : null}
-                                                    {/* Group: Points & Images */}
-                                                    {(Array.isArray(section.points) && section.points.filter(p => p).length > 0) || (Array.isArray(section.images) && section.images.length > 0) ? (
-                                                        <div className="mb-2 pb-2 border-bottom">
-                                                            {Array.isArray(section.points) && section.points.filter(p => p).length > 0 && (
-                                                                <div className="mb-1">
-                                                                    <span className="fw-semibold text-muted"><i className="bi bi-check2-square me-1"></i>Points:</span>
-                                                                    {Array.from(new Set(section.points.filter(p => p))).map((p, idx) => (
-                                                                        <div key={idx} className="text-dark" dangerouslySetInnerHTML={{ __html: isExpanded ? p : limitText(p, 80) }} />
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                            {Array.isArray(section.images) && section.images.length > 0 && (
-                                                                <div className="mb-1"><span className="fw-semibold text-muted"><i className="bi bi-image me-1"></i>Images:</span>
-                                                                    <div className="d-flex flex-wrap gap-2 ms-2">
-                                                                        {Array.from(new Set(section.images.filter(img => img))).map((img, idx) => (
-                                                                            <img key={idx} src={img} alt="Section" className="img-fluid mt-2 rounded-2 border" style={{ maxHeight: 70, maxWidth: 70, background: '#fff' }} />
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    ) : null}
-                                                    {/* Group: FAQs */}
-                                                    {Array.isArray(section.faqs) && section.faqs.filter(faq => faq.question || faq.answer).length > 0 && (
-                                                        <div className="mb-2">
-                                                            <span className="fw-semibold text-muted"><i className="bi bi-question-circle me-1"></i>FAQs:</span>
-                                                            <ul className="list-unstyled mb-0 ms-2">
-                                                                {Array.from(new Set(section.faqs.filter(faq => faq.question || faq.answer).map(faq => JSON.stringify(faq)))).map((faqStr, idx) => {
-                                                                    const faq = JSON.parse(faqStr);
-                                                                    return <li key={idx} className="text-dark"><span className="fw-bold">Q:</span> {isExpanded ? faq.question : (faq.question.length > 60 ? faq.question.substring(0, 60) + '...' : faq.question)} <br /><span className="fw-bold">A:</span> <span dangerouslySetInnerHTML={{ __html: isExpanded ? faq.answer : limitText(faq.answer, 80) }} /></li>;
-                                                                })}
-                                                            </ul>
-                                                        </div>
-                                                    )}
-                                                    {/* Show More/Less Button */}
-                                                    <div className="d-flex justify-content-end mt-2" style={{ position: expandedCards[section._id] ? 'static' : 'absolute', bottom: expandedCards[section._id] ? 'auto' : '2px', right: '12px', left: '12px', background: expandedCards[section._id] ? 'none' : 'linear-gradient(180deg, rgba(244,246,251,0) 0%)', padding: expandedCards[section._id] ? '0' : '0 0 0 0' }}>
-                                                        <button className="btn btn-sm btn-outline-primary" onClick={() => toggleCardExpand(section._id)}>
-                                                            {isExpanded ? 'Show Less' : 'Show More'}
-                                                        </button>
-                                                    </div>
-                                                </>
-                                            );
-                                        })()}
+                                                        </>
+                                                    );
+                                                })()}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        ))
-                    )}
+                                ))
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
             {/* Edit Section Modal */}
             <Modal
-                show={!!showEditSectionModal}
+                show={Boolean(showEditSectionModal)}
                 onHide={handleEditModalClose}
                 centered
             >
@@ -426,7 +422,7 @@ const ServicesSections = () => {
             </Modal>
             {/* Create Section Modal */}
             <Modal
-                show={!!showCreateSectionModal}
+                show={Boolean(showCreateSectionModal)}
                 onHide={handleCreateModalClose}
                 centered
             >
@@ -523,7 +519,7 @@ const ServicesSections = () => {
                     </div>
                 </div>
             </Modal>
-        </>
+        </React.Fragment>
     );
 };
 

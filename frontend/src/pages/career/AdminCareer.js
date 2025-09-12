@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Alert from '../../components/Alert';
 import api from '../../services/api';
@@ -10,9 +10,47 @@ const getImageURL = (filename) => {
 };
 
 const AdminCareer = () => {
+    // Sorting config must be the first hook to avoid no-use-before-define
+    const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+    // Sort applications based on current sort config
+    const sortApplications = useCallback((applicationsToSort) => {
+        if (!sortConfig.key) return applicationsToSort;
+
+        return [...applicationsToSort].sort((a, b) => {
+            let aValue = a[sortConfig.key];
+            let bValue = b[sortConfig.key];
+
+            // Handle different data types
+            switch (sortConfig.key) {
+                case 'fullName':
+                    aValue = aValue?.toLowerCase() || '';
+                    bValue = bValue?.toLowerCase() || '';
+                    break;
+                case 'createdAt':
+                    aValue = new Date(aValue);
+                    bValue = new Date(bValue);
+                    break;
+                case 'email':
+                    aValue = aValue?.toLowerCase() || '';
+                    bValue = bValue?.toLowerCase() || '';
+                    break;
+                default:
+                    aValue = aValue || '';
+                    bValue = bValue || '';
+            }
+
+            if (aValue < bValue) {
+                return sortConfig.direction === 'asc' ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return sortConfig.direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+    }, [sortConfig]);
     // Restore missing functions
     // Apply all filters (search + date range)
-    const applyFilters = (applicationsData, searchValue, dateFilter) => {
+    const applyFilters = useCallback((applicationsData, searchValue, dateFilter) => {
         let result = applicationsData;
         // Apply search filter
         if (searchValue) {
@@ -41,7 +79,7 @@ const AdminCareer = () => {
         }
         const sortedResult = sortApplications(result);
         setFilteredApplications(sortedResult);
-    };
+    }, [sortApplications]);
 
     // Clear search
     const clearSearch = () => {
@@ -121,7 +159,6 @@ const AdminCareer = () => {
     const [filteredApplications, setFilteredApplications] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchLoading, setSearchLoading] = useState(false);
-    const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
     const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
     const [showDateFilter, setShowDateFilter] = useState(true);
     const [loading, setLoading] = useState(true);
@@ -135,7 +172,7 @@ const AdminCareer = () => {
     };
 
     // Fetch career posts (content management)
-    const fetchCareerPosts = async () => {
+    const fetchCareerPosts = useCallback(async () => {
         try {
             const response = await api.get('/career-posts');
             if (response.data.status === 'success') {
@@ -145,10 +182,10 @@ const AdminCareer = () => {
             console.error('Error fetching career posts:', error);
             showAlert('Failed to fetch career posts', 'error');
         }
-    };
+    }, []);
 
     // Fetch career applications (form submissions)
-    const fetchApplications = async (search = '') => {
+    const fetchApplications = useCallback(async (search = '') => {
         try {
             setLoading(search === '');
             setSearchLoading(search !== '');
@@ -171,7 +208,7 @@ const AdminCareer = () => {
             setLoading(false);
             setSearchLoading(false);
         }
-    };
+    }, []);
 
     // Handle search functionality
     const handleSearch = async (searchValue) => {
@@ -282,42 +319,6 @@ const AdminCareer = () => {
                 }
             `}</style>
 
-    // Sort applications based on current sort config
-    const sortApplications = (applicationsToSort) => {
-        if (!sortConfig.key) return applicationsToSort;
-
-        return [...applicationsToSort].sort((a, b) => {
-            let aValue = a[sortConfig.key];
-            let bValue = b[sortConfig.key];
-
-            // Handle different data types
-            switch (sortConfig.key) {
-                case 'fullName':
-                    aValue = aValue?.toLowerCase() || '';
-                    bValue = bValue?.toLowerCase() || '';
-                    break;
-                case 'createdAt':
-                    aValue = new Date(aValue);
-                    bValue = new Date(bValue);
-                    break;
-                case 'email':
-                    aValue = aValue?.toLowerCase() || '';
-                    bValue = bValue?.toLowerCase() || '';
-                    break;
-                default:
-                    aValue = aValue || '';
-                    bValue = bValue || '';
-            }
-
-            if (aValue < bValue) {
-                return sortConfig.direction === 'asc' ? -1 : 1;
-            }
-            if (aValue > bValue) {
-                return sortConfig.direction === 'asc' ? 1 : -1;
-            }
-            return 0;
-        });
-    };
 
     // Get sort icon for column headers
     const getSortIcon = (columnKey) => {
@@ -334,12 +335,12 @@ const AdminCareer = () => {
             fetchCareerPosts();
             fetchApplications();
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, fetchCareerPosts, fetchApplications]);
 
     // Update filtered applications when applications, sort, or filters change
     useEffect(() => {
         applyFilters(applications, searchTerm, dateRange);
-    }, [applications, sortConfig, searchTerm, dateRange]);
+    }, [applications, sortConfig, searchTerm, dateRange, applyFilters]);
 
     // Handle post form input changes
     const handlePostFormChange = (e) => {
@@ -556,13 +557,19 @@ const AdminCareer = () => {
                     {activeTab === 'content' && (
                         <div className="tab-pane">
                             <div className="d-flex justify-content-between align-items-center mb-4">
-                                <h4>Career Page Content</h4>
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={() => setShowPostForm(true)}
-                                >
-                                    Add New Content
-                                </button>
+                                <div className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center w-100" style={{ background: '#1565c0', color: '#fff', borderRadius: 18 }}>
+                                    <h4 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
+                                        <i className="fas fa-briefcase me-2"></i>
+                                        Career Page Content
+                                    </h4>
+                                    <button
+                                        className="btn btn-light btn-sm"
+                                        onClick={() => setShowPostForm(true)}
+                                        style={{ fontWeight: 600, color: '#1565c0' }}>
+                                        <i className="fas fa-plus me-1"></i>
+                                        Add New Content
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Add/Edit Form */}
@@ -627,52 +634,54 @@ const AdminCareer = () => {
                             )}
 
                             {/* Career Posts List */}
-                            <div className="row">
-                                {careerPosts.length === 0 ? (
-                                    <div className="col-12">
-                                        <div className="text-center p-4">
-                                            <p>No career content found. Create your first career post!</p>
+                            <div className="dashboard-card-body px-4 py-4" style={{ background: '#f8fafc', borderRadius: 18, marginTop: 0 }}>
+                                <div className="row">
+                                    {careerPosts.length === 0 ? (
+                                        <div className="col-12">
+                                            <div className="text-center p-4">
+                                                <p>No career content found. Create your first career post!</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ) : (
-                                    careerPosts.map((post) => (
-                                        <div key={post._id} className="col-md-6 col-lg-4 mb-4">
-                                            <div className="card h-100">
-                                                {post.image && (
-                                                    <img
-                                                        src={getImageURL(post.image.filename)}
-                                                        className="card-img-top"
-                                                        alt={post.heading}
-                                                        style={{ height: '200px', objectFit: 'cover' }}
-                                                    />
-                                                )}
-                                                <div className="card-body d-flex flex-column">
-                                                    <h5 className="card-title">{post.heading}</h5>
-                                                    <p className="card-text flex-grow-1">{post.description}</p>
-                                                    <div className="mt-auto">
-                                                        <small className="text-muted">
-                                                            Created: {formatDate(post.createdAt)}
-                                                        </small>
-                                                        <div className="mt-2">
-                                                            <button
-                                                                className="btn btn-sm btn-outline-primary me-2"
-                                                                onClick={() => handleEditPost(post)}
-                                                            >
-                                                                Edit
-                                                            </button>
-                                                            <button
-                                                                className="btn btn-sm btn-outline-danger"
-                                                                onClick={() => handleDeletePost(post._id)}
-                                                            >
-                                                                Delete
-                                                            </button>
+                                    ) : (
+                                        careerPosts.map((post) => (
+                                            <div key={post._id} className="col-md-6 col-lg-4 mb-4">
+                                                <div className="dashboard-card h-100 shadow-sm" style={{ borderRadius: 16, background: '#fff', border: '1.5px solid #90caf9', boxShadow: '0 2px 8px #e0e7ef', transition: 'transform 0.18s, box-shadow 0.18s', overflow: 'hidden' }}>
+                                                    {post.image && (
+                                                        <img
+                                                            src={getImageURL(post.image.filename)}
+                                                            className="card-img-top"
+                                                            alt={post.heading}
+                                                            style={{ height: '200px', objectFit: 'cover', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderBottom: '1.5px solid #e3eafc' }}
+                                                        />
+                                                    )}
+                                                    <div className="card-body d-flex flex-column">
+                                                        <h5 className="card-title" style={{ color: '#1565c0', fontWeight: 700 }}>{post.heading}</h5>
+                                                        <p className="card-text flex-grow-1" style={{ color: '#444' }}>{post.description}</p>
+                                                        <div className="mt-auto">
+                                                            <small className="text-muted">
+                                                                Created: {formatDate(post.createdAt)}
+                                                            </small>
+                                                            <div className="mt-2">
+                                                                <button
+                                                                    className="btn btn-sm btn-outline-primary me-2"
+                                                                    onClick={() => handleEditPost(post)}
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-sm btn-outline-danger"
+                                                                    onClick={() => handleDeletePost(post._id)}
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))
-                                )}
+                                        ))
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}
@@ -680,11 +689,14 @@ const AdminCareer = () => {
                     {/* Applications Tab */}
                     {activeTab === 'applications' && (
                         <div className="tab-pane">
-                            <div className="d-flex justify-content-between align-items-center mb-4">
+                            <div className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center mb-4" style={{ background: '#1565c0', color: '#fff', borderRadius: 18 }}>
                                 <div className="d-flex align-items-center">
-                                    <h4 className="mb-0 me-3">Job Applications</h4>
+                                    <h4 className="mb-0 me-3" style={{ fontWeight: 700, letterSpacing: 1 }}>
+                                        <i className="fas fa-users me-2"></i>
+                                        Job Applications
+                                    </h4>
                                     {sortConfig.key && (
-                                        <small className="text-muted">
+                                        <small className="text-light">
                                             Sorted by {sortConfig.key === 'fullName' ? 'Name' :
                                                 sortConfig.key === 'createdAt' ? 'Date' :
                                                     sortConfig.key === 'email' ? 'Email' : sortConfig.key}
@@ -692,7 +704,7 @@ const AdminCareer = () => {
                                                 ? (sortConfig.direction === 'asc' ? 'Oldest-Newest' : 'Newest-Oldest')
                                                 : (sortConfig.direction === 'asc' ? 'A-Z' : 'Z-A')})
                                             <button
-                                                className="btn btn-sm btn-outline-secondary ms-2"
+                                                className="btn btn-sm btn-outline-light ms-2"
                                                 onClick={() => setSortConfig({ key: 'createdAt', direction: 'desc' })}
                                                 title="Reset to default sorting"
                                             >
@@ -701,7 +713,6 @@ const AdminCareer = () => {
                                         </small>
                                     )}
                                 </div>
-
                                 {/* Search Functionality */}
                                 <div className="search-container" style={{ minWidth: '300px' }}>
                                     <div className="input-group">
@@ -713,7 +724,7 @@ const AdminCareer = () => {
                                             onChange={(e) => handleSearch(e.target.value)}
                                         />
                                         <button
-                                            className="btn btn-outline-secondary"
+                                            className="btn btn-outline-light"
                                             type="button"
                                             onClick={clearSearch}
                                             disabled={!searchTerm}
@@ -724,12 +735,12 @@ const AdminCareer = () => {
                                                 <i className="bi bi-x"></i>
                                             )}
                                         </button>
-                                        <button className="btn btn-primary" type="button" disabled>
+                                        <button className="btn btn-light" type="button" disabled>
                                             <i className="bi bi-search"></i>
                                         </button>
                                     </div>
                                     {searchTerm && (
-                                        <small className="text-muted">
+                                        <small className="text-light">
                                             Found {filteredApplications.length} of {applications.length} applications
                                         </small>
                                     )}
@@ -740,15 +751,15 @@ const AdminCareer = () => {
                             <div className="row mb-3">
                                 <div className="col-md-6">
                                     {/* Date Range Filter */}
-                                    <div className="card" style={filterStyles.dateFilterCard}>
+                                    <div className="dashboard-card shadow-sm" style={{ borderRadius: 14, background: '#f8fafc', border: '1.5px solid #90caf9', boxShadow: '0 2px 8px #e0e7ef' }}>
                                         <div className="card-body p-3">
                                             <div className="d-flex align-items-center justify-content-between mb-2">
-                                                <h6 className="mb-0 text-secondary">
+                                                <h6 className="mb-0" style={{ color: '#1565c0' }}>
                                                     <i className="fas fa-calendar-alt me-2"></i>
                                                     Date Range Filter
                                                 </h6>
                                                 <button
-                                                    className="btn btn-sm btn-outline-secondary"
+                                                    className="btn btn-sm btn-outline-primary"
                                                     onClick={() => setShowDateFilter(!showDateFilter)}
                                                     title={showDateFilter ? "Hide date filter" : "Show date filter"}
                                                 >
@@ -764,7 +775,7 @@ const AdminCareer = () => {
                                                             <input
                                                                 type="date"
                                                                 className="form-control form-control-sm"
-                                                                style={filterStyles.dateInput}
+                                                                style={{ borderColor: '#90caf9' }}
                                                                 value={dateRange.startDate}
                                                                 onChange={(e) => handleDateRangeChange('startDate', e.target.value)}
                                                                 max={dateRange.endDate || new Date().toISOString().split('T')[0]}
@@ -775,7 +786,7 @@ const AdminCareer = () => {
                                                             <input
                                                                 type="date"
                                                                 className="form-control form-control-sm"
-                                                                style={filterStyles.dateInput}
+                                                                style={{ borderColor: '#90caf9' }}
                                                                 value={dateRange.endDate}
                                                                 onChange={(e) => handleDateRangeChange('endDate', e.target.value)}
                                                                 min={dateRange.startDate}
@@ -812,15 +823,15 @@ const AdminCareer = () => {
 
                                 <div className="col-md-6">
                                     {/* Filter Summary */}
-                                    <div className="card" style={filterStyles.summaryCard}>
+                                    <div className="dashboard-card shadow-sm" style={{ borderRadius: 14, background: '#f8fafc', border: '1.5px solid #90caf9', boxShadow: '0 2px 8px #e0e7ef' }}>
                                         <div className="card-body p-3">
-                                            <h6 className="mb-2 text-secondary">
+                                            <h6 className="mb-2" style={{ color: '#1565c0' }}>
                                                 <i className="fas fa-info-circle me-2"></i>
                                                 Results Summary
                                             </h6>
                                             <div className="d-flex justify-content-between">
                                                 <span className="small">Showing:</span>
-                                                <strong className="text-primary">{filteredApplications.length}</strong>
+                                                <strong style={{ color: '#1565c0' }}>{filteredApplications.length}</strong>
                                             </div>
                                             <div className="d-flex justify-content-between">
                                                 <span className="small">Total:</span>
@@ -861,13 +872,13 @@ const AdminCareer = () => {
                                 </div>
                             ) : (
                                 <div className="table-responsive">
-                                    <table className="table table-hover" style={{ backgroundColor: '#fff' }}>
-                                        <thead style={filterStyles.tableHeader}>
+                                    <table className="table table-hover" style={{ backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', border: '1.5px solid #90caf9' }}>
+                                        <thead style={{ background: '#e3eafc' }}>
                                             <tr>
                                                 <th
                                                     className="sortable-header"
                                                     onClick={() => handleSort('fullName')}
-                                                    style={{ cursor: 'pointer', userSelect: 'none', padding: '12px', fontWeight: '600' }}
+                                                    style={{ cursor: 'pointer', userSelect: 'none', padding: '12px', fontWeight: '700', color: '#1565c0', background: '#e3eafc' }}
                                                 >
                                                     Name
                                                     {getSortIcon('fullName')}
@@ -875,18 +886,18 @@ const AdminCareer = () => {
                                                 <th
                                                     className="sortable-header"
                                                     onClick={() => handleSort('email')}
-                                                    style={{ cursor: 'pointer', userSelect: 'none', padding: '12px', fontWeight: '600' }}
+                                                    style={{ cursor: 'pointer', userSelect: 'none', padding: '12px', fontWeight: '700', color: '#1565c0', background: '#e3eafc' }}
                                                 >
                                                     Email
                                                     {getSortIcon('email')}
                                                 </th>
-                                                <th style={{ padding: '12px', fontWeight: '600' }}>Phone</th>
-                                                <th style={{ padding: '12px', fontWeight: '600' }}>Message</th>
-                                                <th style={{ padding: '12px', fontWeight: '600' }}>Resume</th>
+                                                <th style={{ padding: '12px', fontWeight: '700', color: '#1565c0', background: '#e3eafc' }}>Phone</th>
+                                                <th style={{ padding: '12px', fontWeight: '700', color: '#1565c0', background: '#e3eafc' }}>Message</th>
+                                                <th style={{ padding: '12px', fontWeight: '700', color: '#1565c0', background: '#e3eafc' }}>Resume</th>
                                                 <th
                                                     className="sortable-header"
                                                     onClick={() => handleSort('createdAt')}
-                                                    style={{ cursor: 'pointer', userSelect: 'none', padding: '12px', fontWeight: '600' }}
+                                                    style={{ cursor: 'pointer', userSelect: 'none', padding: '12px', fontWeight: '700', color: '#1565c0', background: '#e3eafc' }}
                                                 >
                                                     Applied Date
                                                     {getSortIcon('createdAt')}

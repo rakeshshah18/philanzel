@@ -23,12 +23,6 @@ const Ads = () => {
     const [imagePreview, setImagePreview] = useState('');
     const [message, setMessage] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
-    const [pagination, setPagination] = useState({
-        currentPage: 1,
-        totalPages: 1,
-        totalItems: 0,
-        limit: 10
-    });
 
     // Quill editor configuration
     const quillModules = {
@@ -74,30 +68,6 @@ const Ads = () => {
         }
     };
 
-    const fetchWithPagination = async (page = 1) => {
-        try {
-            setLoading(true);
-            const token = localStorage.getItem('adminToken');
-            if (!token) {
-                setMessage('❌ Pagination is only available for admins.');
-                setLoading(false);
-                return;
-            }
-            const response = await adsSectionsAPI.getPaginated(page, pagination.limit);
-            setAdsSections(response.data.data || []);
-            setPagination({
-                currentPage: response.data.currentPage || 1,
-                totalPages: response.data.totalPages || 1,
-                totalItems: response.data.totalItems || 0,
-                limit: response.data.limit || 10
-            });
-        } catch (error) {
-            console.error('Error fetching paginated ads sections:', error);
-            setMessage(`❌ Failed to fetch ads sections. ${error.response?.data?.message || error.message}`);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSearch = async () => {
         if (!searchQuery.trim()) {
@@ -289,25 +259,32 @@ const Ads = () => {
     };
 
     return (
-        <div className="container-fluid py-4" style={{ background: document.body.classList.contains('dark-mode') ? '#181818' : 'linear-gradient(135deg, #d9cc9fff 0%, #dfa35fff 100%)', minHeight: '100vh' }}>
+        <div className="container-fluid py-4" style={{
+            background: document.body.classList.contains('dark-mode') ? '#181818' : '#f8fafc',
+            minHeight: '100vh'
+        }}>
             {message && <Alert message={message} onClose={() => setMessage('')} />}
 
             <div className="row">
                 <div className="col-12">
                     <div className="card shadow-sm">
-                        <div className="card-header text-dark d-flex justify-content-between align-items-center"
+                        <div className="card-header dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center"
                             style={{
-                                background: document.body.classList.contains('dark-mode') ? '#ff9f31ff' : '#ff9f31ff',
+                                background: '#1565c0',
+                                color: '#fff',
+                                borderTopLeftRadius: 18,
+                                borderTopRightRadius: 18
                             }}
                         >
-                            <h4 className="mb-0">
+                            <h5 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
                                 <i className="fas fa-bullhorn me-2"></i>
                                 Ads Management
-                            </h4>
+                            </h5>
                             <button
-                                className="btn btn-dark"
+                                className="btn btn-light"
                                 onClick={addAdsSection}
                                 disabled={loading}
+                                style={{ fontWeight: 600, borderRadius: 8 }}
                             >
                                 <i className="fas fa-plus me-2"></i>
                                 Add New Ads Section
@@ -316,7 +293,9 @@ const Ads = () => {
 
                         <div className="card-body"
                             style={{
-                                background: document.body.classList.contains('dark-mode') ? 'linear-gradient(135deg, #e0d4abff 0%, #dab183ff 100%)' : 'linear-gradient(135deg, #e0d4abff 0%, #dab183ff 100%)',
+                                background: document.body.classList.contains('dark-mode') ? '#23272f' : '#f8fafc',
+                                borderBottomLeftRadius: 18,
+                                borderBottomRightRadius: 18
                             }}
                         >
                             {/* Search Bar */}
@@ -328,7 +307,9 @@ const Ads = () => {
                                             className="form-control"
                                             placeholder="Search by title, hashtag..."
                                             style={{
-                                                backgroundColor: document.body.classList.contains('dark-mode') ? '#d3c29fff' : '#d3c29fff'
+                                                backgroundColor: document.body.classList.contains('dark-mode') ? '#23272f' : '#f8fafc',
+                                                border: '1px solid #e0e7ef',
+                                                color: document.body.classList.contains('dark-mode') ? '#fff' : '#23272f'
                                             }}
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -338,12 +319,13 @@ const Ads = () => {
                                             className="btn btn-outline-secondary"
                                             onClick={handleSearch}
                                             disabled={loading}
+                                            style={{
+                                                backgroundColor: document.body.classList.contains('dark-mode') ? '#23272f' : '#f8fafc',
+                                                border: '1px solid #e0e7ef',
+                                                color: document.body.classList.contains('dark-mode') ? '#fff' : '#23272f'
+                                            }}
                                         >
-                                            <i className="bi bi-search"
-                                                style={{
-                                                    backgroundColor: document.body.classList.contains('dark-mode') ? '#d3c29fff' : '#d3c29fff'
-                                                }}
-                                            ></i>
+                                            <i className="bi bi-search"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -387,113 +369,136 @@ const Ads = () => {
                                         return (
                                             <div key={adsSection._id} className="col-12 col-sm-6 col-lg-4 mb-4 d-flex justify-content-center">
                                                 <div
-                                                    className="card shadow-lg h-100 w-100"
+                                                    className="dashboard-card shadow-sm h-100 w-100"
                                                     style={{
-                                                        borderRadius: '18px',
-                                                        background: isDarkMode
-                                                            ? '#222'
-                                                            : 'linear-gradient(135deg, #d9cc9fff 0%, #dfa35fff 100%)',
-                                                        color: isDarkMode ? '#fff' : '#212529',
+                                                        borderRadius: '16px',
+                                                        background: isDarkMode ? '#23272f' : '#fff8f0',
+                                                        color: isDarkMode ? '#fff' : '#23272f',
                                                         minWidth: 340,
                                                         maxWidth: 420,
-                                                        boxShadow: isDarkMode ? '0 2px 16px rgba(0,0,0,0.7)' : '0 2px 16px rgba(200,200,200,0.2)'
+                                                        boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #ffb36644',
+                                                        border: isDarkMode ? '1px solid #444' : '1px solid #ffb366',
+                                                        padding: 5,
+                                                        display: 'flex',
+                                                        flexDirection: 'column'
                                                     }}
                                                 >
-                                                    <div className="card-body d-flex flex-column" style={{ padding: '1.2rem', color: isDarkMode ? '#fff' : '#212529' }}>
-                                                        <div className="d-flex justify-content-between align-items-start mb-2">
-                                                            <h5 className="card-title mb-1" style={{ fontWeight: 700, background: isDarkMode ? '#333' : '#fffbe6', color: isDarkMode ? '#ffe066' : '#212529', borderRadius: '8px', padding: '0.4rem 1rem', display: 'inline-block' }}>{adsSection.title}</h5>
-                                                            <div className="dropdown">
-                                                                <button
-                                                                    className="btn btn-sm btn-outline-secondary"
-                                                                    type="button"
-                                                                    data-bs-toggle="dropdown"
-                                                                >
-                                                                    <i className="bi bi-three-dots-vertical"></i>
-                                                                </button>
-                                                                <ul className="dropdown-menu">
-                                                                    <li>
-                                                                        <button
-                                                                            className="dropdown-item"
-                                                                            onClick={() => editAdsSection(adsSection)}
-                                                                        >
-                                                                            <i className="fas fa-edit me-2"></i>Edit
-                                                                        </button>
-                                                                    </li>
-                                                                    <li>
-                                                                        <button
-                                                                            className="dropdown-item"
-                                                                            onClick={() => toggleVisibility(adsSection._id, adsSection.isVisible)}
-                                                                        >
-                                                                            <i className={`fas fa-${adsSection.isVisible ? 'eye-slash' : 'eye'} me-2`}></i>
-                                                                            {adsSection.isVisible ? 'Hide' : 'Show'}
-                                                                        </button>
-                                                                    </li>
-                                                                    <li><hr className="dropdown-divider" /></li>
-                                                                    <li>
-                                                                        <button
-                                                                            className="dropdown-item text-danger"
-                                                                            onClick={() => deleteAdsSection(adsSection._id)}
-                                                                        >
-                                                                            <i className="fas fa-trash me-2"></i>Delete
-                                                                        </button>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
+                                                    <div className="d-flex align-items-center justify-content-between" style={{
+                                                        borderTopLeftRadius: '16px',
+                                                        borderTopRightRadius: '16px',
+                                                        background: isDarkMode ? '#23272f' : '#ffb366',
+                                                        padding: 0,
+                                                        paddingTop: '1rem',
+                                                        paddingRight: '1.25rem',
+                                                        paddingBottom: '1rem',
+                                                        paddingLeft: '1.25rem',
+                                                        borderBottom: isDarkMode ? '1px solid #444' : '1px solid #ff9f31',
+                                                        marginBottom: 0
+                                                    }}>
+                                                        <h5 className="card-title mb-0" style={{
+                                                            fontWeight: 800,
+                                                            fontSize: '1.25rem',
+                                                            letterSpacing: 0.5,
+                                                            color: isDarkMode ? '#ffe066' : '#23272f',
+                                                            background: 'none',
+                                                            borderRadius: '8px',
+                                                            marginBottom: 0,
+                                                            padding: '0.4rem 1rem',
+                                                            borderLeft: isDarkMode ? '6px solid #ffe066' : '6px solid #ff9f31',
+                                                            boxShadow: isDarkMode ? '0 1px 4px #0004' : '0 1px 4px #ffb36644',
+                                                            transition: 'background 0.3s, color 0.3s'
+                                                        }}>{adsSection.title}</h5>
+                                                        <div className="dropdown">
+                                                            <button
+                                                                className="btn btn-sm btn-outline-secondary"
+                                                                type="button"
+                                                                data-bs-toggle="dropdown"
+                                                            >
+                                                                <i className="bi bi-three-dots-vertical"></i>
+                                                            </button>
+                                                            <ul className="dropdown-menu">
+                                                                <li>
+                                                                    <button
+                                                                        className="dropdown-item"
+                                                                        onClick={() => editAdsSection(adsSection)}
+                                                                    >
+                                                                        <i className="fas fa-edit me-2"></i>Edit
+                                                                    </button>
+                                                                </li>
+                                                                <li>
+                                                                    <button
+                                                                        className="dropdown-item"
+                                                                        onClick={() => toggleVisibility(adsSection._id, adsSection.isVisible)}
+                                                                    >
+                                                                        <i className={`fas fa-${adsSection.isVisible ? 'eye-slash' : 'eye'} me-2`}></i>
+                                                                        {adsSection.isVisible ? 'Hide' : 'Show'}
+                                                                    </button>
+                                                                </li>
+                                                                <li><hr className="dropdown-divider" /></li>
+                                                                <li>
+                                                                    <button
+                                                                        className="dropdown-item text-danger"
+                                                                        onClick={() => deleteAdsSection(adsSection._id)}
+                                                                    >
+                                                                        <i className="fas fa-trash me-2"></i>Delete
+                                                                    </button>
+                                                                </li>
+                                                            </ul>
                                                         </div>
+                                                    </div>
 
-                                                        {adsSection.hashtag && (
-                                                            <span className="badge bg-primary mb-2" style={{ fontSize: '0.95rem', background: isDarkMode ? '#ffe066' : '#007bff', color: isDarkMode ? '#222' : '#fff' }}>#{adsSection.hashtag}</span>
-                                                        )}
+                                                    {adsSection.hashtag && (
+                                                        <span className="badge mb-2" style={{ fontSize: '0.95rem', background: isDarkMode ? '#ffe066' : '#ff9f31', color: isDarkMode ? '#222' : '#fff' }}>#{adsSection.hashtag}</span>
+                                                    )}
 
-                                                        {(adsSection.imageUrl || adsSection.image || adsSection.link) && (
-                                                            <div className="mb-2">
-                                                                <img
-                                                                    src={
-                                                                        (adsSection.imageUrl && adsSection.imageUrl.startsWith('/uploads')
-                                                                            ? `http://localhost:8000${adsSection.imageUrl}`
-                                                                            : adsSection.imageUrl) ||
-                                                                        adsSection.image ||
-                                                                        adsSection.link
-                                                                    }
-                                                                    alt={adsSection.title}
-                                                                    className="img-fluid rounded"
-                                                                    style={{ maxHeight: '120px', width: '100%', objectFit: 'cover', boxShadow: isDarkMode ? '0 2px 8px #000' : '0 2px 8px #ccc' }}
-                                                                    onError={(e) => {
-                                                                        e.target.style.display = 'none';
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        )}
-
-                                                        <div
-                                                            className="card-text"
-                                                            dangerouslySetInnerHTML={{ __html: adsSection.description }}
-                                                            style={{ maxHeight: '100px', overflow: 'hidden', fontSize: '1.05rem' }}
-                                                        />
-
-                                                        {(adsSection.linkUrl || (!adsSection.imageUrl && !adsSection.image && adsSection.link)) && (
-                                                            <div className="mt-2">
-                                                                <a
-                                                                    href={adsSection.linkUrl || adsSection.link}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="btn btn-sm btn-outline-primary"
-                                                                    style={{ fontWeight: 600 }}
-                                                                >
-                                                                    <i className="fas fa-external-link-alt me-1"></i>
-                                                                    Visit Link
-                                                                </a>
-                                                            </div>
-                                                        )}
-
-                                                        <div className="mt-2 d-flex justify-content-between align-items-center">
-                                                            <small className="text-muted" style={{ color: isDarkMode ? '#ffe066' : '#6c757d' }}>
-                                                                Created: {new Date(adsSection.createdAt).toLocaleDateString()}
-                                                            </small>
-                                                            <span className={`badge ${adsSection.isVisible ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '0.95rem', background: adsSection.isVisible ? (isDarkMode ? '#28a745' : '#28a745') : (isDarkMode ? '#444' : '#6c757d'), color: '#fff' }}>
-                                                                {adsSection.isVisible ? 'Visible' : 'Hidden'}
-                                                            </span>
+                                                    {(adsSection.imageUrl || adsSection.image || adsSection.link) && (
+                                                        <div className="mb-2">
+                                                            <img
+                                                                src={
+                                                                    (adsSection.imageUrl && adsSection.imageUrl.startsWith('/uploads')
+                                                                        ? `http://localhost:8000${adsSection.imageUrl}`
+                                                                        : adsSection.imageUrl) ||
+                                                                    adsSection.image ||
+                                                                    adsSection.link
+                                                                }
+                                                                alt={adsSection.title}
+                                                                className="img-fluid rounded"
+                                                                style={{ maxHeight: '120px', width: '100%', objectFit: 'cover', boxShadow: isDarkMode ? '0 2px 8px #000' : '0 2px 8px #ccc' }}
+                                                                onError={(e) => {
+                                                                    e.target.style.display = 'none';
+                                                                }}
+                                                            />
                                                         </div>
+                                                    )}
+
+                                                    <div
+                                                        className="card-text"
+                                                        dangerouslySetInnerHTML={{ __html: adsSection.description }}
+                                                        style={{ fontSize: '1.05rem', wordBreak: 'break-word', whiteSpace: 'pre-line', marginBottom: '0.5rem' }}
+                                                    />
+
+                                                    {(adsSection.linkUrl || (!adsSection.imageUrl && !adsSection.image && adsSection.link)) && (
+                                                        <div className="mt-2">
+                                                            <a
+                                                                href={adsSection.linkUrl || adsSection.link}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="btn btn-sm btn-outline-primary"
+                                                                style={{ fontWeight: 600 }}
+                                                            >
+                                                                <i className="fas fa-external-link-alt me-1"></i>
+                                                                Visit Link
+                                                            </a>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="mt-2 d-flex justify-content-between align-items-center">
+                                                        <small className="text-muted" style={{ color: isDarkMode ? '#ffe066' : '#6c757d' }}>
+                                                            Created: {new Date(adsSection.createdAt).toLocaleDateString()}
+                                                        </small>
+                                                        <span className={`badge ${adsSection.isVisible ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '0.95rem', background: adsSection.isVisible ? (isDarkMode ? '#28a745' : '#28a745') : (isDarkMode ? '#444' : '#6c757d'), color: '#fff' }}>
+                                                            {adsSection.isVisible ? 'Visible' : 'Hidden'}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>

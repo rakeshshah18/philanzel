@@ -96,7 +96,20 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     ].some(isActive);
 
     return (
-        <div className={`app-sidebar${isSidebarOpen ? '' : ' collapsed'}`} style={{ width: isSidebarOpen ? 260 : 60, transition: 'width 0.3s', overflow: 'hidden' }}>
+        <div
+            className={`app-sidebar${isSidebarOpen ? '' : ' collapsed'}`}
+            style={{ width: isSidebarOpen ? 260 : 60, transition: 'width 0.3s', overflow: 'hidden', overflowY: 'auto', height: '100vh' }}
+        >
+            <style>{`
+                .app-sidebar::-webkit-scrollbar {
+                    width: 8px;
+                    background: rgba(255,255,255,0.2);
+                }
+                .app-sidebar::-webkit-scrollbar-thumb {
+                    background: rgba(255,255,255,0.3);
+                    border-radius: 4px;
+                }
+            `}</style>
             <div className="app-header d-flex align-items-center justify-content-between px-2" style={{ minHeight: 56 }}>
                 <h4 className="mb-0" style={{ fontSize: isSidebarOpen ? '1.25rem' : '1.5rem', transition: 'font-size 0.3s' }}>
                     <i className="fas fa-chart-line me-2"></i>
