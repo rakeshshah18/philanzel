@@ -344,6 +344,9 @@ export const servicesAPI = {
     // Get all services
     getAll: () => API.get('/admin/services'),
 
+    // Get all services (public)
+    getAll: () => API.get('/services'),
+
     // Create new service
     create: (data) => API.post('/admin/services', data),
 
@@ -376,6 +379,9 @@ export const servicesAPI = {
 export const tabbingServicesSettingsAPI = {
     // Get tabbing services settings
     getSettings: () => API.get('/admin/tabbing-services/settings'),
+
+    // Public endpoint to get tabbing services settings
+    getSettings: () => API.get('/tabbing-services/settings'),
 
     // Update common background image
     updateCommonBackgroundImage: (formData) => {
