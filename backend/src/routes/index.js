@@ -58,8 +58,13 @@ router.use('/career-posts', careerPostRoutes);
 
 // Specific admin routes
 router.use('/admin/tabbing-services', tabbingServicesSettingsRoutes);
+// Public tabbing services settings route (GET only)
+router.use('/tabbing-services', tabbingServicesSettingsRoutes);
 router.use('/admin/services', servicesRoutes);
+// Admin helped industries routes
 router.use('/admin/helped-industries', helpedIndustriesRoutes);
+// Public helped industries route at /api/helped-industries/public
+router.use('/helped-industries/', helpedIndustriesRoutes);
 router.use('/admin/why-choose-us', whyChooseUsRoutes);
 router.use('/admin/our-association', ourAssociationRoutes);
 router.use('/admin/home-faqs', homeFAQsRoutes);
@@ -72,7 +77,9 @@ router.use('/admin/about/our-founder', ourFounderRoutes);
 router.use('/about/our-founder', ourFounderRoutes);
 
 router.use('/admin/auth', adminAuthRoutes);
-router.use('/admin/our-track', ourTrackRoutes);
+
+// Public our-track route (GET only)
+router.use('/our-track', ourTrackRoutes);
 
 // Partner routes MUST come before general /admin routes
 router.use('/admin/partner-posts', partnerPostRoutes);

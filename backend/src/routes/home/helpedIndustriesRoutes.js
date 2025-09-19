@@ -4,8 +4,10 @@ import helpedIndustriesController from '../../controllers/home/helpedIndustriesC
 
 const router = express.Router();
 
+
 // Get all helped industries
 router.get('/', verifyToken, requireRole(['admin', 'super_admin']), helpedIndustriesController.getAll);
+router.get('/public', helpedIndustriesController.getAll);
 
 // Get single helped industries by ID
 router.get('/:id', verifyToken, requireRole(['admin', 'super_admin']), helpedIndustriesController.getById);
@@ -16,7 +18,11 @@ router.post('/', verifyToken, requireRole(['admin', 'super_admin']), helpedIndus
 // Update helped industries
 router.put('/:id', verifyToken, requireRole(['admin', 'super_admin']), helpedIndustriesController.update);
 
+
 // Delete helped industries
 router.delete('/:id', verifyToken, requireRole(['admin', 'super_admin']), helpedIndustriesController.delete);
+
+// Public: Get all helped industries (no auth) - keep this last
+router.get('/public', helpedIndustriesController.getAll);
 
 export default router;

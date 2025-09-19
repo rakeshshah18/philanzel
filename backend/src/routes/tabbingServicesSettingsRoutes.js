@@ -5,8 +5,8 @@ import { verifyToken } from '../adminAuth/middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Get tabbing services settings
-router.get('/settings', verifyToken, tabbingServicesSettingsController.getSettings);
+// Public GET tabbing services settings (no auth)
+router.get('/settings', tabbingServicesSettingsController.getSettings);
 
 // Update common background image
 router.put('/settings/common-background',

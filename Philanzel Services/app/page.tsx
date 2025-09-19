@@ -219,37 +219,37 @@ const BriefcaseIcon = () => <Briefcase className={iconClass} />;
 import Navigation from "@/components/navigation"
 
 
-// Carousel data and component (move above HomePage)
-const carouselData = [
-  {
-    heading: "Personalized Portfolio Management",
-    description: "Get investment strategies tailored to your unique goals and risk profile, managed by experienced professionals.",
-    image: "/images/pms-img-1.jpg",
-    link: "/services/portfolio-management"
-  },
-  {
-    heading: "Comprehensive Wealth Planning",
-    description: "Plan for your future with holistic financial solutions, including tax optimization, estate planning, and more.",
-    image: "/images/pms-img-2.jpg",
-    link: "/services/wealth-planning"
-  },
-  {
-    heading: "Expert Risk Assessment",
-    description: "Protect your assets with advanced risk analysis and proactive management for peace of mind.",
-    image: "/images/pms-img-3.jpg",
-    link: "/services/risk-assessment"
-  }
-]
+
+
 
 
 function Carousel() {
-  const [current, setCurrent] = useState(0)
-  const [animating, setAnimating] = useState(false)
-  const prevIdx = useRef(0)
-  const total = carouselData.length
+  const [carouselData, setCarouselData] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [animating, setAnimating] = useState(false);
+  const prevIdx = useRef(0);
+  const total = carouselData.length;
+
+  useEffect(() => {
+    // Fetch carousel data from API
+    async function fetchData() {
+      try {
+        const res = await fetch("http://localhost:8000/api/homepage");
+        const json = await res.json();
+        if (json.status === "success" && Array.isArray(json.data)) {
+          setCarouselData(json.data);
+        }
+      } catch (e) {
+        // fallback: show nothing or static data
+        setCarouselData([]);
+      }
+    }
+    fetchData();
+  }, []);
 
   // Auto-slide every 2 seconds
   useEffect(() => {
+    if (total === 0) return;
     const interval = setInterval(() => {
       if (!animating) {
         prevIdx.current = current;
@@ -261,25 +261,29 @@ function Carousel() {
   }, [current, animating, total]);
 
   const prev = () => {
-    if (animating) return
-    prevIdx.current = current
-    setAnimating(true)
-    setCurrent((current - 1 + total) % total)
-  }
+    if (animating || total === 0) return;
+    prevIdx.current = current;
+    setAnimating(true);
+    setCurrent((current - 1 + total) % total);
+  };
   const next = () => {
-    if (animating) return
-    prevIdx.current = current
-    setAnimating(true)
-    setCurrent((current + 1) % total)
-  }
+    if (animating || total === 0) return;
+    prevIdx.current = current;
+    setAnimating(true);
+    setCurrent((current + 1) % total);
+  };
 
   // Animation direction
-  const direction = current > prevIdx.current || (current === 0 && prevIdx.current === total - 1) ? 1 : -1
+  const direction = current > prevIdx.current || (current === 0 && prevIdx.current === total - 1) ? 1 : -1;
 
   // End animation after transition
-  const handleAnimationEnd = () => setAnimating(false)
+  const handleAnimationEnd = () => setAnimating(false);
 
-  const { heading, description, image, link } = carouselData[current]
+  if (total === 0) {
+    return null;
+  }
+
+  const { heading, description, image, button } = carouselData[current];
 
   return (
     <div className="relative flex flex-col md:flex-row items-center bg-white rounded-lg shadow-lg overflow-hidden">
@@ -301,16 +305,19 @@ function Carousel() {
       >
         <div className="flex-1 p-8">
           <h2 className="text-4xl font-serif font-black text-gray-900 mb-4">{heading}</h2>
-          <p className="text-lg text-gray-600 mb-6 font-sans">{description}</p>
-          <Link href={link}>
-            <Button size="lg" className="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-4 text-lg">
-              Learn More
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
+          {/* Description may contain HTML */}
+          <div className="text-lg text-gray-600 mb-6 font-sans" dangerouslySetInnerHTML={{ __html: description }} />
+          {button && button.link && (
+            <a href={button.link} target="_blank" rel="noopener noreferrer">
+              <Button size="lg" className="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-4 text-lg">
+                {button.text || "Learn More"}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </a>
+          )}
         </div>
         <div className="flex-1 min-w-[300px] h-full flex items-center justify-center bg-gray-50">
-          <img src={image} alt={heading} className="object-cover w-full h-80 md:h-96 rounded-none" />
+          <img src={image?.url} alt={image?.altText || heading} className="object-cover w-full h-80 md:h-96 rounded-none" />
         </div>
       </div>
       {/* Right Arrow Button */}
@@ -351,8 +358,8 @@ function Carousel() {
           to { transform: translateX(0); opacity: 1; }
         }
       `}</style>
-  </div>
-  )
+    </div>
+  );
 }
 
 export default function HomePage() {
@@ -437,8 +444,8 @@ export default function HomePage() {
                                           By continuing, you provide consent and agree to our{' '}
                                           <a href="/terms" className="underline text-cyan-600" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a>
                                         </label>
-                                            </div>
-                                            < Button type = "submit" className = "w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 text-lg rounded-md" > Continue </Button>
+                                      </div>
+                                      <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 text-lg rounded-md"> Continue </Button>
                                               </form>
                                               </div>
                                               </div>
@@ -537,10 +544,7 @@ export default function HomePage() {
     </section>
 
 
-  {/* Our Associations */ }
-  
 
-  {/* Client Testimonials */ }
   {/* Our Associations Section */}
   <section className="py-20 bg-[#f7f7fb]">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -567,43 +571,43 @@ export default function HomePage() {
             {/* Row 1: right to left */}
             <div className="overflow-hidden">
               <div className="flex gap-8 min-w-max animate-scroll-left" style={{ animation: 'scroll-left 18s linear infinite' }}>
-                <img src="/images/axis-mf.png" alt="Axis Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/birla-mf.png" alt="Birla Sun Life" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/hdfc-mf.png" alt="HDFC Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/icici-mf.png" alt="ICICI Prudential" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Axis Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Birla Sun Life" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="HDFC Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="ICICI Prudential" className="h-12 object-contain bg-white rounded shadow p-2" />
                 {/* duplicate for seamless loop */}
-                <img src="/images/axis-mf.png" alt="Axis Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/birla-mf.png" alt="Birla Sun Life" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/hdfc-mf.png" alt="HDFC Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/icici-mf.png" alt="ICICI Prudential" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Axis Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Birla Sun Life" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="HDFC Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="ICICI Prudential" className="h-12 object-contain bg-white rounded shadow p-2" />
               </div>
             </div>
             {/* Row 2: left to right */}
             <div className="overflow-hidden">
               <div className="flex gap-8 min-w-max animate-scroll-right" style={{ animation: 'scroll-right 20s linear infinite' }}>
-                <img src="/images/reliance-mf.png" alt="Reliance Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/dsp-mf.png" alt="DSP Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/sbi-mf.png" alt="SBI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/motilal-mf.png" alt="Motilal Oswal" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Reliance Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="DSP Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="SBI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Motilal Oswal" className="h-12 object-contain bg-white rounded shadow p-2" />
                 {/* duplicate for seamless loop */}
-                <img src="/images/reliance-mf.png" alt="Reliance Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/dsp-mf.png" alt="DSP Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/sbi-mf.png" alt="SBI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/motilal-mf.png" alt="Motilal Oswal" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Reliance Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="DSP Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="SBI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Motilal Oswal" className="h-12 object-contain bg-white rounded shadow p-2" />
               </div>
             </div>
             {/* Row 3: right to left */}
             <div className="overflow-hidden">
               <div className="flex gap-8 min-w-max animate-scroll-left" style={{ animation: 'scroll-left 22s linear infinite' }}>
-                <img src="/images/uti-mf.png" alt="UTI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/edelweiss-mf.png" alt="Edelweiss Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/nippon-mf.png" alt="Nippon India" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/quant-mf.png" alt="Quant Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="UTI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Edelweiss Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Nippon India" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Quant Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
                 {/* duplicate for seamless loop */}
-                <img src="/images/uti-mf.png" alt="UTI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/edelweiss-mf.png" alt="Edelweiss Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/nippon-mf.png" alt="Nippon India" className="h-12 object-contain bg-white rounded shadow p-2" />
-                <img src="/images/quant-mf.png" alt="Quant Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="UTI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Edelweiss Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Nippon India" className="h-12 object-contain bg-white rounded shadow p-2" />
+                <img src="" alt="Quant Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
               </div>
             </div>
           </div>

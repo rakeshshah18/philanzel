@@ -38,6 +38,9 @@ const handleMulterError = (err, req, res, next) => {
 };
 
 router.post('/', verifyToken, requireRole(['admin', 'super_admin']), imageUpload.single('image'), handleMulterError, createServices);
+// Public GET all services (no auth)
+router.get('/public', getAllServices);
+// Admin GET all services (protected)
 router.get('/', verifyToken, requireRole(['admin', 'super_admin']), getAllServices);
 router.put('/:id', verifyToken, requireRole(['admin', 'super_admin']), imageUpload.single('image'), handleMulterError, updateServices);
 router.delete('/:id', verifyToken, requireRole(['admin', 'super_admin']), deleteServices);
