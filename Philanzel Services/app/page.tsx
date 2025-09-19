@@ -136,14 +136,34 @@ import { useState, useEffect, useRef } from "react"
 
 // Animated stats counter component
 function StatsCounterSection() {
-  const stats = [
-    { label: "Years Experiences", value: 15, suffix: "+" },
-    { label: "Total Expert", value: 675, suffix: "+" },
-    { label: "Financial Planning Done", value: 12500, suffix: "+" },
-    { label: "Happy Customers", value: 8237, suffix: "+" },
-  ];
+  const [stats, setStats] = useState([
+    { label: "Years Experiences", value: 0, suffix: "+" },
+    { label: "Total Expert", value: 0, suffix: "+" },
+    { label: "Financial Planning Done", value: 0, suffix: "+" },
+    { label: "Happy Customers", value: 0, suffix: "+" },
+  ]);
+  const [counts, setCounts] = useState([0, 0, 0, 0]);
 
-  const [counts, setCounts] = useState(stats.map(() => 0));
+  useEffect(() => {
+    // Fetch stats from API
+    async function fetchStats() {
+      try {
+        const res = await fetch("http://localhost:8000/api/our-track");
+        const json = await res.json();
+        if (json.status === "success" && json.data) {
+          setStats([
+            { label: "Years Experiences", value: json.data.yearExp, suffix: "+" },
+            { label: "Total Expert", value: json.data.totalExpert, suffix: "+" },
+            { label: "Financial Planning Done", value: json.data.planningDone, suffix: "+" },
+            { label: "Happy Customers", value: json.data.happyCustomers, suffix: "+" },
+          ]);
+        }
+      } catch (e) {
+        // fallback: do nothing
+      }
+    }
+    fetchStats();
+  }, []);
 
   useEffect(() => {
     const durations = [1000, 1200, 1400, 1600]; // ms for each stat
@@ -158,7 +178,7 @@ function StatsCounterSection() {
       });
     }, 16));
     return () => intervals.forEach(clearInterval);
-  }, []);
+  }, [stats]);
 
   return (
     <section className="py-12 bg-gray-50">
