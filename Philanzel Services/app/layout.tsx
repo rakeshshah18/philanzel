@@ -18,9 +18,9 @@ const openSans = Open_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "PMS Investment Services - Empowering Your Financial Future",
+  title: "Philanzel",
   description:
-    "Tailored investment strategies for discerning investors. Professional portfolio management services with expertise and trust.",
+    "Discover personalized financial solutions crafted to help you achieve both personal and business success.",
   generator: "v0.app",
 }
 
@@ -31,6 +31,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${montserrat.variable} ${openSans.variable} antialiased`}>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+          integrity="sha512-papm6kQwQ0Q0jrISFRCGDpa2BkLomqKgJo0vvVuv5AO9M/dwZ0pniS3pSkeCZMt2rt7NmBGG99nmCaTKk+1h4g=="
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+      </head>
       <body>{children}</body>
     </html>
   )

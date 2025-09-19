@@ -1,8 +1,97 @@
-"use client"
+"use client";
+
+
+// Dynamic Industries Section
+function IndustriesSection() {
+  // Map API icon string to React component
+  const iconMap = {
+    "fas-fa-building": <BankIcon />,
+    "fas-fa-health": <HeartIcon />,
+    "fas-fa-cog": <SettingsIcon />,
+    "fas-fa-bolt": <BoltIcon />,
+    "fas-fa-truck": <TruckIcon />,
+    "fas-fa-factory": <FactoryIcon />,
+    "fas-fa-shield": <ShieldIcon />,
+    "fas-fa-shopping-bag": <ShoppingBagIcon />,
+    "fas-fa-home": <HomeIcon />,
+    "fas-fa-graduation-cap": <GraduationCapIcon />,
+    "fas-fa-briefcase": <BriefcaseIcon />,
+  };
+  const [industriesData, setIndustriesData] = useState({ heading: '', description: '', industries: [] });
+  useEffect(() => {
+    async function fetchIndustries() {
+      try {
+        const res = await fetch(`${BASE_URL}/api/helped-industries/public`);
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          setIndustriesData({
+            heading: json.data[0].heading || '',
+            description: json.data[0].description || '',
+            industries: json.data[0].industries || [],
+          });
+        }
+      } catch (e) {
+        // fallback: do nothing
+      }
+    }
+    fetchIndustries();
+  }, []);
+
+  return (
+    <section className="py-20 bg-[#f7f7fb]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <div className="mb-2">
+            <span className="text-xs font-semibold tracking-widest text-cyan-600 uppercase">Industries We Help</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" dangerouslySetInnerHTML={{ __html: industriesData.heading }}></h2>
+          <div className="text-gray-600 max-w-2xl mx-auto" dangerouslySetInnerHTML={{ __html: industriesData.description }}></div>
+        </div>
+        {/* Restore grid style: 4, 5, 2 columns as before, but dynamic */}
+        <div className="flex flex-col items-center justify-center gap-4 text-center">
+          {/* Row 1: 4 items */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl mx-auto text-center place-items-center">
+            {industriesData.industries.slice(0, 4).map((industry) => (
+              <div key={industry._id} className="bg-white rounded-2xl shadow px-6 py-3 text-base font-semibold text-gray-800 flex flex-col items-center justify-center gap-2 transition hover:bg-cyan-600 hover:text-white hover:shadow-xl cursor-pointer">
+                <div className="flex flex-row items-center justify-center gap-1">
+                  <span className="text-sm align-middle">{iconMap[industry.icon] || null}</span>
+                  <span className="text-sm font-medium whitespace-nowrap align-middle">{industry.name}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Row 2: 5 items */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full max-w-6xl mx-auto text-center place-items-center">
+            {industriesData.industries.slice(4, 9).map((industry) => (
+              <div key={industry._id} className="bg-white rounded-2xl shadow px-6 py-3 text-base font-semibold text-gray-800 flex flex-col items-center justify-center gap-2 transition hover:bg-cyan-600 hover:text-white hover:shadow-xl cursor-pointer">
+                <div className="flex flex-row items-center justify-center gap-1">
+                  <span className="text-sm align-middle">{iconMap[industry.icon] || null}</span>
+                  <span className="text-sm font-medium whitespace-nowrap align-middle">{industry.name}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Row 3: 2 items */}
+          <div className="grid grid-cols-2 gap-4 w-full max-w-2xl mx-auto text-center place-items-center">
+            {industriesData.industries.slice(9, 11).map((industry) => (
+              <div key={industry._id} className="bg-white rounded-2xl shadow px-6 py-3 text-base font-semibold text-gray-800 flex flex-col items-center justify-center gap-2 transition hover:bg-cyan-600 hover:text-white hover:shadow-xl cursor-pointer">
+                <div className="flex flex-row items-center justify-center gap-1">
+                  <span className="text-sm align-middle">{iconMap[industry.icon] || null}</span>
+                  <span className="text-sm font-medium whitespace-nowrap align-middle">{industry.name}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // Define the backend base URL in one place for best practice
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 import Link from "next/link";
-
+import "./pageStyle.css";
 // There is no error 
 
 import { useState, useEffect, useRef } from "react"
@@ -35,7 +124,7 @@ type IndustryPillProps = {
 };
 
 
-import "./pageStyle.css";
+
 
 
 
@@ -496,50 +585,8 @@ export default function HomePage() {
         </section>
         <StatsCounterSection />
         <ServicesTabsSection />
-        <section className="py-20 bg-[#f7f7fb]" >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" >
-            <div className="text-center mb-10" >
-              <div className="mb-2" >
-                <span className="text-xs font-semibold tracking-widest text-cyan-600 uppercase" > Industries We Help </span>
-              </div>
-              < h2 className="text-3xl md:text-4xl font-bold mb-4" > Risk & Compliance Services Tailored < br className="hidden md:block" /> to Your Industry </h2>
-              < p className="text-gray-600 max-w-2xl mx-auto" > Customized financial strategies and regulatory support designed to fuel your business growth and long - term success.</p>
-            </div>
-            < div className="flex flex-col items-center justify-center gap-4 text-center" >
-              {/* Row 1: 4 items */}
-              < div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl mx-auto text-center place-items-center" >
-                <IndustryPill icon={
-                  <BankIcon />} label="Financial Services" />
-                <IndustryPill icon={
-                  <HeartIcon />} label="Healthcare" />
-                <IndustryPill icon={
-                  <SettingsIcon />} label="Technology" />
-                <IndustryPill icon={
-                  <BoltIcon />} label="Energy" />
-              </div>
-              {/* Row 2: 5 items */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full max-w-6xl mx-auto text-center place-items-center" >
-                <IndustryPill icon={
-                  <TruckIcon />} label="Logistics" />
-                <IndustryPill icon={
-                  <FactoryIcon />} label="Manufacturing" />
-                <IndustryPill icon={
-                  <ShieldIcon />} label="Life Insurance" />
-                <IndustryPill icon={
-                  <ShoppingBagIcon />} label="Retail" />
-                <IndustryPill icon={
-                  <HomeIcon />} label="Real Estate" />
-              </div>
-              {/* Row 3: 2 items */}
-              <div className="grid grid-cols-2 gap-4 w-full max-w-2xl mx-auto text-center place-items-center" >
-                <IndustryPill icon={
-                  <GraduationCapIcon />} label="Education" />
-                <IndustryPill icon={
-                  <BriefcaseIcon />} label="Startups & Entrepreneurs" />
-              </div>
-            </div>
-          </div>
-        </section>
+        <IndustriesSection />
+
 
 
 
