@@ -1,9 +1,8 @@
 "use client";
-
-
+import WhyChooseUs from "./home/why-choose-us";
+import OurAssociation from "./home/our-association";
 // Dynamic Industries Section
 function IndustriesSection() {
-  // Map API icon string to React component
   const iconMap = {
     "fas-fa-building": <BankIcon />,
     "fas-fa-health": <HeartIcon />,
@@ -229,12 +228,14 @@ const ServicesTabsSection = () => {
 
             {activeService && (
               <div className="flex flex-col md:flex-row gap-6 items-center">
-                <img
-                  src={activeService.image?.startsWith('http') ? activeService.image : activeService.image ? `${BASE_URL}${activeService.image}` : ''}
-                  alt={`${activeService.label || ''} service`}
-                  className="w-48 h-48 object-cover rounded-lg shadow"
-                  loading="lazy"
-                />
+                {activeService.image && (
+                  <img
+                    src={activeService.image.startsWith('http') ? activeService.image : `${BASE_URL}${activeService.image}`}
+                    alt={`${activeService.label || ''} service`}
+                    className="w-48 h-48 object-cover rounded-lg shadow"
+                    loading="lazy"
+                  />
+                )}
                 <div className="flex-1">
                   <h3 className="text-xl font-bold mb-2">
                     {activeService.heading}
@@ -259,7 +260,7 @@ const ServicesTabsSection = () => {
             <div className="relative rounded-lg overflow-hidden shadow-lg">
               {common.image && (
                 <img
-                  src={common.image.startsWith('http') ? common.image : common.image ? `${BASE_URL}${common.image}` : ''}
+                  src={common.image.startsWith('http') ? common.image : `${BASE_URL}${common.image}`}
                   alt="Common Service"
                   className="w-full h-80 object-cover"
                   loading="lazy"
@@ -586,130 +587,12 @@ export default function HomePage() {
         <StatsCounterSection />
         <ServicesTabsSection />
         <IndustriesSection />
-
-
-
-
-
-
-        {/* Why Choose us? */}
-        <section id="about" className="py-20 bg-white" >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center" >
-              <div className="relative" >
-                <img
-                  src="/pms-img-2.jpg"
-                  alt="Professional financial advisors"
-                  className="rounded-lg shadow-xl"
-                />
-              </div>
-              < div className="flex flex-col justify-center h-full" >
-                <span className="text-xs font-semibold tracking-widest text-cyan-700 bg-cyan-50 px-4 py-1 rounded w-max mb-4" > WHY CHOOSE US ? </span>
-                < h2 className="text-3xl md:text-4xl font-bold mb-4" > Empowering Financial Journeys </h2>
-                < p className="text-gray-700 mb-6 max-w-xl" > At Philanzel, we go beyond just offering financial services — we become your trusted partner in building a secure and successful future.</p>
-                < hr className="my-4 border-gray-200" />
-                <ul className="space-y-4 mb-8" >
-                  <li className="flex items-start gap-3" >
-                    <svg className="w-5 h-5 text-cyan-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" > <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /> </svg>
-                    < span > Every client is unique.We tailor solutions based on your goals, risk appetite, and timeline.</span>
-                  </li>
-                  < li className="flex items-start gap-3" >
-                    <svg className="w-5 h-5 text-cyan-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" > <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /> </svg>
-                    < span > Backed by over 15 years of experience, our team brings deep knowledge and insight into every interaction.</span>
-                  </li>
-                  < li className="flex items-start gap-3" >
-                    <svg className="w-5 h-5 text-cyan-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" > <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /> </svg>
-                    < span > From mutual funds to insurance, PMS to AIF — we provide end - to - end investment and protection solutions.</span>
-                  </li>
-                  < li className="flex items-start gap-3" >
-                    <svg className="w-5 h-5 text-cyan-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" > <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /> </svg>
-                    < span > Our success lies in your satisfaction.We focus on trust, transparency, and long - term relationships.</span>
-                  </li>
-                </ul>
-                < Link href="/consultation" className="mt-2 px-8 py-3 bg-gray-900 text-white font-semibold rounded-full shadow w-max relative overflow-hidden group" >
-                  <span className="pointer-events-none absolute inset-0 z-0 transition-all duration-500 group-hover:scale-150 group-hover:opacity-100 scale-0 opacity-0 rounded-full bg-[radial-gradient(circle,rgba(13,110,253,1)_0%,rgba(13,110,253,1)_100%)]" > </span>
-                  < span className="relative z-10 transition-colors duration-300 group-hover:text-white" > Schedule A Consultation </span>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+        <WhyChooseUs />
 
 
 
         {/* Our Associations Section */}
-        <section className="py-20 bg-[#f7f7fb]" >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center" >
-              {/* Left: Heading, subtitle, button */}
-              < div >
-                <h2 className="text-3xl md:text-4xl font-bold mb-4" > Our Associations </h2>
-                < p className="text-gray-600 mb-8" > that's what you get when you choose Philanzel</p>
-                < button className="bg-gray-800 text-white font-semibold rounded-full px-8 py-3 shadow hover:bg-cyan-700 transition-colors duration-300" > View All </button>
-              </div>
-              {/* Right: Card with logos grid */}
-              <div className="bg-white rounded-2xl shadow-xl p-8 flex items-center justify-center" >
-                <style>{`
-            @keyframes scroll-left {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
-            }
-            @keyframes scroll-right {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(50%); }
-            }
-          `} </style>
-                < div className="grid grid-rows-3 gap-6 w-full" >
-                  {/* Row 1: right to left */}
-                  < div className="overflow-hidden" >
-                    <div className="flex gap-8 min-w-max animate-scroll-left" style={{ animation: 'scroll-left 18s linear infinite' }
-                    }>
-                      <img src="" alt="Axis Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="Birla Sun Life" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="HDFC Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="ICICI Prudential" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      {/* duplicate for seamless loop */}
-                      < img src="" alt="Axis Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="Birla Sun Life" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="HDFC Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="ICICI Prudential" className="h-12 object-contain bg-white rounded shadow p-2" />
-                    </div>
-                  </div>
-                  {/* Row 2: left to right */}
-                  <div className="overflow-hidden" >
-                    <div className="flex gap-8 min-w-max animate-scroll-right" style={{ animation: 'scroll-right 20s linear infinite' }
-                    }>
-                      <img src="" alt="Reliance Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="DSP Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="SBI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="Motilal Oswal" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      {/* duplicate for seamless loop */}
-                      < img src="" alt="Reliance Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="DSP Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="SBI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="Motilal Oswal" className="h-12 object-contain bg-white rounded shadow p-2" />
-                    </div>
-                  </div>
-                  {/* Row 3: right to left */}
-                  <div className="overflow-hidden" >
-                    <div className="flex gap-8 min-w-max animate-scroll-left" style={{ animation: 'scroll-left 22s linear infinite' }
-                    }>
-                      <img src="" alt="UTI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="Edelweiss Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="Nippon India" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="Quant Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      {/* duplicate for seamless loop */}
-                      < img src="" alt="UTI Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="Edelweiss Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="Nippon India" className="h-12 object-contain bg-white rounded shadow p-2" />
-                      <img src="" alt="Quant Mutual Fund" className="h-12 object-contain bg-white rounded shadow p-2" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <OurAssociation />
         < section id="testimonials" className="py-20 bg-white" >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" >
             <div className="text-center mb-8" >
@@ -724,7 +607,6 @@ export default function HomePage() {
                 < span className="font-bold ml-2" > 4.7 </span>
                 < span className="flex items-center ml-1 text-amber-500" >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
-                  < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                   < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                   < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                   < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
@@ -749,7 +631,6 @@ export default function HomePage() {
                       < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                       < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                       < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
-                      < svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                     </span>
                   </div>
                   < hr className="my-2 border-gray-200" />
@@ -765,7 +646,6 @@ export default function HomePage() {
                   < div className="flex items-center mb-2" >
                     <span className="flex text-amber-500" >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
-                      < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                       < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                       < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                       < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
@@ -787,7 +667,6 @@ export default function HomePage() {
                       < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                       < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                       < svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
-                      < svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20" > <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /> </svg>
                     </span>
                   </div>
                   < hr className="my-2 border-gray-200" />

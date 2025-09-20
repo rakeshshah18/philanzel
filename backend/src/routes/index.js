@@ -66,7 +66,11 @@ router.use('/admin/helped-industries', helpedIndustriesRoutes);
 // Public helped industries route at /api/helped-industries/public
 router.use('/helped-industries/', helpedIndustriesRoutes);
 router.use('/admin/why-choose-us', whyChooseUsRoutes);
+// Public why choose us route (GET only)
+router.use('/why-choose-us', whyChooseUsRoutes);
 router.use('/admin/our-association', ourAssociationRoutes);
+// Public our association route (GET only)
+router.use('/our-association', ourAssociationRoutes);
 router.use('/admin/home-faqs', homeFAQsRoutes);
 router.use('/admin/review-sections', reviewSectionRoutes);
 router.use('/admin/ads-sections', adsSectionRoutes);

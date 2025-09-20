@@ -39,7 +39,7 @@
     "app/page.tsx",
     "next-env.d.ts",
     ".next/types/**/*.ts"
-  ],
+, "app/home/our-association.jsx"  ],
   "exclude": [
     "node_modules"
   ]

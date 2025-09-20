@@ -422,6 +422,9 @@ export const whyChooseUsAPI = {
     // Get all why choose us entries
     getAll: () => API.get('/admin/why-choose-us'),
 
+    // Public endpoint to get all why choose us entries
+    getAll: () => API.get('/why-choose-us'),
+
     // Get single why choose us entry by ID
     getById: (id) => API.get(`/admin/why-choose-us/${id}`),
 
