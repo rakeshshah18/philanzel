@@ -30,7 +30,8 @@
     "app/page.jsx",
     "next-env.d.ts",
     ".next/types/**/*.ts",
-    "app/home/our-association.jsx"
-  ],
+    "app/home/our-association.jsx",
+    "components/navigation.tsx"
+, "app/careers/page.jsx"  ],
   "exclude": ["node_modules"]
 }

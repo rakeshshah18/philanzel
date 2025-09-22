@@ -27,6 +27,7 @@ const handleValidation = (req, res, next) => {
 
 // Public routes - for frontend display
 router.get('/', ourFounderController.getAll);
+// router.get('/our-founder', ourFounderController.getAll);
 router.get('/:id', getOurFounderByIdValidation, handleValidation, ourFounderController.getById);
 
 // Protected routes - admin only

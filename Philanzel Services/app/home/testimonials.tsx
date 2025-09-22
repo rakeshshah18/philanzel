@@ -45,6 +45,7 @@ const Testimonials = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Fetch testimonials data from API
   useEffect(() => {
@@ -77,6 +78,25 @@ const Testimonials = () => {
 
     fetchTestimonials();
   }, []);
+
+  // Auto-slide effect - change to next single review after 5 seconds with 1 second transition
+  useEffect(() => {
+    if (!testimonialData?.reviews || testimonialData.reviews.length <= 1) {
+      return; // Don't auto-slide if there's only 1 or no reviews
+    }
+
+    const visibleReviews = testimonialData.reviews.filter((review: Review) => review.isVisible);
+    
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentSlide((prev) => (prev + 1) % visibleReviews.length);
+        setIsTransitioning(false);
+      }, 1000); // 1 second transition delay
+    }, 6000); // Total cycle: 5 seconds display + 1 second transition = 6 seconds
+
+    return () => clearInterval(interval);
+  }, [testimonialData?.reviews]);
 
   // Generate star rating component
   const renderStars = (rating: number) => {
@@ -128,16 +148,26 @@ const Testimonials = () => {
     });
   };
 
-  // Handle navigation
+  // Handle navigation for single review
   const nextSlide = () => {
     if (testimonialData?.reviews) {
-      setCurrentSlide((prev) => (prev + 1) % Math.ceil(testimonialData.reviews.length / 3));
+      const visibleReviews = testimonialData.reviews.filter((review: Review) => review.isVisible);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentSlide((prev) => (prev + 1) % visibleReviews.length);
+        setIsTransitioning(false);
+      }, 1000); // 1 second transition delay
     }
   };
 
   const prevSlide = () => {
     if (testimonialData?.reviews) {
-      setCurrentSlide((prev) => (prev - 1 + Math.ceil(testimonialData.reviews.length / 3)) % Math.ceil(testimonialData.reviews.length / 3));
+      const visibleReviews = testimonialData.reviews.filter((review: Review) => review.isVisible);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentSlide((prev) => (prev - 1 + visibleReviews.length) % visibleReviews.length);
+        setIsTransitioning(false);
+      }, 1000); // 1 second transition delay
     }
   };
 
@@ -196,11 +226,58 @@ const Testimonials = () => {
 
   // Get visible reviews
   const visibleReviews = testimonialData.reviews?.filter((review: Review) => review.isVisible) || [];
-  const reviewsPerPage = 3;
-  const startIndex = currentSlide * reviewsPerPage;
-  const currentReviews = visibleReviews.slice(startIndex, startIndex + reviewsPerPage);
+  const currentReview = visibleReviews[currentSlide];
+  
   return (
-    <section id="testimonials" className="py-20 bg-white">
+    <>
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes slideInFromRight {
+          from {
+            opacity: 0;
+            transform: translateX(100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes slideOutToLeft {
+          from {
+            opacity: 1;
+            transform: translateX(0);
+          }
+          to {
+            opacity: 0;
+            transform: translateX(-100px);
+          }
+        }
+        
+        .testimonial-card {
+          transition: all 0.3s ease-in-out;
+        }
+        
+        .testimonial-card.transitioning-out {
+          animation: slideOutToLeft 1s ease-in-out forwards;
+        }
+        
+        .testimonial-card.transitioning-in {
+          animation: slideInFromRight 1s ease-in-out forwards;
+        }
+      `}</style>
+      
+      <section id="testimonials" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <span className="text-xs font-semibold tracking-widest text-cyan-700 bg-cyan-50 px-4 py-1 rounded w-max mb-4 inline-block">OUR TESTIMONIALS</span>
@@ -236,7 +313,7 @@ const Testimonials = () => {
         </div>
 
         <div className="relative mt-8">
-          {visibleReviews.length > reviewsPerPage && (
+          {visibleReviews.length > 1 && (
             <button 
               onClick={prevSlide}
               className="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-100 hover:bg-cyan-100 text-gray-600 rounded-full w-10 h-10 flex items-center justify-center shadow transition-colors duration-200 z-10"
@@ -247,55 +324,61 @@ const Testimonials = () => {
             </button>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {currentReviews.map((review: Review) => (
-              <div key={review._id} className="bg-white rounded-2xl shadow p-6 flex flex-col h-full border border-gray-100">
-                <div className="flex items-center mb-2">
-                  {review.userProfilePhoto && review.userProfilePhoto.startsWith('data:image') ? (
+          {/* Single testimonial card centered */}
+          <div className="flex justify-center relative overflow-hidden">
+            {currentReview && (
+              <div 
+                key={`${currentReview._id}-${currentSlide}`}
+                className={`testimonial-card bg-white rounded-2xl shadow-lg p-8 max-w-2xl w-full border border-gray-100 transform hover:scale-105 hover:shadow-xl ${
+                  isTransitioning ? 'transitioning-out' : 'transitioning-in'
+                }`}
+              >
+                <div className="flex items-center mb-4">
+                  {currentReview.userProfilePhoto && currentReview.userProfilePhoto.startsWith('data:image') ? (
                     <img 
-                      src={review.userProfilePhoto} 
-                      alt={review.userName}
-                      className="w-10 h-10 rounded-full mr-3 object-cover"
+                      src={currentReview.userProfilePhoto} 
+                      alt={currentReview.userName}
+                      className="w-12 h-12 rounded-full mr-4 object-cover"
                     />
                   ) : (
-                    <span className="w-10 h-10 rounded-full bg-cyan-700 text-white flex items-center justify-center font-bold text-lg mr-3">
-                      {getUserInitials(review.userName)}
+                    <span className="w-12 h-12 rounded-full bg-cyan-700 text-white flex items-center justify-center font-bold text-xl mr-4">
+                      {getUserInitials(currentReview.userName)}
                     </span>
                   )}
                   <div className="flex-1">
-                    <span className="font-semibold text-lg text-gray-900">{review.userName}</span>
-                    {review.isVerified && (
-                      <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Verified</span>
+                    <span className="font-semibold text-xl text-gray-900">{currentReview.userName}</span>
+                    {currentReview.isVerified && (
+                      <span className="ml-3 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Verified</span>
                     )}
                   </div>
                   <span className="ml-auto">
                     <img 
-                      src={review.reviewProviderLogo} 
+                      src={currentReview.reviewProviderLogo} 
                       alt={testimonialData.reviewProvider || "Review Provider"} 
-                      className="h-6 w-6" 
+                      className="h-8 w-8" 
                     />
                   </span>
                 </div>
 
-                <div className="flex items-center mb-2">
+                <div className="flex items-center mb-4">
                   <span className="flex text-amber-500">
-                    {renderStars(review.rating)}
+                    {renderStars(currentReview.rating)}
                   </span>
-                  <span className="text-gray-500 text-xs ml-2">
-                    {formatDate(review.reviewDate)}
+                  <span className="text-gray-500 text-sm ml-3">
+                    {formatDate(currentReview.reviewDate)}
                   </span>
                 </div>
 
-                <hr className="my-2 border-gray-200" />
+                <hr className="my-4 border-gray-200" />
                 
-                <p className="text-gray-700 text-sm flex-1 leading-relaxed">
-                  {review.reviewText}
+                <p className="text-gray-700 text-lg leading-relaxed text-center">
+                  "{currentReview.reviewText}"
                 </p>
               </div>
-            ))}
+            )}
           </div>
 
-          {visibleReviews.length > reviewsPerPage && (
+          {visibleReviews.length > 1 && (
             <button 
               onClick={nextSlide}
               className="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-100 hover:bg-cyan-100 text-gray-600 rounded-full w-10 h-10 flex items-center justify-center shadow transition-colors duration-200 z-10"
@@ -308,12 +391,18 @@ const Testimonials = () => {
         </div>
 
         {/* Pagination indicators */}
-        {visibleReviews.length > reviewsPerPage && (
-          <div className="flex justify-center mt-6 space-x-2">
-            {Array.from({ length: Math.ceil(visibleReviews.length / reviewsPerPage) }).map((_, index) => (
+        {visibleReviews.length > 1 && (
+          <div className="flex justify-center mt-8 space-x-2">
+            {visibleReviews.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentSlide(index)}
+                onClick={() => {
+                  setIsTransitioning(true);
+                  setTimeout(() => {
+                    setCurrentSlide(index);
+                    setIsTransitioning(false);
+                  }, 1000); // 1 second transition delay
+                }}
                 className={`w-3 h-3 rounded-full transition-colors duration-200 ${
                   index === currentSlide ? 'bg-cyan-600' : 'bg-gray-300 hover:bg-gray-400'
                 }`}
@@ -323,6 +412,7 @@ const Testimonials = () => {
         )}
       </div>
     </section>
+    </>
   );
 };
 
