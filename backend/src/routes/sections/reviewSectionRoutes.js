@@ -11,9 +11,11 @@ router.get('/active', reviewSectionController.getActive);
 // Get single review section by ID (public)
 router.get('/:id', reviewSectionController.getById);
 
-// Admin routes (protected)
 // Get all review sections (admin and super_admin)
 router.get('/', verifyToken, requireRole(['admin', 'super_admin']), reviewSectionController.getAll);
+
+// Get all review sections for public
+router.get('/', reviewSectionController.getAll);
 
 // Create new review section (admin and super_admin)
 router.post('/', verifyToken, requireRole(['admin', 'super_admin']), reviewSectionController.create);

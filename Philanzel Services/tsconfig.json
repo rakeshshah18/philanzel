@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "target": "esnext",
     "skipLibCheck": true,
@@ -17,30 +13,24 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "ignoreDeprecations": "6.0",
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "types": [
-      "node",
-      "react"
-    ],
+    "types": ["node", "react"],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+      "@/*": ["./*"]
+    },
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "app/page.tsx",
+    "app/page.jsx",
     "next-env.d.ts",
-    ".next/types/**/*.ts"
-, "app/home/our-association.jsx"  ],
-  "exclude": [
-    "node_modules"
-  ]
+    ".next/types/**/*.ts",
+    "app/home/our-association.jsx"
+  ],
+  "exclude": ["node_modules"]
 }

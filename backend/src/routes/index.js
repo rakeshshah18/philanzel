@@ -73,6 +73,7 @@ router.use('/admin/our-association', ourAssociationRoutes);
 router.use('/our-association', ourAssociationRoutes);
 router.use('/admin/home-faqs', homeFAQsRoutes);
 router.use('/admin/review-sections', reviewSectionRoutes);
+router.use('/review-sections', reviewSectionRoutes);
 router.use('/admin/ads-sections', adsSectionRoutes);
 router.use('/admin/footer', footerRoutes);
 router.use('/footer', footerRoutes);
