@@ -71,10 +71,12 @@ router.use('/why-choose-us', whyChooseUsRoutes);
 router.use('/admin/our-association', ourAssociationRoutes);
 // Public our association route (GET only)
 router.use('/our-association', ourAssociationRoutes);
-router.use('/admin/home-faqs', homeFAQsRoutes);
+router.use('/admin/home-faqs', homeFAQsRoutes); 
+router.use('/home-faqs', homeFAQsRoutes);
 router.use('/admin/review-sections', reviewSectionRoutes);
 router.use('/review-sections', reviewSectionRoutes);
 router.use('/admin/ads-sections', adsSectionRoutes);
+router.use('/ads-sections', adsSectionRoutes);
 router.use('/admin/footer', footerRoutes);
 router.use('/footer', footerRoutes);
 

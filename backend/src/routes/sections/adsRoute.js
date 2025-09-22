@@ -13,6 +13,11 @@ import {
 
 const router = express.Router();
 
+// Public routes (must come BEFORE protected routes)
+router.get('/active', getAllAdsSections);
+router.get('/public', getAllAdsSections);
+router.get('/paginated/public', getAdsSectionsWithPagination);
+
 // Admin routes (protected)
 // Get all ads sections (admin and super_admin)
 router.get('/', verifyToken, requireRole(['admin', 'super_admin']), getAllAdsSections);

@@ -14,6 +14,7 @@ const router = express.Router();
 
 // Get all FAQs (public)
 router.get('/', getAllHomeFAQs);
+router.get('/public', getAllHomeFAQs);
 
 // Get FAQs with pagination (public)
 router.get('/paginated', getHomeFAQsWithPagination);
