@@ -109,7 +109,15 @@ export const getPageById = async (req, res) => {
 export const createPage = async (req, res) => {
     try {
         const { name } = req.body;
-        const page = new CalculatorPage({ name });
+        
+        // Generate slug from name
+        const slug = name.toLowerCase()
+            .replace(/[^a-z0-9 -]/g, '') // Remove special characters
+            .replace(/\s+/g, '-') // Replace spaces with hyphens
+            .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+            .trim('-'); // Remove leading/trailing hyphens
+        
+        const page = new CalculatorPage({ name, slug });
         await page.save();
         res.status(201).json({ success: true, data: page });
     } catch (err) {
@@ -121,9 +129,17 @@ export const createPage = async (req, res) => {
 export const updatePage = async (req, res) => {
     try {
         const { name } = req.body;
+        
+        // Generate slug from name when updating
+        const slug = name.toLowerCase()
+            .replace(/[^a-z0-9 -]/g, '') // Remove special characters
+            .replace(/\s+/g, '-') // Replace spaces with hyphens
+            .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+            .trim('-'); // Remove leading/trailing hyphens
+        
         const page = await CalculatorPage.findByIdAndUpdate(
             req.params.id,
-            { name },
+            { name, slug },
             { new: true }
         );
         if (!page) return res.status(404).json({ success: false, message: 'Page not found' });

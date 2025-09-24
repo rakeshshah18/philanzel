@@ -28,9 +28,28 @@ const Calculators = () => {
     const fetchCalculatorPages = async () => {
         try {
             const res = await calculatorPagesAPI.getAll();
-            setCalculatorPages(res.data || []);
+            console.log('Full API response:', res); // Debug log
+            console.log('res.data:', res.data); // Debug log
+            console.log('res.data.data:', res.data?.data); // Debug log
+            
+            // Extract the actual data array from the response
+            let pages = [];
+            if (res.data && res.data.success && Array.isArray(res.data.data)) {
+                pages = res.data.data;
+            } else if (Array.isArray(res.data)) {
+                pages = res.data;
+            } else if (Array.isArray(res)) {
+                pages = res;
+            }
+            
+            console.log('Pages to set:', pages); // Debug log
+            console.log('Is pages array?', Array.isArray(pages)); // Debug log
+            console.log('Pages length:', pages.length); // Debug log
+            setCalculatorPages(pages);
         } catch (err) {
+            console.error('Fetch calculators error:', err);
             setError('Failed to fetch calculators');
+            setCalculatorPages([]); // Ensure it stays an array
         }
     };
 
@@ -95,16 +114,19 @@ const Calculators = () => {
     };
 
     // Delete a calculator
-    const handleDeleteCalculator = async (id) => {
-        if (!window.confirm('Delete this calculator?')) return;
+    const handleDeleteCalculator = async (id, name) => {
+        if (!window.confirm(`Delete "${name}" calculator?`)) return;
         setDeleteLoading(true);
         setDeleteError("");
         try {
-            await calculatorPagesAPI.delete(id);
+            console.log('Deleting calculator with ID:', id);
+            const deleteResult = await calculatorPagesAPI.delete(id);
+            console.log('Delete result:', deleteResult);
             setDeleteError("");
             fetchCalculatorPages();
         } catch (err) {
-            setDeleteError('Failed to delete calculator');
+            console.error('Delete calculator error:', err);
+            setDeleteError(`Failed to delete calculator: ${err.message || err.toString()}`);
         } finally {
             setDeleteLoading(false);
         }
@@ -337,7 +359,7 @@ const Calculators = () => {
                             </div>
                             <div className="modal-body">
                                 {deleteError && <div className="text-danger mb-2">{deleteError}</div>}
-                                {calculatorPages.length === 0 ? (
+                                {(!Array.isArray(calculatorPages) || calculatorPages.length === 0) ? (
                                     <div className="text-muted">No calculators found.</div>
                                 ) : (
                                     <ul className="list-group">
@@ -354,7 +376,7 @@ const Calculators = () => {
                                                     </button>
                                                     <button
                                                         className="btn btn-sm btn-outline-danger"
-                                                        onClick={() => handleDeleteCalculator(page._id)}
+                                                        onClick={() => handleDeleteCalculator(page._id, page.name)}
                                                         disabled={deleteLoading}
                                                         title="Delete"
                                                     >

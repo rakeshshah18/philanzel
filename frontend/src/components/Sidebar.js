@@ -94,6 +94,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const isSectionsActive = () => [
         '/sections', '/sections/reviews', '/sections/ads', '/sections/footer'
     ].some(isActive);
+    const isCalculatorsActive = () => {
+        if (isActive('/calculators')) return true;
+        return calculatorPages.some(page => 
+            isActive(`/calculators/${page.name.replace(/\s+/g, '-').toLowerCase()}`)
+        );
+    };
 
     return (
         <div
@@ -233,23 +239,15 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     </div>
                 )}
 
-                {/* Calculators Dropdown */}
+                {/* All Calculators Dropdown */}
                 {allowedTabs.includes('calculators') && (
                     <div className="nav-item">
                         <div
-                            className={`nav-link sidebar-btn ${isActive('/calculators') ? 'active' : ''} px-3 py-0`}
+                            className={`nav-link sidebar-btn ${isCalculatorsActive() ? 'active' : ''}`}
                             onClick={() => setIsCalculatorsDropdownOpen(v => !v)}
-                            style={{ fontSize: '1rem', display: 'flex', alignItems: 'center', paddingLeft: '2.5rem', cursor: 'pointer', userSelect: 'none', justifyContent: 'space-between', marginBottom: '0.5rem' }}
+                            style={{ cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}
                         >
-                            <span style={{ display: 'flex', alignItems: 'center' }}>
-                                <Link
-                                    to="/calculators"
-                                    className={`nav-link sidebar-btn ${isActive('/calculators') ? 'active' : ''}`}
-                                    style={{ textDecoration: 'none', fontWeight: 400, paddingLeft: '0', marginBottom: '0.25rem' }}
-                                >
-                                    Calculators
-                                </Link>
-                            </span>
+                            <span><i className="fas fa-calculator me-2"></i>All Calculators</span>
                             <span style={{ display: 'flex', alignItems: 'center' }}>
                                 <i
                                     className="bi bi-arrow-clockwise"
@@ -265,6 +263,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         </div>
                         {isCalculatorsDropdownOpen && (
                             <div className="dropdown-submenu p-1" style={{ backgroundColor: 'rgba(52, 80, 172, 0.96)', borderLeft: '3px solid rgba(255, 255, 255, 0.1)', marginLeft: '0.5rem', marginRight: '0.5rem', borderRadius: '4px', paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
+                                <Link
+                                    to="/calculators"
+                                    className={`nav-link sidebar-btn ${isActive('/calculators') ? 'active' : ''}`}
+                                    style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}
+                                >
+                                    <i className="fas fa-list me-2"></i>Calculators
+                                </Link>
                                 {calculatorPages.length === 0 ? (
                                     <div className="nav-link" style={{ paddingLeft: '3rem', fontSize: '0.9rem', color: '#adb5bd' }}>No calculators found</div>
                                 ) : (
