@@ -644,4 +644,14 @@ export const calculatorSectionsAPI = {
     delete: (id) => API.delete(`/calculators/sections/${id}`)
 };
 
+// Sidebar API
+export const sidebarAPI = {
+    getAll: () => API.get('/sidebar'),
+    getById: (id) => API.get(`/sidebar/${id}`),
+    create: (data) => API.post('/sidebar', data),
+    update: (id, data) => API.put(`/sidebar/${id}`, data),
+    delete: (id) => API.delete(`/sidebar/${id}`),
+    reorder: (items) => API.put('/sidebar/reorder', { items })
+};
+
 

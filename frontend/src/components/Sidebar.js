@@ -1,21 +1,16 @@
-
 import React, { useState, useEffect } from 'react';
-import { servicesAPI, calculatorPagesAPI, adminAuthAPI } from '../services/api';
+import { servicesAPI, calculatorPagesAPI, adminAuthAPI, sidebarAPI } from '../services/api';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const location = useLocation();
-    const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
-    const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
-    const [isSectionsDropdownOpen, setIsSectionsDropdownOpen] = useState(false);
-    const [isCalculatorsDropdownOpen, setIsCalculatorsDropdownOpen] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [services, setServices] = useState([]);
     const [calculatorPages, setCalculatorPages] = useState([]);
     const [allowedTabs, setAllowedTabs] = useState(["pages", "services", "calculators", "sections"]);
-
-
+    const [sidebarItems, setSidebarItems] = useState([]);
+    const [dropdownStates, setDropdownStates] = useState({});
 
     // Always call useAuth() as a hook, never conditionally
     const auth = useAuth();
@@ -46,6 +41,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         applyDarkMode(savedDarkMode);
         fetchServices();
         fetchCalculatorPages();
+        fetchSidebarItems();
         // eslint-disable-next-line
     }, []);
 
@@ -67,6 +63,26 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         }
     };
 
+    const fetchSidebarItems = async () => {
+        try {
+            const response = await sidebarAPI.getAll();
+            const items = response.data.data || [];
+            setSidebarItems(items);
+
+            // Initialize dropdown states for dropdown items
+            const initialDropdownStates = {};
+            items.forEach(item => {
+                if (item.type === 'dropdown') {
+                    initialDropdownStates[item._id] = false;
+                }
+            });
+            setDropdownStates(initialDropdownStates);
+        } catch (error) {
+            console.error('Failed to fetch sidebar items:', error);
+            setSidebarItems([]);
+        }
+    };
+
     const applyDarkMode = (darkMode) => {
         if (darkMode) {
             document.body.classList.add('dark-mode');
@@ -85,20 +101,62 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     };
 
     const isActive = (path) => location.pathname === path;
-    const isPagesActive = () => [
-        '/home', '/about-us', '/career', '/partner'
-    ].some(isActive);
-    const isServicesActive = () => [
-        '/service-1', '/service-2', '/service-3', '/service-4', '/service-5', '/service-6', '/service-7', '/service-8'
-    ].some(isActive);
-    const isSectionsActive = () => [
-        '/sections', '/sections/reviews', '/sections/ads', '/sections/footer'
-    ].some(isActive);
-    const isCalculatorsActive = () => {
-        if (isActive('/calculators')) return true;
-        return calculatorPages.some(page => 
-            isActive(`/calculators/${page.name.replace(/\s+/g, '-').toLowerCase()}`)
-        );
+
+    // Dynamic function to check if any dropdown item is active
+    const isDropdownActive = (sidebarItem) => {
+        if (sidebarItem.type === 'single') {
+            return isActive(sidebarItem.route);
+        }
+        if (sidebarItem.type === 'dropdown' && sidebarItem.dropdownItems) {
+            // Check base dropdown items
+            const baseActive = sidebarItem.dropdownItems.some(dropdownItem => isActive(dropdownItem.route));
+
+            // For services, also check dynamic services
+            if (sidebarItem.name.toLowerCase().includes('service')) {
+                const servicesActive = services.some(service =>
+                    isActive(`/services/${service.slug}`)
+                );
+                return baseActive || servicesActive;
+            }
+
+            // For calculators, also check dynamic calculator pages
+            if (sidebarItem.name.toLowerCase().includes('calculator')) {
+                const calculatorsActive = calculatorPages.some(page =>
+                    isActive(`/calculators/${page.name.replace(/\s+/g, '-').toLowerCase()}`)
+                );
+                return baseActive || calculatorsActive || isActive('/calculators');
+            }
+
+            return baseActive;
+        }
+        return false;
+    };
+
+    // Handle dropdown toggle
+    const toggleDropdown = (itemId) => {
+        setDropdownStates(prev => ({
+            ...prev,
+            [itemId]: !prev[itemId]
+        }));
+    };
+
+    // Get icon for sidebar items
+    const getItemIcon = (itemName) => {
+        const name = itemName.toLowerCase();
+        if (name.includes('dashboard')) return 'fas fa-tachometer-alt';
+        if (name.includes('page')) return 'fas fa-file-alt';
+        if (name.includes('service')) return 'fas fa-cogs';
+        if (name.includes('calculator')) return 'fas fa-calculator';
+        if (name.includes('section')) return 'fas fa-puzzle-piece';
+        if (name.includes('home')) return 'fas fa-home';
+        if (name.includes('about')) return 'fas fa-info-circle';
+        if (name.includes('career')) return 'fas fa-briefcase';
+        if (name.includes('partner')) return 'fas fa-handshake';
+        if (name.includes('contact')) return 'fas fa-envelope';
+        if (name.includes('review')) return 'fas fa-star';
+        if (name.includes('ads')) return 'fas fa-bullhorn';
+        if (name.includes('footer')) return 'fas fa-window-minimize';
+        return 'fas fa-circle'; // default icon
     };
 
     return (
@@ -161,173 +219,152 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 </button>
             </div>
             <nav className="nav flex-column p-3" style={{ display: isSidebarOpen ? 'block' : 'none', transition: 'display 0.3s' }}>
-                <Link
-                    to="/dashboard"
-                    className={`nav-link sidebar-btn ${isActive('/') || isActive('/dashboard') ? 'active' : ''}`}
-                    style={{ marginBottom: '0.5rem' }}
-                >
-                    <i className="fas fa-tachometer-alt me-2"></i>
-                    Dashboard
-                </Link>
+                {/* Dynamic Sidebar Items */}
+                {sidebarItems.map((item) => {
+                    // Check if item is allowed for current admin (backward compatibility)
+                    const isItemAllowed = item.name.toLowerCase().includes('dashboard') ||
+                        allowedTabs.includes('pages') && item.name.toLowerCase().includes('page') ||
+                        allowedTabs.includes('services') && item.name.toLowerCase().includes('service') ||
+                        allowedTabs.includes('calculators') && item.name.toLowerCase().includes('calculator') ||
+                        allowedTabs.includes('sections') && item.name.toLowerCase().includes('section');
 
-                {/* Pages Dropdown */}
-                {allowedTabs.includes('pages') && (
-                    <div className="nav-item">
-                        <div
-                            className={`nav-link sidebar-btn ${isPagesActive() ? 'active' : ''}`}
-                            onClick={() => setIsPagesDropdownOpen(v => !v)}
-                            style={{ cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}
-                        >
-                            <span><i className="fas fa-file-alt me-2"></i>Pages</span>
-                            <i className={`fas fa-chevron-${isPagesDropdownOpen ? 'down' : 'right'} float-end mt-1`}></i>
-                        </div>
-                        {isPagesDropdownOpen && (
-                            <div className="dropdown-submenu p-1" style={{ backgroundColor: 'rgba(52, 80, 172, 0.96)', borderLeft: '3px solid rgba(255, 255, 255, 0.1)', marginLeft: '0.5rem', marginRight: '0.5rem', borderRadius: '4px', paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
-                                <Link to="/home" className={`nav-link sidebar-btn ${isActive('/home') ? 'active' : ''}`} style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}><i className="fas fa-home me-2"></i>Home</Link>
-                                <Link to="/about-us" className={`nav-link sidebar-btn ${isActive('/about-us') ? 'active' : ''}`} style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}><i className="fas fa-info-circle me-2"></i>About Us</Link>
-                                <Link to="/career" className={`nav-link sidebar-btn ${isActive('/career') ? 'active' : ''}`} style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}><i className="fas fa-briefcase me-2"></i>Career</Link>
-                                <Link to="/partner" className={`nav-link sidebar-btn ${isActive('/partner') ? 'active' : ''}`} style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}><i className="fas fa-handshake me-2"></i>Become A Partner</Link>
-                                <Link to="/contact" className={`nav-link sidebar-btn ${isActive('/contact') ? 'active' : ''}`} style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}><i className="fas fa-envelope me-2"></i>Contact Us</Link>
-                            </div>
-                        )}
-                    </div>
-                )}
+                    if (!isItemAllowed && !item.name.toLowerCase().includes('dashboard')) {
+                        return null;
+                    }
 
-                {/* Services Dropdown */}
-                {allowedTabs.includes('services') && (
-                    <div className="nav-item">
-                        <div
-                            className={`nav-link sidebar-btn ${isServicesActive() ? 'active' : ''}`}
-                            onClick={() => setIsServicesDropdownOpen(v => !v)}
-                            style={{ cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}
-                        >
-                            <span><i className="fas fa-cogs me-2"></i>Services</span>
-                            <span style={{ display: 'flex', alignItems: 'center' }}>
-                                <i
-                                    className="bi bi-arrow-clockwise"
-                                    style={{ cursor: 'pointer', marginRight: '0.5rem' }}
-                                    title="Refresh services"
-                                    onClick={e => {
-                                        e.stopPropagation();
-                                        fetchServices();
+                    // Single page item
+                    if (item.type === 'single') {
+                        return (
+                            <Link
+                                key={item._id}
+                                to={item.route}
+                                className={`nav-link sidebar-btn ${isActive(item.route) || (item.route === '/dashboard' && (isActive('/') || isActive('/dashboard'))) ? 'active' : ''}`}
+                                style={{ marginBottom: '0.5rem' }}
+                            >
+                                <i className={`${getItemIcon(item.name)} me-2`}></i>
+                                {item.name}
+                            </Link>
+                        );
+                    }
+
+                    // Dropdown item
+                    if (item.type === 'dropdown') {
+                        const isDropdownOpen = dropdownStates[item._id] || false;
+                        const isItemActive = isDropdownActive(item);
+
+                        return (
+                            <div key={item._id} className="nav-item">
+                                <div
+                                    className={`nav-link sidebar-btn ${isItemActive ? 'active' : ''}`}
+                                    onClick={() => toggleDropdown(item._id)}
+                                    style={{
+                                        cursor: 'pointer',
+                                        userSelect: 'none',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '0.5rem'
                                     }}
-                                ></i>
-                                <i className={`fas fa-chevron-${isServicesDropdownOpen ? 'down' : 'right'} mt-1`}></i>
-                            </span>
-                        </div>
-                        {isServicesDropdownOpen && (
-                            <div className="dropdown-submenu p-1" style={{ backgroundColor: 'rgba(52, 80, 172, 0.96)', borderLeft: '3px solid rgba(255, 255, 255, 0.1)', marginLeft: '0.5rem', marginRight: '0.5rem', borderRadius: '4px', paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
-                                <Link
-                                    to="/services-sections"
-                                    className={`nav-link sidebar-btn ${isActive('/services-sections') ? 'active' : ''}`}
-                                    style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}
                                 >
-                                    <i className="fas fa-th-list me-2"></i>Services Sections
-                                </Link>
-                                {services.length > 0 && services.map(service => (
-                                    <Link
-                                        key={service._id}
-                                        to={`/services/${service.name.replace(/\s+/g, '-').toLowerCase()}`}
-                                        className={`nav-link sidebar-btn ${isActive(`/services/${service.name.replace(/\s+/g, '-').toLowerCase()}`) ? 'active' : ''}`}
-                                        style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}
-                                    >
-                                        <i className="fas fa-cog me-2"></i>{service.name}
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
+                                    <span>
+                                        <i className={`${getItemIcon(item.name)} me-2`}></i>
+                                        {item.name}
+                                    </span>
+                                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                                        {/* Refresh button for Services */}
+                                        {item.name.toLowerCase().includes('service') && (
+                                            <i
+                                                className="bi bi-arrow-clockwise"
+                                                style={{ cursor: 'pointer', marginRight: '0.5rem' }}
+                                                title="Refresh services"
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    fetchServices();
+                                                }}
+                                            ></i>
+                                        )}
+                                        {/* Refresh button for Calculators */}
+                                        {item.name.toLowerCase().includes('calculator') && (
+                                            <i
+                                                className="bi bi-arrow-clockwise"
+                                                style={{ cursor: 'pointer', marginRight: '0.5rem' }}
+                                                title="Refresh calculators"
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    fetchCalculatorPages();
+                                                }}
+                                            ></i>
+                                        )}
+                                        <i className={`fas fa-chevron-${isDropdownOpen ? 'down' : 'right'} float-end mt-1`}></i>
+                                    </span>
+                                </div>
+                                {isDropdownOpen && (
+                                    <div className="dropdown-submenu p-1" style={{
+                                        backgroundColor: 'rgba(52, 80, 172, 0.96)',
+                                        borderLeft: '3px solid rgba(255, 255, 255, 0.1)',
+                                        marginLeft: '0.5rem',
+                                        marginRight: '0.5rem',
+                                        borderRadius: '4px',
+                                        paddingTop: '0.25rem',
+                                        paddingBottom: '0.25rem'
+                                    }}>
+                                        {/* Render base dropdown items from sidebar API */}
+                                        {item.dropdownItems && item.dropdownItems.map((dropdownItem) => (
+                                            <Link
+                                                key={dropdownItem._id}
+                                                to={dropdownItem.route}
+                                                className={`nav-link sidebar-btn ${isActive(dropdownItem.route) ? 'active' : ''}`}
+                                                style={{
+                                                    paddingLeft: '3rem',
+                                                    paddingRight: '1rem',
+                                                    fontSize: '0.9rem',
+                                                    width: '100%',
+                                                    display: 'block',
+                                                    marginBottom: '0.25rem'
+                                                }}
+                                            >
+                                                <i className={`${getItemIcon(dropdownItem.name)} me-2`}></i>
+                                                {dropdownItem.name}
+                                            </Link>
+                                        ))}
 
-                {/* All Calculators Dropdown */}
-                {allowedTabs.includes('calculators') && (
-                    <div className="nav-item">
-                        <div
-                            className={`nav-link sidebar-btn ${isCalculatorsActive() ? 'active' : ''}`}
-                            onClick={() => setIsCalculatorsDropdownOpen(v => !v)}
-                            style={{ cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}
-                        >
-                            <span><i className="fas fa-calculator me-2"></i>All Calculators</span>
-                            <span style={{ display: 'flex', alignItems: 'center' }}>
-                                <i
-                                    className="bi bi-arrow-clockwise"
-                                    style={{ cursor: 'pointer', marginRight: '0.5rem' }}
-                                    title="Refresh calculators"
-                                    onClick={e => {
-                                        e.stopPropagation();
-                                        fetchCalculatorPages();
-                                    }}
-                                ></i>
-                                <i className={`fas fa-chevron-${isCalculatorsDropdownOpen ? 'down' : 'right'} mt-1`}></i>
-                            </span>
-                        </div>
-                        {isCalculatorsDropdownOpen && (
-                            <div className="dropdown-submenu p-1" style={{ backgroundColor: 'rgba(52, 80, 172, 0.96)', borderLeft: '3px solid rgba(255, 255, 255, 0.1)', marginLeft: '0.5rem', marginRight: '0.5rem', borderRadius: '4px', paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
-                                <Link
-                                    to="/calculators"
-                                    className={`nav-link sidebar-btn ${isActive('/calculators') ? 'active' : ''}`}
-                                    style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}
-                                >
-                                    <i className="fas fa-list me-2"></i>Calculators
-                                </Link>
-                                {calculatorPages.length === 0 ? (
-                                    <div className="nav-link" style={{ paddingLeft: '3rem', fontSize: '0.9rem', color: '#adb5bd' }}>No calculators found</div>
-                                ) : (
-                                    calculatorPages.map(page => (
-                                        <Link
-                                            key={page._id}
-                                            to={`/calculators/${page.name.replace(/\s+/g, '-').toLowerCase()}`}
-                                            className={`nav-link sidebar-btn ${isActive(`/calculators/${page.name.replace(/\s+/g, '-').toLowerCase()}`) ? 'active' : ''}`}
-                                            style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}
-                                        >
-                                            <i className="fas fa-calculator me-2"></i>{page.name}
-                                        </Link>
-                                    ))
+                                        {/* Enhanced Services Integration */}
+                                        {item.name.toLowerCase().includes('service') && services.length > 0 && services.map(service => (
+                                            <Link
+                                                key={service._id}
+                                                to={`/services/${service.slug}`}
+                                                className={`nav-link sidebar-btn ${isActive(`/services/${service.slug}`) ? 'active' : ''}`}
+                                                style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}
+                                            >
+                                                <i className="fas fa-cog me-2"></i>{service.name}
+                                            </Link>
+                                        ))}
+
+                                        {/* Enhanced Calculators Integration */}
+                                        {item.name.toLowerCase().includes('calculator') && (
+                                            calculatorPages.length === 0 ? (
+                                                <div className="nav-link" style={{ paddingLeft: '3rem', fontSize: '0.9rem', color: '#adb5bd' }}>No calculators found</div>
+                                            ) : (
+                                                calculatorPages.map(page => (
+                                                    <Link
+                                                        key={page._id}
+                                                        to={`/calculators/${page.name.replace(/\s+/g, '-').toLowerCase()}`}
+                                                        className={`nav-link sidebar-btn ${isActive(`/calculators/${page.name.replace(/\s+/g, '-').toLowerCase()}`) ? 'active' : ''}`}
+                                                        style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}
+                                                    >
+                                                        <i className="fas fa-calculator me-2"></i>{page.name}
+                                                    </Link>
+                                                ))
+                                            )
+                                        )}
+                                    </div>
                                 )}
                             </div>
-                        )}
-                    </div>
-                )}
+                        );
+                    }
 
-                {/* Sections Dropdown */}
-                {allowedTabs.includes('sections') && (
-                    <div className="nav-item">
-                        <div
-                            className={`nav-link sidebar-btn ${isSectionsActive() ? 'active' : ''}`}
-                            onClick={() => setIsSectionsDropdownOpen(v => !v)}
-                            style={{ cursor: 'pointer', userSelect: 'none', marginBottom: '0.5rem' }}
-                        >
-                            <i className="fas fa-puzzle-piece me-2"></i>
-                            Sections
-                            <i className={`fas fa-chevron-${isSectionsDropdownOpen ? 'down' : 'right'} float-end mt-1`}></i>
-                        </div>
-                        {isSectionsDropdownOpen && (
-                            <div className="dropdown-submenu p-1" style={{ backgroundColor: 'rgba(52, 80, 172, 0.96)', borderLeft: '3px solid rgba(255, 255, 255, 0.1)', marginLeft: '0.5rem', marginRight: '0.5rem', borderRadius: '4px', paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
-                                <Link
-                                    to="/sections/reviews"
-                                    className={`nav-link sidebar-btn ${isActive('/sections/reviews') ? 'active' : ''}`}
-                                    style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}
-                                >
-                                    <i className="fas fa-star me-2"></i>Reviews
-                                </Link>
-                                <Link
-                                    to="/sections/ads"
-                                    className={`nav-link sidebar-btn ${isActive('/sections/ads') ? 'active' : ''}`}
-                                    style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}
-                                >
-                                    <i className="fas fa-bullhorn me-2"></i>Ads
-                                </Link>
-                                <Link
-                                    to="/sections/footer"
-                                    className={`nav-link sidebar-btn ${isActive('/sections/footer') ? 'active' : ''}`}
-                                    style={{ paddingLeft: '3rem', paddingRight: '1rem', fontSize: '0.9rem', width: '100%', display: 'block', marginBottom: '0.25rem' }}
-                                >
-                                    <i className="fas fa-window-minimize me-2"></i>Footer
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                )}
+                    return null;
+                })}
 
                 {/* Dark Mode Toggle Button */}
                 <div className="mt-auto pt-3" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>

@@ -36,6 +36,7 @@ import uploadRoutes from './partner/upload.js';
 import aboutServiceRoutes from './all services/aboutServiceRoutes.js';
 import calculatorPagesRoutes from './calculators/pagesRoutes.js';
 import calculatorSectionRoutes from './calculators/sectionRoutes.js';
+import sidebarRoutes from './sidebarRoutes.js';
 
 const router = express.Router();
 
@@ -113,6 +114,9 @@ router.use('/contact-us', contactUsRoutes);
 // Register calculators pages API
 router.use('/calculators/pages', calculatorPagesRoutes);
 router.use('/calculators/sections', calculatorSectionRoutes);
+
+// Sidebar management routes
+router.use('/sidebar', sidebarRoutes);
 
 // General /admin routes MUST come LAST
 // Public homepage routes (GET /homepage, GET /homepage/:id)
