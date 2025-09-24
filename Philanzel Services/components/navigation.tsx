@@ -73,9 +73,7 @@ export default function Navigation() {
           </div>
           <div className="hidden md:flex items-center space-x-4">
             <Link href="/contact-us">
-              <Button variant="outline" className="border-cyan-600 text-cyan-600 hover:bg-cyan-50 bg-transparent">
-                Schedule Consultation
-              </Button>
+              
             </Link>
             <Link href="/login">
               <Button className="bg-cyan-600 hover:bg-cyan-700 text-white">Login</Button>
@@ -149,9 +147,6 @@ export default function Navigation() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Contact Us
-                </Link>
-                <Link href="/contact-us" className="block px-3 py-2" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white mb-2">Schedule Consultation</Button>
                 </Link>
                 <Link href="/login" className="block px-3 py-2" onClick={() => setIsMenuOpen(false)}>
                   <Button className="w-full bg-gray-600 hover:bg-gray-700 text-white">Login</Button>

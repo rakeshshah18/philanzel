@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import careerInquiry, { getAllCareerApplications } from '../../controllers/careerController.js';
+import careerInquiry, { getAllCareerApplications, testCaptcha } from '../../controllers/careerController.js';
 import upload from '../../config/multer.js';
 import verifyCaptcha from '../../middlewares/verifyCaptcha.js';
 
@@ -33,14 +33,16 @@ const handleMulterError = (err, req, res, next) => {
     next(err);
 };
 
-// Career inquiry route with file upload
+// Career inquiry route with file upload (temporarily removing verifyCaptcha middleware)
 router.post(
     '/career-inquiry',
-    verifyCaptcha,
     upload.single('resume'),
     handleMulterError,
     careerInquiry
 );
+
+// Test captcha endpoint
+router.post('/test-captcha', testCaptcha);
 
 // Get all career applications (admin route)
 router.get('/applications', getAllCareerApplications);

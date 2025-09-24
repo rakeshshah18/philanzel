@@ -109,7 +109,20 @@ const createServices = async (req, res) => {
         // Generate slug from name/title if not provided
         let slug = req.body.slug;
         if (!slug) {
-            slug = (serviceName || serviceTitle || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            let baseSlug = (serviceName || serviceTitle || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            if (!baseSlug) {
+                baseSlug = 'service';
+            }
+            slug = baseSlug;
+            
+            // Check if slug already exists and make it unique
+            let counter = 1;
+            let existingService = await OurServices.findOne({ slug });
+            while (existingService) {
+                slug = `${baseSlug}-${counter}`;
+                existingService = await OurServices.findOne({ slug });
+                counter++;
+            }
         }
         // Add new service
         const newServices = new OurServices({
@@ -198,8 +211,44 @@ const updateServices = async (req, res) => {
         console.log('Existing service:', existingServices);
 
         // Update fields (check for both null/undefined and empty string)
-        if (name !== undefined && name !== null) existingServices.name = name.trim();
-        if (title !== undefined && title !== null) existingServices.title = title.trim();
+        if (name !== undefined && name !== null) {
+            existingServices.name = name.trim();
+            // Update slug when name changes
+            let newSlug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            
+            // Check if the new slug is different from current and ensure uniqueness
+            if (newSlug !== existingServices.slug) {
+                let counter = 1;
+                let tempSlug = newSlug;
+                let existingWithSlug = await OurServices.findOne({ slug: tempSlug, _id: { $ne: id } });
+                while (existingWithSlug) {
+                    tempSlug = `${newSlug}-${counter}`;
+                    existingWithSlug = await OurServices.findOne({ slug: tempSlug, _id: { $ne: id } });
+                    counter++;
+                }
+                existingServices.slug = tempSlug;
+            }
+        }
+        if (title !== undefined && title !== null) {
+            existingServices.title = title.trim();
+            // Update slug when title changes (if name wasn't provided)
+            if (name === undefined || name === null) {
+                let newSlug = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                
+                // Check if the new slug is different from current and ensure uniqueness
+                if (newSlug !== existingServices.slug) {
+                    let counter = 1;
+                    let tempSlug = newSlug;
+                    let existingWithSlug = await OurServices.findOne({ slug: tempSlug, _id: { $ne: id } });
+                    while (existingWithSlug) {
+                        tempSlug = `${newSlug}-${counter}`;
+                        existingWithSlug = await OurServices.findOne({ slug: tempSlug, _id: { $ne: id } });
+                        counter++;
+                    }
+                    existingServices.slug = tempSlug;
+                }
+            }
+        }
         if (tabTitle !== undefined && tabTitle !== null) existingServices.tabTitle = tabTitle.trim();
         if (contentTitle !== undefined && contentTitle !== null) existingServices.contentTitle = contentTitle.trim();
         if (description !== undefined) existingServices.description = description ? description.trim() : '';

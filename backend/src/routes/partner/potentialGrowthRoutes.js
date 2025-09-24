@@ -14,6 +14,7 @@ router.post('/', createPotentialGrowth);
 
 // Read all
 router.get('/', getAllPotentialGrowth);
+router.get('/public', getAllPotentialGrowth);
 
 // Read by ID
 router.get('/:id', getPotentialGrowthById);

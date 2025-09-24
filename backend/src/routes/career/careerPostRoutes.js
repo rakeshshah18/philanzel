@@ -68,6 +68,8 @@ const handleMulterError = (err, req, res, next) => {
 
 // Routes
 router.get('/', getAllCareerPosts);
+//career get route for public access
+router.get('/public', getAllCareerPosts);
 router.get('/:id', getCareerPost);
 router.post('/', upload.single('image'), handleMulterError, createCareerPost);
 router.put('/:id', upload.single('image'), handleMulterError, updateCareerPost);

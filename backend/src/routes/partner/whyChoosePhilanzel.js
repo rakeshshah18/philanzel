@@ -14,6 +14,7 @@ const router = express.Router();
 router.post('/', upload.single('image'), createWhyChoosePhilanzel);
 // Read all
 router.get('/', getAllWhyChoosePhilanzel);
+router.get('/public', getAllWhyChoosePhilanzel);
 // Read one
 router.get('/:id', getWhyChoosePhilanzelById);
 // Update

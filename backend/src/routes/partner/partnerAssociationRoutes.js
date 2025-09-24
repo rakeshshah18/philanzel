@@ -7,6 +7,7 @@ const router = express.Router();
 
 // Get all images
 router.get('/', getAll);
+router.get('/public', getAll);
 
 // Add new image (admin and super_admin)
 router.post('/', verifyToken, requireRole(['admin', 'super_admin']), imageUpload.single('image'), create);

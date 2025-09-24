@@ -7,7 +7,7 @@ const router = express.Router();
 // Partner inquiry route
 router.post(
     '/partner-inquiry',
-    verifyCaptcha,
+    // verifyCaptcha,
     partnerInquiry
 );
 

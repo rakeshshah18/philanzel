@@ -1,49 +1,52 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-// TypeScript interfaces based on your actual API structure
-interface WriteReviewButton {
-  text: string;
-  url: string;
-  isEnabled: boolean;
-}
+/**
+ * @typedef {Object} WriteReviewButton
+ * @property {string} text
+ * @property {string} url
+ * @property {boolean} isEnabled
+ */
 
-interface Review {
-  _id: string;
-  userName: string;
-  userProfilePhoto: string;
-  reviewProviderLogo: string;
-  rating: number;
-  reviewText: string;
-  reviewDate: string;
-  isVerified: boolean;
-  isVisible: boolean;
-}
+/**
+ * @typedef {Object} Review
+ * @property {string} _id
+ * @property {string} userName
+ * @property {string} userProfilePhoto
+ * @property {string} reviewProviderLogo
+ * @property {number} rating
+ * @property {string} reviewText
+ * @property {string} reviewDate
+ * @property {boolean} isVerified
+ * @property {boolean} isVisible
+ */
 
-interface TestimonialItem {
-  _id: string;
-  heading: string;
-  description: string;
-  reviewProvider: string;
-  averageRating: number;
-  totalReviewCount: number;
-  writeReviewButton: WriteReviewButton;
-  reviews: Review[];
-}
+/**
+ * @typedef {Object} TestimonialItem
+ * @property {string} _id
+ * @property {string} heading
+ * @property {string} description
+ * @property {string} reviewProvider
+ * @property {number} averageRating
+ * @property {number} totalReviewCount
+ * @property {WriteReviewButton} writeReviewButton
+ * @property {Review[]} reviews
+ */
 
-interface ApiResponse {
-  status: string;
-  count: number;
-  data: TestimonialItem[];
-}
+/**
+ * @typedef {Object} ApiResponse
+ * @property {string} status
+ * @property {number} count
+ * @property {TestimonialItem[]} data
+ */
 
 // Define the backend base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 const Testimonials = () => {
-  const [testimonialData, setTestimonialData] = useState<TestimonialItem | null>(null);
+  const [testimonialData, setTestimonialData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -58,7 +61,7 @@ const Testimonials = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const apiResponse: ApiResponse = await response.json();
+        const apiResponse = await response.json();
         
         // Extract the first item from the data array
         if (apiResponse.status === 'success' && apiResponse.data.length > 0) {
@@ -85,7 +88,7 @@ const Testimonials = () => {
       return; // Don't auto-slide if there's only 1 or no reviews
     }
 
-    const visibleReviews = testimonialData.reviews.filter((review: Review) => review.isVisible);
+    const visibleReviews = testimonialData.reviews.filter((review) => review.isVisible);
     
     const interval = setInterval(() => {
       setIsTransitioning(true);
@@ -99,7 +102,7 @@ const Testimonials = () => {
   }, [testimonialData?.reviews]);
 
   // Generate star rating component
-  const renderStars = (rating: number) => {
+  const renderStars = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
@@ -130,7 +133,7 @@ const Testimonials = () => {
   };
 
   // Get user initials for avatar
-  const getUserInitials = (name: string) => {
+  const getUserInitials = (name) => {
     return name
       .split(' ')
       .map(word => word.charAt(0))
@@ -140,7 +143,7 @@ const Testimonials = () => {
   };
 
   // Format date
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -151,7 +154,7 @@ const Testimonials = () => {
   // Handle navigation for single review
   const nextSlide = () => {
     if (testimonialData?.reviews) {
-      const visibleReviews = testimonialData.reviews.filter((review: Review) => review.isVisible);
+      const visibleReviews = testimonialData.reviews.filter((review) => review.isVisible);
       setIsTransitioning(true);
       setTimeout(() => {
         setCurrentSlide((prev) => (prev + 1) % visibleReviews.length);
@@ -162,7 +165,7 @@ const Testimonials = () => {
 
   const prevSlide = () => {
     if (testimonialData?.reviews) {
-      const visibleReviews = testimonialData.reviews.filter((review: Review) => review.isVisible);
+      const visibleReviews = testimonialData.reviews.filter((review) => review.isVisible);
       setIsTransitioning(true);
       setTimeout(() => {
         setCurrentSlide((prev) => (prev - 1 + visibleReviews.length) % visibleReviews.length);
@@ -225,7 +228,7 @@ const Testimonials = () => {
   }
 
   // Get visible reviews
-  const visibleReviews = testimonialData.reviews?.filter((review: Review) => review.isVisible) || [];
+  const visibleReviews = testimonialData.reviews?.filter((review) => review.isVisible) || [];
   const currentReview = visibleReviews[currentSlide];
   
   return (

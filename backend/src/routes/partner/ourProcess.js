@@ -17,6 +17,7 @@ router.post('/', imageUpload.array('icon'), createOurProcess);
 
 // READ ALL
 router.get('/', getAllOurProcesses);
+router.get('/public', getAllOurProcesses);
 
 // READ ONE
 router.get('/:id', getOurProcessById);

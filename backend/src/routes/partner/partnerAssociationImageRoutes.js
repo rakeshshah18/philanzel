@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Get all images
 router.get('/', getAll);
+router.get('/public', getAll);
 
 // Add new image
 router.post('/', imageUpload.single('image'), create);

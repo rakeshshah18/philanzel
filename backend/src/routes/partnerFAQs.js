@@ -13,6 +13,7 @@ const router = express.Router();
 router.post('/', createPartnerFAQ);
 // Get all FAQs
 router.get('/', getAllPartnerFAQs);
+router.get('/public', getAllPartnerFAQs);
 // Get single FAQ
 router.get('/:id', getPartnerFAQById);
 // Update FAQ
