@@ -25,21 +25,23 @@ const Events = () => {
         }
     };
 
-    // Handle image upload
+    // Handle multiple image upload
     const handleImageUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
         setUploading(true);
         setUploadError('');
         const formData = new FormData();
-        formData.append('image', file);
+        for (let i = 0; i < files.length; i++) {
+            formData.append('images', files[i]);
+        }
         try {
             await axios.post('api/event-images/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             fetchImages();
         } catch (err) {
-            setUploadError('Failed to upload image');
+            setUploadError('Failed to upload images');
         }
         setUploading(false);
     };
@@ -91,7 +93,7 @@ const Events = () => {
                         <div>
                             <label className="btn btn-primary mb-0">
                                 <i className="bi bi-upload me-2"></i>Upload Image
-                                <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} disabled={uploading} />
+                                <input type="file" accept="image/*" multiple onChange={handleImageUpload} style={{ display: 'none' }} disabled={uploading} />
                             </label>
                             {uploading && <span className="ms-2 text-muted">Uploading...</span>}
                             {uploadError && <span className="ms-2 text-danger">{uploadError}</span>}
@@ -140,7 +142,7 @@ const Events = () => {
                                 {admin && (
                                     <button type="button" className="btn btn-danger" style={{ borderRadius: '25px' }}
                                         onClick={async () => {
-                                            await axios.delete(`/event-images/${selectedImage._id}`);
+                                            await axios.delete(`/api/event-images/${selectedImage._id}`);
                                             setShowPhotoModal(false); setSelectedImage(null); fetchImages();
                                         }}
                                     >

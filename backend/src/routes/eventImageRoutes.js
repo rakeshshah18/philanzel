@@ -13,9 +13,9 @@ router.get('/', (req, res, next) => {
 }, eventImageController.getEventImages);
 // POST upload event image
 router.post('/upload', (req, res, next) => {
-    console.log('POST /event-images/upload hit');
+    console.log('POST /event-images/upload hit (multiple)');
     next();
-}, eventImageUpload.single('image'), eventImageController.uploadEventImage);
+}, eventImageUpload.array('images', 10), eventImageController.uploadMultipleEventImages);
 // DELETE event image
 router.delete('/:id', (req, res, next) => {
     console.log('DELETE /event-images/' + req.params.id + ' hit');

@@ -14,18 +14,22 @@ const eventImageController = {
         }
     },
 
-    // Upload a new event image
-    uploadEventImage: async (req, res) => {
+
+    // Upload multiple event images
+    uploadMultipleEventImages: async (req, res) => {
         try {
-            if (!req.file) {
-                return res.status(400).json({ success: false, message: 'No file uploaded' });
+            if (!req.files || req.files.length === 0) {
+                return res.status(400).json({ success: false, message: 'No files uploaded' });
             }
-            const imageUrl = `/uploads/events/${req.file.filename}`;
-            const image = new EventImage({ imageUrl });
-            await image.save();
-            res.json({ success: true, data: image });
+            const images = await Promise.all(req.files.map(async (file) => {
+                const imageUrl = `/uploads/events/${file.filename}`;
+                const image = new EventImage({ imageUrl });
+                await image.save();
+                return image;
+            }));
+            res.json({ success: true, data: images });
         } catch (err) {
-            res.status(500).json({ success: false, message: 'Failed to upload image' });
+            res.status(500).json({ success: false, message: 'Failed to upload images' });
         }
     },
 

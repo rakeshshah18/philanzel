@@ -34,6 +34,6 @@
     "components/navigation.tsx",
     "app/careers/page.jsx",
     "app/home/testimonials.jsx"
-  ],
+, "app/home/tabbing-section.jsx", "app/services/mutual-fund-distribution/page.jsx", "app/services/pms/page.jsx"  ],
   "exclude": ["node_modules"]
 }
