@@ -32,13 +32,17 @@ import footerRoutes from './sections/footerRoutes.js';
 import empoweringIndividual from './partner/empoweringIndividualRoutes.js';
 import potentialGrowthRoutes from './partner/potentialGrowthRoutes.js';
 import express from 'express';
+import eventImageRoutes from './eventImageRoutes.js';
 import uploadRoutes from './partner/upload.js';
 import aboutServiceRoutes from './all services/aboutServiceRoutes.js';
 import calculatorPagesRoutes from './calculators/pagesRoutes.js';
 import calculatorSectionRoutes from './calculators/sectionRoutes.js';
 import sidebarRoutes from './sidebarRoutes.js';
 
+
 const router = express.Router();
+// Event images API
+router.use('/event-images', eventImageRoutes);
 
 // Public review sections routes (after router is initialized)
 router.use('/review-sections', reviewSectionRoutes);
@@ -72,7 +76,7 @@ router.use('/why-choose-us', whyChooseUsRoutes);
 router.use('/admin/our-association', ourAssociationRoutes);
 // Public our association route (GET only)
 router.use('/our-association', ourAssociationRoutes);
-router.use('/admin/home-faqs', homeFAQsRoutes); 
+router.use('/admin/home-faqs', homeFAQsRoutes);
 router.use('/home-faqs', homeFAQsRoutes);
 router.use('/admin/review-sections', reviewSectionRoutes);
 router.use('/review-sections', reviewSectionRoutes);

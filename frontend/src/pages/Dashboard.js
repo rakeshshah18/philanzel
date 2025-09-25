@@ -85,8 +85,67 @@ const Dashboard = () => {
 
 
 
-    // Allowed tabs management (backend-driven)
-    const ALL_TABS = React.useMemo(() => ["pages", "services", "calculators", "sections"], []);
+    // Sidebar categories management (aligned with database structure)
+    const SIDEBAR_CATEGORIES = React.useMemo(() => ({
+        'dashboard': {
+            name: 'Dashboard',
+            type: 'single',
+            subPages: []
+        },
+        'pages': {
+            name: 'Pages',
+            type: 'dropdown',
+            subPages: ['home', 'about-us', 'career', 'partner', 'contact']
+        },
+        'services': {
+            name: 'Services',
+            type: 'dropdown',
+            subPages: ['services-sections']
+        },
+        'calculators': {
+            name: 'All Calculators',
+            type: 'dropdown',
+            subPages: ['calculators']
+        },
+        'sections': {
+            name: 'Sections',
+            type: 'dropdown',
+            subPages: ['reviews', 'ads', 'footer', 'events']
+        }
+    }), []);
+
+    // Generate all tabs from sidebar categories
+    const ALL_TABS = React.useMemo(() => Object.keys(SIDEBAR_CATEGORIES), [SIDEBAR_CATEGORIES]);
+
+    // Get display name for a category
+    const getDisplayName = React.useCallback((key) => {
+        // Check if it's a category
+        if (SIDEBAR_CATEGORIES[key]) {
+            return SIDEBAR_CATEGORIES[key].name;
+        }
+
+        // Check if it's a sub-page and get a nice display name
+        const pageDisplayNames = {
+            'home': 'Home',
+            'about-us': 'About Us',
+            'career': 'Career',
+            'partner': 'Partner',
+            'contact': 'Contact Us',
+            'services-sections': 'Services Sections',
+            'calculators': 'Calculators',
+            'reviews': 'Reviews',
+            'ads': 'Ads',
+            'footer': 'Footer',
+            'events': 'Events'
+        };
+
+        return pageDisplayNames[key] || key.charAt(0).toUpperCase() + key.slice(1);
+    }, [SIDEBAR_CATEGORIES]);
+
+    // Tab display names mapping
+    const getTabDisplayName = (tab) => {
+        return getDisplayName(tab);
+    };
     const [tabSelections, setTabSelections] = useState({}); // { adminId: ["pages", ...] }
 
     // Load allowedTabs for all admins from backend on mount
@@ -200,21 +259,54 @@ const Dashboard = () => {
                                                                     <button className="btn btn-danger btn-sm me-2" onClick={() => handleDeleteAdmin(a._id, a.email)} disabled={deleteLoading}>
                                                                         <i className="bi bi-trash"></i> {deleteLoading ? 'Deleting...' : 'Delete'}
                                                                     </button>
-                                                                    {/* Allowed Tabs checkboxes */}
+                                                                    {/* Allowed Categories checkboxes */}
                                                                     <div style={{ marginTop: 8 }}>
-                                                                        <strong>Allowed Tabs:</strong>
-                                                                        <div style={{ display: 'flex', gap: 8 }}>
-                                                                            {ALL_TABS.map(tab => (
-                                                                                <label key={tab} style={{ fontWeight: 400, fontSize: 13 }}>
-                                                                                    <input
-                                                                                        type="checkbox"
-                                                                                        checked={tabSelections[a._id]?.includes(tab) ?? true}
-                                                                                        onChange={() => handleTabCheckbox(a._id, tab)}
-                                                                                        style={{ marginRight: 4 }}
-                                                                                    />
-                                                                                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                                                                                </label>
-                                                                            ))}
+                                                                        <strong>Allowed Sidebar Categories:</strong>
+                                                                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', maxWidth: '700px' }}>
+                                                                            {ALL_TABS.map(categoryKey => {
+                                                                                const category = SIDEBAR_CATEGORIES[categoryKey];
+                                                                                const tooltipText = category.type === 'dropdown'
+                                                                                    ? `Includes: ${category.subPages.map(p => getDisplayName(p)).join(', ')}`
+                                                                                    : 'Single page access';
+
+                                                                                return (
+                                                                                    <label
+                                                                                        key={categoryKey}
+                                                                                        title={tooltipText}
+                                                                                        style={{
+                                                                                            fontWeight: 400,
+                                                                                            fontSize: 13,
+                                                                                            marginBottom: 4,
+                                                                                            padding: '4px 8px',
+                                                                                            backgroundColor: tabSelections[a._id]?.includes(categoryKey) ? '#e3f2fd' : '#f8f9fa',
+                                                                                            borderRadius: '6px',
+                                                                                            border: '1px solid #dee2e6',
+                                                                                            display: 'flex',
+                                                                                            alignItems: 'center',
+                                                                                            cursor: 'pointer',
+                                                                                            position: 'relative'
+                                                                                        }}
+                                                                                    >
+                                                                                        <input
+                                                                                            type="checkbox"
+                                                                                            checked={tabSelections[a._id]?.includes(categoryKey) ?? true}
+                                                                                            onChange={() => handleTabCheckbox(a._id, categoryKey)}
+                                                                                            style={{ marginRight: 6 }}
+                                                                                        />
+                                                                                        <div>
+                                                                                            <div>{getTabDisplayName(categoryKey)}</div>
+                                                                                            {category.type === 'dropdown' && (
+                                                                                                <div style={{ fontSize: 11, color: '#6c757d', marginTop: 1 }}>
+                                                                                                    {category.subPages.length} pages
+                                                                                                </div>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </label>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                        <div style={{ fontSize: 11, color: '#6c757d', marginTop: 4 }}>
+                                                                            <i className="bi bi-info-circle"></i> Hover over categories to see included pages
                                                                         </div>
                                                                     </div>
                                                                 </>

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Sidebar from './components/Sidebar';
@@ -27,6 +27,8 @@ import AdminRegisterPage from './pages/AdminRegisterPage';
 import ServicesSections from './pages/service pages/ServicesSections';
 import Calculators from './pages/calculators/Calculators';
 import CalculatorPage from './pages/calculators/CalculatorPage';
+import SidebarManagement from './pages/sections/SidebarManagement';
+import Events from './pages/Events';
 
 // Component to handle layout with conditional sidebar and global sidebar toggle
 const AppLayout = () => {
@@ -61,10 +63,11 @@ const AppLayout = () => {
                                 </ProtectedRoute>
                             } />
                             <Route path="/dashboard" element={
-                                <ProtectedRoute>
+                                <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="dashboard">
                                     <Dashboard />
                                 </ProtectedRoute>
                             } />
+                            {/* Pages Category - All routes under this category check for "pages" permission */}
                             <Route path="/home" element={
                                 <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="pages">
                                     <Home />
@@ -88,6 +91,7 @@ const AppLayout = () => {
                             } />
                             <Route path="/partner-faqs" element={<PartnerFAQs />} />
                             <Route path="/public-partner" element={<PublicPartner />} />
+                            {/* Sections Category - All routes under this category check for "sections" permission */}
                             <Route path="/sections/*" element={
                                 <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="sections">
                                     <Sections />
@@ -108,6 +112,21 @@ const AppLayout = () => {
                                     <AdminFooter />
                                 </ProtectedRoute>
                             } />
+                            <Route path="/events" element={
+                                <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="sections">
+                                    <Events />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/event-images" element={
+                                <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="sections">
+                                    <Events />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/sidebar-management" element={
+                                <ProtectedRoute requiredRoles={['super_admin']}>
+                                    <SidebarManagement />
+                                </ProtectedRoute>
+                            } />
                             <Route path="/services/:serviceId" element={
                                 <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="services">
                                     <ServicePage />
@@ -125,11 +144,23 @@ const AppLayout = () => {
                             <Route path="/admin/login" element={<LoginForm />} />
                             <Route path="/login" element={<LoginForm />} />
                             <Route path="/admin/register" element={<AdminRegisterPage />} />
+                            {/* Services Category - All routes under this category check for "services" permission */}
                             <Route path="/services-sections" element={
                                 <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="services">
                                     <ServicesSections />
                                 </ProtectedRoute>
                             } />
+                            <Route path="/services/:serviceId" element={
+                                <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="services">
+                                    <ServicePage />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/services" element={
+                                <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="services">
+                                    <ServicesOverview />
+                                </ProtectedRoute>
+                            } />
+                            {/* All Calculators Category - All routes under this category check for "calculators" permission */}
                             <Route path="/calculators" element={
                                 <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="calculators">
                                     <Calculators />
@@ -138,11 +169,6 @@ const AppLayout = () => {
                             <Route path="/calculators/:slug" element={
                                 <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="calculators">
                                     <CalculatorPage />
-                                </ProtectedRoute>
-                            } />
-                            <Route path="/services" element={
-                                <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="services">
-                                    <ServicesOverview />
                                 </ProtectedRoute>
                             } />
                         </Routes>

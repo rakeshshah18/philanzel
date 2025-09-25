@@ -8,7 +8,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [services, setServices] = useState([]);
     const [calculatorPages, setCalculatorPages] = useState([]);
-    const [allowedTabs, setAllowedTabs] = useState(["pages", "services", "calculators", "sections"]);
+    const [allowedTabs, setAllowedTabs] = useState([
+        "home", "about-us", "career", "partner", "contact",
+        "services", "services-sections", "calculators", "sections",
+        "reviews", "ads", "footer", "events"
+        // NOTE: sidebar-management is excluded - only super_admin can access it
+    ]);
     const [sidebarItems, setSidebarItems] = useState([]);
     const [dropdownStates, setDropdownStates] = useState({});
 
@@ -30,7 +35,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     // fallback to all tabs if error
                 }
             }
-            setAllowedTabs(["pages", "services", "calculators", "sections"]);
+            setAllowedTabs([
+                "home", "about-us", "career", "partner", "contact",
+                "services", "services-sections", "calculators", "sections",
+                "reviews", "ads", "footer", "events"
+                // NOTE: sidebar-management is excluded - only super_admin can access it
+            ]);
         };
         fetchAllowedTabs();
     }, [admin]);
@@ -207,28 +217,80 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     <i className="fas fa-chart-line me-2"></i>
                     {isSidebarOpen && 'Philanzel'}
                 </h4>
-                <button
-                    className="btn btn-sm ms-2"
-                    style={{ minWidth: 32, minHeight: 32, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#184b86ff', color: '#fff', border: '1px solid #184b86ff', transition: 'all 0.2s' }}
-                    onClick={() => setIsSidebarOpen(v => !v)}
-                    title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
-                    onMouseEnter={e => { e.target.style.backgroundColor = '#fff'; e.target.style.color = '#184b86ff'; }}
-                    onMouseLeave={e => { e.target.style.backgroundColor = '#184b86ff'; e.target.style.color = '#fff'; }}
-                >
-                    <i className={`bi ${isSidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
-                </button>
+                <div className="d-flex align-items-center">
+                    {/* Settings Button - Only show when sidebar is expanded and user is super admin */}
+                    {isSidebarOpen && admin && admin.role === 'super_admin' && (
+                        <Link
+                            to="/sidebar-management"
+                            className="btn btn-sm me-2"
+                            style={{
+                                minWidth: 34,
+                                minHeight: 34,
+                                borderRadius: 8,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                                color: '#fff',
+                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                                transition: 'all 0.3s ease',
+                                textDecoration: 'none',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                            }}
+                            title="Sidebar Management Settings"
+                            onMouseEnter={e => {
+                                e.target.style.backgroundColor = '#fff';
+                                e.target.style.color = '#0054b4ff';
+                                e.target.style.transform = 'scale(1.05)';
+                                e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+                            }}
+                            onMouseLeave={e => {
+                                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+                                e.target.style.color = '#fff';
+                                e.target.style.transform = 'scale(1)';
+                                e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+                            }}
+                        >
+                            <i className="bi bi-gear" style={{ fontSize: '14px' }}></i>
+                        </Link>
+                    )}
+                    {/* Toggle Button - Shows collapse arrow when expanded, menu/hamburger when collapsed */}
+                    <button
+                        className="btn btn-sm"
+                        style={{
+                            minWidth: 32,
+                            minHeight: 32,
+                            borderRadius: 6,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: '#184b86ff',
+                            color: '#fff',
+                            border: '1px solid #184b86ff',
+                            transition: 'all 0.2s'
+                        }}
+                        onClick={() => setIsSidebarOpen(v => !v)}
+                        title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+                        onMouseEnter={e => {
+                            e.target.style.backgroundColor = '#fff';
+                            e.target.style.color = '#184b86ff';
+                            e.target.style.transform = 'scale(1.05)';
+                        }}
+                        onMouseLeave={e => {
+                            e.target.style.backgroundColor = '#184b86ff';
+                            e.target.style.color = '#fff';
+                            e.target.style.transform = 'scale(1)';
+                        }}
+                    >
+                        <i className={`bi ${isSidebarOpen ? 'bi-chevron-left' : 'bi-list'}`} style={{ fontSize: '16px' }}></i>
+                    </button>
+                </div>
             </div>
             <nav className="nav flex-column p-3" style={{ display: isSidebarOpen ? 'block' : 'none', transition: 'display 0.3s' }}>
                 {/* Dynamic Sidebar Items */}
                 {sidebarItems.map((item) => {
-                    // Check if item is allowed for current admin (backward compatibility)
-                    const isItemAllowed = item.name.toLowerCase().includes('dashboard') ||
-                        allowedTabs.includes('pages') && item.name.toLowerCase().includes('page') ||
-                        allowedTabs.includes('services') && item.name.toLowerCase().includes('service') ||
-                        allowedTabs.includes('calculators') && item.name.toLowerCase().includes('calculator') ||
-                        allowedTabs.includes('sections') && item.name.toLowerCase().includes('section');
-
-                    if (!isItemAllowed && !item.name.toLowerCase().includes('dashboard')) {
+                    // Show all active sidebar items (isActive: true from database)
+                    if (!item.isActive) {
                         return null;
                     }
 
@@ -369,7 +431,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 {/* Dark Mode Toggle Button */}
                 <div className="mt-auto pt-3" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
                     <button
-                        className="btn w-100 d-flex align-items-center justify-content-center"
+                        className="btn w-100 d-flex align-items-center justify-content-center mb-2"
                         onClick={toggleDarkMode}
                         style={{ backgroundColor: '#184b86ff', border: '1px solid #184b86ff', color: '#fff', fontSize: '0.9rem', padding: '0.5rem 1rem', borderRadius: '6px', transition: 'all 0.3s ease' }}
                         onMouseEnter={e => {
@@ -384,6 +446,25 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         <i className={`fas ${isDarkMode ? 'fa-sun' : 'fa-moon'} me-2`}></i>
                         {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                     </button>
+                    {/* Logout Button - always visible */}
+                    {admin && (
+                        <button
+                            className="btn w-100 d-flex align-items-center justify-content-center"
+                            onClick={auth.logout}
+                            style={{ backgroundColor: '#fff', border: '1px solid #184b86ff', color: '#184b86ff', fontSize: '0.9rem', padding: '0.5rem 1rem', borderRadius: '6px', transition: 'all 0.3s ease' }}
+                            onMouseEnter={e => {
+                                e.target.style.backgroundColor = '#184b86ff';
+                                e.target.style.color = '#fff';
+                            }}
+                            onMouseLeave={e => {
+                                e.target.style.backgroundColor = '#fff';
+                                e.target.style.color = '#184b86ff';
+                            }}
+                        >
+                            <i className="fas fa-sign-out-alt me-2"></i>
+                            Logout
+                        </button>
+                    )}
                 </div>
             </nav>
         </div>

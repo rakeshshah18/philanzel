@@ -7,9 +7,10 @@ const Sections = () => {
     const [message, setMessage] = useState('');
 
     const tabs = [
-        { id: 'review', label: '⭐ Review Sections', icon: 'fas fa-star' },
-        { id: 'ads', label: '📢 Advertisements', icon: 'fas fa-bullhorn' },
-        { id: 'footer', label: '🦶 Footer', icon: 'fas fa-grip-horizontal' }
+        { id: 'review', label: '⭐ Review Sections', icon: 'bi bi-star' },
+        { id: 'ads', label: '📢 Advertisements', icon: 'bi bi-bullhorn' },
+        { id: 'footer', label: '🦶 Footer', icon: 'bi bi-grip-horizontal' },
+        { id: 'sidebar', label: '🔧 Sidebar Management', icon: 'bi bi-bars' }
     ];
 
     const renderTabContent = () => {
@@ -19,7 +20,7 @@ const Sections = () => {
             case 'ads':
                 return (
                     <div className="text-center py-5">
-                        <i className="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                        <i className="bi bi-bullhorn fa-3x text-muted mb-3"></i>
                         <h4 className="text-muted">Advertisements Section</h4>
                         <p className="text-muted">Coming soon...</p>
                     </div>
@@ -27,9 +28,21 @@ const Sections = () => {
             case 'footer':
                 return (
                     <div className="text-center py-5">
-                        <i className="fas fa-grip-horizontal fa-3x text-muted mb-3"></i>
+                        <i className="bi bi-grip-horizontal fa-3x text-muted mb-3"></i>
                         <h4 className="text-muted">Footer Section</h4>
                         <p className="text-muted">Coming soon...</p>
+                    </div>
+                );
+            case 'sidebar':
+                return (
+                    <div className="text-center py-5">
+                        <i className="bi bi-bars fa-3x text-primary mb-3"></i>
+                        <h4 className="text-primary">Sidebar Management</h4>
+                        <p className="text-muted mb-4">Manage dynamic sidebar navigation items</p>
+                        <a href="/sidebar-management" className="btn btn-primary">
+                            <i className="bi bi-cogs me-2"></i>
+                            Open Sidebar Manager
+                        </a>
                     </div>
                 );
             default:
@@ -44,7 +57,7 @@ const Sections = () => {
                     <div className="card shadow-sm">
                         <div className="card-header bg-primary text-white">
                             <h4 className="mb-0">
-                                <i className="fas fa-puzzle-piece me-2"></i>
+                                <i className="bi bi-puzzle-piece me-2"></i>
                                 Website Sections Management
                             </h4>
                         </div>

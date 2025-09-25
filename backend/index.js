@@ -33,28 +33,9 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 
-// Debug middleware to log request details
-app.use((req, res, next) => {
-    if (req.method === 'POST' && req.url.includes('/auth/login')) {
-    }
-    next();
-});
-
+// Serve event images statically
+app.use('/uploads/events', express.static(path.join(process.cwd(), 'uploads/events')));
 // Serve uploaded files statically
-app.use((req, res, next) => {
-    // Capture the original send method
-    const originalSend = res.send;
-    res.send = function (body) {
-        if (res.statusCode === 401 || res.statusCode === 403) {
-            console.log('--- 401/403 Response Debug ---');
-            console.log('Request URL:', req.originalUrl);
-            console.log('Request Method:', req.method);
-            console.log('Response Body:', body);
-        }
-        return originalSend.call(this, body);
-    };
-    next();
-});
 app.use("/uploads", express.static(path.join(__dirname, "./src/career/documents")));
 app.use("/uploads/images", express.static(path.join(__dirname, "./src/uploads/images")));
 app.use("/uploads/empowering-individuals", express.static(path.join(__dirname, "./uploads/empowering-individuals")));
@@ -79,9 +60,11 @@ app.use('/api', routes);
 // Connect to MongoDB
 
 import { seedSuperAdmin } from './src/adminAuth/models/Admin.js';
+import { seedSidebarItems } from './src/utils/seedSidebar.js';
 
 connectDB().then(async () => {
     await seedSuperAdmin();
+    await seedSidebarItems();
 });
 
 // More explicit server binding

@@ -29,7 +29,7 @@ const AdminNavbar = ({ onLoginClick, onRegisterClick, isAuthenticated, admin, on
                                     className="btn btn-danger"
                                     onClick={onDeleteAdminClick}
                                 >
-                                    Delete Admin
+                                    Admins
                                 </button>
                             )}
                         </>

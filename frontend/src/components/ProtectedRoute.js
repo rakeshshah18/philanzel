@@ -61,27 +61,60 @@ const ProtectedRoute = ({
 
     // Check if user has required role (if hasRole function exists)
     if (hasRole && !hasRole(requiredRoles)) {
-        return fallback || (
-            <div className="container mt-5">
-                <Alert
-                    message={
-                        <div>
-                            <h4>Access Denied</h4>
-                            <p>You don't have permission to access this page.</p>
-                            <p>Required role(s): {Array.isArray(requiredRoles) ? requiredRoles.join(', ') : requiredRoles}</p>
-                            <p>Your role: {admin?.role || 'Unknown'}</p>
-                        </div>
-                    }
-                    type="danger"
-                    dismissible={false}
-                />
-            </div>
-        );
+        return fallback || <NotAllowed />;
     }
 
-    // Check allowedTabs if provided
-    if (allowedTabs && tabKey && Array.isArray(allowedTabs) && !allowedTabs.includes(tabKey) && admin?.role !== 'super_admin') {
-        return <NotAllowed />;
+    // Check allowedTabs if provided using new permission system
+    if (allowedTabs && tabKey && Array.isArray(allowedTabs) && admin?.role !== 'super_admin') {
+        // Sidebar categories structure
+        const SIDEBAR_CATEGORIES = {
+            'dashboard': {
+                name: 'Dashboard',
+                type: 'single',
+                subPages: []
+            },
+            'pages': {
+                name: 'Pages',
+                type: 'dropdown',
+                subPages: ['home', 'about-us', 'career', 'partner', 'contact']
+            },
+            'services': {
+                name: 'Services',
+                type: 'dropdown',
+                subPages: ['services-sections']
+            },
+            'calculators': {
+                name: 'All Calculators',
+                type: 'dropdown',
+                subPages: ['calculators']
+            },
+            'sections': {
+                name: 'Sections',
+                type: 'dropdown',
+                subPages: ['reviews', 'ads', 'footer', 'events']
+            }
+        };
+
+        // Check if user has access to the page
+        const hasPageAccess = (allowedCategories, pageKey) => {
+            // Check if user has direct access to the page (for single pages like dashboard)
+            if (allowedCategories.includes(pageKey)) {
+                return true;
+            }
+
+            // Check if user has access to a category that contains this page
+            for (const [categoryKey, category] of Object.entries(SIDEBAR_CATEGORIES)) {
+                if (allowedCategories.includes(categoryKey) && category.subPages.includes(pageKey)) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        if (!hasPageAccess(allowedTabs, tabKey)) {
+            return <NotAllowed />;
+        }
     }
 
     // User is authenticated and has required role
