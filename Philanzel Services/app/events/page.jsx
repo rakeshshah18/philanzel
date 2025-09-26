@@ -111,10 +111,12 @@ export default function EventImagesClient() {
                 <img
                   src={selectedImage}
                   alt="Fullscreen Event"
-                  className={`max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-lg ${
-                    zoom > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-auto"
-                  }`}
                   onClick={(e) => e.stopPropagation()}
+                  className={`
+                    max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-lg
+                    transition duration-300 ease-in-out
+                    ${zoom > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-auto"}
+                  `}
                 />
               </TransformComponent>
             )}
