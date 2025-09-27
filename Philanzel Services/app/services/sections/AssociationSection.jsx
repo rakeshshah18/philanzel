@@ -38,6 +38,9 @@ export default function AssociationSection({ section }) {
     return (
         <section className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <p className="w-fit mx-auto text-sm font-semibold text-cyan-600 tracking-wide mb-2 text-center border-2 border-cyan-100 bg-cyan-50 px-4 py-1 rounded">
+                    OUR PARTNERS
+                </p>
                 <h2 className="text-4xl font-serif font-black text-gray-900 mb-6 text-center">Our Partners</h2>
                 <div className="flex flex-wrap justify-center gap-8">
                     {associations.map(assoc => (
