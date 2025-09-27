@@ -50,7 +50,7 @@ const WhyChooseUs = () => {
                                 return (
                                     <li key={point._id} className="flex items-start gap-3">
                                         <i className={iconClass + " w-5 h-5 text-cyan-600 mt-1 flex-shrink-0 bg-cyan-200 rounded-4xl"}></i>
-                                        <span>{point.text}</span>
+                                        <span>{point.description || point.title || point.text}</span>
                                     </li>
                                 );
                             })}

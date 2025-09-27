@@ -1,3 +1,8 @@
+/* Remove underline from FAQ questions, including <u> and <a> tags inside FAQ questions */
+.faq-question * {
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
 /* Hide scrollbar utility */
 .no-scrollbar {
   scrollbar-width: none; /* Firefox */
@@ -6,8 +11,8 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
