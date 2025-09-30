@@ -2,10 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from '../../services/api';
-
 const EmpoweringIndividual = () => {
-    // Helper to strip HTML tags from a string
-    // Helper to decode HTML entities
     const decodeHtmlEntities = (str) => {
         const txt = document.createElement('textarea');
         txt.innerHTML = str;
@@ -20,8 +17,6 @@ const EmpoweringIndividual = () => {
         content: [{ heading: '', description: '', image: null }]
     });
     const [editingId, setEditingId] = useState(null);
-
-    // Fetch all empowering individuals
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -32,12 +27,9 @@ const EmpoweringIndividual = () => {
         }
         setLoading(false);
     };
-
     useEffect(() => {
         fetchData();
     }, []);
-
-    // Handle form field changes
     const handleChange = (e, idx) => {
         const { name, value, files } = e.target;
         if (name === 'commonDescription') {
@@ -52,22 +44,16 @@ const EmpoweringIndividual = () => {
             setFormData({ ...formData, content: updatedContent });
         }
     };
-
-    // Add new content item
     const addContentItem = () => {
         setFormData({
             ...formData,
             content: [...formData.content, { heading: '', description: '', image: null }]
         });
     };
-
-    // Remove content item
     const removeContentItem = (idx) => {
         const updatedContent = formData.content.filter((_, i) => i !== idx);
         setFormData({ ...formData, content: updatedContent });
     };
-
-    // Submit form (create or update)
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -98,7 +84,6 @@ const EmpoweringIndividual = () => {
         }
         setLoading(false);
     };
-
     // Edit handler
     const handleEdit = (item) => {
         setEditingId(item._id);
@@ -107,13 +92,11 @@ const EmpoweringIndividual = () => {
             content: item.content.map(c => ({
                 heading: c.heading,
                 description: c.description,
-                image: c.image // image path
+                image: c.image
             }))
         });
         setShowForm(true);
     };
-
-    // Delete handler
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this entry?')) return;
         setLoading(true);
@@ -125,22 +108,17 @@ const EmpoweringIndividual = () => {
         }
         setLoading(false);
     };
-
-    // Cancel form
     const handleCancel = () => {
         setShowForm(false);
         setEditingId(null);
         setFormData({ commonDescription: '', content: [{ heading: '', description: '', image: null }] });
     };
-
-    // Helper for image src
     const getImageSrc = (img) => {
         if (!img) return '';
         return img.startsWith('/uploads/empowering-individuals/')
             ? `http://localhost:8000${img}`
             : img;
     };
-
     return (
         <div className="dashboard-card shadow-sm mb-5" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
             <div className="dashboard-card-header px-4 py-3" style={{ background: '#16a34a', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18, display: 'flex', alignItems: 'center' }}>

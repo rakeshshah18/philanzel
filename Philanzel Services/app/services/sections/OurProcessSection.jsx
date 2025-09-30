@@ -34,7 +34,6 @@ export default function OurProcessSection({ section }) {
     if (loading) return <section className="py-20 bg-white"><div className="max-w-7xl mx-auto px-4"><p className="text-gray-600">Loading...</p></div></section>
     if (error) return <section className="py-20 bg-white"><div className="max-w-7xl mx-auto px-4"><p className="text-red-500">Error: {error}</p></div></section>;
     if (!data) return null;
-    console.log('OurProcessSection data:', data);
 
     return (
         <section className="py-20 bg-white">
@@ -61,7 +60,6 @@ export default function OurProcessSection({ section }) {
                                 </div>
                             ));
                         }
-                        // Fallback: use subheading, subdescription, images arrays
                         const subheadingArr = data.subheading || [];
                         const subdescriptionArr = data.subdescription || [];
                         const imagesArr = data.images || [];

@@ -4,7 +4,6 @@ import { contactInfoAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ContactFormTable from './ContactFormTable';
-
 const ContactForm = () => {
     const [contactInfo, setContactInfo] = useState(null);
     const [error, setError] = useState('');
@@ -13,20 +12,15 @@ const ContactForm = () => {
     const [newPoint, setNewPoint] = useState('');
     const [showAddPoint, setShowAddPoint] = useState(false);
     const [activeTab, setActiveTab] = useState('contact');
-
     useEffect(() => {
-        // Fetch contact form submissions
         axios.get('/api/contact-us/forms')
             .catch(() => setError(''));
-        // Fetch contact info using service
         contactInfoAPI.getAll()
             .then(res => {
                 if (res.data.length > 0) setContactInfo(res.data[0]);
             })
             .catch(() => setError('Failed to fetch contact info'));
     }, []);
-
-    // Add new point
     const handleAddPoint = async () => {
         if (!newPoint.trim()) return;
         const updatedPoints = [...contactInfo.points, newPoint];
@@ -34,8 +28,6 @@ const ContactForm = () => {
         setContactInfo({ ...contactInfo, points: updatedPoints });
         setNewPoint('');
     };
-
-    // Edit point
     const handleEditPoint = async (idx) => {
         const updatedPoints = [...contactInfo.points];
         updatedPoints[idx] = editValue;
@@ -44,29 +36,21 @@ const ContactForm = () => {
         setEditing({ field: null, index: null });
         setEditValue('');
     };
-
-    // Delete point
     const handleDeletePoint = async (idx) => {
         const updatedPoints = contactInfo.points.filter((_, i) => i !== idx);
         await contactInfoAPI.update(contactInfo._id, { points: updatedPoints });
         setContactInfo({ ...contactInfo, points: updatedPoints });
     };
-
-    // Edit address/contact/email
     const handleEditField = async (field) => {
         await contactInfoAPI.update(contactInfo._id, { [field]: editValue });
         setContactInfo({ ...contactInfo, [field]: editValue });
         setEditing({ field: null, index: null });
         setEditValue('');
     };
-
-    // Delete address/contact/email (set to empty string)
     const handleDeleteField = async (field) => {
         await contactInfoAPI.update(contactInfo._id, { [field]: '' });
         setContactInfo({ ...contactInfo, [field]: '' });
     };
-
-    // Edit heading/description
     const handleEditHeadingDesc = async () => {
         await contactInfoAPI.update(contactInfo._id, {
             heading: contactInfo.heading,
@@ -74,7 +58,6 @@ const ContactForm = () => {
         });
         setEditing({ field: null, index: null });
     };
-
     return (
         <div className="container mt-4 px-0 mx-0">
             <style>{`
@@ -228,5 +211,4 @@ const ContactForm = () => {
         </div>
     );
 };
-
 export default ContactForm;

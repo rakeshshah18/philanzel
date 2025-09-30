@@ -12,8 +12,6 @@ const AdminFooter = () => {
     const [message, setMessage] = useState({ type: '', text: '' });
     const [editingItem, setEditingItem] = useState(null);
     const [showAddModal, setShowAddModal] = useState(false);
-
-    // Modal states
     const [showAboutModal, setShowAboutModal] = useState(false);
     const [showQuickLinkModal, setShowQuickLinkModal] = useState(false);
     const [showServiceModal, setShowServiceModal] = useState(false);
@@ -21,15 +19,11 @@ const AdminFooter = () => {
     const [showContactModal, setShowContactModal] = useState(false);
     const [showStrategyModal, setShowStrategyModal] = useState(false);
     const [showSocialModal, setShowSocialModal] = useState(false);
-
-    // Editing states
     const [editingQuickLink, setEditingQuickLink] = useState(null);
     const [editingService, setEditingService] = useState(null);
     const [editingCalculator, setEditingCalculator] = useState(null);
     const [editingStrategy, setEditingStrategy] = useState(null);
     const [editingSocial, setEditingSocial] = useState(null);
-
-    // Strategy management states
     const [strategies, setStrategies] = useState([]);
     const [strategyForm, setStrategyForm] = useState({
         heading: '',
@@ -38,8 +32,6 @@ const AdminFooter = () => {
         isActive: true,
         isVisible: true
     });
-
-    // Form states
     const [aboutForm, setAboutForm] = useState({
         description: '',
         readMoreButton: {
@@ -48,28 +40,24 @@ const AdminFooter = () => {
             isEnabled: true
         }
     });
-
     const [quickLinkForm, setQuickLinkForm] = useState({
         title: '',
         url: '',
         order: 1,
         isEnabled: true
     });
-
     const [serviceForm, setServiceForm] = useState({
         title: '',
         url: '',
         order: 1,
         isEnabled: true
     });
-
     const [calculatorForm, setCalculatorForm] = useState({
         title: '',
         url: '',
         order: 1,
         isEnabled: true
     });
-
     const [contactForm, setContactForm] = useState({
         address: {
             street: '',
@@ -87,7 +75,6 @@ const AdminFooter = () => {
             secondary: ''
         }
     });
-
     const [legalForm, setLegalForm] = useState({
         privacyPolicy: {
             title: 'Privacy Policy',
@@ -102,7 +89,6 @@ const AdminFooter = () => {
             description: ''
         }
     });
-
     const [socialForm, setSocialForm] = useState({
         platform: 'Facebook',
         url: '',
@@ -110,12 +96,10 @@ const AdminFooter = () => {
         isEnabled: true,
         order: 1
     });
-
     useEffect(() => {
         fetchFooterData();
         fetchStrategies();
     }, []);
-
     const fetchFooterData = async () => {
         try {
             setLoading(true);
@@ -123,8 +107,6 @@ const AdminFooter = () => {
             const response = await footerAPI.admin.get();
             if (response.data.success) {
                 let footerData = response.data.data;
-
-                // Ensure default Quick Links exist
                 if (!footerData.quickLinks || !footerData.quickLinks.links || footerData.quickLinks.links.length === 0) {
                     const defaultQuickLinks = [
                         {
@@ -140,26 +122,18 @@ const AdminFooter = () => {
                             isActive: true
                         }
                     ];
-
-                    // Add default quick links
                     for (const link of defaultQuickLinks) {
                         try {
                             await footerAPI.admin.addQuickLink(link);
                         } catch (error) {
-                            console.log('Note: Default quick link may already exist:', link.title);
                         }
                     }
-
-                    // Refresh data after adding defaults
                     const updatedResponse = await footerAPI.admin.get();
                     if (updatedResponse.data.success) {
                         footerData = updatedResponse.data.data;
                     }
                 }
-
                 setFooterData(footerData);
-
-                // Initialize legal form with fetched data
                 setLegalForm({
                     privacyPolicy: {
                         title: footerData.privacyPolicy?.title || 'Privacy Policy',
@@ -184,22 +158,17 @@ const AdminFooter = () => {
             setLoading(false);
         }
     };
-
     const showMessage = (type, text) => {
         setMessage({ type, text });
         setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     };
-
     const handleSave = async (section, data) => {
         try {
             setSaving(true);
             const updateData = { [section]: data };
             const response = await footerAPI.admin.update(updateData);
-
             if (response.data.success) {
                 setFooterData(response.data.data);
-
-                // Update legal form state if legal section was saved
                 if (section === 'legal') {
                     setLegalForm({
                         privacyPolicy: {
@@ -216,7 +185,6 @@ const AdminFooter = () => {
                         }
                     });
                 }
-
                 showMessage('success', 'Footer updated successfully!');
             } else {
                 showMessage('error', 'Failed to update footer');
@@ -228,8 +196,6 @@ const AdminFooter = () => {
             setSaving(false);
         }
     };
-
-    // Quick Links CRUD operations
     const addQuickLink = async (linkData) => {
         try {
             const response = await footerAPI.admin.addQuickLink(linkData);
@@ -242,7 +208,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to add quick link');
         }
     };
-
     const updateQuickLink = async (id, linkData) => {
         try {
             const response = await footerAPI.admin.updateQuickLink(id, linkData);
@@ -256,7 +221,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to update quick link');
         }
     };
-
     const deleteQuickLink = async (id) => {
         if (!window.confirm('Are you sure you want to delete this quick link?')) return;
         try {
@@ -269,8 +233,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to delete quick link');
         }
     };
-
-    // Services CRUD operations
     const addService = async (serviceData) => {
         try {
             const response = await footerAPI.admin.addService(serviceData);
@@ -283,8 +245,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to add service');
         }
     };
-
-    // Calculators CRUD operations
     const addCalculator = async (calculatorData) => {
         try {
             const response = await footerAPI.admin.addCalculator(calculatorData);
@@ -297,8 +257,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to add calculator');
         }
     };
-
-    // Social Links CRUD operations
     const addSocialLink = async (socialData) => {
         try {
             const response = await footerAPI.admin.addSocialLink(socialData);
@@ -311,7 +269,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to add social link');
         }
     };
-
     const handleInputChange = (section, field, value) => {
         setFooterData(prev => ({
             ...prev,
@@ -321,7 +278,6 @@ const AdminFooter = () => {
             }
         }));
     };
-
     const handleNestedInputChange = (section, subSection, field, value) => {
         setFooterData(prev => ({
             ...prev,
@@ -333,7 +289,7 @@ const AdminFooter = () => {
                 }
             }
         }));
-    };    // Services delete function
+    };
     const deleteService = async (id) => {
         if (!window.confirm('Are you sure you want to delete this service?')) return;
         try {
@@ -346,8 +302,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to delete service');
         }
     };
-
-    // Calculators delete function
     const deleteCalculator = async (id) => {
         if (!window.confirm('Are you sure you want to delete this calculator?')) return;
         try {
@@ -360,8 +314,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to delete calculator');
         }
     };
-
-    // Update service function
     const updateService = async (id, serviceData) => {
         try {
             const response = await footerAPI.admin.updateService(id, serviceData);
@@ -375,8 +327,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to update service');
         }
     };
-
-    // Update calculator function
     const updateCalculator = async (id, calculatorData) => {
         try {
             const response = await footerAPI.admin.updateCalculator(id, calculatorData);
@@ -390,8 +340,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to update calculator');
         }
     };
-
-    // About Us modal functions
     const handleAboutSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -410,8 +358,6 @@ const AdminFooter = () => {
             setSaving(false);
         }
     };
-
-    // Contact modal functions
     const handleContactSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -430,21 +376,16 @@ const AdminFooter = () => {
             setSaving(false);
         }
     };
-
     const handleSocialSubmit = async (e) => {
         e.preventDefault();
         try {
             setSaving(true);
             let updatedSocialLinks = [...(footerData.contactUs?.followUs?.socialLinks || [])];
-
             if (editingSocial !== null) {
-                // Update existing social link
                 updatedSocialLinks[editingSocial] = { ...socialForm };
             } else {
-                // Add new social link
                 updatedSocialLinks.push({ ...socialForm });
             }
-
             const response = await footerAPI.admin.update({
                 contactUs: {
                     ...footerData.contactUs,
@@ -454,7 +395,6 @@ const AdminFooter = () => {
                     }
                 }
             });
-
             if (response.data.success) {
                 setFooterData(response.data.data);
                 showMessage('success', editingSocial !== null ? 'Social link updated successfully!' : 'Social link added successfully!');
@@ -467,8 +407,6 @@ const AdminFooter = () => {
             setSaving(false);
         }
     };
-
-    // Modal open functions
     const openAboutModal = () => {
         setAboutForm({
             description: footerData?.aboutUs?.description || '',
@@ -480,7 +418,6 @@ const AdminFooter = () => {
         });
         setShowAboutModal(true);
     };
-
     const openQuickLinkModal = (link = null, index = null) => {
         if (link) {
             setEditingQuickLink(index);
@@ -501,7 +438,6 @@ const AdminFooter = () => {
         }
         setShowQuickLinkModal(true);
     };
-
     const openServiceModal = (service = null, index = null) => {
         if (service) {
             setEditingService(index);
@@ -522,7 +458,6 @@ const AdminFooter = () => {
         }
         setShowServiceModal(true);
     };
-
     const openCalculatorModal = (calculator = null, index = null) => {
         if (calculator) {
             setEditingCalculator(index);
@@ -543,7 +478,6 @@ const AdminFooter = () => {
         }
         setShowCalculatorModal(true);
     };
-
     const openContactModal = () => {
         setContactForm({
             address: {
@@ -564,7 +498,6 @@ const AdminFooter = () => {
         });
         setShowContactModal(true);
     };
-
     const openSocialModal = (index = null) => {
         if (index !== null) {
             const link = footerData.contactUs.followUs.socialLinks[index];
@@ -588,15 +521,12 @@ const AdminFooter = () => {
         }
         setShowSocialModal(true);
     };
-
     const deleteSocialLink = async (index) => {
         if (window.confirm('Are you sure you want to delete this social link?')) {
             try {
                 setSaving(true);
-                // Since we don't have a delete endpoint, we'll update the entire social links array
                 const updatedSocialLinks = [...footerData.contactUs.followUs.socialLinks];
                 updatedSocialLinks.splice(index, 1);
-
                 const response = await footerAPI.admin.update({
                     contactUs: {
                         ...footerData.contactUs,
@@ -606,7 +536,6 @@ const AdminFooter = () => {
                         }
                     }
                 });
-
                 if (response.data.success) {
                     setFooterData(response.data.data);
                     showMessage('success', 'Social link deleted successfully!');
@@ -618,8 +547,6 @@ const AdminFooter = () => {
             }
         }
     };
-
-    // Form handlers for add/edit modals
     const handleQuickLinkSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -641,7 +568,6 @@ const AdminFooter = () => {
             setSaving(false);
         }
     };
-
     const handleServiceSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -663,7 +589,6 @@ const AdminFooter = () => {
             setSaving(false);
         }
     };
-
     const handleCalculatorSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -685,8 +610,6 @@ const AdminFooter = () => {
             setSaving(false);
         }
     };
-
-    // Modal close handlers with cleanup
     const closeQuickLinkModal = () => {
         setShowQuickLinkModal(false);
         setEditingQuickLink(null);
@@ -697,7 +620,6 @@ const AdminFooter = () => {
             isEnabled: true
         });
     };
-
     const closeServiceModal = () => {
         setShowServiceModal(false);
         setEditingService(null);
@@ -708,7 +630,6 @@ const AdminFooter = () => {
             isEnabled: true
         });
     };
-
     const closeCalculatorModal = () => {
         setShowCalculatorModal(false);
         setEditingCalculator(null);
@@ -719,7 +640,6 @@ const AdminFooter = () => {
             isEnabled: true
         });
     };
-
     const closeAboutModal = () => {
         setShowAboutModal(false);
         setAboutForm({
@@ -731,7 +651,6 @@ const AdminFooter = () => {
             }
         });
     };
-
     const closeContactModal = () => {
         setShowContactModal(false);
         setContactForm({
@@ -752,8 +671,6 @@ const AdminFooter = () => {
             }
         });
     };
-
-    // Strategy management functions
     const fetchStrategies = async () => {
         try {
             const response = await footerAPI.admin.optimizeStrategy.getAll();
@@ -765,7 +682,6 @@ const AdminFooter = () => {
             showMessage('error', 'Failed to load strategies');
         }
     };
-
     const openStrategyModal = (strategy = null, index = null) => {
         if (strategy) {
             setEditingStrategy(index);
@@ -788,7 +704,6 @@ const AdminFooter = () => {
         }
         setShowStrategyModal(true);
     };
-
     const closeStrategyModal = () => {
         setShowStrategyModal(false);
         setEditingStrategy(null);
@@ -800,7 +715,6 @@ const AdminFooter = () => {
             isVisible: true
         });
     };
-
     const closeSocialModal = () => {
         setShowSocialModal(false);
         setEditingSocial(null);
@@ -812,7 +726,6 @@ const AdminFooter = () => {
             order: 1
         });
     };
-
     const handleStrategySubmit = async (e) => {
         e.preventDefault();
         try {
@@ -834,7 +747,6 @@ const AdminFooter = () => {
             setSaving(false);
         }
     };
-
     const deleteStrategy = async (index) => {
         if (window.confirm('Are you sure you want to delete this strategy?')) {
             try {
@@ -850,7 +762,6 @@ const AdminFooter = () => {
             }
         }
     };
-
     if (loading) {
         return (
             <div className="container-fluid py-4">
@@ -869,7 +780,6 @@ const AdminFooter = () => {
             </div>
         );
     }
-
     if (error || !footerData) {
         return (
             <div className="container-fluid py-4">
@@ -887,7 +797,6 @@ const AdminFooter = () => {
             </div>
         );
     }
-
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -910,8 +819,6 @@ const AdminFooter = () => {
                                     ></button>
                                 </div>
                             )}
-
-                            {/* Tab Navigation */}
                             <ul className="nav nav-tabs mb-4 ">
                                 <li className="nav-item">
                                     <button
@@ -1010,10 +917,7 @@ const AdminFooter = () => {
                                     </button>
                                 </li>
                             </ul>
-
-                            {/* Tab Content */}
                             <div className="tab-content">
-                                {/* About Us Tab */}
                                 {activeTab === 'about' && (
                                     <div className="tab-pane active">
                                         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -1025,7 +929,6 @@ const AdminFooter = () => {
                                                 <i className="fas fa-edit me-1"></i>Edit About Us
                                             </button>
                                         </div>
-
                                         <div className="table-responsive">
                                             <table className="table table-striped">
                                                 <thead>
@@ -1068,8 +971,6 @@ const AdminFooter = () => {
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Contact Info Tab */}
                                 {activeTab === 'contact' && (
                                     <div className="tab-pane active">
                                         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -1081,7 +982,6 @@ const AdminFooter = () => {
                                                 <i className="fas fa-edit me-1"></i>Edit Contact Info
                                             </button>
                                         </div>
-
                                         <div className="table-responsive">
                                             <table className="table table-striped">
                                                 <thead>
@@ -1147,8 +1047,6 @@ const AdminFooter = () => {
                                                 </tbody>
                                             </table>
                                         </div>
-
-                                        {/* Social Links Section */}
                                         <div className="mt-4">
                                             <div className="d-flex justify-content-between align-items-center mb-3">
                                                 <h6 className="mb-0">Social Media Links</h6>
@@ -1159,7 +1057,6 @@ const AdminFooter = () => {
                                                     <i className="fas fa-plus me-1"></i>Add Social Link
                                                 </button>
                                             </div>
-
                                             <div className="table-responsive">
                                                 <table className="table table-striped table-sm">
                                                     <thead>
@@ -1217,8 +1114,6 @@ const AdminFooter = () => {
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Copyright Tab */}
                                 {activeTab === 'copyright' && (
                                     <div className="tab-pane active">
                                         <h5 className="mb-3">Copyright Settings</h5>
@@ -1260,13 +1155,9 @@ const AdminFooter = () => {
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Legal Tab */}
                                 {activeTab === 'legal' && (
                                     <div className="tab-pane active">
                                         <h5 className="mb-4">Legal Pages Management</h5>
-
-                                        {/* Privacy Policy Section */}
                                         <div className="mb-4 border rounded p-3">
                                             <h6 className="text-primary mb-3">Privacy Policy</h6>
                                             <div className="mb-3">
@@ -1301,8 +1192,6 @@ const AdminFooter = () => {
                                                 />
                                             </div>
                                         </div>
-
-                                        {/* Terms of Service Section */}
                                         <div className="mb-4 border rounded p-3">
                                             <h6 className="text-primary mb-3">Terms of Service</h6>
                                             <div className="mb-3">
@@ -1337,8 +1226,6 @@ const AdminFooter = () => {
                                                 />
                                             </div>
                                         </div>
-
-                                        {/* Legal Disclaimer Section */}
                                         <div className="mb-4 border rounded p-3">
                                             <h6 className="text-primary mb-3">Legal Disclaimer</h6>
                                             <div className="mb-3">
@@ -1373,8 +1260,6 @@ const AdminFooter = () => {
                                                 />
                                             </div>
                                         </div>
-
-                                        {/* Save Button */}
                                         <div className="d-flex justify-content-end">
                                             <button
                                                 className="btn btn-primary"
@@ -1386,8 +1271,6 @@ const AdminFooter = () => {
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Strategy Tab */}
                                 {activeTab === 'strategy' && (
                                     <div className="tab-pane active">
                                         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -1400,7 +1283,6 @@ const AdminFooter = () => {
                                                 Add Strategy
                                             </button>
                                         </div>
-
                                         <div className="table-responsive">
                                             <table className="table table-striped">
                                                 <thead>
@@ -1457,8 +1339,6 @@ const AdminFooter = () => {
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Quick Links Tab */}
                                 {activeTab === 'quickLinks' && (
                                     <div className="tab-pane active">
                                         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -1520,8 +1400,6 @@ const AdminFooter = () => {
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Services Tab */}
                                 {activeTab === 'services' && (
                                     <div className="tab-pane active">
                                         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -1534,7 +1412,6 @@ const AdminFooter = () => {
                                                 Add Service
                                             </button>
                                         </div>
-
                                         <div className="table-responsive">
                                             <table className="table table-striped">
                                                 <thead>
@@ -1585,8 +1462,6 @@ const AdminFooter = () => {
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Calculators Tab */}
                                 {activeTab === 'calculators' && (
                                     <div className="tab-pane active">
                                         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -1660,8 +1535,6 @@ const AdminFooter = () => {
                     </div>
                 </div>
             </div>
-
-            {/* About Us Modal */}
             <div className={`modal fade ${showAboutModal ? 'show' : ''}`} style={{ display: showAboutModal ? 'block' : 'none' }} tabIndex="-1">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -1682,7 +1555,6 @@ const AdminFooter = () => {
                                         required
                                     />
                                 </div>
-
                                 <h6 className="mb-3">Read More Button</h6>
                                 <div className="mb-3">
                                     <label className="form-label">Button Text</label>
@@ -1740,8 +1612,6 @@ const AdminFooter = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Quick Link Modal */}
             <div className={`modal fade ${showQuickLinkModal ? 'show' : ''}`} style={{ display: showQuickLinkModal ? 'block' : 'none' }} tabIndex="-1">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -1807,8 +1677,6 @@ const AdminFooter = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Service Modal */}
             <div className={`modal fade ${showServiceModal ? 'show' : ''}`} style={{ display: showServiceModal ? 'block' : 'none' }} tabIndex="-1">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -1874,8 +1742,6 @@ const AdminFooter = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Calculator Modal */}
             <div className={`modal fade ${showCalculatorModal ? 'show' : ''}`} style={{ display: showCalculatorModal ? 'block' : 'none' }} tabIndex="-1">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -1941,8 +1807,6 @@ const AdminFooter = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Contact Modal */}
             <div className={`modal fade ${showContactModal ? 'show' : ''}`} style={{ display: showContactModal ? 'block' : 'none' }} tabIndex="-1">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -2085,8 +1949,6 @@ const AdminFooter = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Strategy Modal */}
             <div className={`modal fade ${showStrategyModal ? 'show' : ''}`} style={{ display: showStrategyModal ? 'block' : 'none' }} tabIndex="-1">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -2169,8 +2031,6 @@ const AdminFooter = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Social Link Modal */}
             <div className={`modal fade ${showSocialModal ? 'show' : ''}`} style={{ display: showSocialModal ? 'block' : 'none' }} tabIndex="-1">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -2269,8 +2129,6 @@ const AdminFooter = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Modal Backdrop */}
             {(showAboutModal || showQuickLinkModal || showServiceModal || showCalculatorModal || showContactModal || showStrategyModal || showSocialModal) &&
                 <div className="modal-backdrop fade show"></div>
             }

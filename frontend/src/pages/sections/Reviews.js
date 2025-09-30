@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Alert from '../../components/Alert';
 import { reviewSectionsAPI } from '../../services/api';
-
 const Reviews = () => {
     const [reviewSections, setReviewSections] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -25,7 +24,6 @@ const Reviews = () => {
     useEffect(() => {
         fetchReviewSections();
     }, []);
-
     const fetchReviewSections = async () => {
         try {
             setLoading(true);
@@ -38,7 +36,6 @@ const Reviews = () => {
             setLoading(false);
         }
     };
-
     const getStars = (rating) => {
         return Array.from({ length: 5 }, (_, i) => {
             const starValue = i + 1;
@@ -70,30 +67,24 @@ const Reviews = () => {
         });
     };
 
-    // Manual calculation function for debugging
     const calculateManualRating = (section) => {
         if (!section.reviews || section.reviews.length === 0) {
             return { average: 0, count: 0, details: 'No reviews' };
         }
-
         const visibleReviews = section.reviews.filter(r => r.isVisible);
         if (visibleReviews.length === 0) {
             return { average: 0, count: 0, details: 'No visible reviews' };
         }
-
         const ratings = visibleReviews.map(r => r.rating);
         const total = ratings.reduce((sum, rating) => sum + rating, 0);
         const average = total / visibleReviews.length;
         const roundedAverage = Math.round(average * 10) / 10;
-
         return {
             average: roundedAverage,
             count: visibleReviews.length,
             details: `Ratings: [${ratings.join(', ')}], Total: ${total}, Average: ${average.toFixed(2)}`
         };
     };
-
-    // Individual review management functions
     const editIndividualReview = (sectionId, reviewIndex) => {
         const section = reviewSections.find(s => s._id === sectionId);
         if (section && section.reviews[reviewIndex]) {
@@ -105,7 +96,6 @@ const Reviews = () => {
             setShowReviewEditModal(true);
         }
     };
-
     const toggleReviewVisibility = async (sectionId, reviewIndex) => {
         try {
             setLoading(true);
@@ -119,12 +109,12 @@ const Reviews = () => {
                     reviews: updatedReviews
                 });
 
-                setMessage('✅ Review visibility updated successfully!');
+                setMessage('Review visibility updated successfully!');
                 await fetchReviewSections();
             }
         } catch (error) {
             console.error('Error updating review visibility:', error);
-            setMessage(`❌ Failed to update review visibility. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to update review visibility. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
@@ -145,13 +135,12 @@ const Reviews = () => {
                     ...section,
                     reviews: updatedReviews
                 });
-
-                setMessage('✅ Review deleted successfully!');
+                setMessage('Review deleted successfully!');
                 await fetchReviewSections();
             }
         } catch (error) {
             console.error('Error deleting review:', error);
-            setMessage(`❌ Failed to delete review. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to delete review. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
@@ -172,19 +161,18 @@ const Reviews = () => {
                     reviews: updatedReviews
                 });
 
-                setMessage('✅ Review updated successfully!');
+                setMessage('Review updated successfully!');
                 setShowReviewEditModal(false);
                 setEditingReviewData(null);
                 await fetchReviewSections();
             }
         } catch (error) {
             console.error('Error updating review:', error);
-            setMessage(`❌ Failed to update review. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to update review. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleReviewEditChange = (field, value) => {
         setEditingReviewData(prev => ({
             ...prev,
@@ -194,8 +182,6 @@ const Reviews = () => {
             }
         }));
     };
-
-    // Section editing functions
     const editSection = (section) => {
         setEditingSectionData({
             ...section
@@ -210,13 +196,13 @@ const Reviews = () => {
             setLoading(true);
             await reviewSectionsAPI.update(editingSectionData._id, editingSectionData);
 
-            setMessage('✅ Section updated successfully!');
+            setMessage('Section updated successfully!');
             setShowSectionEditModal(false);
             setEditingSectionData(null);
             await fetchReviewSections();
         } catch (error) {
             console.error('Error updating section:', error);
-            setMessage(`❌ Failed to update section. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to update section. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
@@ -228,8 +214,6 @@ const Reviews = () => {
             [field]: value
         }));
     };
-
-    // Add new review functions
     const openAddReviewModal = (sectionId) => {
         setAddingToSectionId(sectionId);
         setNewReviewData({
@@ -250,13 +234,11 @@ const Reviews = () => {
             [field]: value
         }));
     };
-
     const saveNewReview = async () => {
         if (!newReviewData.userName.trim() || !newReviewData.reviewText.trim()) {
-            setMessage('❌ Please fill in user name and review text');
+            setMessage('Please fill in user name and review text');
             return;
         }
-
         try {
             setLoading(true);
             const section = reviewSections.find(s => s._id === addingToSectionId);
@@ -265,26 +247,22 @@ const Reviews = () => {
                     ...newReviewData,
                     reviewDate: new Date().toISOString()
                 }];
-
                 await reviewSectionsAPI.update(addingToSectionId, {
                     ...section,
                     reviews: updatedReviews
                 });
-
-                setMessage('✅ Review added successfully!');
+                setMessage('Review added successfully!');
                 setShowAddReviewModal(false);
                 setAddingToSectionId(null);
                 await fetchReviewSections();
             }
         } catch (error) {
             console.error('Error adding review:', error);
-            setMessage(`❌ Failed to add review. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to add review. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
-
     const isDarkMode = document.body.classList.contains('dark-mode');
     return (
         <div className="container-fluid py-4" style={{ background: isDarkMode ? '#181818' : '#f8fafc', minHeight: '100vh' }}>
@@ -311,7 +289,6 @@ const Reviews = () => {
                                 onClose={() => setMessage('')}
                             />
                         )}
-
                         {/* Review Sections List */}
                         <div className="row">
                             {loading && reviewSections.length === 0 ? (
@@ -513,7 +490,6 @@ const Reviews = () => {
                     </div>
                 </div>
             </div>
-
             {/* Individual Review Edit Modal */}
             {showReviewEditModal && editingReviewData && (
                 <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -560,7 +536,6 @@ const Reviews = () => {
                                         </select>
                                     </div>
                                 </div>
-
                                 <div className="row">
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label">User Profile Photo URL</label>
@@ -583,7 +558,6 @@ const Reviews = () => {
                                         />
                                     </div>
                                 </div>
-
                                 <div className="mb-3">
                                     <label className="form-label">Review Text *</label>
                                     <textarea
@@ -595,7 +569,6 @@ const Reviews = () => {
                                         placeholder="Enter the review text..."
                                     ></textarea>
                                 </div>
-
                                 <div className="row">
                                     <div className="col-md-6">
                                         <div className="form-check">
@@ -757,7 +730,6 @@ const Reviews = () => {
                     </div>
                 </div>
             )}
-
             {/* Add New Review Modal */}
             {showAddReviewModal && (
                 <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -805,7 +777,6 @@ const Reviews = () => {
                                         </select>
                                     </div>
                                 </div>
-
                                 <div className="row">
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label">User Profile Photo URL</label>
@@ -828,7 +799,6 @@ const Reviews = () => {
                                         />
                                     </div>
                                 </div>
-
                                 <div className="mb-3">
                                     <label className="form-label">Review Text *</label>
                                     <textarea

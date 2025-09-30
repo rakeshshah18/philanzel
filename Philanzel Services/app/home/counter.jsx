@@ -1,10 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-
-// Define the backend base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-
-// Animated stats counter component
 const StatsCounterSection = () => {
     const [stats, setStats] = useState([
         { label: "Years Experiences", value: 0, suffix: "+" },
@@ -15,7 +11,6 @@ const StatsCounterSection = () => {
     const [counts, setCounts] = useState([0, 0, 0, 0]);
 
     useEffect(() => {
-        // Fetch stats from API
         async function fetchStats() {
             try {
                 const res = await fetch(`${BASE_URL}/api/our-track`);
@@ -29,14 +24,13 @@ const StatsCounterSection = () => {
                     ]);
                 }
             } catch (e) {
-                // fallback: do nothing
             }
         }
         fetchStats();
     }, []);
 
     useEffect(() => {
-        const durations = [1000, 1200, 1400, 1600]; // ms for each stat
+        const durations = [1000, 1200, 1400, 1600];
         const increments = stats.map((stat, i) => Math.max(1, Math.floor(stat.value / (durations[i] / 16))));
         const intervals = stats.map((stat, i) => setInterval(() => {
             setCounts(prev => {

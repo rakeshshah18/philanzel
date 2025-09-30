@@ -12,7 +12,6 @@ const Career = () => {
             setAlert({ show: false, message: '', type: '' });
         }, 5000);
     };
-
     return (
         <div className="container-fluid">
             <div className="row">
@@ -24,11 +23,9 @@ const Career = () => {
                             onClose={() => setAlert({ show: false, message: '', type: '' })}
                         />
                     )}
-
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <h1 className="h3 mb-0">Career Management</h1>
                     </div>
-
                     <div className="row">
                         <div className="col-12">
                             <div className="card">
@@ -58,7 +55,6 @@ const Career = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-
                                                 <div className="col-md-6 mb-3">
                                                     <div className="card bg-light">
                                                         <div className="card-body text-center">
@@ -72,7 +68,6 @@ const Career = () => {
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <div className="mt-4">
                                                 <h6>Quick Stats</h6>
                                                 <div className="row">

@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { footerAPI } from '../../services/api';
-
 const Footer = () => {
     const [footerData, setFooterData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [saving, setSaving] = useState(false);
-
     useEffect(() => {
         fetchFooterData();
     }, []);
-
     const fetchFooterData = async () => {
         try {
             setLoading(true);
@@ -29,7 +26,6 @@ const Footer = () => {
             setLoading(false);
         }
     };
-
     const handleSave = async () => {
         try {
             setSaving(true);
@@ -47,7 +43,6 @@ const Footer = () => {
             setSaving(false);
         }
     };
-
     const handleInputChange = (path, value) => {
         const keys = path.split('.');
         const newFooterData = { ...footerData };
@@ -57,10 +52,8 @@ const Footer = () => {
             current = current[keys[i]];
         }
         current[keys[keys.length - 1]] = value;
-
         setFooterData(newFooterData);
     };
-
     if (loading) {
         return (
             <div className="container-fluid py-4">
@@ -87,7 +80,6 @@ const Footer = () => {
             </div>
         );
     }
-
     if (error) {
         return (
             <div className="container-fluid py-4">
@@ -118,7 +110,6 @@ const Footer = () => {
             </div>
         );
     }
-
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -422,7 +413,6 @@ const Footer = () => {
                                     </div>
                                 </div>
                             )}
-
                             {/* Action Buttons */}
                             <div className="row mt-4">
                                 <div className="col-12">

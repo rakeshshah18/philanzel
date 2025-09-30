@@ -3,16 +3,11 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-
-// Define the backend base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-
 const CtaSection = () => {
     const [ctaData, setCtaData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // Fetch CTA data from API
     useEffect(() => {
         const fetchCtaData = async () => {
             try {
@@ -24,15 +19,12 @@ const CtaSection = () => {
                 }
 
                 const apiResponse = await response.json();
-
-                // Extract the first visible and active item from the data array
                 if (apiResponse.success && apiResponse.data.length > 0) {
                     const visibleCta = apiResponse.data.find(item => item.isVisible && item.isActive) || apiResponse.data[0];
                     setCtaData(visibleCta);
                 } else {
                     throw new Error('No CTA data found');
                 }
-
                 setError(null);
             } catch (err) {
                 console.error('Error fetching CTA data:', err);
@@ -41,19 +33,15 @@ const CtaSection = () => {
                 setLoading(false);
             }
         };
-
         fetchCtaData();
     }, []);
 
-    // Helper function to strip HTML tags
     const stripHtmlTags = (html) => {
         if (!html) return '';
         const div = document.createElement('div');
         div.innerHTML = html;
         return div.textContent || div.innerText || '';
     };
-
-    // Loading state
     if (loading) {
         return (
             <section className="py-20 bg-cyan-600">
@@ -67,8 +55,6 @@ const CtaSection = () => {
             </section>
         );
     }
-
-    // Error state
     if (error || !ctaData) {
         return (
             <section className="py-20 bg-cyan-600">
@@ -96,7 +82,7 @@ const CtaSection = () => {
                     {stripHtmlTags(ctaData.description) || "Let's Drive Your Business Forward Today!"}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link href="/contact-us">
+                    <Link href="/contact">
                         <Button size="lg" className="bg-white text-cyan-600 hover:bg-gray-100 px-8 py-4 text-lg font-sans btn-animate">
                             Schedule a Consultation
                             <ArrowRight className="ml-2 h-5 w-5" />

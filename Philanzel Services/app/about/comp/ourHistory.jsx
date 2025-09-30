@@ -1,14 +1,10 @@
 'use client'
-
 import { useState, useEffect } from 'react'
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
 export function OurHistory() {
     const [journeyData, setJourneyData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-
     useEffect(() => {
         const fetchJourneyData = async () => {
             try {
@@ -27,16 +23,12 @@ export function OurHistory() {
                 setLoading(false)
             }
         }
-
         fetchJourneyData()
     }, [])
-
-    // Function to strip HTML tags for clean text display
     const stripHtml = (html) => {
         if (!html) return ''
         return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
     }
-
     if (loading) {
         return (
             <section className="py-20 bg-gray-50">
@@ -48,7 +40,6 @@ export function OurHistory() {
             </section>
         )
     }
-
     if (error || !journeyData) {
         return (
             <section className="py-20 bg-gray-50">
@@ -60,10 +51,7 @@ export function OurHistory() {
             </section>
         )
     }
-
-    // Sort cards by order
     const sortedCards = journeyData.cards ? [...journeyData.cards].sort((a, b) => a.order - b.order) : []
-
     return (
         <section className="py-20 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,13 +64,8 @@ export function OurHistory() {
                         {stripHtml(journeyData.description) || "Explore the milestones that have shaped our growth and commitment to financial empowerment."}
                     </div>
                 </div>
-                
-                {/* Timeline */}
                 <div className="relative">
-                    {/* Timeline line */}
                     <div className="absolute top-8 left-0 w-full h-4 bg-cyan-400 hidden md:block rounded-2xl"></div>
-                    
-                    {/* Timeline items - Scrollable container */}
                     <div className="overflow-x-auto max-w-full" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', maxWidth: '1050px', margin: '0 auto' }}>
                         <style jsx>{`
                             div::-webkit-scrollbar {
@@ -105,8 +88,6 @@ export function OurHistory() {
                             ))}
                         </div>
                     </div>
-                    
-                    {/* Scroll indicator */}
                     {sortedCards.length > 3 && (
                         <div className="flex justify-center mt-4">
                             <p className="text-sm text-gray-500">← Scroll to see more milestones →</p>

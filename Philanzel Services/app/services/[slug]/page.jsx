@@ -1,8 +1,4 @@
 "use client"
-
-
-
-
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -12,7 +8,6 @@ import Cta from '../../home/cta-section';
 import Testimonials from '../../home/testimonials';
 import AdsSection from '../../home/ads-section';
 import Navbar from '../../../components/navigation';
-// If you have an AdsSection component, import it here:
 
 
 const HeroSection = dynamic(() => import('../sections/HeroSection'));
@@ -41,7 +36,6 @@ function normalizeType(type) {
 function SectionRenderer({ section }) {
     const rawType = section.type || section.sectionType || section.name;
     const type = normalizeType(rawType);
-    console.log('Rendering section type:', type, section);
     switch (type) {
         case 'hero':
             return <HeroSection section={section} />;
@@ -158,13 +152,9 @@ export default function UserServicePage() {
                     </div>
                 </div>
             </section>
-            {/* Ads Section removed (component not found) */}
-            {/* Testimonials Section */}
             <Testimonials />
             <AdsSection />
-            {/* CTA Section */}
             <Cta />
-            {/* Footer Section */}
             <Footer />
         </div>
     );

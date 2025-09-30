@@ -5,12 +5,8 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './Calculators.css';
 import 'katex/dist/katex.min.css';
-
 const Calculators = () => {
-    // Utility to check if content is HTML
     const isHtmlContent = content => /<\/?[a-z][\s\S]*>/i.test(content);
-
-    // Delete a section
     const handleDeleteSection = async (id) => {
         if (!window.confirm('Delete this section?')) return;
         setLoadingSections(true);
@@ -24,15 +20,9 @@ const Calculators = () => {
             setLoadingSections(false);
         }
     };
-    // Fetch all calculator pages
     const fetchCalculatorPages = async () => {
         try {
             const res = await calculatorPagesAPI.getAll();
-            console.log('Full API response:', res); // Debug log
-            console.log('res.data:', res.data); // Debug log
-            console.log('res.data.data:', res.data?.data); // Debug log
-            
-            // Extract the actual data array from the response
             let pages = [];
             if (res.data && res.data.success && Array.isArray(res.data.data)) {
                 pages = res.data.data;
@@ -41,10 +31,6 @@ const Calculators = () => {
             } else if (Array.isArray(res)) {
                 pages = res;
             }
-            
-            console.log('Pages to set:', pages); // Debug log
-            console.log('Is pages array?', Array.isArray(pages)); // Debug log
-            console.log('Pages length:', pages.length); // Debug log
             setCalculatorPages(pages);
         } catch (err) {
             console.error('Fetch calculators error:', err);
@@ -119,9 +105,7 @@ const Calculators = () => {
         setDeleteLoading(true);
         setDeleteError("");
         try {
-            console.log('Deleting calculator with ID:', id);
             const deleteResult = await calculatorPagesAPI.delete(id);
-            console.log('Delete result:', deleteResult);
             setDeleteError("");
             fetchCalculatorPages();
         } catch (err) {
@@ -131,8 +115,6 @@ const Calculators = () => {
             setDeleteLoading(false);
         }
     };
-
-    // Edit a section (open modal)
     const handleEditSection = (section) => {
         setEditSectionId(section._id);
         setEditSectionForm({
@@ -143,8 +125,6 @@ const Calculators = () => {
         });
         setEditSectionModal(true);
     };
-
-    // Save edited section
     const handleEditSectionSubmit = async (e) => {
         e.preventDefault();
         setEditSectionLoading(true);
@@ -161,7 +141,6 @@ const Calculators = () => {
             setEditSectionLoading(false);
         }
     };
-    // ...existing state and effect hooks...
     const [isDarkMode, setIsDarkMode] = useState(false);
     useEffect(() => {
         const checkDarkMode = () => {
@@ -194,15 +173,12 @@ const Calculators = () => {
     const [editSectionId, setEditSectionId] = useState(null);
     const [editSectionError, setEditSectionError] = useState("");
     const [editSectionLoading, setEditSectionLoading] = useState(false);
-    // Removed unused newSectionForm state
-
     useEffect(() => {
         fetchCalculatorPages();
     }, [showDeleteModal, showAddModal]);
     useEffect(() => {
         fetchSections();
     }, []);
-
     return (
         <div className="container-fluid py-4" style={{ background: isDarkMode ? '#181818' : 'linear-gradient(135deg, #b6b2efff 0%, #dfccf0ff 100%)', minHeight: '100vh' }}>
             <h2 className="mb-4" style={{ fontWeight: 700, background: isDarkMode ? '#222' : '#c5bde5ff', color: isDarkMode ? '#dfd0d0ff' : '#212529', borderRadius: '12px', padding: '0.75rem 2rem', display: 'inline-block', boxShadow: '0 2px 8px #b6b2ef44' }}>Calculators</h2>
@@ -541,6 +517,5 @@ const Calculators = () => {
             )}
         </div>
     );
-    // ...existing code for modals and forms is included in the main return above...
 }
 export default Calculators;

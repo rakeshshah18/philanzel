@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 const Alert = ({
     message,
     type = 'info',
@@ -9,27 +8,22 @@ const Alert = ({
     show = true
 }) => {
     const [isVisible, setIsVisible] = useState(show);
-
     const handleClose = () => {
         setIsVisible(false);
         if (onClose) {
             onClose();
         }
     };
-
     if (!isVisible || !message) {
         return null;
     }
-
     const getAlertClass = () => {
         const baseClass = 'alert';
         const typeClass = `alert-${type}`;
         const dismissibleClass = dismissible ? 'alert-dismissible' : '';
         const fadeClass = 'fade show';
-
         return `${baseClass} ${typeClass} ${dismissibleClass} ${fadeClass} ${className}`.trim();
     };
-
     return (
         <div className={getAlertClass()} role="alert">
             {message}
@@ -62,22 +56,16 @@ const Alert = ({
         </div>
     );
 };
-
-// Specific alert types for convenience
 export const SuccessAlert = ({ message, ...props }) => (
     <Alert message={message} type="success" {...props} />
 );
-
 export const ErrorAlert = ({ message, ...props }) => (
     <Alert message={message} type="danger" {...props} />
 );
-
 export const WarningAlert = ({ message, ...props }) => (
     <Alert message={message} type="warning" {...props} />
 );
-
 export const InfoAlert = ({ message, ...props }) => (
     <Alert message={message} type="info" {...props} />
 );
-
 export default Alert;

@@ -1,13 +1,10 @@
 "use client"
 import { useEffect, useState } from "react"
 import { DollarSign, Users, Globe, Building } from "lucide-react"
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
 export default function OurProcessSection({ section }) {
     const [data, setData] = useState(section || null)
     const [loading, setLoading] = useState(!section)
-
     useEffect(() => {
         if (!section) {
             fetch(`${BASE_URL}/api/partner/our-process/public`)
@@ -20,11 +17,8 @@ export default function OurProcessSection({ section }) {
                 .finally(() => setLoading(false))
         }
     }, [section])
-
     if (loading) return <section className="py-20 bg-white"><div className="max-w-7xl mx-auto px-4"><p className="text-gray-600">Loading...</p></div></section>
     if (!data) return null
-    console.log('OurProcessSection data:', data);
-
     return (
         <section className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,7 +41,6 @@ export default function OurProcessSection({ section }) {
                                 </div>
                             ));
                         }
-                        // Fallback: use subheading, subdescription, images arrays
                         const subheadingArr = data.subheading || [];
                         const subdescriptionArr = data.subdescription || [];
                         const imagesArr = data.images || [];

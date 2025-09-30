@@ -22,8 +22,6 @@ import FaqSection from "./home/faq-section";
 import CtaSection from "./home/cta-section";
 import Footer from "./home/footer";
 import "./pageStyle.css";
-
-// Define the backend base URL in one place for best practice
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 export default function HomePage() {
@@ -120,7 +118,6 @@ export default function HomePage() {
               {/* Carousel */}
               <div className="md:col-span-5 flex flex-col justify-center h-full">
                 <Carousel />
-                {/* Certified by & Download App section in a row */}
                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-8 items-center">
                   {/* Certified by */}
                   <div>
@@ -220,35 +217,15 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
-        {/* WhyChooseUs Section */}
         <WhyChooseUs />
-
-        {/* Our Association Section */}
         <OurAssociation />
-
-        {/* Stats Counter Section */}
         <StatsCounterSection />
-
-        {/* Services Tabs Section */}
         <ServicesTabsSection />
-
-        {/* Industries Section */}
         <IndustriesSection />
-
-        {/* Testimonials Section */}
         <Testimonials />
-
-        {/* Ads Section */}
         <AdsSection />
-
-        {/* FAQ Section */}
         <FaqSection />
-
-        {/* CTA Section */}
         <CtaSection />
-
-        {/* Footer */}
         <Footer />
       </div>
     </>

@@ -4,7 +4,6 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import api from '../../services/api';
 import OurProcess from './OurProcess';
-
 function SafeOurProcess() {
     const [error, setError] = useState(null);
     return (
@@ -14,38 +13,27 @@ function SafeOurProcess() {
         </>
     );
 }
-
 function AdminPartner() {
-    // -------------------- UI State --------------------
     const [alert, setAlert] = useState({ show: false, variant: 'success', message: '' });
     const [activeTab, setActiveTab] = useState('content');
-
-    // Partner Page Content
     const [partnerPost, setPartnerPost] = useState({ heading: '', thought: '', description: '' });
     const [postId, setPostId] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    // Applications
     const [applications, setApplications] = useState([]);
     const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
     const [searchTerm, setSearchTerm] = useState('');
-
-    // Partner Association Images (local to this page)
     const [partnerImages, setPartnerImages] = useState([]);
     const [partnerImagesLoading, setPartnerImagesLoading] = useState(false);
     const [partnerImagesError, setPartnerImagesError] = useState('');
     const [newImageFile, setNewImageFile] = useState(null);
     const [newImageAlt, setNewImageAlt] = useState('');
-
-    // -------------------- Helpers --------------------
     const showAlert = (message, variant = 'success', timeout = 3000) => {
         setAlert({ show: true, variant, message });
         if (timeout) {
             setTimeout(() => setAlert({ show: false, variant: 'success', message: '' }), timeout);
         }
     };
-
     const getStatusVariant = (status) => {
         switch (status) {
             case 'pending': return 'warning';
@@ -55,7 +43,6 @@ function AdminPartner() {
             default: return 'secondary';
         }
     };
-
     const handleSort = (key) => {
         setSortConfig((prev) => {
             if (prev.key === key) {
@@ -64,11 +51,9 @@ function AdminPartner() {
             return { key, direction: 'asc' };
         });
     };
-
     const filteredApplications = useMemo(() => {
         const term = searchTerm.trim().toLowerCase();
         let data = Array.isArray(applications) ? [...applications] : [];
-
         if (term) {
             data = data.filter((a) => (
                 (a.serviceName || '').toLowerCase().includes(term) ||
@@ -79,7 +64,6 @@ function AdminPartner() {
                 (a.status || '').toLowerCase().includes(term)
             ));
         }
-
         const { key, direction } = sortConfig;
         data.sort((a, b) => {
             const va = a?.[key];
@@ -87,14 +71,12 @@ function AdminPartner() {
             if (va == null && vb == null) return 0;
             if (va == null) return direction === 'asc' ? -1 : 1;
             if (vb == null) return direction === 'asc' ? 1 : -1;
-
             // date sort for createdAt
             if (key === 'createdAt') {
                 const da = new Date(va).getTime();
                 const db = new Date(vb).getTime();
                 return direction === 'asc' ? da - db : db - da;
             }
-
             // default string/number compare
             if (typeof va === 'number' && typeof vb === 'number') {
                 return direction === 'asc' ? va - vb : vb - va;
@@ -106,8 +88,6 @@ function AdminPartner() {
 
         return data;
     }, [applications, searchTerm, sortConfig]);
-
-    // -------------------- Data Fetchers --------------------
     const fetchPartnerPost = async () => {
         try {
             const response = await api.get('/admin/partner-posts');
@@ -125,7 +105,6 @@ function AdminPartner() {
             console.error('Error fetching partner post:', error);
         }
     };
-
     const fetchApplications = async () => {
         try {
             const response = await api.get('/user/partner-applications');
@@ -135,13 +114,10 @@ function AdminPartner() {
             setApplications([]);
         }
     };
-
-    // Partner Association Images
     const fetchImages = async () => {
         setPartnerImagesLoading(true);
         setPartnerImagesError('');
         try {
-            // FIX: Use correct endpoint for partner association images
             const response = await api.get('/partner');
             setPartnerImages(response.data?.data || []);
         } catch (err) {
@@ -150,37 +126,30 @@ function AdminPartner() {
             setPartnerImagesLoading(false);
         }
     };
-
     useEffect(() => {
         fetchPartnerPost();
         fetchApplications();
         fetchImages();
     }, []);
-
-    // -------------------- Handlers --------------------
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setPartnerPost((prev) => ({ ...prev, [name]: value }));
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
         try {
             const requestData = {
                 heading: partnerPost.heading,
                 thought: partnerPost.thought,
                 description: partnerPost.description
             };
-
             let response;
             if (postId) {
                 response = await api.put(`/admin/partner-posts/${postId}`, requestData);
             } else {
                 response = await api.post('/admin/partner-posts', requestData);
             }
-
             if (response.data && response.data.data) {
                 const savedData = response.data.data;
                 setPartnerPost({
@@ -200,7 +169,6 @@ function AdminPartner() {
             setLoading(false);
         }
     };
-
     const updateApplicationStatus = async (applicationId, newStatus) => {
         try {
             await api.put(`/user/partner-applications/${applicationId}/status`, { status: newStatus });
@@ -213,7 +181,6 @@ function AdminPartner() {
             showAlert('Error updating application status', 'danger');
         }
     };
-
     const deleteApplication = async (applicationId) => {
         if (!window.confirm('Are you sure you want to delete this application?')) return;
         try {
@@ -225,8 +192,6 @@ function AdminPartner() {
             showAlert('Error deleting application', 'danger');
         }
     };
-
-    // Partner Association Image Handlers
     const handleAddImage = async (e) => {
         e.preventDefault();
         if (!newImageFile) return;
@@ -236,7 +201,6 @@ function AdminPartner() {
             const formData = new FormData();
             formData.append('image', newImageFile);
             formData.append('alt', newImageAlt);
-            // FIX: Use correct endpoint for image upload
             await api.post('/partner', formData);
             setNewImageFile(null);
             setNewImageAlt('');
@@ -252,7 +216,6 @@ function AdminPartner() {
         setPartnerImagesLoading(true);
         setPartnerImagesError('');
         try {
-            // FIX: Use correct endpoint for image delete
             await api.delete(`/partner/${id}`);
             setPartnerImages((prev) => prev.filter((img) => img._id !== id));
         } catch (err) {
@@ -261,18 +224,14 @@ function AdminPartner() {
             setPartnerImagesLoading(false);
         }
     };
-
-    // -------------------- Render --------------------
     return (
         <Container fluid className="py-4">
             <Row>
                 <Col>
                     <h2 className="mb-4">Partner Management</h2>
-
                     {alert.show && (
                         <Alert variant={alert.variant} className="mb-4">{alert.message}</Alert>
                     )}
-
                     <Tab.Container activeKey={activeTab} onSelect={setActiveTab}>
                         <Nav variant="tabs" className="mb-4">
                             <Nav.Item>
@@ -292,13 +251,10 @@ function AdminPartner() {
                                 </Nav.Link>
                             </Nav.Item>
                         </Nav>
-
                         <Tab.Content>
-                            {/* -------------------- Content Management Tab -------------------- */}
                             <Tab.Pane eventKey="content">
                                 <Row>
                                     <Col>
-                                        {/* Content Display Card */}
                                         <Card className="mb-4 shadow-sm dashboard-card" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
                                             <Card.Header className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
                                                 <h5 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
@@ -417,8 +373,6 @@ function AdminPartner() {
                                         </div>
                                     </Col>
                                 </Row>
-
-                                {/* OurProcess CRUD UI (only when content tab is active) */}
                                 {activeTab === 'content' && (
                                     <Row className="mb-4">
                                         <Col>
@@ -426,8 +380,6 @@ function AdminPartner() {
                                         </Col>
                                     </Row>
                                 )}
-
-                                {/* Edit Content Modal */}
                                 <Modal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg" backdrop="static">
                                     <Modal.Header closeButton>
                                         <Modal.Title>
@@ -451,7 +403,6 @@ function AdminPartner() {
                                                     required
                                                 />
                                             </Form.Group>
-
                                             <Form.Group className="mb-3">
                                                 <Form.Label>
                                                     <i className="fas fa-lightbulb me-2"></i>
@@ -473,7 +424,6 @@ function AdminPartner() {
                                                     }}
                                                 />
                                             </Form.Group>
-
                                             <Form.Group className="mb-3">
                                                 <Form.Label>
                                                     <i className="fas fa-file-text me-2"></i>
@@ -521,8 +471,6 @@ function AdminPartner() {
                                     </Modal.Footer>
                                 </Modal>
                             </Tab.Pane>
-
-                            {/* -------------------- Applications Tab -------------------- */}
                             <Tab.Pane eventKey="applications">
                                 <div className="mb-3">
                                     <Form.Control
@@ -616,30 +564,30 @@ function AdminPartner() {
             {/* Custom CSS for Partner Management Tabs */}
             <style>{`
         .active-partner-tab {
-          color: #6c757d !important;
-          background-color: #666060ff !important;
-          border-color: #555758ff #75797eff #696767ff !important;
-          font-weight: 600 !important;
-          border-bottom: 1px solid #696565ff !important;
+            color: #6c757d !important;
+            background-color: #666060ff !important;
+            border-color: #555758ff #75797eff #696767ff !important;
+            font-weight: 600 !important;
+            border-bottom: 1px solid #696565ff !important;
         }
         .inactive-partner-tab {
-          color: #495057 !important;
-          background-color: transparent !important;
-          border-color: #646668ff !important;
-          font-weight: 400 !important;
+            color: #495057 !important;
+            background-color: transparent !important;
+            border-color: #646668ff !important;
+            font-weight: 400 !important;
         }
         .active-partner-tab:hover,
         .active-partner-tab:focus {
-          color: #262b30ff !important;
-          background-color: #b4b0b0ff !important;
+            color: #262b30ff !important;
+            background-color: #b4b0b0ff !important;
         }
         .inactive-partner-tab:hover,
         .inactive-partner-tab:focus {
-          color: #495057 !important;
-          background-color: #636464ff !important;
-          border-color: #696a6bff !important;
+            color: #495057 !important;
+            background-color: #636464ff !important;
+            border-color: #696a6bff !important;
         }
-      `}</style>
+        `}</style>
         </Container>
     );
 }

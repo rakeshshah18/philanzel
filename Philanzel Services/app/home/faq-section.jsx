@@ -1,16 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-
-// Define the backend base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 const FaqSection = () => {
     const [faqData, setFaqData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // Fetch FAQ data from API
     useEffect(() => {
         const fetchFaqData = async () => {
             try {
@@ -22,8 +18,6 @@ const FaqSection = () => {
                 }
                 
                 const apiResponse = await response.json();
-                
-                // Extract the first item from the data array
                 if (apiResponse.status === 'success' && apiResponse.data.length > 0) {
                     setFaqData(apiResponse.data[0]);
                 } else {
@@ -41,16 +35,12 @@ const FaqSection = () => {
 
         fetchFaqData();
     }, []);
-
-    // Helper function to strip HTML tags from description
     const stripHtmlTags = (html) => {
         if (!html) return '';
         const div = document.createElement('div');
         div.innerHTML = html;
         return div.textContent || div.innerText || '';
     };
-
-    // Loading state
     if (loading) {
         return (
             <section className="py-20 bg-white">
@@ -75,8 +65,6 @@ const FaqSection = () => {
             </section>
         );
     }
-
-    // Error state
     if (error || !faqData) {
         return (
             <section className="py-20 bg-white">

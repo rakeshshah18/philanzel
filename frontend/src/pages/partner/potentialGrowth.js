@@ -3,9 +3,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import API from '../../services/api';
 import WhyChoosePhilanzel from './WhyChoosePhilanzel';
-
 const apiUrl = '/partner/potential-growth';
-
 const PotentialGrowth = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -19,12 +17,9 @@ const PotentialGrowth = () => {
     const [solutionForm, setSolutionForm] = useState({ heading: '', description: '', icon: '' });
     const [showSolutionForm, setShowSolutionForm] = useState(false);
     const [editSolutionIdx, setEditSolutionIdx] = useState(null);
-
-
     useEffect(() => {
         fetchData();
     }, []);
-
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -37,14 +32,11 @@ const PotentialGrowth = () => {
         }
         setLoading(false);
     };
-
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
-
     const handleSolutionChange = (e) => {
         if (e.target.name === 'icon' && e.target.files && e.target.files[0]) {
-            // Handle image upload
             const file = e.target.files[0];
             const formData = new FormData();
             formData.append('image', file);
@@ -59,9 +51,6 @@ const PotentialGrowth = () => {
             setSolutionForm({ ...solutionForm, [e.target.name]: e.target.value });
         }
     };
-
-
-    // Add New Solution handler for the form
     const handleAddSolution = async (e) => {
         e.preventDefault();
         const updatedForm = { ...form, solutions: [...form.solutions, solutionForm] };
@@ -79,12 +68,10 @@ const PotentialGrowth = () => {
             setError('Failed to save new solution');
         }
     };
-    // Edit Solution handler
     const handleEditSolution = (idx) => {
         setEditSolutionIdx(idx);
         setSolutionForm(form.solutions[idx]);
     };
-
     const handleUpdateSolution = async (e) => {
         e.preventDefault();
         const updatedSolutions = form.solutions.map((sol, idx) => idx === editSolutionIdx ? solutionForm : sol);
@@ -103,8 +90,6 @@ const PotentialGrowth = () => {
             setError('Failed to update solution');
         }
     };
-
-    // Delete Solution handler
     const handleDeleteSolution = async (idx) => {
         const updatedSolutions = form.solutions.filter((_, i) => i !== idx);
         const updatedForm = { ...form, solutions: updatedSolutions };
@@ -120,8 +105,6 @@ const PotentialGrowth = () => {
             setError('Failed to delete solution');
         }
     };
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -138,7 +121,6 @@ const PotentialGrowth = () => {
         }
         setLoading(false);
     };
-
     const handleDelete = async () => {
         if (data && data._id) {
             setLoading(true);
@@ -154,8 +136,6 @@ const PotentialGrowth = () => {
             setLoading(false);
         }
     };
-
-
     return (
         <div className="dashboard-card shadow-sm mb-5" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
             <div className="dashboard-card-header px-4 py-3" style={{ background: '#0ea5e9', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18, display: 'flex', alignItems: 'center' }}>
@@ -272,9 +252,6 @@ const PotentialGrowth = () => {
         </div>
     );
 };
-
-
-// Display WhyChoosePhilanzel below Potential Growth
 export default function PotentialGrowthWithWhyChoosePhilanzel() {
     return (
         <>

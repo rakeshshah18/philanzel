@@ -1,11 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-
 const OurAssociation = () => {
   const [data, setData] = useState(null);
-
   const [rows, setRows] = useState([[], [], []]);
   useEffect(() => {
     async function fetchData() {
@@ -14,7 +11,6 @@ const OurAssociation = () => {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
           setData(json.data[0]);
-          // Merge rowOne, rowTwo, rowThree into rows array
           setRows([
             json.data[0].rowOne || [],
             json.data[0].rowTwo || [],
@@ -22,22 +18,17 @@ const OurAssociation = () => {
           ]);
         }
       } catch (e) {
-        // fallback: do nothing
       }
     }
     fetchData();
   }, []);
 
   if (!data) return null;
-
-  // Each row is already a row of logos
   const logoRows = rows;
-
   return (
     <section className="py-20 bg-[#f7f7fb]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Left: Heading, subtitle, button */}
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               {data.heading || "Our Associations"}
@@ -50,7 +41,6 @@ const OurAssociation = () => {
               View All
             </button>
           </div>
-          {/* Right: Card with logos grid */}
           <div className="bg-white rounded-2xl shadow-xl p-8 flex items-center justify-center">
             <style>{`
               @keyframes scroll-left {
@@ -70,7 +60,6 @@ const OurAssociation = () => {
                     style={{ animation: `${i % 2 === 1 ? "scroll-right" : "scroll-left"} ${18 + i * 2}s linear infinite` }}
                   >
                     {row.concat(row).map((logo, idx) => {
-                      // Fix: prepend BASE_URL if url is relative
                       let imgUrl = logo?.url || '';
                       if (imgUrl && !imgUrl.startsWith('http') && !imgUrl.startsWith('//')) {
                         imgUrl = `${BASE_URL}${imgUrl}`;

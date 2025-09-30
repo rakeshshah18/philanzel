@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Alert from '../../components/Alert';
 import api from '../../services/api';
-
-// Helper function to get the correct image URL
 const getImageURL = (filename) => {
     const baseURL = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000';
     return `${baseURL}/uploads/images/${filename}`;
 };
-
 const PublicCareer = () => {
     const [alert, setAlert] = useState({ show: false, message: '', type: '' });
     const [careerContent, setCareerContent] = useState([]);
@@ -20,15 +17,12 @@ const PublicCareer = () => {
         message: '',
         resume: null
     });
-
     const showAlert = (message, type) => {
         setAlert({ show: true, message, type });
         setTimeout(() => {
             setAlert({ show: false, message: '', type: '' });
         }, 5000);
     };
-
-    // Fetch career content
     const fetchCareerContent = async () => {
         try {
             setLoading(true);
@@ -43,12 +37,9 @@ const PublicCareer = () => {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         fetchCareerContent();
     }, []);
-
-    // Handle form input changes
     const handleInputChange = (e) => {
         const { name, value, files } = e.target;
         setFormData(prev => ({
@@ -56,50 +47,37 @@ const PublicCareer = () => {
             [name]: files ? files[0] : value
         }));
     };
-
-    // Submit application form
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.message.trim()) {
             showAlert('Please fill in all required fields', 'error');
             return;
         }
-
-        // Basic email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.email)) {
             showAlert('Please enter a valid email address', 'error');
             return;
         }
-
-        // Basic phone validation
         const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
         if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
             showAlert('Please enter a valid phone number', 'error');
             return;
         }
-
         try {
             setSubmitting(true);
-
             const applicationData = new FormData();
             applicationData.append('fullName', formData.fullName.trim());
             applicationData.append('email', formData.email.trim());
             applicationData.append('phone', formData.phone.trim());
             applicationData.append('message', formData.message.trim());
-
             if (formData.resume) {
                 applicationData.append('resume', formData.resume);
             }
-
             const response = await api.post('/user/career-inquiry', applicationData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-
             if (response.data.status === 'success') {
                 showAlert('Application submitted successfully! We will contact you soon.', 'success');
-                // Reset form
                 setFormData({
                     fullName: '',
                     email: '',
@@ -107,7 +85,6 @@ const PublicCareer = () => {
                     message: '',
                     resume: null
                 });
-                // Reset file input
                 const fileInput = document.getElementById('resume');
                 if (fileInput) fileInput.value = '';
             }
@@ -119,10 +96,8 @@ const PublicCareer = () => {
             setSubmitting(false);
         }
     };
-
     return (
         <div className="container mt-5">
-            {/* Alert */}
             {alert.show && (
                 <Alert
                     message={alert.message}
@@ -130,12 +105,9 @@ const PublicCareer = () => {
                     onClose={() => setAlert({ show: false, message: '', type: '' })}
                 />
             )}
-
-            {/* Career Content Section */}
             <div className="row mb-5">
                 <div className="col-12">
                     <h1 className="text-center mb-4">Join Our Team</h1>
-
                     {loading ? (
                         <div className="text-center p-4">
                             <div className="spinner-border" role="status">

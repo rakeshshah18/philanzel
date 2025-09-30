@@ -1,15 +1,11 @@
 'use client'
-
 import { CheckCircle } from "lucide-react"
 import { useState, useEffect } from "react"
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
 export function OurApproach() {
     const [approachData, setApproachData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-
     useEffect(() => {
         const fetchApproachData = async () => {
             try {
@@ -28,17 +24,13 @@ export function OurApproach() {
                 setLoading(false)
             }
         }
-
         fetchApproachData()
     }, [])
-
-    // Helper function to strip HTML tags
     const stripHtmlTags = (html) => {
         const div = document.createElement('div')
         div.innerHTML = html
         return div.textContent || div.innerText || ''
     }
-
     if (loading) {
         return (
             <section className="py-20 bg-gray-50">
@@ -50,7 +42,6 @@ export function OurApproach() {
             </section>
         )
     }
-
     if (error || !approachData) {
         return (
             <section className="py-20 bg-gray-50">
@@ -62,7 +53,6 @@ export function OurApproach() {
             </section>
         )
     }
-
     return (
         <section className="py-20 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -97,7 +87,6 @@ export function OurApproach() {
                                     </div>
                                 ))
                             ) : (
-                                // Fallback static content
                                 <>
                                     <div className="flex items-start space-x-4">
                                         <CheckCircle className="h-6 w-6 text-cyan-600 mt-1 flex-shrink-0" />
@@ -136,7 +125,6 @@ export function OurApproach() {
                             )}
                         </div>
                     </div>
-                    
                 </div>
             </div>
         </section>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-
 const AdminInquiries = () => {
     const [inquiries, setInquiries] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -9,7 +8,6 @@ const AdminInquiries = () => {
     useEffect(() => {
         fetchInquiries();
     }, []);
-
     const fetchInquiries = async () => {
         try {
             setLoading(true);
@@ -22,7 +20,6 @@ const AdminInquiries = () => {
             setLoading(false);
         }
     };
-
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -32,7 +29,6 @@ const AdminInquiries = () => {
             minute: '2-digit'
         });
     };
-
     if (loading) {
         return (
             <div className="container-fluid py-4">
@@ -44,7 +40,6 @@ const AdminInquiries = () => {
             </div>
         );
     }
-
     return (
         <div className="container-fluid py-4">
             <div className="row">

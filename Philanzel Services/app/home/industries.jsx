@@ -3,10 +3,7 @@ import React, { useState, useEffect } from "react";
 import {
     Landmark, HeartPulse, Settings2, Zap, Truck, Factory, ShieldCheck, ShoppingBag, Home, GraduationCap, Briefcase
 } from "lucide-react";
-
-// Define the backend base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-
 const IndustriesSection = () => {
     const iconClass = "w-6 h-6 text-gray-500";
     const iconMap = {
@@ -42,7 +39,6 @@ const IndustriesSection = () => {
                     });
                 }
             } catch (e) {
-                // fallback: do nothing
             }
         }
         fetchIndustries();
@@ -60,7 +56,6 @@ const IndustriesSection = () => {
                 </div>
 
                 <div className="flex flex-col items-center justify-center gap-4 text-center">
-                    {/* Row 1: 4 items */}
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl mx-auto text-center place-items-center">
                         {industriesData.industries.slice(0, 4).map((industry) => (
                             <div key={industry._id} className="bg-white rounded-2xl shadow px-6 py-3 text-base font-semibold text-gray-800 flex flex-col items-center justify-center gap-2 transition hover:bg-cyan-600 hover:text-white hover:shadow-xl cursor-pointer">
@@ -71,8 +66,6 @@ const IndustriesSection = () => {
                             </div>
                         ))}
                     </div>
-
-                    {/* Row 2: 5 items */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full max-w-6xl mx-auto text-center place-items-center">
                         {industriesData.industries.slice(4, 9).map((industry) => (
                             <div key={industry._id} className="bg-white rounded-2xl shadow px-6 py-3 text-base font-semibold text-gray-800 flex flex-col items-center justify-center gap-2 transition hover:bg-cyan-600 hover:text-white hover:shadow-xl cursor-pointer">
@@ -83,8 +76,6 @@ const IndustriesSection = () => {
                             </div>
                         ))}
                     </div>
-
-                    {/* Row 3: 2 items */}
                     <div className="grid grid-cols-2 gap-4 w-full max-w-2xl mx-auto text-center place-items-center">
                         {industriesData.industries.slice(9, 11).map((industry) => (
                             <div key={industry._id} className="bg-white rounded-2xl shadow px-6 py-3 text-base font-semibold text-gray-800 flex flex-col items-center justify-center gap-2 transition hover:bg-cyan-600 hover:text-white hover:shadow-xl cursor-pointer">

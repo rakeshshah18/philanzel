@@ -1,17 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { homePageAPI } from '../../services/api';
 import { FaSyncAlt, FaTrashAlt, FaFileAlt, FaImage, FaRegCalendarPlus } from 'react-icons/fa';
-
 const AdminHomePage = () => {
     const [homePages, setHomePages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-
     useEffect(() => {
         fetchHomePages();
     }, []);
-
     const fetchHomePages = async () => {
         try {
             setLoading(true);
@@ -24,12 +20,10 @@ const AdminHomePage = () => {
             setLoading(false);
         }
     };
-
     const deleteHomePage = async (id) => {
         if (!window.confirm('Are you sure you want to delete this homepage content?')) {
             return;
         }
-
         try {
             await homePageAPI.delete(id);
             setHomePages(homePages.filter(page => page._id !== id));
@@ -38,7 +32,6 @@ const AdminHomePage = () => {
             console.error('Error deleting homepage content:', error);
         }
     };
-
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -48,7 +41,6 @@ const AdminHomePage = () => {
             minute: '2-digit'
         });
     };
-
     if (loading) {
         return (
             <div className="container-fluid py-5 d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '60vh' }}>
@@ -59,8 +51,6 @@ const AdminHomePage = () => {
             </div>
         );
     }
-
-    // Dashboard summary (example: total homepages)
     const summaryCards = [
         {
             icon: <FaFileAlt size={28} className="text-primary" />,

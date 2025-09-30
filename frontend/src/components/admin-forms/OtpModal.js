@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-
 const OtpModal = ({ show, onClose, onVerify, loading, email }) => {
   const [otp, setOtp] = useState('');
-
   const handleSubmit = (e) => {
     e.preventDefault();
     onVerify({ email, otp });
   };
-
   if (!show) return null;
-
   return (
     <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="modal-dialog modal-dialog-centered">

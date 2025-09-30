@@ -29,18 +29,12 @@ import Calculators from './pages/calculators/Calculators';
 import CalculatorPage from './pages/calculators/CalculatorPage';
 import SidebarManagement from './pages/sections/SidebarManagement';
 import Events from './pages/Events';
-
-// Component to handle layout with conditional sidebar and global sidebar toggle
 const AppLayout = () => {
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
     const { admin } = useAuth();
-
-    // Pages that should not show the sidebar
     const noSidebarPages = ['/login', '/admin/login', '/admin/register', '/public-career'];
     const showSidebar = !noSidebarPages.includes(location.pathname);
-
-    // Sidebar width (should match Sidebar.js)
     const sidebarWidth = isSidebarOpen && showSidebar ? 260 : showSidebar ? 60 : 0;
 
     return (
@@ -67,7 +61,6 @@ const AppLayout = () => {
                                     <Dashboard />
                                 </ProtectedRoute>
                             } />
-                            {/* Pages Category - All routes under this category check for "pages" permission */}
                             <Route path="/home" element={
                                 <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="pages">
                                     <Home />
@@ -91,7 +84,6 @@ const AppLayout = () => {
                             } />
                             <Route path="/partner-faqs" element={<PartnerFAQs />} />
                             <Route path="/public-partner" element={<PublicPartner />} />
-                            {/* Sections Category - All routes under this category check for "sections" permission */}
                             <Route path="/sections/*" element={
                                 <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="sections">
                                     <Sections />
@@ -144,7 +136,6 @@ const AppLayout = () => {
                             <Route path="/admin/login" element={<LoginForm />} />
                             <Route path="/login" element={<LoginForm />} />
                             <Route path="/admin/register" element={<AdminRegisterPage />} />
-                            {/* Services Category - All routes under this category check for "services" permission */}
                             <Route path="/services-sections" element={
                                 <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="services">
                                     <ServicesSections />
@@ -160,7 +151,6 @@ const AppLayout = () => {
                                     <ServicesOverview />
                                 </ProtectedRoute>
                             } />
-                            {/* All Calculators Category - All routes under this category check for "calculators" permission */}
                             <Route path="/calculators" element={
                                 <ProtectedRoute allowedTabs={admin?.allowedTabs} tabKey="calculators">
                                     <Calculators />
@@ -173,7 +163,6 @@ const AppLayout = () => {
                             } />
                         </Routes>
                     </main>
-                    {/* Show footer (which includes OptimizeStrategy) only on footer admin page for preview */}
                     {location.pathname === '/sections/footer' && <Footer />}
                 </div>
             </div>

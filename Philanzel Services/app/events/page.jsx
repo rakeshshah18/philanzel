@@ -7,12 +7,10 @@ import Link from "next/link";
 import Footer from "../home/footer";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import React, { useState, useEffect, useRef } from "react";
-
 export default function EventImagesClient() {
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-
   useEffect(() => {
     async function fetchImages() {
       try {
@@ -25,12 +23,9 @@ export default function EventImagesClient() {
     }
     fetchImages();
   }, []);
-
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
-
-      {/* Hero Section */}
       <section className="bg-gradient-to-br from-gray-50 to-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -91,8 +86,6 @@ export default function EventImagesClient() {
           </div>
         </div>
       </section>
-
-      {/* Fullscreen Modal with Zoom & Drag */}
       {selectedImage && (
         <div
           className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
@@ -123,8 +116,6 @@ export default function EventImagesClient() {
           </TransformWrapper>
         </div>
       )}
-
-
       <Footer />
     </div>
   );

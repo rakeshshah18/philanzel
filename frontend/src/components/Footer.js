@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { footerAPI } from '../services/api';
-
 const Footer = () => {
     const [footerData, setFooterData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     useEffect(() => {
         fetchFooterData();
     }, []);
-
     const fetchFooterData = async () => {
         try {
             setLoading(true);
@@ -27,7 +24,6 @@ const Footer = () => {
             setLoading(false);
         }
     };
-
     if (loading) {
         return (
             <footer className="py-4" style={{ backgroundColor: '#2c3e50', color: '#ffffff' }}>
@@ -41,7 +37,6 @@ const Footer = () => {
             </footer>
         );
     }
-
     if (error || !footerData) {
         return (
             <footer className="py-4" style={{ backgroundColor: '#2c3e50', color: '#ffffff' }}>
@@ -53,18 +48,13 @@ const Footer = () => {
             </footer>
         );
     }
-
     const footerStyle = {
         backgroundColor: footerData.backgroundColor || '#2c3e50',
         color: footerData.textColor || '#ffffff'
     };
-
-    // Get strategies (already filtered by backend)
     const strategies = footerData.optimizeStrategy?.strategies || [];
-
     return (
         <>
-            {/* Optimize Strategy Section - Above Footer */}
             {strategies.length > 0 && (
                 <section className="optimize-strategy-section py-5">
                     <div className="container">
@@ -100,12 +90,9 @@ const Footer = () => {
                     </div>
                 </section>
             )}
-
-            {/* Footer Section */}
             <footer style={footerStyle} className="py-5 mt-auto">
                 <div className="container">
                     <div className="row">
-                        {/* About Us Section */}
                         <div className="col-lg-3 col-md-6 mb-4">
                             <h5 className="mb-3">About Us</h5>
                             <p className="small">{footerData.aboutUs.description}</p>
@@ -118,8 +105,6 @@ const Footer = () => {
                                 </a>
                             )}
                         </div>
-
-                        {/* Quick Links Section */}
                         <div className="col-lg-2 col-md-6 mb-4">
                             <h5 className="mb-3">{footerData.quickLinks.title}</h5>
                             <ul className="list-unstyled">
@@ -140,8 +125,6 @@ const Footer = () => {
                                 ))}
                             </ul>
                         </div>
-
-                        {/* Services Section */}
                         <div className="col-lg-2 col-md-6 mb-4">
                             <h5 className="mb-3">{footerData.ourServices.title}</h5>
                             <ul className="list-unstyled">
@@ -167,8 +150,6 @@ const Footer = () => {
                                 ))}
                             </ul>
                         </div>
-
-                        {/* Calculators Section */}
                         <div className="col-lg-2 col-md-6 mb-4">
                             <h5 className="mb-3">{footerData.calculators.title}</h5>
                             <ul className="list-unstyled">
@@ -191,18 +172,12 @@ const Footer = () => {
                                 ))}
                             </ul>
                         </div>
-
-                        {/* Contact Us Section */}
                         <div className="col-lg-3 col-md-6 mb-4">
                             <h5 className="mb-3">{footerData.contactUs.title}</h5>
-
-                            {/* Address */}
                             <div className="mb-3">
                                 <i className="fas fa-map-marker-alt me-2"></i>
                                 <small>{footerData.contactUs.address}</small>
                             </div>
-
-                            {/* Phone Numbers */}
                             <div className="mb-2">
                                 <i className="fas fa-phone me-2"></i>
                                 <small>
@@ -229,8 +204,6 @@ const Footer = () => {
                                     </small>
                                 </div>
                             )}
-
-                            {/* Email */}
                             <div className="mb-3">
                                 <i className="fas fa-envelope me-2"></i>
                                 <small>
@@ -243,8 +216,6 @@ const Footer = () => {
                                     </a>
                                 </small>
                             </div>
-
-                            {/* Social Links */}
                             <div>
                                 <h6 className="mb-2">{footerData.contactUs.followUs.title}</h6>
                                 <div className="d-flex gap-2">
@@ -284,8 +255,6 @@ const Footer = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Bottom Section - Copyright and Legal */}
                     <div className="row mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                         <div className="col-md-6">
                             <p className="mb-0 small" style={{ opacity: 0.8 }}>

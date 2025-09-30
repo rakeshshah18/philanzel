@@ -4,35 +4,22 @@ import { useAuth } from '../../contexts/AuthContext';
 import { aboutUsAPI, ourJourneyAPI, ourFounderAPI, aboutWhyChooseUsAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-
-// Helper function to get full image URL
 const getImageUrl = (imageUrl) => {
     if (!imageUrl) return null;
-
-    // If it's already a full URL, return as is
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
         return imageUrl;
     }
-
-    // If it's a relative URL from backend, prepend the base URL
     const baseUrl = process.env.NODE_ENV === 'production'
         ? 'https://philanzel-backend.vercel.app'
         : 'http://localhost:8000';
-
-    // Handle backend upload paths correctly
     if (imageUrl.startsWith('/uploads/')) {
         return `${baseUrl}${imageUrl}`;
     }
-
-    // Handle legacy paths
     if (imageUrl.startsWith('/images/')) {
         return `${baseUrl}${imageUrl}`;
     }
-
-    // Default case - add uploads prefix if missing
     return `${baseUrl}/uploads/images/${imageUrl}`;
 };
-
 const AboutUs = () => {
     const { isAuthenticated, loading } = useAuth();
     const [aboutPages, setAboutPages] = useState([]);
@@ -44,31 +31,23 @@ const AboutUs = () => {
     const [showForm, setShowForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
-
-    // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; // Fixed items per page
-
-    // Our Journey form state
+    const itemsPerPage = 10;
     const [showJourneyForm, setShowJourneyForm] = useState(false);
     const [isEditingJourney, setIsEditingJourney] = useState(false);
     const [editingJourneyId, setEditingJourneyId] = useState(null);
     const [journeyLoading, setJourneyLoading] = useState(false);
-
-    // Journey card management
     const [showCardForm, setShowCardForm] = useState(false);
     const [cardFormData, setCardFormData] = useState({
         year: '',
         heading: '',
         description: ''
     });
-
     const [journeyFormData, setJourneyFormData] = useState({
         heading: '',
         description: '',
         cards: []
     });
-
     const [formData, setFormData] = useState({
         heading: '',
         description: '',
@@ -81,7 +60,6 @@ const AboutUs = () => {
             altText: ''
         }
     });
-
     useEffect(() => {
         if (!loading && isAuthenticated) {
             fetchAboutData();
@@ -90,7 +68,6 @@ const AboutUs = () => {
             fetchOurFounderData();
         }
     }, [loading, isAuthenticated]);
-
     const fetchAboutData = async () => {
         setFetchLoading(true);
         try {
@@ -103,30 +80,24 @@ const AboutUs = () => {
             setFetchLoading(false);
         }
     };
-
     const fetchJourneyData = async () => {
         try {
             const response = await ourJourneyAPI.getAll();
             setJourneyData(response.data.data || []);
         } catch (error) {
             console.error('Error fetching our journey data:', error);
-            // Don't show error message for journey data as it's secondary content
         }
     };
-
     const fetchWhyChooseUsData = async () => {
         try {
             const response = await aboutWhyChooseUsAPI.getAll();
             setWhyChooseUsData(response.data.data || []);
         } catch (error) {
             console.error('Error fetching why choose us data:', error);
-            // Don't show error message for why choose us data as it's secondary content
         }
     };
-
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-
         if (name.includes('.')) {
             const [parent, child] = name.split('.');
             if (child === 'file') {
@@ -153,27 +124,20 @@ const AboutUs = () => {
             }));
         }
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setActionLoading(true);
         setMessage('');
-
-        // Validate required fields
         if (!formData.heading.trim()) {
-            setMessage('❌ Title is required.');
+            setMessage('Title is required.');
             setActionLoading(false);
             return;
         }
-
         if (!formData.description.trim() || formData.description === '<p><br></p>') {
-            setMessage('❌ Description is required.');
+            setMessage('Description is required.');
             setActionLoading(false);
             return;
         }
-
-
-
         try {
             const submitData = new FormData();
             submitData.append('heading', formData.heading);
@@ -185,25 +149,22 @@ const AboutUs = () => {
             if (formData.image.file) {
                 submitData.append('image', formData.image.file);
             }
-
             if (isEditing) {
                 await aboutUsAPI.update(editingId, submitData);
-                setMessage('✅ About Us content updated successfully!');
+                setMessage('About Us content updated successfully!');
             } else {
                 await aboutUsAPI.create(submitData);
-                setMessage('✅ About Us content created successfully!');
+                setMessage('About Us content created successfully!');
             }
-
             fetchAboutData();
             resetForm();
         } catch (error) {
             console.error('Error saving about us content:', error);
-            setMessage(error.response?.data?.message || '❌ Failed to save about us content.');
+            setMessage(error.response?.data?.message || 'Failed to save about us content.');
         } finally {
             setActionLoading(false);
         }
     };
-
     const handleEdit = (item) => {
         setFormData({
             heading: item.heading,
@@ -221,20 +182,18 @@ const AboutUs = () => {
         setEditingId(item._id);
         setShowForm(true);
     };
-
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this content?')) {
             try {
                 await aboutUsAPI.delete(id);
-                setMessage('✅ Content deleted successfully!');
+                setMessage('Content deleted successfully!');
                 fetchAboutData();
             } catch (error) {
                 console.error('Error deleting content:', error);
-                setMessage('❌ Failed to delete content.');
+                setMessage('Failed to delete content.');
             }
         }
     };
-
     const resetForm = () => {
         setFormData({
             heading: '',
@@ -262,7 +221,6 @@ const AboutUs = () => {
             [name]: value
         }));
     };
-
     const handleCardChange = (e) => {
         const { name, value } = e.target;
         setCardFormData(prev => ({
@@ -270,31 +228,26 @@ const AboutUs = () => {
             [name]: value
         }));
     };
-
     const addCard = () => {
         if (!cardFormData.year || !cardFormData.heading || !cardFormData.description) {
-            setMessage('❌ Year, heading, and description are required for cards.');
+            setMessage('Year, heading, and description are required for cards.');
             return;
         }
-
         const newCard = {
             ...cardFormData,
             order: journeyFormData.cards.length
         };
-
         setJourneyFormData(prev => ({
             ...prev,
             cards: [...prev.cards, newCard]
         }));
-
-        // Reset card form
         setCardFormData({
             year: '',
             heading: '',
             description: ''
         });
         setShowCardForm(false);
-        setMessage('✅ Card added successfully!');
+        setMessage('Card added successfully!');
     };
 
     const removeCard = (index) => {
@@ -302,52 +255,44 @@ const AboutUs = () => {
             ...prev,
             cards: prev.cards.filter((_, i) => i !== index)
         }));
-        setMessage('✅ Card removed successfully!');
+        setMessage('Card removed successfully!');
     };
-
     const handleJourneySubmit = async (e) => {
         e.preventDefault();
         setJourneyLoading(true);
         setMessage('');
-
-        // Validate required fields
         if (!journeyFormData.heading.trim()) {
-            setMessage('❌ Journey heading is required.');
+            setMessage('Journey heading is required.');
             setJourneyLoading(false);
             return;
         }
-
         if (!journeyFormData.description.trim() || journeyFormData.description === '<p><br></p>') {
-            setMessage('❌ Journey description is required.');
+            setMessage('Journey description is required.');
             setJourneyLoading(false);
             return;
         }
-
         try {
             const submitData = {
                 heading: journeyFormData.heading,
                 description: journeyFormData.description,
                 cards: journeyFormData.cards
             };
-
             if (isEditingJourney) {
                 await ourJourneyAPI.update(editingJourneyId, submitData);
-                setMessage('✅ Our Journey content updated successfully!');
+                setMessage('Our Journey content updated successfully!');
             } else {
                 await ourJourneyAPI.create(submitData);
-                setMessage('✅ Our Journey content created successfully!');
+                setMessage('Our Journey content created successfully!');
             }
-
             fetchJourneyData();
             resetJourneyForm();
         } catch (error) {
             console.error('Error saving our journey content:', error);
-            setMessage(error.response?.data?.message || '❌ Failed to save our journey content.');
+            setMessage(error.response?.data?.message || 'Failed to save our journey content.');
         } finally {
             setJourneyLoading(false);
         }
     };
-
     const handleEditJourney = (journey) => {
         setJourneyFormData({
             heading: journey.heading,
@@ -358,20 +303,18 @@ const AboutUs = () => {
         setEditingJourneyId(journey._id);
         setShowJourneyForm(true);
     };
-
     const handleDeleteJourney = async (id) => {
         if (window.confirm('Are you sure you want to delete this journey content?')) {
             try {
                 await ourJourneyAPI.delete(id);
-                setMessage('✅ Journey content deleted successfully!');
+                setMessage('Journey content deleted successfully!');
                 fetchJourneyData();
             } catch (error) {
                 console.error('Error deleting journey content:', error);
-                setMessage('❌ Failed to delete journey content.');
+                setMessage('Failed to delete journey content.');
             }
         }
     };
-
     const resetJourneyForm = () => {
         setJourneyFormData({
             heading: '',
@@ -388,8 +331,6 @@ const AboutUs = () => {
         setIsEditingJourney(false);
         setEditingJourneyId(null);
     };
-
-    // WhyChooseUs Management Functions
     const [whyChooseUsFormData, setWhyChooseUsFormData] = useState({
         heading: '',
         title: '',
@@ -403,8 +344,6 @@ const AboutUs = () => {
     const [whyChooseUsLoading, setWhyChooseUsLoading] = useState(false);
     const [showPointForm, setShowPointForm] = useState(false);
     const [pointFormData, setPointFormData] = useState('');
-
-    // Our Founder state
     const [ourFounderData, setOurFounderData] = useState([]);
     const [ourFounderFormData, setOurFounderFormData] = useState({
         name: '',
@@ -416,18 +355,15 @@ const AboutUs = () => {
     const [isEditingOurFounder, setIsEditingOurFounder] = useState(false);
     const [editingOurFounderId, setEditingOurFounderId] = useState(null);
     const [ourFounderLoading, setOurFounderLoading] = useState(false);
-
     const handleWhyChooseUsChange = (e) => {
         setWhyChooseUsFormData({
             ...whyChooseUsFormData,
             [e.target.name]: e.target.value
         });
     };
-
     const handleWhyChooseUsImageChange = (e) => {
         setWhyChooseUsImage(e.target.files[0]);
     };
-
     const addPoint = () => {
         if (pointFormData.trim()) {
             setWhyChooseUsFormData({
@@ -438,59 +374,48 @@ const AboutUs = () => {
             setShowPointForm(false);
         }
     };
-
     const removePoint = (index) => {
         setWhyChooseUsFormData({
             ...whyChooseUsFormData,
             points: whyChooseUsFormData.points.filter((_, i) => i !== index)
         });
     };
-
     const handleWhyChooseUsSubmit = async (e) => {
         e.preventDefault();
         setWhyChooseUsLoading(true);
-
         try {
             const formData = new FormData();
             formData.append('heading', whyChooseUsFormData.heading);
-            formData.append('description', whyChooseUsFormData.title); // Backend expects 'description' field
-
-            // Format button as object with text and link
+            formData.append('description', whyChooseUsFormData.title);
             const buttonObj = {
                 text: whyChooseUsFormData.button || 'Get Started',
                 link: '#'
             };
             formData.append('button', JSON.stringify(buttonObj));
-
-            // Format points as array of objects with text and icon
             const pointsArray = whyChooseUsFormData.points.map(point => ({
                 text: typeof point === 'string' ? point : (point.text || point.title || point.description || ''),
                 icon: 'fas fa-check'
             }));
             formData.append('points', JSON.stringify(pointsArray));
-
             if (whyChooseUsImage) {
                 formData.append('image', whyChooseUsImage);
             }
-
             if (isEditingWhyChooseUs) {
                 await aboutWhyChooseUsAPI.update(editingWhyChooseUsId, formData);
-                setMessage('✅ Why Choose Us content updated successfully!');
+                setMessage('Why Choose Us content updated successfully!');
             } else {
                 await aboutWhyChooseUsAPI.create(formData);
-                setMessage('✅ Why Choose Us content created successfully!');
+                setMessage('Why Choose Us content created successfully!');
             }
-
             fetchWhyChooseUsData();
             resetWhyChooseUsForm();
         } catch (error) {
             console.error('Error saving why choose us content:', error);
-            setMessage(error.response?.data?.message || '❌ Failed to save why choose us content.');
+            setMessage(error.response?.data?.message || 'Failed to save why choose us content.');
         } finally {
             setWhyChooseUsLoading(false);
         }
     };
-
     const handleEditWhyChooseUs = (item) => {
         setWhyChooseUsFormData({
             heading: item.heading,
@@ -504,20 +429,18 @@ const AboutUs = () => {
         setEditingWhyChooseUsId(item._id);
         setShowWhyChooseUsForm(true);
     };
-
     const handleDeleteWhyChooseUs = async (id) => {
         if (window.confirm('Are you sure you want to delete this Why Choose Us content?')) {
             try {
                 await aboutWhyChooseUsAPI.delete(id);
-                setMessage('✅ Why Choose Us content deleted successfully!');
+                setMessage('Why Choose Us content deleted successfully!');
                 fetchWhyChooseUsData();
             } catch (error) {
                 console.error('Error deleting why choose us content:', error);
-                setMessage('❌ Failed to delete why choose us content.');
+                setMessage('Failed to delete why choose us content.');
             }
         }
     };
-
     const resetWhyChooseUsForm = () => {
         setWhyChooseUsFormData({
             heading: '',
@@ -532,62 +455,52 @@ const AboutUs = () => {
         setIsEditingWhyChooseUs(false);
         setEditingWhyChooseUsId(null);
     };
-
-    // Our Founder Functions
     const fetchOurFounderData = async () => {
         try {
             const response = await ourFounderAPI.getAll();
             setOurFounderData(response.data.data);
         } catch (error) {
             console.error('Error fetching our founder data:', error);
-            setMessage('❌ Failed to fetch our founder data.');
+            setMessage('Failed to fetch our founder data.');
         }
     };
-
     const handleOurFounderChange = (e) => {
         setOurFounderFormData({
             ...ourFounderFormData,
             [e.target.name]: e.target.value
         });
     };
-
     const handleOurFounderImageChange = (e) => {
         const file = e.target.files[0];
         setOurFounderImage(file);
     };
-
     const handleOurFounderSubmit = async (e) => {
         e.preventDefault();
         setOurFounderLoading(true);
-
         try {
             const formData = new FormData();
             formData.append('name', ourFounderFormData.name);
             formData.append('designation', ourFounderFormData.designation);
             formData.append('description', ourFounderFormData.description);
-
             if (ourFounderImage) {
                 formData.append('image', ourFounderImage);
             }
-
             if (isEditingOurFounder) {
                 await ourFounderAPI.update(editingOurFounderId, formData);
-                setMessage('✅ Our founder content updated successfully!');
+                setMessage('Our founder content updated successfully!');
             } else {
                 await ourFounderAPI.create(formData);
-                setMessage('✅ Our founder content created successfully!');
+                setMessage('Our founder content created successfully!');
             }
-
             fetchOurFounderData();
             resetOurFounderForm();
         } catch (error) {
             console.error('Error saving our founder content:', error);
-            setMessage(error.response?.data?.message || '❌ Failed to save our founder content.');
+            setMessage(error.response?.data?.message || 'Failed to save our founder content.');
         } finally {
             setOurFounderLoading(false);
         }
     };
-
     const handleEditOurFounder = (item) => {
         setOurFounderFormData({
             name: item.name,
@@ -598,20 +511,18 @@ const AboutUs = () => {
         setEditingOurFounderId(item._id);
         setShowOurFounderForm(true);
     };
-
     const handleDeleteOurFounder = async (id) => {
         if (window.confirm('Are you sure you want to delete this our founder content?')) {
             try {
                 await ourFounderAPI.delete(id);
-                setMessage('✅ Our founder content deleted successfully!');
+                setMessage('Our founder content deleted successfully!');
                 fetchOurFounderData();
             } catch (error) {
                 console.error('Error deleting our founder content:', error);
-                setMessage('❌ Failed to delete our founder content.');
+                setMessage('Failed to delete our founder content.');
             }
         }
     };
-
     const resetOurFounderForm = () => {
         setOurFounderFormData({
             name: '',
@@ -623,13 +534,10 @@ const AboutUs = () => {
         setIsEditingOurFounder(false);
         setEditingOurFounderId(null);
     };
-
-    // Pagination logic
     const totalPages = Math.ceil(aboutPages.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const currentItems = aboutPages.slice(startIndex, endIndex);
-
     return (
         <div className="container-fluid py-4">
             <div className="row mb-4">
@@ -664,7 +572,6 @@ const AboutUs = () => {
                     </div>
                 </div>
             </div>
-
             {message && (
                 <div className="row mb-4">
                     <div className="col-12">
@@ -676,7 +583,6 @@ const AboutUs = () => {
                     </div>
                 </div>
             )}
-
             {fetchLoading && (
                 <div className="row mb-4">
                     <div className="col-12 text-center">
@@ -686,8 +592,6 @@ const AboutUs = () => {
                     </div>
                 </div>
             )}
-
-            {/* Create/Edit Form */}
             {showForm && (
                 <div className="card mb-4">
                     <div className="card-header" style={{ background: '#0ea5e9', color: '#fff' }}>
@@ -808,8 +712,6 @@ const AboutUs = () => {
                     </div>
                 </div>
             )}
-
-            {/* About Us Content Display */}
             {!showForm && (
                 <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
                     <div className="dashboard-card-header px-4 py-3" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
@@ -819,7 +721,6 @@ const AboutUs = () => {
                         </h4>
                     </div>
                     <div className="dashboard-card-body px-4 py-4">
-                        {/* Content List */}
                         {currentItems.length > 0 ? (
                             <>
                                 <div className="table-responsive">

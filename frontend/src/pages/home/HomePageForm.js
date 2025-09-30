@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { homePageAPI } from '../../services/api';
 import Alert from '../../components/Alert';
-
 const HomePageForm = () => {
     const [formData, setFormData] = useState({
         heading: '',
@@ -17,10 +16,8 @@ const HomePageForm = () => {
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
-
     const handleChange = (e) => {
         const { name, value } = e.target;
-
         if (name.startsWith('button.')) {
             const buttonField = name.split('.')[1];
             setFormData(prev => ({
@@ -46,15 +43,12 @@ const HomePageForm = () => {
             }));
         }
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
-
         try {
             const response = await homePageAPI.create(formData);
-
             setMessage('Homepage content created successfully!');
             setFormData({
                 heading: '',
@@ -74,7 +68,6 @@ const HomePageForm = () => {
             setLoading(false);
         }
     };
-
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -91,7 +84,6 @@ const HomePageForm = () => {
                                     onClose={() => setMessage('')}
                                 />
                             )}
-
                             <form onSubmit={handleSubmit}>
                                 {/* Heading */}
                                 <div className="mb-3">
@@ -107,7 +99,6 @@ const HomePageForm = () => {
                                         required
                                     />
                                 </div>
-
                                 {/* Description */}
                                 <div className="mb-3">
                                     <label htmlFor="description" className="form-label">Description *</label>
@@ -122,7 +113,6 @@ const HomePageForm = () => {
                                         required
                                     ></textarea>
                                 </div>
-
                                 {/* Button Section */}
                                 <div className="card mb-3">
                                     <div className="card-header">
@@ -159,7 +149,6 @@ const HomePageForm = () => {
                                         </div>
                                     </div>
                                 </div>
-
                                 {/* Image Section */}
                                 <div className="card mb-3">
                                     <div className="card-header">
@@ -235,5 +224,4 @@ const HomePageForm = () => {
         </div>
     );
 };
-
 export default HomePageForm;

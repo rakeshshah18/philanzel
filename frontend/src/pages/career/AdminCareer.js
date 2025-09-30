@@ -2,25 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Alert from '../../components/Alert';
 import api from '../../services/api';
-
-// Helper function to get the correct image URL
 const getImageURL = (filename) => {
     const baseURL = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000';
     return `${baseURL}/uploads/images/${filename}`;
 };
-
 const AdminCareer = () => {
-    // Sorting config must be the first hook to avoid no-use-before-define
     const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
-    // Sort applications based on current sort config
     const sortApplications = useCallback((applicationsToSort) => {
         if (!sortConfig.key) return applicationsToSort;
-
         return [...applicationsToSort].sort((a, b) => {
             let aValue = a[sortConfig.key];
             let bValue = b[sortConfig.key];
-
-            // Handle different data types
             switch (sortConfig.key) {
                 case 'fullName':
                     aValue = aValue?.toLowerCase() || '';
@@ -38,7 +30,6 @@ const AdminCareer = () => {
                     aValue = aValue || '';
                     bValue = bValue || '';
             }
-
             if (aValue < bValue) {
                 return sortConfig.direction === 'asc' ? -1 : 1;
             }
@@ -48,11 +39,8 @@ const AdminCareer = () => {
             return 0;
         });
     }, [sortConfig]);
-    // Restore missing functions
-    // Apply all filters (search + date range)
     const applyFilters = useCallback((applicationsData, searchValue, dateFilter) => {
         let result = applicationsData;
-        // Apply search filter
         if (searchValue) {
             result = result.filter(app =>
                 app.fullName?.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -61,7 +49,6 @@ const AdminCareer = () => {
                 app.message?.toLowerCase().includes(searchValue.toLowerCase())
             );
         }
-        // Apply date range filter
         if (dateFilter.startDate || dateFilter.endDate) {
             result = result.filter(app => {
                 const appDate = new Date(app.createdAt);
@@ -80,27 +67,19 @@ const AdminCareer = () => {
         const sortedResult = sortApplications(result);
         setFilteredApplications(sortedResult);
     }, [sortApplications]);
-
-    // Clear search
     const clearSearch = () => {
         setSearchTerm('');
         applyFilters(applications, '', dateRange);
     };
-
-    // Clear date filter
     const clearDateFilter = () => {
         setDateRange({ startDate: '', endDate: '' });
         applyFilters(applications, searchTerm, { startDate: '', endDate: '' });
     };
-
-    // Handle date range change
     const handleDateRangeChange = (field, value) => {
         const newDateRange = { ...dateRange, [field]: value };
         setDateRange(newDateRange);
         applyFilters(applications, searchTerm, newDateRange);
     };
-
-    // Sorting functionality
     const handleSort = (key) => {
         let direction = 'asc';
         if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -110,8 +89,6 @@ const AdminCareer = () => {
     };
     const { isAuthenticated } = useAuth();
     const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-
-    // Add custom styles for date filters and proper backgrounds
     const filterStyles = {
         dateFilterCard: {
             backgroundColor: '#f8f9fa',
@@ -143,8 +120,6 @@ const AdminCareer = () => {
             backgroundColor: '#f8f9fa'
         }
     };
-
-    // Career Post Content State (CRUD for heading, description, image)
     const [careerPosts, setCareerPosts] = useState([]);
     const [showPostForm, setShowPostForm] = useState(false);
     const [editingPost, setEditingPost] = useState(null);
@@ -153,8 +128,6 @@ const AdminCareer = () => {
         description: '',
         image: null
     });
-
-    // Career Applications State (Table view of form submissions)
     const [applications, setApplications] = useState([]);
     const [filteredApplications, setFilteredApplications] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -162,16 +135,13 @@ const AdminCareer = () => {
     const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
     const [showDateFilter, setShowDateFilter] = useState(true);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('content'); // 'content' or 'applications'
-
+    const [activeTab, setActiveTab] = useState('content');
     const showAlert = (message, type) => {
         setAlert({ show: true, message, type });
         setTimeout(() => {
             setAlert({ show: false, message: '', type: '' });
         }, 5000);
     };
-
-    // Fetch career posts (content management)
     const fetchCareerPosts = useCallback(async () => {
         try {
             const response = await api.get('/career-posts');
@@ -183,18 +153,14 @@ const AdminCareer = () => {
             showAlert('Failed to fetch career posts', 'error');
         }
     }, []);
-
-    // Fetch career applications (form submissions)
     const fetchApplications = useCallback(async (search = '') => {
         try {
             setLoading(search === '');
             setSearchLoading(search !== '');
-
             let url = '/user/applications';
             if (search.trim()) {
                 url += `?search=${encodeURIComponent(search.trim())}`;
             }
-
             const response = await api.get(url);
             if (response.data.status === 'success') {
                 const applicationsData = response.data.data;
@@ -209,38 +175,28 @@ const AdminCareer = () => {
             setSearchLoading(false);
         }
     }, []);
-
-    // Handle search functionality
     const handleSearch = async (searchValue) => {
         setSearchTerm(searchValue);
-
         if (searchValue.trim() === '') {
-            // If search is empty, apply only date filter with current sorting
             applyFilters(applications, '', dateRange);
             return;
         }
-
-        // Debounce search to avoid too many API calls
         clearTimeout(window.searchTimeout);
         window.searchTimeout = setTimeout(async () => {
             try {
                 setSearchLoading(true);
                 const response = await api.get(`/user/applications?search=${encodeURIComponent(searchValue.trim())}`);
                 if (response.data.status === 'success') {
-                    // Apply both search and date filters
                     applyFilters(response.data.data, searchValue, dateRange);
                 }
             } catch (error) {
                 console.error('Error searching applications:', error);
-                // Fallback to client-side filtering
                 applyFilters(applications, searchValue, dateRange);
             } finally {
                 setSearchLoading(false);
             }
-        }, 300); // 300ms debounce
+        }, 300);
     };
-
-    // Clear search
     <style jsx>{`
                 .active-career-tab {
                     color: #fff;
@@ -318,9 +274,6 @@ const AdminCareer = () => {
                     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
                 }
             `}</style>
-
-
-    // Get sort icon for column headers
     const getSortIcon = (columnKey) => {
         if (sortConfig.key !== columnKey) {
             return <i className="fas fa-sort text-muted ms-1"></i>;
@@ -329,20 +282,15 @@ const AdminCareer = () => {
             ? <i className="fas fa-sort-up text-primary ms-1"></i>
             : <i className="fas fa-sort-down text-primary ms-1"></i>;
     };
-
     useEffect(() => {
         if (isAuthenticated) {
             fetchCareerPosts();
             fetchApplications();
         }
     }, [isAuthenticated, fetchCareerPosts, fetchApplications]);
-
-    // Update filtered applications when applications, sort, or filters change
     useEffect(() => {
         applyFilters(applications, searchTerm, dateRange);
     }, [applications, sortConfig, searchTerm, dateRange, applyFilters]);
-
-    // Handle post form input changes
     const handlePostFormChange = (e) => {
         const { name, value, files } = e.target;
         setPostFormData(prev => ({
@@ -350,42 +298,32 @@ const AdminCareer = () => {
             [name]: files ? files[0] : value
         }));
     };
-
-    // Submit career post form (Create/Update)
     const handlePostFormSubmit = async (e) => {
         e.preventDefault();
-
         if (!postFormData.heading.trim() || !postFormData.description.trim()) {
             showAlert('Heading and description are required', 'error');
             return;
         }
-
         try {
             const formData = new FormData();
             formData.append('heading', postFormData.heading.trim());
             formData.append('description', postFormData.description.trim());
-
             if (postFormData.image) {
                 formData.append('image', postFormData.image);
             }
-
             if (editingPost) {
-                // Update existing post
                 const response = await api.put(`/admin/career-posts/${editingPost._id}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-
                 if (response.data.status === 'success') {
                     showAlert('Career post updated successfully', 'success');
                     fetchCareerPosts();
                     resetPostForm();
                 }
             } else {
-                // Create new post
                 const response = await api.post('/admin/career-posts', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-
                 if (response.data.status === 'success') {
                     showAlert('Career post created successfully', 'success');
                     fetchCareerPosts();
@@ -398,15 +336,11 @@ const AdminCareer = () => {
             showAlert(errorMessage, 'error');
         }
     };
-
-    // Reset post form
     const resetPostForm = () => {
         setPostFormData({ heading: '', description: '', image: null });
         setEditingPost(null);
         setShowPostForm(false);
     };
-
-    // Edit career post
     const handleEditPost = (post) => {
         setPostFormData({
             heading: post.heading,
@@ -416,13 +350,10 @@ const AdminCareer = () => {
         setEditingPost(post);
         setShowPostForm(true);
     };
-
-    // Delete career post
     const handleDeletePost = async (postId) => {
         if (!window.confirm('Are you sure you want to delete this career post?')) {
             return;
         }
-
         try {
             const response = await api.delete(`/admin/career-posts/${postId}`);
             if (response.data.status === 'success') {
@@ -435,8 +366,6 @@ const AdminCareer = () => {
             showAlert(errorMessage, 'error');
         }
     };
-
-    // Format date
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -446,8 +375,6 @@ const AdminCareer = () => {
             minute: '2-digit'
         });
     };
-
-    // Download resume
     const handleDownloadResume = (resumeInfo, applicantName) => {
         if (resumeInfo && resumeInfo.filename) {
             const link = document.createElement('a');
@@ -458,7 +385,6 @@ const AdminCareer = () => {
             document.body.removeChild(link);
         }
     };
-
     if (!isAuthenticated) {
         return (
             <div className="container mt-5 text-center">
@@ -467,7 +393,6 @@ const AdminCareer = () => {
             </div>
         );
     }
-
     return (
         <div className="container-fluid mt-4">
             <style>
@@ -525,8 +450,6 @@ const AdminCareer = () => {
                             onClose={() => setAlert({ show: false, message: '', type: '' })}
                         />
                     )}
-
-                    {/* Tabs */}
                     <ul className="nav nav-tabs mb-4">
                         <li className="nav-item">
                             <button
@@ -552,8 +475,6 @@ const AdminCareer = () => {
                             </button>
                         </li>
                     </ul>
-
-                    {/* Content Management Tab */}
                     {activeTab === 'content' && (
                         <div className="tab-pane">
                             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -571,8 +492,6 @@ const AdminCareer = () => {
                                     </button>
                                 </div>
                             </div>
-
-                            {/* Add/Edit Form */}
                             {showPostForm && (
                                 <div className="card mb-4">
                                     <div className="card-header">

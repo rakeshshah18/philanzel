@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Alert from './Alert';
 import api from '../services/api';
-
 const CareerApplicationForm = ({ onSuccess }) => {
     const [alert, setAlert] = useState({ show: false, message: '', type: '' });
     const [submitting, setSubmitting] = useState(false);
@@ -12,15 +11,12 @@ const CareerApplicationForm = ({ onSuccess }) => {
         message: '',
         resume: null
     });
-
     const showAlert = (message, type) => {
         setAlert({ show: true, message, type });
         setTimeout(() => {
             setAlert({ show: false, message: '', type: '' });
         }, 5000);
     };
-
-    // Handle form input changes
     const handleInputChange = (e) => {
         const { name, value, files } = e.target;
         setFormData(prev => ({
@@ -28,50 +24,37 @@ const CareerApplicationForm = ({ onSuccess }) => {
             [name]: files ? files[0] : value
         }));
     };
-
-    // Submit application form
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.message.trim()) {
             showAlert('Please fill in all required fields', 'error');
             return;
         }
-
-        // Basic email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.email)) {
             showAlert('Please enter a valid email address', 'error');
             return;
         }
-
-        // Basic phone validation
         const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
         if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
             showAlert('Please enter a valid phone number', 'error');
             return;
         }
-
         try {
             setSubmitting(true);
-
             const applicationData = new FormData();
             applicationData.append('fullName', formData.fullName.trim());
             applicationData.append('email', formData.email.trim());
             applicationData.append('phone', formData.phone.trim());
             applicationData.append('message', formData.message.trim());
-
             if (formData.resume) {
                 applicationData.append('resume', formData.resume);
             }
-
             const response = await api.post('/user/career-inquiry', applicationData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-
             if (response.data.status === 'success') {
                 showAlert('Application submitted successfully! We will contact you soon.', 'success');
-                // Reset form
                 setFormData({
                     fullName: '',
                     email: '',
@@ -79,11 +62,8 @@ const CareerApplicationForm = ({ onSuccess }) => {
                     message: '',
                     resume: null
                 });
-                // Reset file input
                 const fileInput = document.getElementById('resume');
                 if (fileInput) fileInput.value = '';
-
-                // Call onSuccess callback if provided
                 if (onSuccess) {
                     onSuccess();
                 }
@@ -96,14 +76,12 @@ const CareerApplicationForm = ({ onSuccess }) => {
             setSubmitting(false);
         }
     };
-
     return (
         <div className="card shadow">
             <div className="card-header bg-primary text-white">
                 <h3 className="mb-0 text-center">Apply Now</h3>
             </div>
             <div className="card-body">
-                {/* Alert */}
                 {alert.show && (
                     <Alert
                         message={alert.message}
@@ -111,7 +89,6 @@ const CareerApplicationForm = ({ onSuccess }) => {
                         onClose={() => setAlert({ show: false, message: '', type: '' })}
                     />
                 )}
-
                 <form onSubmit={handleSubmit}>
                     <div className="row">
                         <div className="col-md-6 mb-3">
@@ -145,7 +122,6 @@ const CareerApplicationForm = ({ onSuccess }) => {
                             />
                         </div>
                     </div>
-
                     <div className="row">
                         <div className="col-md-6 mb-3">
                             <label htmlFor="phone" className="form-label">
@@ -195,7 +171,6 @@ const CareerApplicationForm = ({ onSuccess }) => {
                             placeholder="Tell us about yourself, your experience, and why you'd like to join our team..."
                         />
                     </div>
-
                     <div className="text-center">
                         <button
                             type="submit"

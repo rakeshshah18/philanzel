@@ -2,20 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Alert from '../../components/Alert';
 import api from '../../services/api';
-
-// Helper function to get the correct image URL
 const getImageURL = (filename) => {
     const baseURL = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000';
     const fullURL = `${baseURL}/uploads/images/${filename}`;
     console.log('Generated image URL:', fullURL);
     return fullURL;
 };
-
 const Career = () => {
     const { isAuthenticated } = useAuth();
     const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-
-    // Career Post Content State (CRUD for heading, description, image)
     const [careerPosts, setCareerPosts] = useState([]);
     const [showPostForm, setShowPostForm] = useState(false);
     const [editingPost, setEditingPost] = useState(null);
@@ -24,11 +19,9 @@ const Career = () => {
         description: '',
         image: null
     });
-
-    // Career Applications State (Table view of form submissions)
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('content'); // 'content' or 'applications'
+    const [activeTab, setActiveTab] = useState('content');
 
     const showAlert = (message, type) => {
         setAlert({ show: true, message, type });
@@ -36,14 +29,11 @@ const Career = () => {
             setAlert({ show: false, message: '', type: '' });
         }, 5000);
     };
-
-    // Fetch career posts (content management)
     const fetchCareerPosts = async () => {
         try {
             const response = await api.get('/career-posts');
             if (response.data.status === 'success') {
                 console.log('Career posts fetched:', response.data.data);
-                // Debug image structure
                 response.data.data.forEach((post, index) => {
                     console.log(`Post ${index + 1} image:`, post.image);
                 });
@@ -54,8 +44,6 @@ const Career = () => {
             showAlert('Failed to fetch career posts', 'error');
         }
     };
-
-    // Fetch career applications (form submissions)
     const fetchApplications = async () => {
         try {
             setLoading(true);
@@ -70,15 +58,12 @@ const Career = () => {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         if (isAuthenticated) {
             fetchCareerPosts();
             fetchApplications();
         }
     }, [isAuthenticated]);
-
-    // Handle post form input changes
     const handlePostFormChange = (e) => {
         const { name, value, files } = e.target;
         setPostFormData(prev => ({
@@ -86,16 +71,12 @@ const Career = () => {
             [name]: files ? files[0] : value
         }));
     };
-
-    // Submit career post form (Create/Update)
     const handlePostFormSubmit = async (e) => {
         e.preventDefault();
-
         if (!postFormData.heading.trim() || !postFormData.description.trim()) {
             showAlert('Heading and description are required', 'error');
             return;
         }
-
         try {
             const formData = new FormData();
             formData.append('heading', postFormData.heading.trim());
@@ -104,24 +85,19 @@ const Career = () => {
             if (postFormData.image) {
                 formData.append('image', postFormData.image);
             }
-
             if (editingPost) {
-                // Update existing post
                 const response = await api.put(`/admin/career-posts/${editingPost._id}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-
                 if (response.data.status === 'success') {
                     showAlert('Career post updated successfully', 'success');
                     fetchCareerPosts();
                     resetPostForm();
                 }
             } else {
-                // Create new post
                 const response = await api.post('/admin/career-posts', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-
                 if (response.data.status === 'success') {
                     showAlert('Career post created successfully', 'success');
                     fetchCareerPosts();
@@ -134,15 +110,11 @@ const Career = () => {
             showAlert(errorMessage, 'error');
         }
     };
-
-    // Reset post form
     const resetPostForm = () => {
         setPostFormData({ heading: '', description: '', image: null });
         setEditingPost(null);
         setShowPostForm(false);
     };
-
-    // Edit career post
     const handleEditPost = (post) => {
         setPostFormData({
             heading: post.heading,
@@ -152,13 +124,10 @@ const Career = () => {
         setEditingPost(post);
         setShowPostForm(true);
     };
-
-    // Delete career post
     const handleDeletePost = async (postId) => {
         if (!window.confirm('Are you sure you want to delete this career post?')) {
             return;
         }
-
         try {
             const response = await api.delete(`/admin/career-posts/${postId}`);
             if (response.data.status === 'success') {
@@ -171,8 +140,6 @@ const Career = () => {
             showAlert(errorMessage, 'error');
         }
     };
-
-    // Format date
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -182,8 +149,6 @@ const Career = () => {
             minute: '2-digit'
         });
     };
-
-    // Download resume
     const handleDownloadResume = (resumeInfo, applicantName) => {
         if (resumeInfo && resumeInfo.filename) {
             const link = document.createElement('a');
@@ -194,7 +159,6 @@ const Career = () => {
             document.body.removeChild(link);
         }
     };
-
     if (!isAuthenticated) {
         return (
             <div className="container mt-5 text-center">
@@ -203,14 +167,11 @@ const Career = () => {
             </div>
         );
     }
-
     return (
         <div className="container-fluid mt-4">
             <div className="row">
                 <div className="col-12">
                     <h2 className="mb-4">Career Management Dashboard</h2>
-
-                    {/* Alert */}
                     {alert.show && (
                         <Alert
                             message={alert.message}
@@ -218,7 +179,6 @@ const Career = () => {
                             onClose={() => setAlert({ show: false, message: '', type: '' })}
                         />
                     )}
-
                     {/* Tabs */}
                     <ul className="nav nav-tabs mb-4">
                         <li className="nav-item">
@@ -399,10 +359,10 @@ const Career = () => {
                                                         </div>
                                                     </div>
                                                 )}
-                                                <div className="card-body d-flex flex-column">
+                                                <div className="card-body d-flex flex-column ">
                                                     <h5 className="card-title">{post.heading}</h5>
                                                     <p className="card-text flex-grow-1">{post.description}</p>
-                                                    <div className="mt-auto">
+                                                    <div className="mt-auto ">
                                                         <small className="text-muted">
                                                             Created: {formatDate(post.createdAt)}
                                                         </small>

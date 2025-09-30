@@ -14,11 +14,9 @@ function PublicPartner() {
     useEffect(() => {
         fetchPartnerData();
     }, []);
-
     const fetchPartnerData = async () => {
         try {
             const response = await api.get('/partner-posts');
-            console.log('Public partner posts response:', response.data);
             if (response.data && response.data.data && response.data.data.length > 0) {
                 const post = response.data.data[0];
                 setPartnerData({
@@ -29,7 +27,6 @@ function PublicPartner() {
             }
         } catch (error) {
             console.error('Error fetching partner data:', error);
-            // Set default data on error
             setPartnerData({
                 heading: 'Become Our Partner',
                 thought: 'Building success together',
@@ -37,10 +34,8 @@ function PublicPartner() {
             });
         }
     };
-
     return (
         <div>
-            {/* Hero Section */}
             <section className="py-5 bg-light">
                 <Container>
                     <Row className="align-items-center justify-content-center">
@@ -65,8 +60,6 @@ function PublicPartner() {
                     </Row>
                 </Container>
             </section>
-
-            {/* Benefits Section */}
             <section className="py-5">
                 <Container>
                     <Row>
@@ -105,8 +98,6 @@ function PublicPartner() {
                     </Row>
                 </Container>
             </section>
-
-            {/* Partnership Process */}
             <section className="py-5 bg-light">
                 <Container>
                     <Row>
@@ -154,8 +145,6 @@ function PublicPartner() {
                     </Row>
                 </Container>
             </section>
-
-            {/* Call to Action */}
             <section className="py-5 bg-primary text-white">
                 <Container>
                     <Row>
@@ -175,8 +164,6 @@ function PublicPartner() {
                     </Row>
                 </Container>
             </section>
-
-            {/* Partnership Application Form Modal */}
             <PartnerApplicationForm
                 show={showForm}
                 onHide={() => setShowForm(false)}

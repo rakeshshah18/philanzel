@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { getAllSections, createSection, updateSection, deleteSection } from './SectionService';
-
 const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreateModal: externalSetShowCreateModal }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [editSectionId, setEditSectionId] = useState(null);
@@ -42,14 +41,12 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
     useEffect(() => {
         fetchSections();
     }, []);
-
     const fetchSections = async () => {
         setLoading(true);
         const res = await getAllSections();
         setSections(res.data || []);
         setLoading(false);
     };
-
     const handleCreate = async (e) => {
         e.preventDefault();
         await createSection(formData);
@@ -57,7 +54,6 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
         setFormData({ name: '', heading: [''], description: [''], subheading: [''], subdescription: [''], images: [''], faqs: [{ question: '', answer: '' }] });
         fetchSections();
     };
-
     return (
         <div>
             {loading ? <div>Loading...</div> : (
@@ -288,7 +284,6 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                     <label className="form-label">Section Name:</label>
                                     <input type="text" className="form-control mb-2" placeholder="Section Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
                                     <label className="form-label">Fields:</label>
-                                    {/* Heading */}
                                     <label>Heading:</label>
                                     {formData.heading.map((val, idx) => (
                                         <div key={idx} className="input-group mb-2">
@@ -301,7 +296,6 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                             <button type="button" className="btn btn-outline-danger" style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={() => setFormData({ ...formData, heading: formData.heading.filter((_, i) => i !== idx) })} disabled={formData.heading.length === 1}><i className="bi bi-dash-lg"></i></button>
                                         </div>
                                     ))}
-                                    {/* Description */}
                                     <label>Description:</label>
                                     {formData.description.map((val, idx) => (
                                         <div key={idx} className="input-group mb-2">
@@ -327,8 +321,6 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                             <button type="button" className="btn btn-outline-danger" style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={() => setFormData({ ...formData, subheading: formData.subheading.filter((_, i) => i !== idx) })} disabled={formData.subheading.length === 1}><i className="bi bi-dash-lg"></i></button>
                                         </div>
                                     ))}
-                                    {/* Points */}
-                                    {/* Subdescription */}
                                     <label>Subdescription:</label>
                                     {formData.subdescription.map((val, idx) => (
                                         <div key={idx} className="input-group mb-2">
@@ -341,7 +333,6 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                             <button type="button" className="btn btn-outline-danger" style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={() => setFormData({ ...formData, subdescription: formData.subdescription.filter((_, i) => i !== idx) })} disabled={formData.subdescription.length === 1}><i className="bi bi-dash-lg"></i></button>
                                         </div>
                                     ))}
-                                    {/* Points */}
                                     <label>Points:</label>
                                     {formData.points.map((val, idx) => (
                                         <div key={idx} className="input-group mb-2">
@@ -354,7 +345,6 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                             <button type="button" className="btn btn-outline-danger" style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={() => setFormData({ ...formData, points: formData.points.filter((_, i) => i !== idx) })} disabled={formData.points.length === 1}><i className="bi bi-dash-lg"></i></button>
                                         </div>
                                     ))}
-                                    {/* Images */}
                                     <label>Images:</label>
                                     {formData.images.map((val, idx) => (
                                         <div key={idx} className="input-group mb-2">
@@ -367,7 +357,6 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                             <button type="button" className="btn btn-outline-danger" style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={() => setFormData({ ...formData, images: formData.images.filter((_, i) => i !== idx) })} disabled={formData.images.length === 1}><i className="bi bi-dash-lg"></i></button>
                                         </div>
                                     ))}
-                                    {/* FAQs */}
                                     <label>FAQs:</label>
                                     {formData.faqs.map((faq, idx) => (
                                         <div key={idx} className="input-group mb-2">
@@ -385,7 +374,6 @@ const SectionManager = ({ showCreateModal: externalShowCreateModal, setShowCreat
                                             <button type="button" className="btn btn-outline-danger" style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={() => setFormData({ ...formData, faqs: formData.faqs.filter((_, i) => i !== idx) })} disabled={formData.faqs.length === 1}><i className="bi bi-dash-lg"></i></button>
                                         </div>
                                     ))}
-                                    {/* ExtraSubheading */}
                                 </div>
                                 <button type="submit" className="btn btn-success">Create</button>
                             </form>

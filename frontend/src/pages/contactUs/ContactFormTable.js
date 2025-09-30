@@ -1,23 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import axios from 'axios';
-
 const API_URL = process.env.NODE_ENV === 'production'
     ? 'https://philanzel-backend.vercel.app/api/contact-us/forms'
     : 'http://localhost:8000/api/contact-us/forms';
-
 const ContactFormTable = () => {
-    // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const [recordsPerPage, setRecordsPerPage] = useState(10);
-    // Selection state
     const [selectedRows, setSelectedRows] = useState([]);
-    // Table/filter/sort/search state
     const [formSubmissions, setFormSubmissions] = useState([]);
     const [error, setError] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
     const [search, setSearch] = useState({ term: '', date: '' });
-    // Memoized sorted submissions
     const sortedSubmissions = React.useMemo(() => {
         let sortable = [...formSubmissions];
         if (sortConfig.key) {
@@ -37,10 +31,8 @@ const ContactFormTable = () => {
         }
         return sortable;
     }, [formSubmissions, sortConfig]);
-    // Pagination logic (must be after sortedSubmissions)
     const totalPages = Math.ceil(sortedSubmissions.length / recordsPerPage);
     const paginatedSubmissions = sortedSubmissions.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage);
-    // Select all logic
     const isAllSelected = paginatedSubmissions.length > 0 && paginatedSubmissions.every(sub => selectedRows.includes(sub._id));
     const handleSelectAll = () => {
         if (isAllSelected) {
@@ -52,14 +44,12 @@ const ContactFormTable = () => {
     const handleSelectRow = (id) => {
         setSelectedRows(prev => prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]);
     };
-    // Delete selected handler
     const handleDeleteSelected = async () => {
         if (selectedRows.length === 0) return;
         if (!window.confirm('Are you sure you want to delete the selected submissions?')) return;
         try {
             await axios.delete(API_URL, { data: { ids: selectedRows } });
             setSelectedRows([]);
-            // Re-fetch submissions to ensure UI matches database
             const params = {};
             if (search.term) params.term = search.term;
             if (search.date) params.date = search.date;
@@ -70,7 +60,6 @@ const ContactFormTable = () => {
             setError('Failed to delete selected submissions');
         }
     };
-    // Export to Excel handler
     const handleExportExcel = () => {
         const data = sortedSubmissions.map(sub => ({
             Name: sub.name,
@@ -84,22 +73,17 @@ const ContactFormTable = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, 'ContactForms');
         XLSX.writeFile(workbook, 'Contact users.xlsx');
     };
-    // Manual refresh handler
     const handleRefresh = () => {
         setSearch({ term: '', date: '' });
         setSortConfig({ key: 'createdAt', direction: 'desc' });
         setSelectedRows([]);
     };
-
-    // Fetch submissions with search filters
     useEffect(() => {
         const params = {};
         if (search.term) params.term = search.term;
         if (search.date) {
-            // Accept both YYYY-MM-DD and MM/DD/YYYY
             let dateParam = search.date;
             if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(search.date)) {
-                // Convert MM/DD/YYYY to YYYY-MM-DD
                 const [month, day, year] = search.date.split('/');
                 dateParam = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
             }
@@ -112,10 +96,6 @@ const ContactFormTable = () => {
             })
             .catch(() => setError('Failed to fetch contact form submissions'));
     }, [search]);
-
-    // Pagination logic (must be after sortedSubmissions)
-    // ...existing code...
-
     const handleSort = (key) => {
         setSortConfig(prev => {
             if (prev.key === key) {
@@ -124,11 +104,7 @@ const ContactFormTable = () => {
             return { key, direction: 'asc' };
         });
     };
-    // ...existing code...
-
-    // Reset to first page on search/filter/sort
     useEffect(() => { setCurrentPage(1); }, [search, sortConfig]);
-
     return (
         <div className="dashboard-card shadow-sm mb-5" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef', marginLeft: '2rem' }}>
             <div className="dashboard-card-header px-4 py-3" style={{ background: '#0ea5e9', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18, display: 'flex', alignItems: 'center' }}>

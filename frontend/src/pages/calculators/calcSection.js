@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { calculatorSectionsAPI } from "../../services/api";
-
 const CalcSection = ({ onSaved, hideSectionList = false }) => {
     const [sections, setSections] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [form, setForm] = useState({ sectionName: "", heading: "", content: "", faqs: [] });
     const [editingId, setEditingId] = useState(null);
-
-    // Fetch all sections
     const fetchSections = async () => {
         setLoading(true);
         try {
@@ -21,37 +18,26 @@ const CalcSection = ({ onSaved, hideSectionList = false }) => {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         if (!hideSectionList) {
             fetchSections();
         }
     }, [hideSectionList]);
-
-    // Handle form input
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
-
-    // Handle FAQ change
     const handleFaqChange = (idx, field, value) => {
         const faqs = [...form.faqs];
         faqs[idx][field] = value;
         setForm({ ...form, faqs });
     };
-
-    // Add FAQ
     const addFaq = () => {
         setForm({ ...form, faqs: [...form.faqs, { question: "", description: "" }] });
     };
-
-    // Remove FAQ
     const removeFaq = (idx) => {
         const faqs = form.faqs.filter((_, i) => i !== idx);
         setForm({ ...form, faqs });
     };
-
-    // Submit form (create or update)
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -68,14 +54,10 @@ const CalcSection = ({ onSaved, hideSectionList = false }) => {
             setError("Failed to save section");
         }
     };
-
-    // Edit section
     const handleEdit = (section) => {
         setForm({ sectionName: section.sectionName, heading: section.heading, content: section.content, faqs: section.faqs || [] });
         setEditingId(section._id);
     };
-
-    // Delete section
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this section?")) return;
         try {
@@ -85,7 +67,6 @@ const CalcSection = ({ onSaved, hideSectionList = false }) => {
             setError("Failed to delete section");
         }
     };
-
     return (
         <div className="container mt-2">
             {error && <div className="alert alert-danger">{error}</div>}

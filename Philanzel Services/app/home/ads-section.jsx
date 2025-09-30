@@ -1,15 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
-
-// Define the backend base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 const AdsSection = () => {
     const [adsData, setAdsData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // Fetch ads data from API
     useEffect(() => {
         const fetchAdsData = async () => {
             try {
@@ -21,8 +17,6 @@ const AdsSection = () => {
                 }
                 
                 const apiResponse = await response.json();
-                
-                // Extract the first visible item from the data array
                 if (apiResponse.status === 'success' && apiResponse.data.length > 0) {
                     const visibleAd = apiResponse.data.find(ad => ad.isVisible) || apiResponse.data[0];
                     setAdsData(visibleAd);
@@ -41,15 +35,11 @@ const AdsSection = () => {
 
         fetchAdsData();
     }, []);
-
-    // Helper function to strip HTML tags from description
     const stripHtmlTags = (html) => {
         const div = document.createElement('div');
         div.innerHTML = html;
         return div.textContent || div.innerText || '';
     };
-
-    // Loading state
     if (loading) {
         return (
             <section className="relative py-4 md:py-4 bg-gray-200 overflow-hidden rounded-3xl border-4 border-dotted border-white mx-auto mb-16 max-w-5xl">
@@ -76,7 +66,6 @@ const AdsSection = () => {
         );
     }
 
-    // Error state
     if (error || !adsData) {
         return (
             <section className="relative py-4 md:py-4 bg-gray-100 overflow-hidden rounded-3xl border-4 border-dotted border-white mx-auto mb-16 max-w-5xl">
@@ -113,7 +102,6 @@ const AdsSection = () => {
             <div className="banner-dot-bg absolute inset-0 w-full h-full z-0" aria-hidden="true"></div>
             <div className="relative z-10 max-w-3xl mx-auto px-2 sm:px-4 lg:px-6">
                 <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-                    {/* Dynamic Content */}
                     <div className="flex-1 flex flex-col items-center justify-center text-center py-4 px-2 md:px-4">
                         <h2 className="text-4xl md:text-5xl font-bold mb-4 text-black">
                             {adsData.title || "INVEST SMARTER, LIVE BETTER"}
@@ -134,7 +122,6 @@ const AdsSection = () => {
                             </a>
                         </div>
                     </div>
-                    {/* Dynamic Phone Image */}
                     <div className="flex-1 flex items-center justify-center relative py-4 px-2 md:px-4">
                         <img 
                             src={adsData.imageUrl || adsData.link || "/phone-1.png"} 

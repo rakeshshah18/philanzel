@@ -4,7 +4,6 @@ import { calculatorSectionsAPI, calculatorPagesAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'katex/dist/katex.min.css';
-
 const CalculatorPage = () => {
     const { slug } = useParams();
     const [showModal, setShowModal] = useState(false);
@@ -16,9 +15,7 @@ const CalculatorPage = () => {
     const [error, setError] = useState('');
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editSectionData, setEditSectionData] = useState(null);
-
     useEffect(() => {
-        // Fetch calculator page info by slug
         const fetchPage = async () => {
             try {
                 const res = await calculatorPagesAPI.getBySlug(slug);
@@ -30,7 +27,6 @@ const CalculatorPage = () => {
         };
         fetchPage();
     }, [slug]);
-
     const handleAddSectionClick = async () => {
         setShowModal(true);
         setLoading(true);
@@ -43,20 +39,16 @@ const CalculatorPage = () => {
             setLoading(false);
         }
     };
-
     const handleSectionSelect = (e) => {
         setSelectedSectionId(e.target.value);
     };
-
     const handleAddSectionToPage = async () => {
         if (!selectedSectionId) return;
         setLoading(true);
         try {
-            // API call to associate section with page using id
             await calculatorPagesAPI.addSectionToPage(pageInfo._id, selectedSectionId);
             setShowModal(false);
             setSelectedSectionId('');
-            // Refresh page sections
             const res = await calculatorPagesAPI.getBySlug(slug);
             setPageSections(res.data.sections || []);
         } catch (err) {
@@ -65,13 +57,11 @@ const CalculatorPage = () => {
             setLoading(false);
         }
     };
-
     const handleDeleteSection = async (sectionId) => {
         if (!window.confirm('Are you sure you want to delete this section from the page?')) return;
         setLoading(true);
         try {
             await calculatorPagesAPI.deleteSectionFromPage(pageInfo._id, sectionId);
-            // Refresh page sections
             const res = await calculatorPagesAPI.getBySlug(slug);
             setPageSections(res.data.sections || []);
         } catch (err) {
@@ -80,17 +70,14 @@ const CalculatorPage = () => {
             setLoading(false);
         }
     };
-
     const openEditModal = (section) => {
         setEditSectionData({ ...section });
         setEditModalOpen(true);
     };
-
     const handleEditFieldChange = (e) => {
         const { name, value } = e.target;
         setEditSectionData(prev => ({ ...prev, [name]: value }));
     };
-
     const handleEditSectionSave = async () => {
         setLoading(true);
         try {
@@ -110,7 +97,6 @@ const CalculatorPage = () => {
             setLoading(false);
         }
     };
-
     const quillModules = {
         toolbar: [
             [{ 'header': [1, 2, false] }],
@@ -122,7 +108,6 @@ const CalculatorPage = () => {
             ['clean']
         ]
     };
-
     return (
         <div className="container-fluid py-4" style={{ minHeight: '100vh' }}>
             <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: document.body.classList.contains('dark-mode') ? '#23272f' : '#f8fafc', border: 'none', boxShadow: document.body.classList.contains('dark-mode') ? '0 2px 12px #0006' : '0 2px 12px #e0e7ef' }}>

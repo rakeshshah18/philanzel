@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import PartnerApplicationForm from '../../components/PartnerApplicationForm';
 import api from '../../services/api';
-
 function BecomePartner() {
     const [partnerData, setPartnerData] = useState({
         heading: '',
@@ -10,11 +9,9 @@ function BecomePartner() {
         description: ''
     });
     const [showForm, setShowForm] = useState(false);
-
     useEffect(() => {
         fetchPartnerData();
     }, []);
-
     const fetchPartnerData = async () => {
         try {
             const response = await api.get('/partner-posts');
@@ -29,7 +26,6 @@ function BecomePartner() {
             }
         } catch (error) {
             console.error('Error fetching partner data:', error);
-            // Set default data on error
             setPartnerData({
                 heading: 'Become Our Partner',
                 thought: 'Building success together',
@@ -37,7 +33,6 @@ function BecomePartner() {
             });
         }
     };
-
     return (
         <div>
             {/* Hero Section */}

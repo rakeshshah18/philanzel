@@ -1,8 +1,5 @@
-
 import React, { useEffect } from 'react';
 import './NotAllowed.css';
-
-
 const NotAllowed = () => {
     useEffect(() => {
         document.body.classList.add('not-allowed-bg');
@@ -12,7 +9,6 @@ const NotAllowed = () => {
     }, []);
     return (
         <>
-            {/* Animated floating icons */}
             <i className="fas fa-ban floating-icon icon1"></i>
             <i className="fas fa-lock floating-icon icon2"></i>
             <i className="fas fa-user-slash floating-icon icon3"></i>

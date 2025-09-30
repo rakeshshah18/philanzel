@@ -3,18 +3,15 @@ import { useEffect, useState } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function CalculatorSection({ section }) {
-    // Accepts: sectionName, heading, content, faqs
     const [data, setData] = useState(section || null)
 
     useEffect(() => {
         if (!section) {
-            // Optionally fetch data if needed
         }
     }, [section])
 
     if (!data) return null
 
-    // Helper to strip HTML tags for plain text fallback
     const stripHtmlTags = (html) => {
         if (!html) return '';
         const div = typeof window !== 'undefined' ? document.createElement('div') : { innerHTML: '', textContent: '', innerText: '' };

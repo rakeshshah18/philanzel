@@ -2,21 +2,17 @@ import React, { useState, useEffect } from 'react';
 import axios from '../../services/api';
 import EmpoweringIndividual from './empoweringIndividual';
 import PotentialGrowth from './potentialGrowth';
-
 const OurProcess = () => {
     const [processes, setProcesses] = useState([]);
     const [form, setForm] = useState({ heading: '', description: '', steps: [{ name: '', heading: '', description: '', icon: null }] });
     const [editingId, setEditingId] = useState(null);
-
     useEffect(() => {
         fetchProcesses();
     }, []);
-
     const fetchProcesses = async () => {
         const res = await axios.get('/partner/our-process');
         setProcesses(res.data.data || []);
     };
-
     const handleChange = (e, idx, field) => {
         if (field) {
             const steps = [...form.steps];
@@ -30,16 +26,13 @@ const OurProcess = () => {
             setForm({ ...form, [e.target.name]: e.target.value });
         }
     };
-
     const addStep = () => {
         setForm({ ...form, steps: [...form.steps, { name: '', heading: '', description: '', icon: null }] });
     };
-
     const removeStep = (idx) => {
         const steps = form.steps.filter((_, i) => i !== idx);
         setForm({ ...form, steps });
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         const data = new FormData();
@@ -58,7 +51,6 @@ const OurProcess = () => {
         setEditingId(null);
         fetchProcesses();
     };
-
     const handleEdit = (proc) => {
         setEditingId(proc._id);
         setForm({
@@ -67,12 +59,10 @@ const OurProcess = () => {
             steps: proc.steps.map(s => ({ ...s, icon: s.icon }))
         });
     };
-
     const handleDelete = async (id) => {
         await axios.delete(`/partner/ourProcess/${id}`);
         fetchProcesses();
     };
-
     return (
         <div className="dashboard-card shadow-sm mb-5" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
             <div className="dashboard-card-header px-4 py-3" style={{ background: '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
@@ -162,9 +152,7 @@ const OurProcess = () => {
                         </div>
                     ))}
                 </div>
-                {/* Render Empowering Individuals below Existing Processes */}
                 <EmpoweringIndividual />
-                {/* Potential Growth is part of Become a Partner, so render here only for /partner */}
                 <PotentialGrowth />
             </div>
         </div>

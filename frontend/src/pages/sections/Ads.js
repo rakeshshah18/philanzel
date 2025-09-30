@@ -36,23 +36,18 @@ const Ads = () => {
             ['clean']
         ],
     };
-
     const quillFormats = [
         'header', 'bold', 'italic', 'underline', 'strike',
         'color', 'background', 'list', 'bullet', 'align',
         'link', 'image'
     ];
-
     useEffect(() => {
         fetchAdsSections();
     }, []);
-
-    // Fetch all ads sections (admin or public)
     const fetchAdsSections = async () => {
         try {
             setLoading(true);
             let response;
-            // If admin token exists, use admin endpoint, else use public
             const token = localStorage.getItem('adminToken');
             if (token) {
                 response = await adsSectionsAPI.getAllAdmin();
@@ -62,19 +57,16 @@ const Ads = () => {
             setAdsSections(response.data.data || []);
         } catch (error) {
             console.error('Error fetching ads sections:', error);
-            setMessage(`❌ Failed to fetch ads sections. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to fetch ads sections. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
-
     const handleSearch = async () => {
         if (!searchQuery.trim()) {
             fetchAdsSections();
             return;
         }
-
         try {
             setLoading(true);
             const response = await adsSectionsAPI.search(searchQuery);
@@ -86,7 +78,6 @@ const Ads = () => {
             setLoading(false);
         }
     };
-
     const addAdsSection = () => {
         setNewAdsData({
             title: '',
@@ -123,8 +114,6 @@ const Ads = () => {
 
         try {
             setLoading(true);
-
-            // Create FormData for file upload
             const formData = new FormData();
             formData.append('title', newAdsData.title);
             formData.append('description', newAdsData.description);
@@ -133,28 +122,24 @@ const Ads = () => {
             formData.append('linkUrl', newAdsData.linkUrl);
             formData.append('backgroundColor', newAdsData.backgroundColor);
             formData.append('isVisible', newAdsData.isVisible);
-
-            // Add image file if selected
             if (selectedImageFile) {
                 formData.append('image', selectedImageFile);
             }
-
             await adsSectionsAPI.createWithFile(formData);
-            setMessage('✅ Ads section created successfully!');
+            setMessage('Ads section created successfully!');
             setShowAddModal(false);
             setSelectedImageFile(null);
             setImagePreview('');
             await fetchAdsSections();
         } catch (error) {
             console.error('Error creating ads section:', error);
-            setMessage(`❌ Failed to create ads section. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to create ads section. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
 
     const editAdsSection = (adsSection) => {
-        // Handle backward compatibility with old field names
         setEditingData({
             ...adsSection,
             imageUrl: adsSection.imageUrl || adsSection.image || (adsSection.link && adsSection.link.includes('image') ? adsSection.link : ''),
@@ -164,10 +149,9 @@ const Ads = () => {
         setImagePreview('');
         setShowEditModal(true);
     };
-
     const saveEditedAdsSection = async () => {
         if (!editingData.title.trim()) {
-            setMessage('❌ Title is required');
+            setMessage('Title is required');
             return;
         }
 
@@ -175,7 +159,6 @@ const Ads = () => {
             setLoading(true);
 
             if (selectedImageFile) {
-                // If new image file selected, use FormData
                 const formData = new FormData();
                 formData.append('title', editingData.title);
                 formData.append('description', editingData.description);
@@ -188,11 +171,10 @@ const Ads = () => {
 
                 await adsSectionsAPI.updateWithFile(editingData._id, formData);
             } else {
-                // No new file, use regular update
                 await adsSectionsAPI.update(editingData._id, editingData);
             }
 
-            setMessage('✅ Ads section updated successfully!');
+            setMessage('Ads section updated successfully!');
             setShowEditModal(false);
             setEditingData(null);
             setSelectedImageFile(null);
@@ -200,12 +182,11 @@ const Ads = () => {
             await fetchAdsSections();
         } catch (error) {
             console.error('Error updating ads section:', error);
-            setMessage(`❌ Failed to update ads section. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to update ads section. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const toggleVisibility = async (id, currentVisibility) => {
         try {
             setLoading(true);
@@ -215,49 +196,44 @@ const Ads = () => {
                     ...adsSection,
                     isVisible: !currentVisibility
                 });
-                setMessage('✅ Visibility updated successfully!');
+                setMessage('Visibility updated successfully!');
                 await fetchAdsSections();
             }
         } catch (error) {
             console.error('Error updating visibility:', error);
-            setMessage(`❌ Failed to update visibility. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to update visibility. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const deleteAdsSection = async (id) => {
         if (!window.confirm('Are you sure you want to delete this ads section?')) {
             return;
         }
-
         try {
             setLoading(true);
             await adsSectionsAPI.delete(id);
-            setMessage('✅ Ads section deleted successfully!');
+            setMessage('Ads section deleted successfully!');
             await fetchAdsSections();
         } catch (error) {
             console.error('Error deleting ads section:', error);
-            setMessage(`❌ Failed to delete ads section. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to delete ads section. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleNewAdsChange = (field, value) => {
         setNewAdsData(prev => ({
             ...prev,
             [field]: value
         }));
     };
-
     const handleEditChange = (field, value) => {
         setEditingData(prev => ({
             ...prev,
             [field]: value
         }));
     };
-
     return (
         <div className="container-fluid py-4" style={{
             background: document.body.classList.contains('dark-mode') ? '#181818' : '#f8fafc',
@@ -535,7 +511,6 @@ const Ads = () => {
                                         placeholder="Enter ads section title"
                                     />
                                 </div>
-
                                 <div className="mb-3">
                                     <label className="form-label">Description</label>
                                     <ReactQuill
@@ -546,7 +521,6 @@ const Ads = () => {
                                         placeholder="Enter ads description..."
                                     />
                                 </div>
-
                                 <div className="mb-3">
                                     <label className="form-label">Image</label>
                                     <div className="row">
@@ -581,7 +555,6 @@ const Ads = () => {
                                         </div>
                                     )}
                                 </div>
-
                                 <div className="mb-3">
                                     <label className="form-label">External Link (Optional)</label>
                                     <input
@@ -592,7 +565,6 @@ const Ads = () => {
                                         placeholder="https://example.com - Where users go when they click the ad"
                                     />
                                 </div>
-
                                 <div className="row">
                                     <div className="col-md-6">
                                         <div className="mb-3">
@@ -618,7 +590,6 @@ const Ads = () => {
                                         </div>
                                     </div>
                                 </div>
-
                                 <div className="mb-3">
                                     <div className="form-check">
                                         <input
@@ -654,7 +625,6 @@ const Ads = () => {
                     </div>
                 </div>
             )}
-
             {/* Edit Ads Section Modal */}
             {showEditModal && editingData && (
                 <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -679,7 +649,6 @@ const Ads = () => {
                                         placeholder="Enter ads section title"
                                     />
                                 </div>
-
                                 <div className="mb-3">
                                     <label className="form-label">Description</label>
                                     <ReactQuill
@@ -690,7 +659,6 @@ const Ads = () => {
                                         placeholder="Enter ads description..."
                                     />
                                 </div>
-
                                 <div className="mb-3">
                                     <label className="form-label">Image</label>
                                     <div className="row">
@@ -725,7 +693,6 @@ const Ads = () => {
                                         </div>
                                     )}
                                 </div>
-
                                 <div className="mb-3">
                                     <label className="form-label">External Link (Optional)</label>
                                     <input
@@ -736,7 +703,6 @@ const Ads = () => {
                                         placeholder="https://example.com - Where users go when they click the ad"
                                     />
                                 </div>
-
                                 <div className="row">
                                     <div className="col-md-6">
                                         <div className="mb-3">
@@ -762,7 +728,6 @@ const Ads = () => {
                                         </div>
                                     </div>
                                 </div>
-
                                 <div className="mb-3">
                                     <div className="form-check">
                                         <input

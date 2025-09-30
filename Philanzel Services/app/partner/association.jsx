@@ -5,27 +5,18 @@ import { useState, useEffect } from "react"
 export default function AssociationSection() {
     const [associations, setAssociations] = useState([])
     const [isLoading, setIsLoading] = useState(true)
-
-    // Define the backend base URL
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
-    // Fetch associations data from API
     useEffect(() => {
         const fetchAssociations = async () => {
             try {
                 setIsLoading(true)
-                
-                // First set static data immediately
                 setAssociations(getStaticAssociations())
-                
-                // Then try to fetch from API
                 const response = await fetch(`${BASE_URL}/api/partner/public`)
                 
                 if (response.ok) {
                     const result = await response.json()
                     
                     if (result.data && result.data.length > 0) {
-                        // Map the new API response structure
                         const allImages = result.data.map((item, index) => ({
                             id: item._id || `association-${index}`,
                             name: `Association ${index + 1}`,
@@ -65,8 +56,6 @@ export default function AssociationSection() {
         { id: 7, name: "Max Life", image: "https://via.placeholder.com/150x80/7c3aed/ffffff?text=Max+Life" },
         { id: 8, name: "Bajaj Allianz", image: "https://via.placeholder.com/150x80/0891b2/ffffff?text=Bajaj+Allianz" },
     ]
-
-    // Duplicate the associations array for seamless infinite scroll
     const duplicatedAssociations = [...associations, ...associations]
 
     if (isLoading) {
@@ -89,8 +78,6 @@ export default function AssociationSection() {
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">Our Trusted Associations</h2>
                     <p className="text-gray-600">Partners and certifications that validate our commitment to excellence</p>
                 </div>
-
-                {/* Continuous scrolling container */}
                 <div className="relative overflow-hidden">
                     <div className="flex space-x-8" style={{
                         animation: 'scroll 30s linear infinite',

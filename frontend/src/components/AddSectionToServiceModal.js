@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
-
 const AddSectionToServiceModal = ({ serviceId, show, onClose, onSectionAdded }) => {
     const [sections, setSections] = useState([]);
     const [selectedSectionId, setSelectedSectionId] = useState('');
     const [loading, setLoading] = useState(false);
-
     useEffect(() => {
         if (show) fetchSections();
     }, [show]);
-
     const API_BASE = process.env.NODE_ENV === 'production'
         ? 'https://philanzel-backend.vercel.app/api'
         : 'http://localhost:8000/api';
@@ -22,7 +19,6 @@ const AddSectionToServiceModal = ({ serviceId, show, onClose, onSectionAdded }) 
             setSections([]);
         }
     };
-
     const handleAddSection = async () => {
         if (!selectedSectionId) return;
         setLoading(true);
@@ -45,7 +41,6 @@ const AddSectionToServiceModal = ({ serviceId, show, onClose, onSectionAdded }) 
         }
         setLoading(false);
     };
-
     return (
         <Modal show={show} onHide={onClose} centered>
             <Modal.Header closeButton>

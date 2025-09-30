@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { careerAPI } from '../../services/api';
 import Alert from '../../components/Alert';
-
 const CareerForm = () => {
     const [formData, setFormData] = useState({
         fullName: '',
@@ -12,7 +11,6 @@ const CareerForm = () => {
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
-
     const handleChange = (e) => {
         const { name, value, files } = e.target;
         setFormData(prev => ({
@@ -20,12 +18,10 @@ const CareerForm = () => {
             [name]: files ? files[0] : value
         }));
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
-
         try {
             const submitData = new FormData();
             Object.keys(formData).forEach(key => {
@@ -33,12 +29,8 @@ const CareerForm = () => {
                     submitData.append(key, formData[key]);
                 }
             });
-
-            // Add a dummy reCAPTCHA token for now (you can implement real reCAPTCHA later)
             submitData.append('recaptchaToken', 'dummy-token-for-development');
-
             const response = await careerAPI.submit(submitData);
-
             setMessage('Application submitted successfully!');
             setFormData({
                 fullName: '',
@@ -47,7 +39,6 @@ const CareerForm = () => {
                 message: '',
                 resume: null
             });
-            // Reset file input
             document.getElementById('resume').value = '';
         } catch (error) {
             setMessage(error.response?.data?.message || 'Failed to submit application');
@@ -55,7 +46,6 @@ const CareerForm = () => {
             setLoading(false);
         }
     };
-
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -100,7 +90,6 @@ const CareerForm = () => {
                                         />
                                     </div>
                                 </div>
-
                                 <div className="row">
                                     <div className="col-md-6 mb-3">
                                         <label htmlFor="phone" className="form-label">Phone *</label>
@@ -115,7 +104,6 @@ const CareerForm = () => {
                                         />
                                     </div>
                                 </div>
-
                                 <div className="mb-3">
                                     <label htmlFor="message" className="form-label">Message/Cover Letter *</label>
                                     <textarea
@@ -129,7 +117,6 @@ const CareerForm = () => {
                                         required
                                     ></textarea>
                                 </div>
-
                                 <div className="mb-3">
                                     <label htmlFor="resume" className="form-label">Resume (PDF/DOC/DOCX) *</label>
                                     <input
@@ -145,7 +132,6 @@ const CareerForm = () => {
                                         Maximum file size: 5MB. Accepted formats: PDF, DOC, DOCX
                                     </div>
                                 </div>
-
                                 <button
                                     type="submit"
                                     className="btn btn-primary"

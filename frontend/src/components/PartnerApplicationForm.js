@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Form, Button, Alert } from 'react-bootstrap';
 import api from '../services/api';
-
 function PartnerApplicationForm({ show, onHide }) {
     const [formData, setFormData] = useState({
         serviceName: '',
@@ -12,7 +11,6 @@ function PartnerApplicationForm({ show, onHide }) {
     });
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -20,22 +18,16 @@ function PartnerApplicationForm({ show, onHide }) {
             [name]: value
         }));
     };
-
     const showAlert = (message, variant = 'success') => {
         setAlert({ show: true, message, variant });
         setTimeout(() => setAlert({ show: false, message: '', variant: 'success' }), 3000);
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
         try {
             await api.post('/user/partner-applications', formData);
-
             showAlert('Partnership application submitted successfully! We will review your application and get back to you soon.');
-
-            // Reset form
             setFormData({
                 serviceName: '',
                 personName: '',
@@ -43,12 +35,9 @@ function PartnerApplicationForm({ show, onHide }) {
                 phone: '',
                 message: ''
             });
-
-            // Close modal after a short delay
             setTimeout(() => {
                 onHide();
             }, 2000);
-
         } catch (error) {
             console.error('Error submitting application:', error);
             const errorMessage = error.response?.data?.message || 'Error submitting application. Please try again.';
@@ -57,7 +46,6 @@ function PartnerApplicationForm({ show, onHide }) {
             setLoading(false);
         }
     };
-
     const resetForm = () => {
         setFormData({
             serviceName: '',
@@ -68,25 +56,21 @@ function PartnerApplicationForm({ show, onHide }) {
         });
         setAlert({ show: false, message: '', variant: 'success' });
     };
-
     const handleModalHide = () => {
         resetForm();
         onHide();
     };
-
     return (
         <Modal show={show} onHide={handleModalHide} size="lg" centered>
             <Modal.Header closeButton>
                 <Modal.Title>Partnership Application</Modal.Title>
             </Modal.Header>
-
             <Modal.Body>
                 {alert.show && (
                     <Alert variant={alert.variant} className="mb-4">
                         {alert.message}
                     </Alert>
                 )}
-
                 <Form onSubmit={handleSubmit}>
                     <Form.Group className="mb-3">
                         <Form.Label>Service/Business Type *</Form.Label>
@@ -99,7 +83,6 @@ function PartnerApplicationForm({ show, onHide }) {
                             required
                         />
                     </Form.Group>
-
                     <Form.Group className="mb-3">
                         <Form.Label>Contact Person Name *</Form.Label>
                         <Form.Control
@@ -111,7 +94,6 @@ function PartnerApplicationForm({ show, onHide }) {
                             required
                         />
                     </Form.Group>
-
                     <Form.Group className="mb-3">
                         <Form.Label>Email Address *</Form.Label>
                         <Form.Control
@@ -123,7 +105,6 @@ function PartnerApplicationForm({ show, onHide }) {
                             required
                         />
                     </Form.Group>
-
                     <Form.Group className="mb-3">
                         <Form.Label>Phone Number *</Form.Label>
                         <Form.Control
@@ -135,7 +116,6 @@ function PartnerApplicationForm({ show, onHide }) {
                             required
                         />
                     </Form.Group>
-
                     <Form.Group className="mb-4">
                         <Form.Label>Partnership Proposal/Message *</Form.Label>
                         <Form.Control
@@ -151,7 +131,6 @@ function PartnerApplicationForm({ show, onHide }) {
                             Please provide details about your business and partnership ideas.
                         </Form.Text>
                     </Form.Group>
-
                     <div className="d-flex justify-content-end gap-2">
                         <Button variant="secondary" onClick={handleModalHide} disabled={loading}>
                             Cancel

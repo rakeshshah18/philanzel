@@ -15,14 +15,13 @@ const WhyChooseUs = () => {
                     setData(json.data[0]);
                 }
             } catch (e) {
-                // fallback: do nothing
             }
         }
         fetchData();
     }, []);
 
     if (!data) {
-        return null; // or a loading spinner
+        return null;
     }
 
     return (
@@ -43,10 +42,8 @@ const WhyChooseUs = () => {
                         <hr className="my-4 border-gray-200" />
                         <ul className="space-y-4 mb-8">
                             {data.points?.map((point) => {
-                                // Map old Font Awesome 5 class to v6 if needed
                                 let iconClass = point.icon || "fa-solid fa-check";
                                 if (iconClass === "fas fa-check") iconClass = "fa-solid fa-check";
-                                // Add more mappings if your API uses other 'fas' icons
                                 return (
                                     <li key={point._id} className="flex items-start gap-3">
                                         <i className={iconClass + " w-5 h-5 text-cyan-600 mt-1 flex-shrink-0 bg-cyan-200 rounded-4xl"}></i>

@@ -3,9 +3,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-
 const ServicePage = () => {
-    // Dark mode detection
     const [isDarkMode, setIsDarkMode] = useState(false);
     useEffect(() => {
         const checkDarkMode = () => {
@@ -23,22 +21,17 @@ const ServicePage = () => {
     const [availableSections, setAvailableSections] = useState([]);
     const [selectedSectionId, setSelectedSectionId] = useState('');
     const [addingSection, setAddingSection] = useState(false);
-
-    // Edit/Delete logic
     const [editingSectionIdx, setEditingSectionIdx] = useState(null);
     const [editingSectionData, setEditingSectionData] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
-
     const handleEditSection = (idx) => {
         setEditingSectionIdx(idx);
         setEditingSectionData({ ...service.sections[idx] });
         setShowEditModal(true);
     };
-
     const handleEditFieldChange = (field, value) => {
         setEditingSectionData(prev => ({ ...prev, [field]: value }));
     };
-
     const handleEditArrayFieldChange = (field, i, value) => {
         setEditingSectionData(prev => {
             const arr = Array.isArray(prev[field]) ? [...prev[field]] : [];
@@ -46,7 +39,6 @@ const ServicePage = () => {
             return { ...prev, [field]: arr };
         });
     };
-
     const handleEditModalSave = async () => {
         if (editingSectionIdx === null) return;
         try {
@@ -67,13 +59,11 @@ const ServicePage = () => {
             alert('Failed to update section: ' + (err?.response?.data?.message || err.message));
         }
     };
-
     const handleEditModalClose = () => {
         setShowEditModal(false);
         setEditingSectionIdx(null);
         setEditingSectionData(null);
     };
-
     const handleDeleteSection = async (idx) => {
         if (!window.confirm('Are you sure you want to delete this section?')) return;
         try {
@@ -82,7 +72,6 @@ const ServicePage = () => {
             await axios.delete(`${API_BASE}/services/${service._id}/sections/${idx}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            // Refresh service data
             setLoading(true);
             const res = await axios.get(`/api/services/slug/${serviceId}`);
             setService(res.data.data || null);
@@ -91,8 +80,6 @@ const ServicePage = () => {
             alert('Failed to delete section: ' + (err?.response?.data?.message || err.message));
         }
     };
-
-    // Fetch available AboutService sections for modal
     useEffect(() => {
         if (showAddSectionModal) {
             const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
@@ -105,21 +92,16 @@ const ServicePage = () => {
         setLoading(true);
         axios.get(`/api/services/slug/${serviceId}`)
             .then(res => {
-                console.log('API response:', res.data);
-                console.log('Service object:', res.data.data);
                 setService(res.data.data || null);
                 setLoading(false);
             })
             .catch((err) => {
-                console.log('API error:', err);
                 setService(null);
                 setLoading(false);
             });
     }, [serviceId]);
-
     if (loading) return <div>Loading...</div>;
     if (!service) return <div>Service not found.</div>;
-
     return (
         <div className="container-fluid py-4" style={{ minHeight: '100vh' }}>
             <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: isDarkMode ? '#23272f' : '#f8fafc', border: 'none', boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #e0e7ef' }}>
@@ -171,23 +153,19 @@ const ServicePage = () => {
                                                 {Array.isArray(section.heading) && section.heading.filter(h => h && h.trim()).length > 0 && (
                                                     <div className="mb-2"><strong>Heading:</strong> {section.heading.filter(h => h && h.trim()).join(', ')}</div>
                                                 )}
-                                                {/* Description */}
                                                 {Array.isArray(section.description) && section.description.filter(d => d && d.trim()).length > 0 && (
                                                     <div className="mb-2"><strong>Description:</strong> {section.description.filter(d => d && d.trim()).map((d, i) => (
                                                         <div key={i} dangerouslySetInnerHTML={{ __html: d }} />
                                                     ))}</div>
                                                 )}
-                                                {/* Subheading */}
                                                 {Array.isArray(section.subheading) && section.subheading.filter(s => s && s.trim()).length > 0 && (
                                                     <div className="mb-2"><strong>Subheading:</strong> {section.subheading.filter(s => s && s.trim()).join(', ')}</div>
                                                 )}
-                                                {/* Subdescription */}
                                                 {Array.isArray(section.subdescription) && section.subdescription.filter(sd => sd && sd.trim()).length > 0 && (
                                                     <div className="mb-2"><strong>Subdescription:</strong> {section.subdescription.filter(sd => sd && sd.trim()).map((sd, i) => (
                                                         <div key={i} dangerouslySetInnerHTML={{ __html: sd }} />
                                                     ))}</div>
                                                 )}
-                                                {/* Points */}
                                                 {Array.isArray(section.points) && section.points.filter(p => p && p.trim()).length > 0 && (
                                                     <div className="mb-2"><strong>Points:</strong>
                                                         <ul className="ps-3 mb-0">
@@ -197,7 +175,6 @@ const ServicePage = () => {
                                                         </ul>
                                                     </div>
                                                 )}
-                                                {/* Images */}
                                                 {Array.isArray(section.images) && section.images.filter(img => img && img.trim()).length > 0 && (
                                                     <div className="mb-2"><strong>Images:</strong>
                                                         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -207,7 +184,6 @@ const ServicePage = () => {
                                                         </div>
                                                     </div>
                                                 )}
-                                                {/* FAQs */}
                                                 {Array.isArray(section.faqs) && section.faqs.filter(faq => faq && faq.question && faq.question.trim()).length > 0 && (
                                                     <div className="mb-2"><strong>FAQs:</strong>
                                                         <ul className="ps-3 mb-0">
@@ -224,7 +200,6 @@ const ServicePage = () => {
                             </div>
                         </div>
                     )}
-                    {/* Edit Section Modal */}
                     {showEditModal && editingSectionData && (
                         <div className="modal fade show" style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }}>
                             <div className="modal-dialog modal-lg">
@@ -262,7 +237,7 @@ const ServicePage = () => {
                                                 ) : null}
                                             </div>
                                             <div className="mb-3">
-                                                <label className="form-label">Subheading</label>
+                                                <label className="form-label">Sub Heading</label>
                                                 {Array.isArray(editingSectionData.subheading) ? (
                                                     editingSectionData.subheading.map((s, i) => (
                                                         <input key={i} type="text" className="form-control mb-1" value={s} onChange={e => handleEditArrayFieldChange('subheading', i, e.target.value)} />
@@ -270,7 +245,7 @@ const ServicePage = () => {
                                                 ) : null}
                                             </div>
                                             <div className="mb-3">
-                                                <label className="form-label">Subdescription</label>
+                                                <label className="form-label">Sub Description</label>
                                                 {Array.isArray(editingSectionData.subdescription) ? (
                                                     editingSectionData.subdescription.map((sd, i) => (
                                                         <ReactQuill
@@ -339,7 +314,6 @@ const ServicePage = () => {
                             </div>
                         </div>
                     )}
-                    {/* Add Section Modal */}
                     {showAddSectionModal && (
                         <div className="modal fade show" style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }}>
                             <div className="modal-dialog">
@@ -370,8 +344,6 @@ const ServicePage = () => {
                                                 const headers = {
                                                     Authorization: `Bearer ${token}`,
                                                 };
-                                                console.log('DEBUG: Add Section Request Headers:', headers);
-                                                console.log('DEBUG: Token value:', token);
                                                 const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
                                                 await axios.post(`${API_BASE}/services/${service._id}/sections`, { sectionId: selectedSectionId }, {
                                                     headers,
@@ -379,7 +351,6 @@ const ServicePage = () => {
                                                 setShowAddSectionModal(false);
                                                 setSelectedSectionId('');
                                                 setAddingSection(false);
-                                                // Refresh service data
                                                 setLoading(true);
                                                 const res = await axios.get(`/api/services/slug/${serviceId}`);
                                                 setService(res.data.data || null);

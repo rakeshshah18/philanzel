@@ -1,27 +1,20 @@
 "use client"
 import { useEffect, useState } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-
 export default function CalculatorSection({ section }) {
-    // Accepts: sectionName, heading, content, faqs
     const [data, setData] = useState(section || null)
-
     useEffect(() => {
         if (!section) {
-            // Optionally fetch data if needed
         }
     }, [section])
 
     if (!data) return null
-
-    // Helper to strip HTML tags for plain text fallback
     const stripHtmlTags = (html) => {
         if (!html) return '';
         const div = typeof window !== 'undefined' ? document.createElement('div') : { innerHTML: '', textContent: '', innerText: '' };
         div.innerHTML = html;
         return div.textContent || div.innerText || '';
     };
-
     return (
         <section className="py-20 bg-white">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 bg-cyan-50 rounded-2xl shadow-lg p-10 mb-10">

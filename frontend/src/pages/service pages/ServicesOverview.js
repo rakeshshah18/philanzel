@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { servicesAPI } from '../../services/api';
 import ServiceModal from '../../components/ServiceModal';
 import './ServicesOverview.css';
-// import { Link } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 
 const ServicesOverview = () => {
-    // Dark mode detection
     const [isDarkMode, setIsDarkMode] = useState(false);
     useEffect(() => {
         const checkDarkMode = () => {

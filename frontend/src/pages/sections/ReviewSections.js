@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { reviewSectionsAPI } from '../../services/api';
 import Alert from '../../components/Alert';
-
 const ReviewSections = ({ setMessage }) => {
     const [reviewSections, setReviewSections] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -31,11 +30,9 @@ const ReviewSections = ({ setMessage }) => {
         isActive: true,
         displayOrder: 0
     });
-
     useEffect(() => {
         fetchReviewSections();
     }, []);
-
     const fetchReviewSections = async () => {
         try {
             setLoading(true);
@@ -48,12 +45,10 @@ const ReviewSections = ({ setMessage }) => {
             setLoading(false);
         }
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!formData.heading.trim() || !formData.description.trim() || !formData.writeReviewButton.url.trim()) {
-            setMessage('❌ Please fill in heading, description, and write review URL');
+            setMessage('Please fill in heading, description, and write review URL');
             return;
         }
 
@@ -63,7 +58,7 @@ const ReviewSections = ({ setMessage }) => {
         );
 
         if (validReviews.length === 0) {
-            setMessage('❌ Please add at least one complete review');
+            setMessage('Please add at least one complete review');
             return;
         }
 
@@ -77,22 +72,21 @@ const ReviewSections = ({ setMessage }) => {
 
             if (isEditing) {
                 await reviewSectionsAPI.update(editingId, submitData);
-                setMessage('✅ Review section updated successfully!');
+                setMessage('Review section updated successfully!');
             } else {
                 await reviewSectionsAPI.create(submitData);
-                setMessage('✅ Review section created successfully!');
+                setMessage('Review section created successfully!');
             }
 
             resetForm();
             await fetchReviewSections();
         } catch (error) {
             console.error('Error saving review section:', error);
-            setMessage(`❌ Failed to save review section. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to save review section. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleEdit = (section) => {
         setFormData({
             heading: section.heading,
@@ -117,25 +111,22 @@ const ReviewSections = ({ setMessage }) => {
         setEditingId(section._id);
         setShowForm(true);
     };
-
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this review section?')) {
             return;
         }
-
         try {
             setLoading(true);
             await reviewSectionsAPI.delete(id);
-            setMessage('✅ Review section deleted successfully!');
+            setMessage('Review section deleted successfully!');
             await fetchReviewSections();
         } catch (error) {
             console.error('Error deleting review section:', error);
-            setMessage(`❌ Failed to delete review section. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to delete review section. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const resetForm = () => {
         setFormData({
             heading: '',
@@ -164,7 +155,6 @@ const ReviewSections = ({ setMessage }) => {
         setEditingId(null);
         setShowForm(false);
     };
-
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
 
@@ -184,7 +174,6 @@ const ReviewSections = ({ setMessage }) => {
             }));
         }
     };
-
     const handleReviewChange = (index, field, value) => {
         setFormData(prev => ({
             ...prev,
@@ -193,7 +182,6 @@ const ReviewSections = ({ setMessage }) => {
             )
         }));
     };
-
     const addReview = () => {
         setFormData(prev => ({
             ...prev,
@@ -208,7 +196,6 @@ const ReviewSections = ({ setMessage }) => {
             }]
         }));
     };
-
     const removeReview = (index) => {
         if (formData.reviews.length > 1) {
             setFormData(prev => ({
@@ -217,7 +204,6 @@ const ReviewSections = ({ setMessage }) => {
             }));
         }
     };
-
     const renderStars = (rating) => {
         return Array.from({ length: 5 }, (_, i) => (
             <i
@@ -227,14 +213,9 @@ const ReviewSections = ({ setMessage }) => {
             ></i>
         ));
     };
-
     const getProviderBadgeColor = (provider) => {
         const colors = {
             'Google': 'bg-danger',
-            'Facebook': 'bg-primary',
-            'Trustpilot': 'bg-success',
-            'Yelp': 'bg-warning text-dark',
-            'Custom': 'bg-secondary'
         };
         return colors[provider] || 'bg-secondary';
     };
@@ -267,8 +248,6 @@ const ReviewSections = ({ setMessage }) => {
                     Add Review Section
                 </button>
             </div>
-
-            {/* Add/Edit Form */}
             {showForm && (
                 <div className="card border-primary mb-4">
                     <div className="card-header bg-light">
@@ -278,7 +257,6 @@ const ReviewSections = ({ setMessage }) => {
                     </div>
                     <div className="card-body">
                         <form onSubmit={handleSubmit}>
-                            {/* Basic Information */}
                             <div className="row mb-4">
                                 <div className="col-md-8">
                                     <label htmlFor="heading" className="form-label">Section Heading *</label>
@@ -311,7 +289,6 @@ const ReviewSections = ({ setMessage }) => {
                                     </select>
                                 </div>
                             </div>
-
                             <div className="mb-4">
                                 <label htmlFor="description" className="form-label">Description *</label>
                                 <textarea
@@ -325,8 +302,6 @@ const ReviewSections = ({ setMessage }) => {
                                     placeholder="Brief description of the review section"
                                 ></textarea>
                             </div>
-
-                            {/* Write Review Button */}
                             <div className="mb-4">
                                 <h6>Write Review Button Configuration</h6>
                                 <div className="row">

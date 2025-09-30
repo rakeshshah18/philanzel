@@ -15,11 +15,8 @@ export default function PartnerAbout() {
     })
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitStatus, setSubmitStatus] = useState(null)
-
-    // Define the backend base URL
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 
-    // Fetch services data from API
     useEffect(() => {
         const fetchServices = async () => {
             try {
@@ -28,7 +25,6 @@ export default function PartnerAbout() {
                 
                 if (response.ok) {
                     const result = await response.json()
-                    // Access the data property which contains the services array
                     if (result && result.data && Array.isArray(result.data)) {
                         setServices(result.data)
                     } else {
@@ -50,19 +46,15 @@ export default function PartnerAbout() {
         fetchServices()
     }, [])
 
-    // Handle form input changes
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
         }))
     }
-
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault()
         
-        // Validate terms acceptance
         if (!formData.terms) {
             setSubmitStatus('terms-error')
             setTimeout(() => setSubmitStatus(null), 5000)
@@ -73,18 +65,13 @@ export default function PartnerAbout() {
         setSubmitStatus(null)
 
         try {
-            // Prepare form data for API submission with correct field names
             const submitData = {
-                serviceName: formData.services,  // API expects 'serviceName'
-                personName: formData.name,       // API expects 'personName'
+                serviceName: formData.services, 
+                personName: formData.name,       
                 email: formData.email,
                 phone: formData.phone,
                 message: formData.message
             }
-
-            console.log("Submitting partner inquiry:", submitData)
-
-            // Submit to backend API
             const response = await fetch(`${BASE_URL}/api/user/partner-inquiry`, {
                 method: 'POST',
                 headers: {
@@ -99,11 +86,9 @@ export default function PartnerAbout() {
             }
 
             const result = await response.json()
-            console.log("Partner inquiry submitted successfully:", result)
 
             setSubmitStatus('success')
 
-            // Reset form after successful submission
             setFormData({
                 services: "",
                 name: "",
@@ -137,9 +122,7 @@ export default function PartnerAbout() {
                             </h1>
                         </div>
                         
-                        {/* Two Column Layout */}
                         <div className="flex flex-col lg:flex-row gap-8 items-start">
-                            {/* Left Column - Content */}
                             <div className="flex-1">
                                 <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-4">
                                     <p>
@@ -161,13 +144,9 @@ export default function PartnerAbout() {
                                     </p>
                                 </div>
                             </div>
-
-                            {/* Right Column - Form */}
                             <div className="w-80 flex-shrink-0">
                                 <div className="bg-gray-50 rounded-lg p-2">
                                     <h3 className="text-base font-bold text-gray-900 mb-2">Partner Registration</h3>
-                                    
-                                    {/* Success/Error Messages */}
                                     {submitStatus && (
                                         <div className={`mb-4 p-3 rounded-lg text-xs ${
                                             submitStatus === 'success'

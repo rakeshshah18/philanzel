@@ -21,8 +21,6 @@ const SidebarManagement = () => {
         isActive: true
     });
     const [newDropdownItem, setNewDropdownItem] = useState({ name: '', route: '' });
-
-    // Dark mode detection
     useEffect(() => {
         const checkDarkMode = () => {
             setIsDarkMode(document.body.classList.contains('dark-mode'));
@@ -32,28 +30,20 @@ const SidebarManagement = () => {
         observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
         return () => observer.disconnect();
     }, []);
-
     const showAlert = (type, message) => {
         setAlert({ show: true, type, message });
         setTimeout(() => setAlert({ show: false, type: '', message: '' }), 5000);
     };
-
     const fetchSidebarItems = useCallback(async () => {
         try {
             setError(null);
             setLoading(true);
             const response = await sidebarAPI.getAll();
-
-            // The API returns { success: true, data: [...] }
-            // Axios wraps response in .data, so response.data = { success: true, data: [...] }
-            // We need response.data.data to get the actual array
             const items = response.data.data || [];
-
             setSidebarItems(Array.isArray(items) ? items : []);
         } catch (error) {
             console.error('Error fetching sidebar items:', error);
             let errorMessage = 'Failed to fetch sidebar items';
-
             if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
                 errorMessage = 'Cannot connect to server. Please make sure the backend is running on http://localhost:8000';
             } else if (error.response?.status === 404) {
@@ -65,27 +55,22 @@ const SidebarManagement = () => {
             } else if (error.message) {
                 errorMessage = error.message;
             }
-
             setError(errorMessage);
         } finally {
             setLoading(false);
         }
     }, []);
-
     useEffect(() => {
         fetchSidebarItems();
     }, [fetchSidebarItems]);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             setSaving(true);
-
             const submitData = {
                 ...formData,
                 order: parseInt(formData.order) || 0
             };
-
             if (showEditModal && selectedItem) {
                 await sidebarAPI.update(selectedItem._id, submitData);
                 showAlert('success', 'Sidebar item updated successfully');
@@ -93,7 +78,6 @@ const SidebarManagement = () => {
                 await sidebarAPI.create(submitData);
                 showAlert('success', 'Sidebar item created successfully');
             }
-
             resetForm();
             setShowAddModal(false);
             setShowEditModal(false);
@@ -104,7 +88,6 @@ const SidebarManagement = () => {
             setSaving(false);
         }
     };
-
     const handleEdit = (item) => {
         setSelectedItem(item);
         setFormData({
@@ -117,7 +100,6 @@ const SidebarManagement = () => {
         });
         setShowEditModal(true);
     };
-
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this sidebar item?')) {
             try {
@@ -132,7 +114,6 @@ const SidebarManagement = () => {
             }
         }
     };
-
     const resetForm = () => {
         setFormData({
             name: '',
@@ -145,7 +126,6 @@ const SidebarManagement = () => {
         setNewDropdownItem({ name: '', route: '' });
         setSelectedItem(null);
     };
-
     const handleAddDropdownItem = () => {
         if (newDropdownItem.name && newDropdownItem.route) {
             setFormData(prev => ({
@@ -155,14 +135,12 @@ const SidebarManagement = () => {
             setNewDropdownItem({ name: '', route: '' });
         }
     };
-
     const handleRemoveDropdownItem = (index) => {
         setFormData(prev => ({
             ...prev,
             dropdownItems: prev.dropdownItems.filter((_, i) => i !== index)
         }));
     };
-
     const handleReorder = async (newOrder) => {
         try {
             await sidebarAPI.reorder(newOrder);
@@ -172,7 +150,6 @@ const SidebarManagement = () => {
             showAlert('danger', 'Failed to reorder sidebar items');
         }
     };
-
     if (error) {
         return (
             <div className="container-fluid py-4">
@@ -196,7 +173,6 @@ const SidebarManagement = () => {
             </div>
         );
     }
-
     if (loading) {
         return (
             <div className="container-fluid py-4">
@@ -209,7 +185,6 @@ const SidebarManagement = () => {
             </div>
         );
     }
-
     return (
         <div className="container-fluid py-4">
             {/* Alert */}

@@ -1,10 +1,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { homePageAPI, newsAPI } from '../services/api';
-
 export const useProtectedAdminOperations = () => {
     const { protectedOperation, isAuthenticated, hasRole } = useAuth();
-
-    // Homepage Operations
     const homepageOperations = {
         create: async (data) => {
             return protectedOperation(
@@ -12,28 +9,24 @@ export const useProtectedAdminOperations = () => {
                 ['admin', 'super_admin']
             );
         },
-
         createWithFile: async (formData) => {
             return protectedOperation(
                 () => homePageAPI.createWithFile(formData),
                 ['admin', 'super_admin']
             );
         },
-
         update: async (id, data) => {
             return protectedOperation(
                 () => homePageAPI.update(id, data),
                 ['admin', 'super_admin']
             );
         },
-
         updateWithFile: async (id, formData) => {
             return protectedOperation(
                 () => homePageAPI.updateWithFile(id, formData),
                 ['admin', 'super_admin']
             );
         },
-
         delete: async (id) => {
             return protectedOperation(
                 () => homePageAPI.delete(id),
@@ -41,8 +34,6 @@ export const useProtectedAdminOperations = () => {
             );
         }
     };
-
-    // News Operations
     const newsOperations = {
         create: async (data) => {
             return protectedOperation(
@@ -50,28 +41,24 @@ export const useProtectedAdminOperations = () => {
                 ['admin', 'super_admin']
             );
         },
-
         createWithFile: async (formData) => {
             return protectedOperation(
                 () => newsAPI.createWithFile(formData),
                 ['admin', 'super_admin']
             );
         },
-
         update: async (id, data) => {
             return protectedOperation(
                 () => newsAPI.update(id, data),
                 ['admin', 'super_admin']
             );
         },
-
         updateWithFile: async (id, formData) => {
             return protectedOperation(
                 () => newsAPI.updateWithFile(id, formData),
                 ['admin', 'super_admin']
             );
         },
-
         delete: async (id) => {
             return protectedOperation(
                 () => newsAPI.delete(id),
@@ -79,12 +66,9 @@ export const useProtectedAdminOperations = () => {
             );
         }
     };
-
-    // Utility functions
     const canPerformOperation = (requiredRoles = ['admin', 'super_admin']) => {
         return isAuthenticated && hasRole(requiredRoles);
     };
-
     const getPermissionMessage = (requiredRoles = ['admin', 'super_admin']) => {
         if (!isAuthenticated) {
             return 'Please login to perform this operation.';
@@ -94,7 +78,6 @@ export const useProtectedAdminOperations = () => {
         }
         return null;
     };
-
     return {
         homepageOperations,
         newsOperations,
@@ -104,5 +87,4 @@ export const useProtectedAdminOperations = () => {
         hasRole
     };
 };
-
 export default useProtectedAdminOperations;

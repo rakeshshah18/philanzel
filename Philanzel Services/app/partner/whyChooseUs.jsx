@@ -1,16 +1,10 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { CheckCircle } from "lucide-react"
-
 export default function WhyChooseUsSection() {
     const [chooseUsData, setChooseUsData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
-
-    // Define the backend base URL
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
-    // Fetch why choose us data from API
     useEffect(() => {
         const fetchChooseUsData = async () => {
             try {
@@ -23,9 +17,7 @@ export default function WhyChooseUsSection() {
                     
                     if (result.status === "success" && result.data && result.data.length > 0) {
                         setChooseUsData(result.data[0])
-                        console.log('Loaded why choose us data:', result.data[0])
                     } else {
-                        console.log('Using static data as API response structure is unexpected:', result)
                         setChooseUsData(getStaticChooseUsData())
                     }
                 } else {
@@ -42,8 +34,6 @@ export default function WhyChooseUsSection() {
 
         fetchChooseUsData()
     }, [])
-
-    // Static fallback data
     const getStaticChooseUsData = () => ({
         heading: "Why Choose Philanzel?",
         description: "<p>Philanzel gives you the <strong>tools</strong>, <em>training</em>, and support you need to start strong and succeed as a POSP Partner—without any upfront investment.</p>",
@@ -66,12 +56,8 @@ export default function WhyChooseUsSection() {
             }
         ]
     })
-
-    // Function to safely render HTML content
     const renderHTMLContent = (htmlString) => {
         if (!htmlString) return null
-        
-        // Clean and decode HTML entities
         const cleanHTML = htmlString
             .replace(/\\u003C/g, '<')
             .replace(/\\u003E/g, '>')
@@ -110,10 +96,8 @@ export default function WhyChooseUsSection() {
                             />
                         </div>
                     </div>
-                    {/* Content */}
                     <div className="w-full lg:w-1/2">
                         <div className="space-y-8">
-                            {/* Header */}
                             <div>
                                 <h2 className="text-4xl font-serif font-bold text-gray-900 mb-6">
                                     {chooseUsData?.heading || "Why Choose Philanzel?"}
@@ -122,8 +106,6 @@ export default function WhyChooseUsSection() {
                                     {renderHTMLContent(chooseUsData?.description)}
                                 </div>
                             </div>
-
-                            {/* Points List */}
                             <div className="space-y-4">
                                 {chooseUsData?.points?.map((point, index) => (
                                     <div key={point._id || index} className="flex items-start space-x-3">

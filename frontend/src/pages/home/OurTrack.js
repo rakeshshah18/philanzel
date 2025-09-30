@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { ourTrackAPI } from '../../services/api';
 import Alert from '../../components/Alert';
 import { useAuth } from '../../contexts/AuthContext';
-
 const OurTrack = () => {
     const { isAuthenticated } = useAuth();
     const [trackData, setTrackData] = useState(null);
@@ -10,18 +9,15 @@ const OurTrack = () => {
     const [message, setMessage] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-
     const [formData, setFormData] = useState({
         yearExp: '',
         totalExpert: '',
         planningDone: '',
         happyCustomers: ''
     });
-
     useEffect(() => {
         fetchTrackData();
     }, []);
-
     const fetchTrackData = async () => {
         setLoading(true);
         try {
@@ -42,7 +38,6 @@ const OurTrack = () => {
             setLoading(false);
         }
     };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -50,22 +45,17 @@ const OurTrack = () => {
             [name]: value
         }));
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
-
         try {
-            // Convert strings to numbers
             const submitData = {
                 yearExp: parseInt(formData.yearExp),
                 totalExpert: parseInt(formData.totalExpert),
                 planningDone: parseInt(formData.planningDone),
                 happyCustomers: parseInt(formData.happyCustomers)
             };
-
-            // Validate numbers
             for (const [key, value] of Object.entries(submitData)) {
                 if (isNaN(value) || value < 0) {
                     setMessage(`❌ ${key} must be a valid positive number.`);
@@ -73,29 +63,25 @@ const OurTrack = () => {
                     return;
                 }
             }
-
             let response;
             if (isEditing) {
                 response = await ourTrackAPI.update(submitData);
-                setMessage('✅ Track record updated successfully!');
+                setMessage('Track record updated successfully!');
             } else {
                 response = await ourTrackAPI.create(submitData);
-                setMessage('✅ Track record created successfully!');
+                setMessage('Track record created successfully!');
                 setIsEditing(true);
             }
-
             setTrackData(response.data.data);
             setShowForm(false);
             resetForm();
-
         } catch (error) {
             console.error('Error saving track data:', error);
-            setMessage(error.response?.data?.message || '❌ Failed to save track record.');
+            setMessage(error.response?.data?.message || 'Failed to save track record.');
         } finally {
             setLoading(false);
         }
     };
-
     const handleEdit = () => {
         if (trackData) {
             setFormData({
@@ -108,25 +94,22 @@ const OurTrack = () => {
         setShowForm(true);
         setMessage('');
     };
-
     const handleDelete = async () => {
         if (!window.confirm('Are you sure you want to delete the track record?')) return;
-
         setLoading(true);
         try {
             await ourTrackAPI.delete();
-            setMessage('✅ Track record deleted successfully!');
+            setMessage('Track record deleted successfully!');
             setTrackData(null);
             setIsEditing(false);
             resetForm();
         } catch (error) {
             console.error('Error deleting track data:', error);
-            setMessage('❌ Failed to delete track record.');
+            setMessage('Failed to delete track record.');
         } finally {
             setLoading(false);
         }
     };
-
     const resetForm = () => {
         setFormData({
             yearExp: '',
@@ -137,7 +120,6 @@ const OurTrack = () => {
         setShowForm(false);
         setMessage('');
     };
-
     const StatCard = ({ icon, value, label, color = "primary" }) => (
         <div className="col-md-3 mb-4">
             <div className={`card border-${color} h-100`}>
@@ -153,7 +135,6 @@ const OurTrack = () => {
             </div>
         </div>
     );
-
     return (
         <div className="container-fluid py-4">
             <div className="row mb-4">
@@ -196,7 +177,6 @@ const OurTrack = () => {
                     </div>
                 </div>
             </div>
-
             {message && (
                 <div className="row mb-4">
                     <div className="col-12">
@@ -208,7 +188,6 @@ const OurTrack = () => {
                     </div>
                 </div>
             )}
-
             {loading && (
                 <div className="row mb-4">
                     <div className="col-12 text-center">
@@ -218,8 +197,6 @@ const OurTrack = () => {
                     </div>
                 </div>
             )}
-
-            {/* Track Record Display */}
             {!showForm && (
                 <div className="row">
                     <StatCard
@@ -248,8 +225,6 @@ const OurTrack = () => {
                     />
                 </div>
             )}
-
-            {/* Form for Creating/Editing */}
             {showForm && (
                 <div className="row">
                     <div className="col-lg-8 mx-auto">
@@ -280,7 +255,6 @@ const OurTrack = () => {
                                                 placeholder="Enter years of experience"
                                             />
                                         </div>
-
                                         <div className="col-md-6 mb-3">
                                             <label htmlFor="totalExpert" className="form-label">
                                                 <i className="fas fa-users me-2"></i>
@@ -298,7 +272,6 @@ const OurTrack = () => {
                                                 placeholder="Enter total number of experts"
                                             />
                                         </div>
-
                                         <div className="col-md-6 mb-3">
                                             <label htmlFor="planningDone" className="form-label">
                                                 <i className="fas fa-tasks me-2"></i>
@@ -316,7 +289,6 @@ const OurTrack = () => {
                                                 placeholder="Enter projects completed"
                                             />
                                         </div>
-
                                         <div className="col-md-6 mb-3">
                                             <label htmlFor="happyCustomers" className="form-label">
                                                 <i className="fas fa-smile me-2"></i>
@@ -335,7 +307,6 @@ const OurTrack = () => {
                                             />
                                         </div>
                                     </div>
-
                                     <div className="d-flex justify-content-end gap-2">
                                         <button
                                             type="button"
@@ -369,8 +340,6 @@ const OurTrack = () => {
                     </div>
                 </div>
             )}
-
-            {/* Empty state */}
             {!loading && !trackData && !showForm && (
                 <div className="row">
                     <div className="col-12 text-center py-5">

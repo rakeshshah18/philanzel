@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { servicesAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
-
 const ServiceModal = ({ show, onHide, onServiceAdded, service = null, isEdit = false }) => {
     const [formData, setFormData] = useState({
         name: service?.name || ''
@@ -9,7 +8,6 @@ const ServiceModal = ({ show, onHide, onServiceAdded, service = null, isEdit = f
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const { showAlert } = useAuth();
-
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -17,19 +15,16 @@ const ServiceModal = ({ show, onHide, onServiceAdded, service = null, isEdit = f
         });
         setError('');
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
         setError('');
-
         try {
             if (!formData.name.trim()) {
                 setError('Service name is required');
                 setIsSubmitting(false);
                 return;
             }
-
             let response;
             if (isEdit && service) {
                 response = await servicesAPI.update(service._id, formData);
@@ -38,7 +33,6 @@ const ServiceModal = ({ show, onHide, onServiceAdded, service = null, isEdit = f
                 response = await servicesAPI.create(formData);
                 showAlert('Service created successfully!', 'success');
             }
-
             setFormData({ name: '' });
             onServiceAdded(response.data.data);
             onHide();
@@ -50,15 +44,12 @@ const ServiceModal = ({ show, onHide, onServiceAdded, service = null, isEdit = f
             setIsSubmitting(false);
         }
     };
-
     const handleClose = () => {
         setFormData({ name: service?.name || '' });
         setError('');
         onHide();
     };
-
     if (!show) return null;
-
     return (
         <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
             <div className="modal-dialog modal-dialog-centered">
@@ -82,7 +73,6 @@ const ServiceModal = ({ show, onHide, onServiceAdded, service = null, isEdit = f
                                     {error}
                                 </div>
                             )}
-
                             <div className="mb-3">
                                 <label htmlFor="serviceName" className="form-label">
                                     Service Name <span className="text-danger">*</span>

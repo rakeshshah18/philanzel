@@ -1,16 +1,11 @@
 "use client"
 import { useEffect, useState } from 'react';
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-
 export default function AboutSolutionsSection({ section }) {
-    // Accepts section prop, but can fallback to API if needed
     const [data, setData] = useState(section || null);
     const [loading, setLoading] = useState(!section);
-
     useEffect(() => {
         if (!section) {
-            // fallback: fetch from API if not provided
             fetch(`${BASE_URL}/api/about-us`)
                 .then(res => res.json())
                 .then(result => {
@@ -24,13 +19,10 @@ export default function AboutSolutionsSection({ section }) {
 
     if (loading) return <section className="py-20 bg-white"><div className="max-w-7xl mx-auto px-4"><p className="text-gray-600">Loading...</p></div></section>;
     if (!data) return null;
-    console.log('AboutSolutionsSection data:', data);
-
     const stripHtml = html => {
         if (typeof html !== 'string') return '';
         return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
     };
-
     return (
         <section className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,14 +1,10 @@
 'use client'
-
 import { useState, useEffect } from 'react'
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
 export function OurFounder() {
     const [founderData, setFounderData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-
     useEffect(() => {
         const fetchFounderData = async () => {
             try {
@@ -27,18 +23,14 @@ export function OurFounder() {
                 setLoading(false)
             }
         }
-
         fetchFounderData()
     }, [])
-
-    // Helper function to strip HTML tags
     const stripHtmlTags = (html) => {
         if (!html) return ''
         const div = document.createElement('div')
         div.innerHTML = html
         return div.textContent || div.innerText || ''
     }
-
     if (loading) {
         return (
             <section className="py-20 bg-white">
@@ -52,7 +44,6 @@ export function OurFounder() {
     }
 
     if (error || !founderData) {
-        // Fallback static content
         return (
             <section className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -95,7 +86,6 @@ export function OurFounder() {
             </section>
         )
     }
-
     return (
         <section className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -108,7 +98,6 @@ export function OurFounder() {
                         {founderData.designation || 'Founder & CEO'}
                     </p>
                 </div>
-                
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div className="bg-gray-50 p-8 rounded-lg shadow-lg">
                         <div className="space-y-4 text-gray-600 font-sans leading-relaxed">

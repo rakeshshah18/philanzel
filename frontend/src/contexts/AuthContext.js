@@ -1,9 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { adminAuthAPI } from '../services/api';
 import Alert from '../components/Alert';
-
 const AuthContext = createContext();
-
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
@@ -11,24 +9,19 @@ export const useAuth = () => {
     }
     return context;
 };
-
 export const AuthProvider = ({ children }) => {
     const [admin, setAdmin] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
     const [alert, setAlert] = useState({ show: false, message: '', type: 'info' });
-
-    // Check for existing token on mount
     useEffect(() => {
         checkAuthStatus();
     }, []);
-
     const checkAuthStatus = async () => {
         try {
             let token = localStorage.getItem('adminToken');
             const { isJwtExpired } = require('../utils/jwt');
             if (!token || isJwtExpired(token)) {
-                // Try to refresh the access token using refresh token cookie
                 try {
                     const refreshResponse = await adminAuthAPI.refreshToken();
                     const newAccessToken = refreshResponse.data.accessToken;
@@ -36,11 +29,9 @@ export const AuthProvider = ({ children }) => {
                         localStorage.setItem('adminToken', newAccessToken);
                         token = newAccessToken;
                     } else {
-                        // If no access token returned, treat as failed refresh
                         throw new Error('No access token returned from refresh');
                     }
                 } catch (refreshError) {
-                    // Prevent infinite loop: only log out and do not retry
                     localStorage.removeItem('adminToken');
                     setAdmin(null);
                     setIsAuthenticated(false);
@@ -49,15 +40,11 @@ export const AuthProvider = ({ children }) => {
                     return;
                 }
             }
-
-            // Verify token by getting profile
             const response = await adminAuthAPI.getProfile();
             const adminData = response.data.data;
-
             setAdmin(adminData);
             setIsAuthenticated(true);
         } catch (error) {
-            // Token is invalid or expired
             localStorage.removeItem('adminToken');
             setAdmin(null);
             setIsAuthenticated(false);
@@ -68,18 +55,11 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
         }
     };
-
     const login = async (email, password) => {
         try {
-            console.log('Login attempt with:', { email });
             const response = await adminAuthAPI.login({ email, password });
-            console.log('Login response:', response);
             const { admin: adminData, accessToken } = response.data.data;
-
-            // Store token
             localStorage.setItem('adminToken', accessToken);
-
-            // Update state
             setAdmin(adminData);
             setIsAuthenticated(true);
 
@@ -90,20 +70,15 @@ export const AuthProvider = ({ children }) => {
             return { success: false, error: errorMessage };
         }
     };
-
     const register = async (registerData) => {
         try {
             console.log('Registration attempt:', registerData);
             const response = await adminAuthAPI.register(registerData);
-            console.log('Registration response:', response);
-            // If OTP flow, backend returns no admin object
             if (response.data.message && response.data.message.includes('OTP')) {
                 return { success: true };
             }
             const { admin: adminData, accessToken } = response.data.data;
-            // Store token
             localStorage.setItem('adminToken', accessToken);
-            // Update state
             setAdmin(adminData);
             setIsAuthenticated(true);
             return { success: true, admin: adminData };
@@ -114,25 +89,21 @@ export const AuthProvider = ({ children }) => {
             return { success: false, error: errorMessage };
         }
     };
-
     const logout = async () => {
         try {
             await adminAuthAPI.logout();
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
-            // Clear local state regardless of API call success
             localStorage.removeItem('adminToken');
             setAdmin(null);
             setIsAuthenticated(false);
         }
     };
-
     const updateProfile = async (profileData) => {
         try {
             const response = await adminAuthAPI.updateProfile(profileData);
             const updatedAdmin = response.data.data;
-
             setAdmin(updatedAdmin);
             return { success: true, admin: updatedAdmin };
         } catch (error) {
@@ -140,7 +111,6 @@ export const AuthProvider = ({ children }) => {
             return { success: false, error: errorMessage };
         }
     };
-
     const changePassword = async (passwordData) => {
         try {
             await adminAuthAPI.changePassword(passwordData);
@@ -150,8 +120,6 @@ export const AuthProvider = ({ children }) => {
             return { success: false, error: errorMessage };
         }
     };
-
-    // Helper function to check if admin has required role
     const hasRole = (requiredRoles) => {
         if (!isAuthenticated || !admin) return false;
         if (Array.isArray(requiredRoles)) {
@@ -159,23 +127,17 @@ export const AuthProvider = ({ children }) => {
         }
         return admin.role === requiredRoles;
     };
-
-    // Helper function to check if admin is authenticated
     const requireAuth = () => {
         if (!isAuthenticated) {
             throw new Error('Authentication required. Please login first.');
         }
     };
-
-    // Helper function to check if admin has permission for operation
     const requirePermission = (requiredRoles = ['admin', 'super_admin']) => {
         requireAuth();
         if (!hasRole(requiredRoles)) {
             throw new Error('Insufficient permissions for this operation.');
         }
     };
-
-    // Protected API wrapper function
     const protectedOperation = async (operation, requiredRoles = ['admin', 'super_admin']) => {
         try {
             requirePermission(requiredRoles);
@@ -186,24 +148,18 @@ export const AuthProvider = ({ children }) => {
                 error.message.includes('Insufficient permissions')) {
                 return { success: false, error: error.message };
             }
-            // If it's an API error, let it bubble up
             throw error;
         }
     };
-
-    // Alert functionality
     const showAlert = (message, type = 'info') => {
         setAlert({ show: true, message, type });
-        // Auto-dismiss after 3 seconds
         setTimeout(() => {
             setAlert({ show: false, message: '', type: 'info' });
         }, 3000);
     };
-
     const hideAlert = () => {
         setAlert({ show: false, message: '', type: 'info' });
     };
-
     const value = {
         admin,
         isAuthenticated,
@@ -222,10 +178,8 @@ export const AuthProvider = ({ children }) => {
         hideAlert,
         alert
     };
-
     return (
         <AuthContext.Provider value={value}>
-            {/* Global Alert */}
             {alert.show && (
                 <div style={{
                     position: 'fixed',

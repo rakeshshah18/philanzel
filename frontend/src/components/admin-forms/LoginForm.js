@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-
 const LoginForm = ({ show, onClose, onLogin, loading }) => {
     const navigate = useNavigate();
     const { login } = useAuth();
@@ -11,25 +10,20 @@ const LoginForm = ({ show, onClose, onLogin, loading }) => {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-
-    // Determine if this is being used as a standalone page or modal
     const isStandalone = !show && !onClose && !onLogin;
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
-        if (error) setError(''); // Clear error when user starts typing
+        if (error) setError('');
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
         if (isStandalone) {
-            // Standalone page login
             try {
                 setIsLoading(true);
                 const result = await login(formData.email, formData.password);
@@ -44,25 +38,19 @@ const LoginForm = ({ show, onClose, onLogin, loading }) => {
                 setIsLoading(false);
             }
         } else {
-            // Modal login
             await onLogin(formData);
             setFormData({ email: '', password: '' });
         }
     };
-
     const handleClose = () => {
         setFormData({ email: '', password: '' });
         setError('');
         if (onClose) onClose();
     };
-
     const handleBackToDashboard = () => {
         navigate('/dashboard');
     };
-
-    // Don't render modal if show is false
     if (!isStandalone && !show) return null;
-
     const formContent = (
         <>
             {error && (
@@ -98,9 +86,7 @@ const LoginForm = ({ show, onClose, onLogin, loading }) => {
             </div>
         </>
     );
-
     if (isStandalone) {
-        // Standalone page layout
         return (
             <div className="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light">
                 <div className="row w-100">
@@ -146,8 +132,6 @@ const LoginForm = ({ show, onClose, onLogin, loading }) => {
             </div>
         );
     }
-
-    // Modal layout
     return (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
             <div className="modal-dialog modal-dialog-centered">

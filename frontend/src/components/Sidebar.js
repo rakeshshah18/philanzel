@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { servicesAPI, calculatorPagesAPI, adminAuthAPI, sidebarAPI } from '../services/api';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-
+import { useAuth } from '../contexts/AuthContext'
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const location = useLocation();
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -12,16 +11,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         "home", "about-us", "career", "partner", "contact",
         "services", "services-sections", "calculators", "sections",
         "reviews", "ads", "footer", "events"
-        // NOTE: sidebar-management is excluded - only super_admin can access it
     ]);
     const [sidebarItems, setSidebarItems] = useState([]);
     const [dropdownStates, setDropdownStates] = useState({});
-
-    // Always call useAuth() as a hook, never conditionally
     const auth = useAuth();
     const admin = auth && auth.admin ? auth.admin : null;
-
-    // Fetch allowedTabs from backend for current admin
     useEffect(() => {
         const fetchAllowedTabs = async () => {
             if (admin && admin.role !== 'super_admin') {
@@ -32,19 +26,16 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         return;
                     }
                 } catch (err) {
-                    // fallback to all tabs if error
                 }
             }
             setAllowedTabs([
                 "home", "about-us", "career", "partner", "contact",
                 "services", "services-sections", "calculators", "sections",
                 "reviews", "ads", "footer", "events"
-                // NOTE: sidebar-management is excluded - only super_admin can access it
             ]);
         };
         fetchAllowedTabs();
     }, [admin]);
-
     useEffect(() => {
         const savedDarkMode = localStorage.getItem('darkMode') === 'true';
         setIsDarkMode(savedDarkMode);
@@ -52,9 +43,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         fetchServices();
         fetchCalculatorPages();
         fetchSidebarItems();
-        // eslint-disable-next-line
     }, []);
-
     const fetchServices = async () => {
         try {
             const response = await servicesAPI.getAll();
@@ -63,7 +52,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             setServices([]);
         }
     };
-
     const fetchCalculatorPages = async () => {
         try {
             const response = await calculatorPagesAPI.getAll();
@@ -72,14 +60,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             setCalculatorPages([]);
         }
     };
-
     const fetchSidebarItems = async () => {
         try {
             const response = await sidebarAPI.getAll();
             const items = response.data.data || [];
             setSidebarItems(items);
-
-            // Initialize dropdown states for dropdown items
             const initialDropdownStates = {};
             items.forEach(item => {
                 if (item.type === 'dropdown') {
@@ -92,7 +77,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             setSidebarItems([]);
         }
     };
-
     const applyDarkMode = (darkMode) => {
         if (darkMode) {
             document.body.classList.add('dark-mode');
@@ -102,55 +86,41 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             document.body.setAttribute('data-bs-theme', 'light');
         }
     };
-
     const toggleDarkMode = () => {
         const newDarkMode = !isDarkMode;
         setIsDarkMode(newDarkMode);
         localStorage.setItem('darkMode', newDarkMode.toString());
         applyDarkMode(newDarkMode);
     };
-
     const isActive = (path) => location.pathname === path;
-
-    // Dynamic function to check if any dropdown item is active
     const isDropdownActive = (sidebarItem) => {
         if (sidebarItem.type === 'single') {
             return isActive(sidebarItem.route);
         }
         if (sidebarItem.type === 'dropdown' && sidebarItem.dropdownItems) {
-            // Check base dropdown items
             const baseActive = sidebarItem.dropdownItems.some(dropdownItem => isActive(dropdownItem.route));
-
-            // For services, also check dynamic services
             if (sidebarItem.name.toLowerCase().includes('service')) {
                 const servicesActive = services.some(service =>
                     isActive(`/services/${service.slug}`)
                 );
                 return baseActive || servicesActive;
             }
-
-            // For calculators, also check dynamic calculator pages
             if (sidebarItem.name.toLowerCase().includes('calculator')) {
                 const calculatorsActive = calculatorPages.some(page =>
                     isActive(`/calculators/${page.name.replace(/\s+/g, '-').toLowerCase()}`)
                 );
                 return baseActive || calculatorsActive || isActive('/calculators');
             }
-
             return baseActive;
         }
         return false;
     };
-
-    // Handle dropdown toggle
     const toggleDropdown = (itemId) => {
         setDropdownStates(prev => ({
             ...prev,
             [itemId]: !prev[itemId]
         }));
     };
-
-    // Get icon for sidebar items
     const getItemIcon = (itemName) => {
         const name = itemName.toLowerCase();
         if (name.includes('dashboard')) return 'fas fa-tachometer-alt';
@@ -166,9 +136,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         if (name.includes('review')) return 'fas fa-star';
         if (name.includes('ads')) return 'fas fa-bullhorn';
         if (name.includes('footer')) return 'fas fa-window-minimize';
-        return 'fas fa-circle'; // default icon
+        return 'fas fa-circle';
     };
-
     return (
         <div
             className={`app-sidebar${isSidebarOpen ? '' : ' collapsed'}`}
@@ -218,7 +187,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     {isSidebarOpen && 'Philanzel'}
                 </h4>
                 <div className="d-flex align-items-center">
-                    {/* Settings Button - Only show when sidebar is expanded and user is super admin */}
                     {isSidebarOpen && admin && admin.role === 'super_admin' && (
                         <Link
                             to="/sidebar-management"
@@ -254,7 +222,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                             <i className="bi bi-gear" style={{ fontSize: '14px' }}></i>
                         </Link>
                     )}
-                    {/* Toggle Button - Shows collapse arrow when expanded, menu/hamburger when collapsed */}
                     <button
                         className="btn btn-sm"
                         style={{
@@ -287,14 +254,10 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 </div>
             </div>
             <nav className="nav flex-column p-3" style={{ display: isSidebarOpen ? 'block' : 'none', transition: 'display 0.3s' }}>
-                {/* Dynamic Sidebar Items */}
                 {sidebarItems.map((item) => {
-                    // Show all active sidebar items (isActive: true from database)
                     if (!item.isActive) {
                         return null;
                     }
-
-                    // Single page item
                     if (item.type === 'single') {
                         return (
                             <Link
@@ -308,12 +271,9 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                             </Link>
                         );
                     }
-
-                    // Dropdown item
                     if (item.type === 'dropdown') {
                         const isDropdownOpen = dropdownStates[item._id] || false;
                         const isItemActive = isDropdownActive(item);
-
                         return (
                             <div key={item._id} className="nav-item">
                                 <div
@@ -333,7 +293,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                                         {item.name}
                                     </span>
                                     <span style={{ display: 'flex', alignItems: 'center' }}>
-                                        {/* Refresh button for Services */}
                                         {item.name.toLowerCase().includes('service') && (
                                             <i
                                                 className="bi bi-arrow-clockwise"
@@ -345,7 +304,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                                                 }}
                                             ></i>
                                         )}
-                                        {/* Refresh button for Calculators */}
                                         {item.name.toLowerCase().includes('calculator') && (
                                             <i
                                                 className="bi bi-arrow-clockwise"
@@ -370,7 +328,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                                         paddingTop: '0.25rem',
                                         paddingBottom: '0.25rem'
                                     }}>
-                                        {/* Render base dropdown items from sidebar API */}
                                         {item.dropdownItems && item.dropdownItems.map((dropdownItem) => (
                                             <Link
                                                 key={dropdownItem._id}
@@ -389,8 +346,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                                                 {dropdownItem.name}
                                             </Link>
                                         ))}
-
-                                        {/* Enhanced Services Integration */}
                                         {item.name.toLowerCase().includes('service') && services.length > 0 && services.map(service => (
                                             <Link
                                                 key={service._id}
@@ -401,8 +356,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                                                 <i className="fas fa-cog me-2"></i>{service.name}
                                             </Link>
                                         ))}
-
-                                        {/* Enhanced Calculators Integration */}
                                         {item.name.toLowerCase().includes('calculator') && (
                                             calculatorPages.length === 0 ? (
                                                 <div className="nav-link" style={{ paddingLeft: '3rem', fontSize: '0.9rem', color: '#adb5bd' }}>No calculators found</div>
@@ -427,8 +380,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
                     return null;
                 })}
-
-                {/* Dark Mode Toggle Button */}
                 <div className="mt-auto pt-3" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
                     <button
                         className="btn w-100 d-flex align-items-center justify-content-center mb-2"
@@ -446,7 +397,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         <i className={`fas ${isDarkMode ? 'fa-sun' : 'fa-moon'} me-2`}></i>
                         {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                     </button>
-                    {/* Logout Button - always visible */}
                     {admin && (
                         <button
                             className="btn w-100 d-flex align-items-center justify-content-center"

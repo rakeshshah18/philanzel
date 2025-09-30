@@ -11,14 +11,13 @@ const AdminRegisterPage = () => {
     const [pendingOtpEmail, setPendingOtpEmail] = useState('');
     const [authMessage, setAuthMessage] = useState('');
     const navigate = useNavigate();
-
     const handleRegister = async (formData) => {
         setLoading(true);
         setAuthMessage('');
         const result = await register(formData);
         setLoading(false);
         if (result.success && result.admin) {
-            setAuthMessage('✅ Admin registered successfully!');
+            setAuthMessage('Admin registered successfully!');
             navigate('/admin/login');
             setOtpRequired(false);
         } else if (result.success && !result.admin) {
@@ -26,9 +25,8 @@ const AdminRegisterPage = () => {
             setOtpRequired(true);
             setAuthMessage('OTP sent to super admin. Please enter OTP to complete registration.');
         } else {
-            setAuthMessage(`❌ ${result.error}`);
+            setAuthMessage(`${result.error}`);
         }
-        // Return value for RegisterForm to show OTP field
         return { otpRequired: result.success && !result.admin };
     };
 
@@ -44,15 +42,15 @@ const AdminRegisterPage = () => {
             });
             const data = await res.json();
             if (data.success) {
-                setAuthMessage('✅ Admin registered successfully!');
+                setAuthMessage('Admin registered successfully!');
                 setOtpRequired(false);
                 setPendingOtpEmail('');
                 navigate('/admin/login');
             } else {
-                setAuthMessage(`❌ ${data.message}`);
+                setAuthMessage(`${data.message}`);
             }
         } catch (err) {
-            setAuthMessage('❌ OTP verification failed.');
+            setAuthMessage('OTP verification failed.');
         }
         setLoading(false);
     };
@@ -60,7 +58,7 @@ const AdminRegisterPage = () => {
     return (
         <>
             {authMessage && (
-                <div className={`alert ${authMessage.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
+                <div className={`alert ${authMessage.includes('successfully') ? 'alert-success' : 'alert-danger'}`} role="alert">
                     {authMessage}
                 </div>
             )}

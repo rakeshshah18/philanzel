@@ -1,14 +1,10 @@
 'use client'
-
 import { useState, useEffect } from 'react'
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
 export function OurStory() {
     const [aboutData, setAboutData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-
     useEffect(() => {
         const fetchAboutData = async () => {
             try {
@@ -30,7 +26,6 @@ export function OurStory() {
 
         fetchAboutData()
     }, [])
-
     if (loading) {
         return (
             <section className="py-20 bg-white">
@@ -42,7 +37,6 @@ export function OurStory() {
             </section>
         )
     }
-
     if (error || !aboutData) {
         return (
             <section className="py-20 bg-white">
@@ -54,13 +48,10 @@ export function OurStory() {
             </section>
         )
     }
-
-    // Function to strip HTML tags for clean text display
     const stripHtml = (html) => {
         if (!html) return ''
         return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
     }
-
     return (
         <section className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

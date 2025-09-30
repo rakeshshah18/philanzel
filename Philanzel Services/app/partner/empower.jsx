@@ -5,11 +5,7 @@ import { useState, useEffect } from "react"
 export default function EmpowerSection() {
     const [empowerData, setEmpowerData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
-
-    // Define the backend base URL
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
-    // Fetch empower data from API
     useEffect(() => {
         const fetchEmpowerData = async () => {
             try {
@@ -22,9 +18,7 @@ export default function EmpowerSection() {
                     
                     if (result.status === "success" && result.data && result.data.length > 0) {
                         setEmpowerData(result.data[0])
-                        console.log('Loaded empower data:', result.data[0])
                     } else {
-                        console.log('Using static data as API response structure is unexpected:', result)
                         setEmpowerData(getStaticEmpowerData())
                     }
                 } else {
@@ -41,8 +35,6 @@ export default function EmpowerSection() {
 
         fetchEmpowerData()
     }, [])
-
-    // Static fallback data
     const getStaticEmpowerData = () => ({
         commonDescription: "<p><strong>Empowering Individuals to Build Successful Insurance & Investment Careers with Zero Barriers</strong></p>",
         content: [
@@ -53,12 +45,8 @@ export default function EmpowerSection() {
             }
         ]
     })
-
-    // Function to safely render HTML content
     const renderHTMLContent = (htmlString) => {
         if (!htmlString) return null
-        
-        // Clean and decode HTML entities
         const cleanHTML = htmlString
             .replace(/\\u003C/g, '<')
             .replace(/\\u003E/g, '>')
@@ -83,7 +71,6 @@ export default function EmpowerSection() {
     return (
         <section className="py-20 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Common Description */}
                 {empowerData?.commonDescription && (
                     <div className="text-center mb-16">
                         <p className="text-sm font-semibold text-cyan-600 uppercase tracking-wide mb-2">ABOUT PHILANZEL</p>
@@ -92,8 +79,6 @@ export default function EmpowerSection() {
                         </div>
                     </div>
                 )}
-
-                {/* Content Items */}
                 {empowerData?.content?.map((item, index) => (
                     <div key={item._id || index} className="mb-16">
                         <div className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}>
@@ -110,8 +95,6 @@ export default function EmpowerSection() {
                                     />
                                 </div>
                             </div>
-
-                            {/* Content */}
                             <div className="w-full lg:w-1/2">
                                 <div className="space-y-6">
                                     <h2 className="text-3xl lg:text-4xl font-serif font-bold text-gray-900">

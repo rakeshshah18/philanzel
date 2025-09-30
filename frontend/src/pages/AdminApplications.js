@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { careerAPI } from '../services/api';
-
 const AdminApplications = () => {
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-
     useEffect(() => {
         fetchApplications();
     }, []);
-
     const fetchApplications = async () => {
         try {
             setLoading(true);
@@ -38,13 +35,10 @@ const AdminApplications = () => {
             alert('No resume file available');
             return;
         }
-
         const baseURL = process.env.NODE_ENV === 'production'
             ? 'https://philanzel-backend.vercel.app'
             : 'http://localhost:8000';
         const downloadUrl = `${baseURL}/uploads/${resume.filename}`;
-
-        // Create a temporary link element and trigger download
         const link = document.createElement('a');
         link.href = downloadUrl;
         link.download = `${applicantName}_resume_${resume.originalName || resume.filename}`;
@@ -62,7 +56,6 @@ const AdminApplications = () => {
             </div>
         );
     }
-
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -83,7 +76,6 @@ const AdminApplications = () => {
                                     {error}
                                 </div>
                             )}
-
                             {applications.length === 0 ? (
                                 <div className="text-center py-4">
                                     <p className="text-muted">No applications found</p>

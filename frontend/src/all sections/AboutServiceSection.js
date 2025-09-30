@@ -1,13 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { Modal, Button, Form } from 'react-bootstrap';
-
 const API_URL = process.env.NODE_ENV === 'production'
     ? 'https://philanzel-backend.vercel.app/api/sections'
     : 'http://localhost:8000/api/sections';
-
 const SERVICE_PAGES = [
     'Retirement Solutions',
     'Mutual Fund Distribution',
@@ -18,7 +15,6 @@ const SERVICE_PAGES = [
     'PE FUND',
     'Financial Planning'
 ];
-
 const AboutServiceSection = () => {
     const { isAuthenticated } = useAuth();
     const token = localStorage.getItem('adminToken');
@@ -34,7 +30,6 @@ const AboutServiceSection = () => {
     useEffect(() => {
         fetchSections();
     }, []);
-
     const fetchSections = async () => {
         setLoading(true);
         try {
@@ -46,19 +41,16 @@ const AboutServiceSection = () => {
             setLoading(false);
         }
     };
-
     const handleEdit = (section) => {
         setEditingSection(section);
         setFormData({ image: section.image || '', heading: section.heading, description: section.description });
         setShowModal(true);
     };
-
     const handleAddTo = (section) => {
         setSelectedSection(section);
         setSelectedService('');
         setShowAddToModal(true);
     };
-
     const handleAddToSubmit = async (e) => {
         e.preventDefault();
         if (!selectedService) {
@@ -67,7 +59,6 @@ const AboutServiceSection = () => {
         }
         const slug = selectedService.replace(/\s+/g, '-').toLowerCase();
         try {
-            // API call to associate section with service
             await axios.post(`/api/services/${slug}/add-section`, {
                 sectionId: selectedSection._id
             });
@@ -77,7 +68,6 @@ const AboutServiceSection = () => {
             alert('Failed to add section: ' + (err?.response?.data?.message || err.message));
         }
     };
-
     const handleDelete = async (id) => {
         if (!isAuthenticated) {
             alert('You must be logged in as admin to delete sections.');
@@ -94,7 +84,6 @@ const AboutServiceSection = () => {
             }
         }
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!isAuthenticated) {
@@ -111,8 +100,6 @@ const AboutServiceSection = () => {
             alert('Failed to update section: ' + (err?.response?.data?.message || err.message));
         }
     };
-
-
     return (
         <div className="about-service-section">
             {loading ? <div>Loading...</div> : (
@@ -134,7 +121,6 @@ const AboutServiceSection = () => {
                     ))}
                 </ul>
             )}
-
             <Modal show={showAddToModal} onHide={() => setShowAddToModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>

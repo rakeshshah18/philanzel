@@ -6,11 +6,7 @@ import { DollarSign, Users, Globe, Building } from "lucide-react"
 export default function OurProcessSection() {
     const [processData, setProcessData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
-
-    // Define the backend base URL
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
-    // Fetch process data from API
     useEffect(() => {
         const fetchProcessData = async () => {
             try {
@@ -42,8 +38,6 @@ export default function OurProcessSection() {
 
         fetchProcessData()
     }, [])
-
-    // Static fallback data
     const getStaticProcessData = () => ({
         heading: "Why Partner With Philanzel?",
         description: "Join forces with a trusted leader in financial services and unlock new opportunities for growth and success.",
@@ -82,8 +76,6 @@ export default function OurProcessSection() {
             }
         ]
     })
-
-    // Get appropriate icon component
     const getIconComponent = (step, index) => {
         if (step.icon) {
             return (
@@ -97,8 +89,6 @@ export default function OurProcessSection() {
                 />
             )
         }
-
-        // Fallback to static icons
         const iconColors = ['cyan', 'amber', 'green', 'purple']
         const color = iconColors[index % iconColors.length]
         const IconComponents = { DollarSign, Users, Globe, Building }
@@ -106,8 +96,6 @@ export default function OurProcessSection() {
 
         return <IconComponent className={`h-12 w-12 text-${color}-600`} />
     }
-
-    // Get background color for icon container
     const getBackgroundColor = (step, index) => {
         if (step.color) return `bg-${step.color}-100`
         

@@ -1,10 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import "./tabbing-css.css"; // your custom CSS file
-
-// Define the backend base URL
+import "./tabbing-css.css";
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-
 const ServicesTabsSection = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [common, setCommon] = useState({
@@ -13,23 +10,16 @@ const ServicesTabsSection = () => {
     image: "",
     button: { text: "", link: "" },
   });
-
   const [tabs, setTabs] = useState([]);
-
   useEffect(() => {
     async function fetchTabs() {
       try {
-        // Fetch tabbing services (tabs) and settings in parallel
         const [servicesRes, settingsRes] = await Promise.all([
           fetch(`${BASE_URL}/api/services/public`),
           fetch(`${BASE_URL}/api/tabbing-services/settings`),
         ]);
-
         const servicesJson = await servicesRes.json();
-        console.log("SERVICES DATA:", servicesJson.data);
         const settingsJson = await settingsRes.json();
-
-        // Set common section from settings
         if (settingsJson.success && settingsJson.data) {
           setCommon({
             heading: settingsJson.data.commonHeading || "OUR SERVICES",
@@ -38,12 +28,9 @@ const ServicesTabsSection = () => {
             button: settingsJson.data.commonImageButton || { text: "", link: "" },
           });
         }
-
-        // Set tabs from services
         const servicesArr = Array.isArray(servicesJson?.data)
           ? servicesJson.data
           : [];
-
         setTabs(
           servicesArr.map((service) => ({
             label: service.tabTitle || service.label || service.title || "",
@@ -60,17 +47,13 @@ const ServicesTabsSection = () => {
         console.error("Error fetching tabs:", e);
       }
     }
-
     fetchTabs();
   }, []);
-
   const handleTabClick = (index) => setActiveTab(index);
   const activeService = tabs.length > 0 ? tabs[activeTab] : null;
-
   return (
     <section className="py-16 bg-white">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Section heading */}
         <div className="text-center mb-8">
           <div className="mb-2">
             <span className="text-xs font-semibold tracking-widest text-cyan-700 bg-cyan-50 px-4 py-1 rounded">
@@ -83,9 +66,7 @@ const ServicesTabsSection = () => {
             dangerouslySetInnerHTML={{ __html: common.description }}
           />
         </div>
-
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Left side tabs */}
           <div className="flex-1 min-w-0">
             <div
               role="tablist"
@@ -146,7 +127,6 @@ const ServicesTabsSection = () => {
             )}
           </div>
 
-          {/* Right side common card */}
           <div className="w-full md:w-80 flex-shrink-0 self-start">
             <div className="relative rounded-lg overflow-hidden shadow-lg">
               {common.image && (

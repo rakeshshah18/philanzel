@@ -1,16 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-
-// Define the backend base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 const Footer = () => {
     const [footerData, setFooterData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // Fetch footer data from API
     useEffect(() => {
         const fetchFooterData = async () => {
             try {
@@ -40,19 +36,13 @@ const Footer = () => {
 
         fetchFooterData();
     }, []);
-
-    // Helper function to strip HTML tags
     const stripHtmlTags = (html) => {
         if (!html) return '';
         const div = document.createElement('div');
         div.innerHTML = html;
         return div.textContent || div.innerText || '';
     };
-
-    // Get current year for copyright
     const currentYear = new Date().getFullYear();
-
-    // Loading state
     if (loading) {
         return (
             <footer className="py-16" style={{ backgroundColor: 'rgb(0, 146, 184)', color: '#ffffff' }}>
@@ -73,8 +63,6 @@ const Footer = () => {
             </footer>
         );
     }
-
-    // Error state or no data
     if (error || !footerData) {
         return (
             <footer className="py-16" style={{ backgroundColor: 'rgb(0, 146, 184)', color: '#ffffff' }}>
@@ -104,8 +92,6 @@ const Footer = () => {
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-
-                    {/* About Us Section */}
                     <div>
                         <h3 className="text-lg font-serif font-bold mb-4 text-white">About Us</h3>
                         <p className="text-gray-300 font-sans mb-4 text-sm leading-relaxed">
@@ -120,8 +106,6 @@ const Footer = () => {
                             </Link>
                         )}
                     </div>
-
-                    {/* Quick Links Section */}
                     <div>
                         <h4 className="text-lg font-serif font-bold mb-4 text-white">
                             {footerData.quickLinks?.title || "Quick Links"}
@@ -144,8 +128,6 @@ const Footer = () => {
                                 ))}
                         </ul>
                     </div>
-
-                    {/* Our Services Section */}
                     <div>
                         <h4 className="text-lg font-serif font-bold mb-4 text-white">
                             {footerData.ourServices?.title || "Our Services"}
@@ -154,7 +136,7 @@ const Footer = () => {
                             {footerData.ourServices?.services
                                 ?.filter(service => service.isEnabled)
                                 ?.sort((a, b) => (a.order || 0) - (b.order || 0))
-                                ?.slice(0, 9) // Show first 9 services to match screenshot
+                                ?.slice(0, 9) 
                                 ?.map((service) => (
                                     <li key={service._id}>
                                         <Link
@@ -167,8 +149,6 @@ const Footer = () => {
                                 ))}
                         </ul>
                     </div>
-
-                    {/* Calculators Section */}
                     <div>
                         <h4 className="text-lg font-serif font-bold mb-4 text-white">
                             {footerData.calculators?.title || "Calculators"}
@@ -189,8 +169,6 @@ const Footer = () => {
                                 ))}
                         </ul>
                     </div>
-
-                    {/* Contact Us Section */}
                     <div>
                         <h4 className="text-lg font-serif font-bold mb-4 text-white">
                             {footerData.contactUs?.title || "Contact Us"}
@@ -225,7 +203,6 @@ const Footer = () => {
                                         ?.filter(social => social.isEnabled)
                                         ?.sort((a, b) => (a.order || 0) - (b.order || 0))
                                         ?.map((social) => {
-                                            // Function to get SVG icon based on platform
                                             const getSocialIcon = (platform) => {
                                                 const platformLower = platform?.toLowerCase() || '';
 
@@ -266,7 +243,6 @@ const Footer = () => {
                                                         </svg>
                                                     );
                                                 } else {
-                                                    // Default icon for unknown platforms
                                                     return (
                                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                                             <path d="M13.723 18.654l-3.61 3.609c-2.316 2.315-6.063 2.315-8.378 0-1.12-1.118-1.735-2.606-1.735-4.188 0-1.582.615-3.07 1.734-4.189l4.866-4.865c2.355-2.355 6.114-2.262 8.377 0 .453.453.81.973 1.089 1.527l-1.593 1.592c-.18-.613-.5-1.189-.964-1.652-1.448-1.448-3.93-1.51-5.439-.001l-4.866 4.866c-.72.72-1.12 1.846-1.12 2.972 0 1.126.4 2.253 1.12 2.973 1.6 1.6 4.2 1.6 5.8 0l2.344-2.344c.26.105.54.18.832.223l1.549 1.548zm1.524-11.309l3.61-3.609c2.315-2.315 6.062-2.315 8.377 0 1.12 1.118 1.735 2.606 1.735 4.188 0 1.582-.615 3.07-1.734 4.189l-4.866 4.865c-2.355 2.355-6.114 2.262-8.377 0-.453-.453-.81-.973-1.089-1.527l1.593-1.592c.18.613.5 1.189.964 1.652 1.448 1.448 3.93 1.51 5.439.001l4.866-4.866c.72-.72 1.12-1.846 1.12-2.972 0-1.126-.4-2.253-1.12-2.973-1.6-1.6-4.2-1.6-5.8 0l-2.344 2.344c-.26-.105-.54-.18-.832-.223z" />
@@ -293,8 +269,6 @@ const Footer = () => {
                         )}
                     </div>
                 </div>
-
-                {/* Bottom Copyright Section */}
                 <div className="border-t border-gray-600 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
                     <div className="text-gray-300 font-sans text-sm mb-4 md:mb-0">
                         {footerData.copyrightText?.replace('{year}', currentYear) || `© ${currentYear} Philanzel. All rights reserved.`}

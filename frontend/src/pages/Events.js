@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
-
 const Events = () => {
     const { admin } = useAuth();
     const [images, setImages] = useState([]);
@@ -10,12 +9,9 @@ const Events = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [showPhotoModal, setShowPhotoModal] = useState(false);
 
-
-    // Fetch event images from backend
     useEffect(() => {
         fetchImages();
     }, []);
-
     const fetchImages = async () => {
         try {
             const res = await axios.get('api/event-images');
@@ -24,8 +20,6 @@ const Events = () => {
             setImages([]);
         }
     };
-
-    // Handle multiple image upload
     const handleImageUpload = async (e) => {
         const files = e.target.files;
         if (!files || files.length === 0) return;
@@ -45,7 +39,6 @@ const Events = () => {
         }
         setUploading(false);
     };
-
     const getStatusBadge = (status) => {
         const baseClasses = "badge fs-6 px-3 py-2";
         switch (status) {
@@ -78,9 +71,6 @@ const Events = () => {
         };
         return new Date(dateString).toLocaleDateString('en-US', options);
     };
-
-
-
     return (
         <div className="container py-4">
             <div className="row mb-4">
@@ -101,8 +91,6 @@ const Events = () => {
                     )}
                 </div>
             </div>
-
-            {/* Images Gallery */}
             <div className="row g-4">
                 {images.length === 0 && (
                     <div className="col-12 text-center text-muted">No event images uploaded yet.</div>
@@ -119,8 +107,6 @@ const Events = () => {
                     </div>
                 ))}
             </div>
-
-            {/* Image Modal */}
             {showPhotoModal && selectedImage && (
                 <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
                     <div className="modal-dialog modal-lg modal-dialog-centered">

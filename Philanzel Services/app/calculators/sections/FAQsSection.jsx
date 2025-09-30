@@ -1,14 +1,11 @@
 "use client"
 import { useEffect, useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
 export default function FAQsSection({ section }) {
     const [data, setData] = useState(section || null)
     const [loading, setLoading] = useState(!section)
     const [openFAQ, setOpenFAQ] = useState(null)
-
     useEffect(() => {
         if (!section) {
             fetch(`${BASE_URL}/api/partner-faqs/public`)
@@ -24,7 +21,6 @@ export default function FAQsSection({ section }) {
 
     if (loading) return <section className="py-20 bg-white"><div className="max-w-7xl mx-auto px-4"><p className="text-gray-600">Loading...</p></div></section>
     if (!data) return null
-
     return (
         <section className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -4,9 +4,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import API from '../../services/api';
 import PartnerFAQs from './PartnerFAQs';
-
 const apiUrl = '/partner/why-choose-philanzel';
-
 const WhyChoosePhilanzel = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -16,11 +14,9 @@ const WhyChoosePhilanzel = () => {
     const [editImage, setEditImage] = useState(null);
     const [editingPoints, setEditingPoints] = useState(false);
     const [editPointsForm, setEditPointsForm] = useState([]);
-
     useEffect(() => {
         fetchItems();
     }, []);
-
     const fetchItems = async () => {
         setLoading(true);
         try {
@@ -32,22 +28,17 @@ const WhyChoosePhilanzel = () => {
         }
         setLoading(false);
     };
-
     if (loading) return <div>Loading...</div>;
     if (error) return <div className="text-danger">{error}</div>;
     if (!items.length) return <div>No Why Choose Philanzel data found.</div>;
-
-    // Common heading/description edit
     const handleCommonEdit = (item) => {
         setEditingCommon(true);
         setEditForm({ heading: item.heading, description: item.description });
         setEditImage(null);
     };
-
     const handleCommonChange = (e) => {
         setEditForm({ ...editForm, [e.target.name]: e.target.value });
     };
-
     const handleCommonSave = async (item) => {
         try {
             let formData;
@@ -56,7 +47,6 @@ const WhyChoosePhilanzel = () => {
                 formData.append('heading', editForm.heading);
                 formData.append('description', editForm.description);
                 formData.append('image', editImage);
-                // Add points if needed
                 if (item.points) {
                     formData.append('points', JSON.stringify(item.points));
                 }
@@ -72,13 +62,10 @@ const WhyChoosePhilanzel = () => {
             setError('Failed to update');
         }
     };
-
-    // Edit all points
     const handleEditPointsClick = (item) => {
         setEditingPoints(true);
         setEditPointsForm(item.points.map(p => p.description));
     };
-
     const handleEditPointsChange = (idx, value) => {
         setEditPointsForm(prev => {
             const updated = [...prev];
@@ -86,7 +73,6 @@ const WhyChoosePhilanzel = () => {
             return updated;
         });
     };
-
     const handleEditPointsSave = async (item) => {
         const updatedPoints = editPointsForm.map(desc => ({ description: desc }));
         try {
@@ -97,8 +83,6 @@ const WhyChoosePhilanzel = () => {
             setError('Failed to update points');
         }
     };
-
-
     return (
         <>
             <section className="why-choose-philanzel mt-4">

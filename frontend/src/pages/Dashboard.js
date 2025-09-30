@@ -1,15 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { adminAuthAPI, servicesAPI, calculatorPagesAPI, reviewSectionsAPI, adsSectionsAPI } from '../services/api';
 import { LoginForm, RegisterForm, AdminNavbar } from '../components/admin-forms';
 import OtpModal from '../components/admin-forms/OtpModal';
 import { useAuth } from '../contexts/AuthContext';
 import Alert from '../components/Alert';
-
 const Dashboard = () => {
     const { admin, isAuthenticated, logout } = useAuth();
-
-    // KPI stats state
     const [stats, setStats] = useState({
         services: null,
         calculators: null,
@@ -18,29 +14,20 @@ const Dashboard = () => {
     });
     const [statsLoading, setStatsLoading] = useState(false);
     const [statsError, setStatsError] = useState('');
-
-    // Fetch KPI stats on mount
     useEffect(() => {
         const fetchStats = async () => {
             setStatsLoading(true);
             setStatsError('');
             try {
-                // Services count
                 const servicesRes = await servicesAPI.getAll();
                 const servicesCount = Array.isArray(servicesRes.data.data) ? servicesRes.data.data.length : 0;
-
-                // Calculators count
                 const calculatorsRes = await calculatorPagesAPI.getAll();
                 const calculatorsCount = Array.isArray(calculatorsRes.data.data) ? calculatorsRes.data.data.length : 0;
-
-                // Reviews count (sum of all reviews in all sections)
                 const reviewsRes = await reviewSectionsAPI.getAll();
                 let reviewsCount = 0;
                 if (Array.isArray(reviewsRes.data.data)) {
                     reviewsCount = reviewsRes.data.data.reduce((sum, section) => sum + (Array.isArray(section.reviews) ? section.reviews.length : 0), 0);
                 }
-
-                // Ads count
                 const adsRes = await adsSectionsAPI.getAllAdmin();
                 const adsCount = Array.isArray(adsRes.data.data) ? adsRes.data.data.length : 0;
 
@@ -58,14 +45,10 @@ const Dashboard = () => {
         };
         fetchStats();
     }, []);
-
-    // Admin list state (for super_admin)
     const [admins, setAdmins] = useState([]);
     const [adminsLoading, setAdminsLoading] = useState(false);
     const [adminsError, setAdminsError] = useState('');
     const [deleteLoading, setDeleteLoading] = useState(false);
-
-    // Auth modals and state
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [showDeleteAdminModal, setShowDeleteAdminModal] = useState(false);
@@ -82,10 +65,6 @@ const Dashboard = () => {
                 .finally(() => setAdminsLoading(false));
         }
     }, [admin]);
-
-
-
-    // Sidebar categories management (aligned with database structure)
     const SIDEBAR_CATEGORIES = React.useMemo(() => ({
         'dashboard': {
             name: 'Dashboard',
@@ -113,18 +92,11 @@ const Dashboard = () => {
             subPages: ['reviews', 'ads', 'footer', 'events']
         }
     }), []);
-
-    // Generate all tabs from sidebar categories
     const ALL_TABS = React.useMemo(() => Object.keys(SIDEBAR_CATEGORIES), [SIDEBAR_CATEGORIES]);
-
-    // Get display name for a category
     const getDisplayName = React.useCallback((key) => {
-        // Check if it's a category
         if (SIDEBAR_CATEGORIES[key]) {
             return SIDEBAR_CATEGORIES[key].name;
         }
-
-        // Check if it's a sub-page and get a nice display name
         const pageDisplayNames = {
             'home': 'Home',
             'about-us': 'About Us',
@@ -141,14 +113,10 @@ const Dashboard = () => {
 
         return pageDisplayNames[key] || key.charAt(0).toUpperCase() + key.slice(1);
     }, [SIDEBAR_CATEGORIES]);
-
-    // Tab display names mapping
     const getTabDisplayName = (tab) => {
         return getDisplayName(tab);
     };
-    const [tabSelections, setTabSelections] = useState({}); // { adminId: ["pages", ...] }
-
-    // Load allowedTabs for all admins from backend on mount
+    const [tabSelections, setTabSelections] = useState({});
     useEffect(() => {
         const fetchAllowedTabs = async () => {
             if (admins.length > 0) {
@@ -167,8 +135,6 @@ const Dashboard = () => {
         };
         fetchAllowedTabs();
     }, [admins, ALL_TABS]);
-
-    // Handle checkbox change (update backend)
     const handleTabCheckbox = async (adminId, tabKey) => {
         setTabSelections(prev => {
             const current = prev[adminId] || [];
@@ -178,22 +144,15 @@ const Dashboard = () => {
             } else {
                 updated = [...current, tabKey];
             }
-            // Update backend
             adminAuthAPI.assignTabs(adminId, updated);
             return { ...prev, [adminId]: updated };
         });
     };
-
-
-
-    // Handle deleting an admin (frontend-only)
     const handleDeleteAdmin = async (adminId, email) => {
         if (!window.confirm(`Are you sure you want to delete admin ${email}? This cannot be undone.`)) return;
         setDeleteLoading(true);
         try {
-            // Remove from localStorage (allowedTabs)
             localStorage.removeItem(`allowedTabs_${adminId}`);
-            // Remove from admins list (frontend-only)
             setAdmins(prev => prev.filter(a => a._id !== adminId));
             setAuthMessage(`✅ Admin ${email} deleted successfully (frontend only)`);
         } catch (err) {
@@ -202,12 +161,9 @@ const Dashboard = () => {
             setDeleteLoading(false);
         }
     };
-
-    // Dummy handlers for forms (frontend-only)
     const handleLogin = () => { };
     const handleRegister = () => { };
     const handleVerifyOtp = () => { };
-
     return (
         <>
             <AdminNavbar
@@ -218,8 +174,6 @@ const Dashboard = () => {
                 onLogout={logout}
                 onDeleteAdminClick={() => setShowDeleteAdminModal(true)}
             />
-
-            {/* Delete Admin Modal (super_admin only) */}
             {showDeleteAdminModal && (
                 <div className="modal fade show" style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }} tabIndex="-1">
                     <div className="modal-dialog modal-lg">
@@ -326,10 +280,6 @@ const Dashboard = () => {
                     </div>
                 </div>
             )}
-
-
-
-            {/* Success/Error Messages */}
             {authMessage && (
                 <div className="container-fluid px-4 pt-3">
                     <Alert
@@ -339,7 +289,6 @@ const Dashboard = () => {
                     />
                 </div>
             )}
-
             <div className="container-fluid p-4">
                 <div className="row mb-4">
                     <div className="col">
@@ -347,8 +296,6 @@ const Dashboard = () => {
                         <p className="text-muted">Welcome to Philanzel Financial Services</p>
                     </div>
                 </div>
-
-                {/* KPI Cards */}
                 <div className="row g-4 mb-4">
                     <div className="col-12 col-sm-6 col-lg-3">
                         <div className="card shadow-sm dashboard-card h-100" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
@@ -398,8 +345,6 @@ const Dashboard = () => {
                 {statsError && (
                     <div className="alert alert-danger my-2">{statsError}</div>
                 )}
-
-                {/* Analytics & Recent Activity Placeholder */}
                 <div className="row g-4">
                     <div className="col-12 col-lg-8">
                         <div className="card shadow-sm dashboard-card h-100" style={{ borderRadius: 18, background: '#fff', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>

@@ -39,18 +39,13 @@ import React, { useState, useEffect } from "react";
  * @property {number} count
  * @property {TestimonialItem[]} data
  */
-
-// Define the backend base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-
 const Testimonials = () => {
   const [testimonialData, setTestimonialData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Fetch testimonials data from API
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
@@ -60,16 +55,12 @@ const Testimonials = () => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
         const apiResponse = await response.json();
-        
-        // Extract the first item from the data array
         if (apiResponse.status === 'success' && apiResponse.data.length > 0) {
           setTestimonialData(apiResponse.data[0]);
         } else {
           throw new Error('No testimonial data found');
         }
-        
         setError(null);
       } catch (err) {
         console.error('Error fetching testimonials:', err);
@@ -78,35 +69,27 @@ const Testimonials = () => {
         setLoading(false);
       }
     };
-
     fetchTestimonials();
   }, []);
-
-  // Auto-slide effect - change to next single review after 5 seconds with 1 second transition
   useEffect(() => {
     if (!testimonialData?.reviews || testimonialData.reviews.length <= 1) {
-      return; // Don't auto-slide if there's only 1 or no reviews
+      return;
     }
-
     const visibleReviews = testimonialData.reviews.filter((review) => review.isVisible);
-    
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setTimeout(() => {
         setCurrentSlide((prev) => (prev + 1) % visibleReviews.length);
         setIsTransitioning(false);
-      }, 1000); // 1 second transition delay
-    }, 6000); // Total cycle: 5 seconds display + 1 second transition = 6 seconds
+      }, 1000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [testimonialData?.reviews]);
-
-  // Generate star rating component
   const renderStars = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
-
     for (let i = 0; i < fullStars; i++) {
       stars.push(
         <svg key={i} className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -114,7 +97,6 @@ const Testimonials = () => {
         </svg>
       );
     }
-
     if (hasHalfStar) {
       stars.push(
         <svg key="half" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -128,11 +110,8 @@ const Testimonials = () => {
         </svg>
       );
     }
-
     return stars;
   };
-
-  // Get user initials for avatar
   const getUserInitials = (name) => {
     return name
       .split(' ')
@@ -141,8 +120,6 @@ const Testimonials = () => {
       .toUpperCase()
       .slice(0, 2);
   };
-
-  // Format date
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -150,8 +127,6 @@ const Testimonials = () => {
       day: 'numeric'
     });
   };
-
-  // Handle navigation for single review
   const nextSlide = () => {
     if (testimonialData?.reviews) {
       const visibleReviews = testimonialData.reviews.filter((review) => review.isVisible);
@@ -159,10 +134,9 @@ const Testimonials = () => {
       setTimeout(() => {
         setCurrentSlide((prev) => (prev + 1) % visibleReviews.length);
         setIsTransitioning(false);
-      }, 1000); // 1 second transition delay
+      }, 1000);
     }
   };
-
   const prevSlide = () => {
     if (testimonialData?.reviews) {
       const visibleReviews = testimonialData.reviews.filter((review) => review.isVisible);
@@ -170,11 +144,9 @@ const Testimonials = () => {
       setTimeout(() => {
         setCurrentSlide((prev) => (prev - 1 + visibleReviews.length) % visibleReviews.length);
         setIsTransitioning(false);
-      }, 1000); // 1 second transition delay
+      }, 1000);
     }
   };
-
-  // Loading state
   if (loading) {
     return (
       <section id="testimonials" className="py-20 bg-white">
@@ -194,8 +166,6 @@ const Testimonials = () => {
       </section>
     );
   }
-
-  // Error state
   if (error) {
     return (
       <section id="testimonials" className="py-20 bg-white">
@@ -213,8 +183,6 @@ const Testimonials = () => {
       </section>
     );
   }
-
-  // No data state
   if (!testimonialData) {
     return (
       <section id="testimonials" className="py-20 bg-white">
@@ -226,11 +194,8 @@ const Testimonials = () => {
       </section>
     );
   }
-
-  // Get visible reviews
   const visibleReviews = testimonialData.reviews?.filter((review) => review.isVisible) || [];
   const currentReview = visibleReviews[currentSlide];
-  
   return (
     <>
       <style jsx>{`
@@ -244,7 +209,6 @@ const Testimonials = () => {
             transform: translateY(0);
           }
         }
-        
         @keyframes slideInFromRight {
           from {
             opacity: 0;
@@ -314,7 +278,6 @@ const Testimonials = () => {
             </a>
           )}
         </div>
-
         <div className="relative mt-8">
           {visibleReviews.length > 1 && (
             <button 
@@ -326,8 +289,6 @@ const Testimonials = () => {
               </svg>
             </button>
           )}
-
-          {/* Single testimonial card centered */}
           <div className="flex justify-center relative overflow-hidden">
             {currentReview && (
               <div 
@@ -362,7 +323,6 @@ const Testimonials = () => {
                     />
                   </span>
                 </div>
-
                 <div className="flex items-center mb-4">
                   <span className="flex text-amber-500">
                     {renderStars(currentReview.rating)}
@@ -371,16 +331,13 @@ const Testimonials = () => {
                     {formatDate(currentReview.reviewDate)}
                   </span>
                 </div>
-
                 <hr className="my-4 border-gray-200" />
-                
                 <p className="text-gray-700 text-lg leading-relaxed text-center">
                   "{currentReview.reviewText}"
                 </p>
               </div>
             )}
           </div>
-
           {visibleReviews.length > 1 && (
             <button 
               onClick={nextSlide}
@@ -392,8 +349,6 @@ const Testimonials = () => {
             </button>
           )}
         </div>
-
-        {/* Pagination indicators */}
         {visibleReviews.length > 1 && (
           <div className="flex justify-center mt-8 space-x-2">
             {visibleReviews.map((_, index) => (
@@ -404,7 +359,7 @@ const Testimonials = () => {
                   setTimeout(() => {
                     setCurrentSlide(index);
                     setIsTransitioning(false);
-                  }, 1000); // 1 second transition delay
+                  }, 1000);
                 }}
                 className={`w-3 h-3 rounded-full transition-colors duration-200 ${
                   index === currentSlide ? 'bg-cyan-600' : 'bg-gray-300 hover:bg-gray-400'

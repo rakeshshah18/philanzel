@@ -42,8 +42,6 @@ export default function PartnerPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        // Handle form submission logic here
-        console.log("Partnership application submission:", formData)
         setIsSubmitted(true)
     }
 
@@ -82,44 +80,20 @@ export default function PartnerPage() {
     return (
         <div className="min-h-screen bg-white">
             <Navigation />
-
-            {/* Hero Section */}
             <section className="bg-gradient-to-br from-gray-50 to-white py-5">
-            {/* Partner About Section */}
             <PartnerAbout />
             </section>
-
-            {/* Association Section */}
             <AssociationSection />
-
-            {/* Partnership Benefits Section */}
             <OurProcessSection />
-
-            {/* Empowerment Section */}
             <EmpowerSection />
-
-            {/* Potential Growth Section */}
             <PotentialGrowthSection />
-
-            {/* Why Choose Us Section */}
             <WhyChooseUsSection />
-
-            {/* Testimonials Section */}
             <TestimonialsSection />
-
-            {/* Ads Section */}
             <AdsSection />
-
-            {/* FAQs Section */}
             <FAQsSection />
-
-            {/* CTA Section */}
             <CTASection />
-
-            {/* Footer */}
             <Footer />
 
-            
         </div>
     )
 }

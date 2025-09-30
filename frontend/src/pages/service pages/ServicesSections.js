@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-
 const ServicesSections = () => {
-    // Detect dark mode
     const [isDarkMode, setIsDarkMode] = useState(false);
     useEffect(() => {
         const checkDarkMode = () => {
@@ -15,7 +13,6 @@ const ServicesSections = () => {
         observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
         return () => observer.disconnect();
     }, []);
-
     const [sections, setSections] = useState([]);
     const [showEditSectionModal, setShowEditSectionModal] = useState(false);
     const [editingSection, setEditingSection] = useState(null);
@@ -23,16 +20,13 @@ const ServicesSections = () => {
     const [newSection, setNewSection] = useState({ name: '', heading: [''], description: [''], subheading: [''], subdescription: [''], points: [''], images: [''], faqs: [{ question: '', answer: '' }] });
     const [createLoading, setCreateLoading] = useState(false);
     const [createError, setCreateError] = useState('');
-
     const handleEditSection = (section) => {
         setEditingSection({ ...section }); // ensure a new object reference
         setShowEditSectionModal(true);
     };
-
     const handleEditFieldChange = (field, value) => {
         setEditingSection(prev => ({ ...prev, [field]: value }));
     };
-
     const handleEditArrayFieldChange = (field, idx, value) => {
         setEditingSection(prev => {
             const arr = Array.isArray(prev[field]) ? [...prev[field]] : [];
@@ -40,12 +34,10 @@ const ServicesSections = () => {
             return { ...prev, [field]: arr };
         });
     };
-
     const handleEditModalClose = () => {
         setShowEditSectionModal(false);
         setEditingSection(null);
     };
-
     const handleEditModalSave = async () => {
         if (!editingSection || !editingSection._id) return;
         try {
@@ -67,20 +59,16 @@ const ServicesSections = () => {
             alert('Error updating section');
         }
     };
-
     const handleDeleteSection = async (sectionId) => {
         if (window.confirm('Are you sure you want to delete this section?')) {
-            // TODO: Implement section delete API call
             alert(`Delete section with ID: ${sectionId}`);
         }
     };
-
     const handleCreateSection = () => {
         setShowCreateSectionModal(true);
         setNewSection({ name: '', heading: [''], description: [''], subheading: [''], subdescription: [''], points: [''], images: [''], faqs: [{ question: '', answer: '' }] });
         setCreateError('');
     };
-
     const handleCreateFieldChange = (field, value) => {
         setNewSection(prev => ({ ...prev, [field]: value }));
     };
@@ -123,11 +111,9 @@ const ServicesSections = () => {
             setCreateLoading(false);
         }
     };
-
     useEffect(() => {
         fetchSections();
     }, []);
-
     const fetchSections = async () => {
         try {
             const res = await fetch('http://localhost:8000/api/sections');
@@ -146,7 +132,6 @@ const ServicesSections = () => {
             setSections([]);
         }
     };
-    // Helper functions for dynamic fields
     const addArrayField = (section, field) => {
         return { ...section, [field]: [...section[field], ''] };
     };
@@ -219,10 +204,7 @@ const ServicesSections = () => {
                                                         </button>
                                                     </div>
                                                 </div>
-                                                {/* Limited content rendering */}
-                                                {/* Render all content directly, no expand/collapse logic */}
                                                 {(() => {
-                                                    // Helper to limit text (not used anymore)
                                                     return (
                                                         <>
                                                             <div className="mb-2 pb-2 border-bottom">
@@ -238,7 +220,6 @@ const ServicesSections = () => {
                                                                     </div>
                                                                 )}
                                                             </div>
-                                                            {/* Group: Sub Info */}
                                                             {(Array.isArray(section.subheading) && section.subheading.filter(s => s).length > 0) || (Array.isArray(section.subdescription) && section.subdescription.filter(s => s).length > 0) ? (
                                                                 <div className="mb-2 pb-2 border-bottom">
                                                                     {Array.isArray(section.subheading) && section.subheading.filter(s => s).length > 0 && (
@@ -260,7 +241,6 @@ const ServicesSections = () => {
                                                                     )}
                                                                 </div>
                                                             ) : null}
-                                                            {/* Group: Points & Images */}
                                                             {(Array.isArray(section.points) && section.points.filter(p => p).length > 0) || (Array.isArray(section.images) && section.images.length > 0) ? (
                                                                 <div className="mb-2 pb-2 border-bottom">
                                                                     {Array.isArray(section.points) && section.points.filter(p => p).length > 0 && (
@@ -282,7 +262,6 @@ const ServicesSections = () => {
                                                                     )}
                                                                 </div>
                                                             ) : null}
-                                                            {/* Group: FAQs */}
                                                             {Array.isArray(section.faqs) && section.faqs.filter(faq => faq.question || faq.answer).length > 0 && (
                                                                 <div className="mb-2">
                                                                     <span className="fw-semibold text-muted"><i className="bi bi-question-circle me-1"></i>FAQs:</span>
@@ -306,7 +285,6 @@ const ServicesSections = () => {
                     </div>
                 </div>
             </div>
-            {/* Edit Section Modal */}
             <Modal
                 show={Boolean(showEditSectionModal)}
                 onHide={handleEditModalClose}
@@ -420,7 +398,6 @@ const ServicesSections = () => {
                     </div>
                 </div>
             </Modal>
-            {/* Create Section Modal */}
             <Modal
                 show={Boolean(showCreateSectionModal)}
                 onHide={handleCreateModalClose}

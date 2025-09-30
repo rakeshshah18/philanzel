@@ -1,18 +1,14 @@
 'use client';
-
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-
 export default function Carousel() {
     const [carouselData, setCarouselData] = useState([]);
     const [current, setCurrent] = useState(0);
     const [animating, setAnimating] = useState(false);
     const prevIdx = useRef(0);
     const total = carouselData.length;
-
     const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
     useEffect(() => {
         async function fetchData() {
             try {
@@ -79,7 +75,6 @@ export default function Carousel() {
             >
                 <div className="flex-1 p-8">
                     <h2 className="text-4xl font-serif font-black text-gray-900 mb-4">{heading}</h2>
-                    {/* Description may contain HTML */}
                     <div className="text-lg text-gray-600 mb-6 font-sans" dangerouslySetInnerHTML={{ __html: description }} />
                     {button && button.link && (
                         <a href={button.link} target="_blank" rel="noopener noreferrer">
@@ -94,7 +89,6 @@ export default function Carousel() {
                     <img src={image?.url} alt={image?.altText || heading} className="object-cover w-full h-80 md:h-96 rounded-none" />
                 </div>
             </div>
-            {/* Right Arrow Button */}
             <button
                 onClick={next}
                 className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-gray-100 hover:bg-cyan-600 hover:text-white text-cyan-600 shadow-lg items-center justify-center"
@@ -104,7 +98,6 @@ export default function Carousel() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                 </svg>
             </button>
-            {/* Dots - bottom center */}
             <div className="absolute left-1/2 bottom-6 -translate-x-1/2 flex gap-2">
                 {carouselData.map((_, idx) => (
                     <button

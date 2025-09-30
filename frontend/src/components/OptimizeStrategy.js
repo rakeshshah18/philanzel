@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { footerAPI } from '../services/api';
-
 const OptimizeStrategy = () => {
     const [strategies, setStrategies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     useEffect(() => {
         fetchStrategies();
     }, []);
-
     const fetchStrategies = async () => {
         try {
             setLoading(true);
             setError(null);
             const response = await footerAPI.getPublic();
             if (response.data.success && response.data.data.optimizeStrategy) {
-                // Filter visible strategies
                 const visibleStrategies = response.data.data.optimizeStrategy.filter(strategy => strategy.isVisible);
                 setStrategies(visibleStrategies);
             }
@@ -27,12 +23,9 @@ const OptimizeStrategy = () => {
             setLoading(false);
         }
     };
-
-    // Don't render if no strategies or loading/error
     if (loading || error || !strategies || strategies.length === 0) {
         return null;
     }
-
     return (
         <section className="optimize-strategy-section py-5 bg-light">
             <div className="container">

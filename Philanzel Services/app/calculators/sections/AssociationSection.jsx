@@ -1,12 +1,9 @@
 "use client"
 import { useEffect, useState } from "react"
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
 export default function AssociationSection({ section }) {
     const [associations, setAssociations] = useState(section?.associations || [])
     const [loading, setLoading] = useState(!section)
-
     useEffect(() => {
         if (!section) {
             setAssociations(getStaticAssociations())
@@ -26,15 +23,12 @@ export default function AssociationSection({ section }) {
                 .finally(() => setLoading(false))
         }
     }, [section])
-
     const getStaticAssociations = () => [
         { id: 1, name: "IRDAI", image: "https://via.placeholder.com/150x80/0f172a/ffffff?text=IRDAI" },
         { id: 2, name: "IRDA", image: "https://via.placeholder.com/150x80/1e40af/ffffff?text=IRDA" },
     ]
-
     if (loading) return <section className="py-20 bg-white"><div className="max-w-7xl mx-auto px-4"><p className="text-gray-600">Loading...</p></div></section>
     if (!associations.length) return null
-
     return (
         <section className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

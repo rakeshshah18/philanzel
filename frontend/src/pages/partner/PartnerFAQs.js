@@ -3,23 +3,18 @@ import axios from 'axios';
 import { Button, Form } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
-
 export default function PartnerFAQs() {
     const [faqs, setFaqs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [faqEditMode, setFaqEditMode] = useState({}); // { [faqId]: true/false }
-    const [faqItemsForm, setFaqItemsForm] = useState({}); // { [faqId]: [{question, answer}] }
-    const [faqAddMode, setFaqAddMode] = useState({}); // { [faqId]: true/false }
+    const [faqEditMode, setFaqEditMode] = useState({});
+    const [faqItemsForm, setFaqItemsForm] = useState({});
+    const [faqAddMode, setFaqAddMode] = useState({});
     const [newFaqItem, setNewFaqItem] = useState({ question: '', answer: '' });
-
     useEffect(() => {
         fetchFaqs();
-        // eslint-disable-next-line
     }, []);
-
     const fetchFaqs = () => {
         axios.get(`${API_BASE}/admin/partner-faqs`)
             .then(res => {
@@ -31,10 +26,6 @@ export default function PartnerFAQs() {
                 setLoading(false);
             });
     };
-
-
-    // FAQ items edit logic
-    // Handler to start editing a specific FAQ item (only one at a time)
     const handleFaqItemEdit = (faqId, idx) => {
         setFaqItemsForm(prev => ({
             ...prev,
@@ -51,8 +42,6 @@ export default function PartnerFAQs() {
                 )
         }));
     };
-
-    // Handler to save an edited FAQ item
     const handleFaqItemSave = async (faqId, idx) => {
         const faq = faqs.find(f => f._id === faqId);
         const updatedItems = faqItemsForm[faqId].map((item, i) => ({ question: item.question, answer: item.answer }));
@@ -70,15 +59,12 @@ export default function PartnerFAQs() {
             setError('Failed to update FAQ item');
         }
     };
-
-    // Handler to cancel editing an FAQ item
     const handleFaqItemCancel = (faqId, idx) => {
         setFaqItemsForm(prev => ({
             ...prev,
             [faqId]: prev[faqId].map(item => ({ ...item, editing: false }))
         }));
     };
-
     const handleFaqItemChange = (faqId, idx, field, value) => {
         setFaqItemsForm(prev => {
             const updated = { ...prev };
@@ -86,7 +72,6 @@ export default function PartnerFAQs() {
             return updated;
         });
     };
-
     const handleFaqItemDelete = async (faq, idx) => {
         const updatedFaqs = faq.faqs.filter((_, i) => i !== idx);
         try {
@@ -100,10 +85,6 @@ export default function PartnerFAQs() {
             setError('Failed to delete FAQ item');
         }
     };
-
-
-
-    // FAQ item add logic
     const handleFaqAddClick = (faq) => {
         setFaqAddMode({ ...faqAddMode, [faq._id]: true });
         setNewFaqItem({ question: '', answer: '' });
@@ -112,7 +93,6 @@ export default function PartnerFAQs() {
     const handleNewFaqItemChange = (field, value) => {
         setNewFaqItem(prev => ({ ...prev, [field]: value }));
     };
-
     const handleFaqItemAddSave = async (faq) => {
         const updatedFaqs = [...(faq.faqs || []), { question: newFaqItem.question, answer: newFaqItem.answer }];
         try {
@@ -127,16 +107,12 @@ export default function PartnerFAQs() {
             setError('Failed to add FAQ item');
         }
     };
-
     const handleFaqItemAddCancel = (faq) => {
         setFaqAddMode({ ...faqAddMode, [faq._id]: false });
         setNewFaqItem({ question: '', answer: '' });
     };
-
-
     if (loading) return <div>Loading FAQs...</div>;
     if (error) return <div>Error: {error}</div>;
-
     return (
         <div className="dashboard-card shadow-sm mb-5" style={{ borderRadius: 18, background: '#f8fafc', border: 'none', boxShadow: '0 2px 12px #e0e7ef' }}>
             <style>{`

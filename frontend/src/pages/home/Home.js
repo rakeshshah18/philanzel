@@ -4,38 +4,24 @@ import Alert from '../../components/Alert';
 import { homePageAPI, ourTrackAPI, servicesAPI, tabbingServicesSettingsAPI, helpedIndustriesAPI, whyChooseUsAPI, ourAssociationAPI, homeFAQsAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-
-// Helper function to get full image URL
 const getImageUrl = (imageUrl) => {
     if (!imageUrl) return null;
-
-    // If it's already a full URL, return as is
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
         return imageUrl;
     }
-
-    // If it's a relative URL from backend, prepend the base URL
     const baseUrl = process.env.NODE_ENV === 'production'
         ? 'https://philanzel-backend.vercel.app'
         : 'http://localhost:8000';
-
-    // Handle backend upload paths correctly
     if (imageUrl.startsWith('/uploads/')) {
         return `${baseUrl}${imageUrl}`;
     }
-
-    // Handle legacy paths
     if (imageUrl.startsWith('/images/')) {
         return `${baseUrl}${imageUrl}`;
     }
-
-    // Default case - add uploads prefix if missing
     return `${baseUrl}/uploads/images/${imageUrl}`;
 };
 
 const Home = () => {
-    // Helper to decode HTML entities
-    // Helper to decode HTML entities
     const [homePages, setHomePages] = useState([]);
     const [fetchLoading, setFetchLoading] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -45,38 +31,26 @@ const Home = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [isDarkMode, setIsDarkMode] = useState(false);
-
-    // Removed unused pagination state variables
-
-    // Check for dark mode
     useEffect(() => {
         const checkDarkMode = () => {
             setIsDarkMode(document.body.classList.contains('dark-mode'));
         };
-
         checkDarkMode();
-
-        // Listen for dark mode changes
         const observer = new MutationObserver(() => {
             checkDarkMode();
         });
-
         observer.observe(document.body, {
             attributes: true,
             attributeFilter: ['class']
         });
-
         return () => observer.disconnect();
     }, []);
-
     const [formData, setFormData] = useState({
         heading: '',
         description: '',
         button: { text: '', link: '' },
         image: { file: null, altText: '' }
     });
-
-    // OurTrack state
     const [trackData, setTrackData] = useState(null);
     const [trackLoading, setTrackLoading] = useState(false);
     const [showTrackForm, setShowTrackForm] = useState(false);
@@ -87,8 +61,6 @@ const Home = () => {
         planningDone: '',
         happyCustomers: ''
     });
-
-    // Home Services state
     const [homeServices, setHomeServices] = useState([
         {
             id: 1,
@@ -101,7 +73,6 @@ const Home = () => {
         serviceName: '',
         description: ''
     });
-
     const { isAuthenticated, loading: authLoading } = useAuth();
     useEffect(() => {
         if (!authLoading && isAuthenticated) {
@@ -122,12 +93,9 @@ const Home = () => {
     const fetchHomePages = async () => {
         setFetchLoading(true);
         try {
-            console.log('Fetching homepage data...');
             const response = await homePageAPI.getAll();
-            console.log('Homepage API response:', response);
             if (response.data && response.data.data) {
                 setHomePages(response.data.data);
-                console.log('Homepage data loaded successfully:', response.data.data.length, 'items', response.data.data);
             }
         } catch (error) {
             console.error('Error fetching homepage content:', error);
@@ -137,15 +105,13 @@ const Home = () => {
                 data: error.response?.data,
                 message: error.message
             });
-            setMessage(`❌ Failed to fetch homepage content. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to fetch homepage content. ${error.response?.data?.message || error.message}`);
         } finally {
             setFetchLoading(false);
         }
     };
-
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-
         if (name.includes('.')) {
             const [parent, child] = name.split('.');
             if (child === 'file') {
@@ -172,12 +138,10 @@ const Home = () => {
             }));
         }
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
-
         try {
             const submitData = new FormData();
             submitData.append('heading', formData.heading);
@@ -189,26 +153,22 @@ const Home = () => {
             if (formData.image.file) {
                 submitData.append('image', formData.image.file);
             }
-
             if (isEditing && editingId) {
                 await homePageAPI.updateWithFile(editingId, submitData);
-                setMessage('✅ Banner updated successfully!');
+                setMessage('Banner updated successfully!');
             } else {
                 await homePageAPI.createWithFile(submitData);
-                setMessage('✅ Banner created successfully!');
+                setMessage('Banner created successfully!');
             }
-
             resetForm();
             fetchHomePages();
             setShowForm(false);
-
         } catch (error) {
-            setMessage('❌ Failed to save banner. Please try again.');
+            setMessage('Failed to save banner. Please try again.');
         } finally {
             setLoading(false);
         }
     };
-
     const resetForm = () => {
         setFormData({
             heading: '',
@@ -218,11 +178,9 @@ const Home = () => {
         });
         setIsEditing(false);
         setEditingId(null);
-
         const fileInput = document.getElementById('image.file');
         if (fileInput) fileInput.value = '';
     };
-
     const handleEdit = (page) => {
         setFormData({
             heading: page.heading,
@@ -241,30 +199,23 @@ const Home = () => {
         setShowForm(true);
         setMessage('');
     };
-
     const handleCancelEdit = () => {
         resetForm();
         setShowForm(false);
         setMessage('');
     };
-
     const deleteHomePage = async (id) => {
         if (!window.confirm('Are you sure you want to delete this banner?')) {
             return;
         }
-
         try {
             await homePageAPI.delete(id);
             setHomePages(homePages.filter(page => page._id !== id));
-            setMessage('✅ Banner deleted successfully!');
+            setMessage('Banner deleted successfully!');
         } catch (error) {
-            setMessage('❌ Failed to delete banner.');
+            setMessage('Failed to delete banner.');
         }
     };
-
-    // Removed unused handleView function
-
-    // OurTrack functions
     const fetchTrackData = async () => {
         setTrackLoading(true);
         try {
@@ -277,16 +228,14 @@ const Home = () => {
             }
         } catch (error) {
             console.error('Error fetching track data:', error);
-            // Only show error message if it's not a 404 (no data found) and not network related
             if (error.response?.status !== 404 && error.response?.status !== 0) {
-                setTrackMessage('❌ Failed to fetch track record.');
+                setTrackMessage('Failed to fetch track record.');
             }
             setIsTrackEditing(false);
         } finally {
             setTrackLoading(false);
         }
     };
-
     const handleTrackChange = (e) => {
         const { name, value } = e.target;
         setTrackFormData(prev => ({
@@ -294,12 +243,10 @@ const Home = () => {
             [name]: value
         }));
     };
-
     const handleTrackSubmit = async (e) => {
         e.preventDefault();
         setTrackLoading(true);
         setMessage('');
-
         try {
             const submitData = {
                 yearExp: parseInt(trackFormData.yearExp),
@@ -307,7 +254,6 @@ const Home = () => {
                 planningDone: parseInt(trackFormData.planningDone),
                 happyCustomers: parseInt(trackFormData.happyCustomers)
             };
-
             for (const [key, value] of Object.entries(submitData)) {
                 if (isNaN(value) || value < 0) {
                     setMessage(`❌ ${key} must be a valid positive number.`);
@@ -315,29 +261,25 @@ const Home = () => {
                     return;
                 }
             }
-
             let response;
             if (isTrackEditing) {
                 response = await ourTrackAPI.update(submitData);
-                setTrackMessage('✅ Track record updated successfully!');
+                setTrackMessage('Track record updated successfully!');
             } else {
                 response = await ourTrackAPI.create(submitData);
-                setTrackMessage('✅ Track record created successfully!');
+                setTrackMessage('Track record created successfully!');
                 setIsTrackEditing(true);
             }
-
             setTrackData(response.data.data);
             setShowTrackForm(false);
             resetTrackForm();
-
         } catch (error) {
             console.error('Error saving track data:', error);
-            setTrackMessage(error.response?.data?.message || '❌ Failed to save track record.');
+            setTrackMessage(error.response?.data?.message || 'Failed to save track record.');
         } finally {
             setTrackLoading(false);
         }
     };
-
     const handleTrackEdit = () => {
         if (trackData) {
             setTrackFormData({
@@ -350,7 +292,6 @@ const Home = () => {
         setShowTrackForm(true);
         setTrackMessage('');
     };
-
     const resetTrackForm = () => {
         setTrackFormData({
             yearExp: '',
@@ -361,8 +302,6 @@ const Home = () => {
         setShowTrackForm(false);
         setTrackMessage('');
     };
-
-    // Home Services functions
     const handleEditHomeService = (service) => {
         setHomeServiceFormData({
             serviceName: service.serviceName,
@@ -370,7 +309,6 @@ const Home = () => {
         });
         setEditingHomeService(service.id);
     };
-
     const handleSaveHomeService = () => {
         setHomeServices(prev =>
             prev.map(service =>
@@ -382,18 +320,15 @@ const Home = () => {
         setEditingHomeService(null);
         setHomeServiceFormData({ serviceName: '', description: '' });
     };
-
     const handleCancelHomeServiceEdit = () => {
         setEditingHomeService(null);
         setHomeServiceFormData({ serviceName: '', description: '' });
     };
-
     const handleDeleteHomeService = (id) => {
         if (window.confirm('Are you sure you want to delete this service?')) {
             setHomeServices(prev => prev.filter(service => service.id !== id));
         }
     };
-
     const handleAddHomeService = () => {
         const newId = Math.max(...homeServices.map(s => s.id)) + 1;
         const newService = {
@@ -408,14 +343,8 @@ const Home = () => {
             description: newService.description
         });
     };
-
-    // Removed unused filter and pagination logic
-
-    // Custom Slider State
     const [sliderIndex, setSliderIndex] = useState(0);
     const sliderRef = useRef(null);
-
-    // Auto-slide every 5 seconds
     useEffect(() => {
         if (!homePages.length) return;
         const interval = setInterval(() => {
@@ -423,11 +352,9 @@ const Home = () => {
         }, 5000);
         return () => clearInterval(interval);
     }, [homePages.length]);
-
     const goToSlide = idx => setSliderIndex(idx);
     const prevSlide = () => setSliderIndex(idx => idx === 0 ? homePages.length - 1 : idx - 1);
     const nextSlide = () => setSliderIndex(idx => (idx + 1) % homePages.length);
-
     return (
         <div style={{
             backgroundColor: isDarkMode ? '#121212' : '#f8f9fa',
@@ -444,11 +371,6 @@ const Home = () => {
                         <span style={{ color: isDarkMode ? '#adb5bd' : '#6c757d' }}>Home</span>
                     </nav>
                 </div>
-
-                {/* Action Buttons */}
-                {/* Removed previous Add New and Refresh buttons above slider */}
-
-                {/* Success/Error Messages */}
                 {message && (
                     <Alert
                         message={message}
@@ -457,7 +379,6 @@ const Home = () => {
                         className="mb-3"
                     />
                 )}
-
                 {/* Create/Edit Form */}
                 {showForm && (
                     <div className="card mb-4" style={{ border: isDarkMode ? '1px solid #444' : '1px solid #dee2e6' }}>
@@ -597,8 +518,7 @@ const Home = () => {
                 {/* Custom Home Slider */}
                 {homePages.length > 0 && (
                     <div className="custom-slider" style={{ position: 'relative', maxWidth: 900, margin: '0 auto 2rem', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', background: '#fff' }}>
-                        {/* Add New & Refresh Buttons */}
-                        <div style={{ position: 'absolute', top: 24, left: 32, display: 'flex', gap: 10, zIndex: 2 }}>
+                       <div style={{ position: 'absolute', top: 24, left: 32, display: 'flex', gap: 10, zIndex: 2 }}>
                             <button
                                 className="btn btn-info"
                                 style={{ fontWeight: 500, fontSize: 18, borderRadius: 6, padding: '6px 18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -620,7 +540,6 @@ const Home = () => {
                         <div style={{ display: 'flex', transition: 'transform 2.6s cubic-bezier(.4,0,.2,1)', transform: `translateX(-${sliderIndex * 100}%)` }} ref={sliderRef}>
                             {homePages.map((slide, idx) => (
                                 <div key={slide._id || idx} style={{ minWidth: '100%', boxSizing: 'border-box', padding: 0, position: 'relative', height: 440, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f7fa' }}>
-                                    {/* Edit/Delete buttons at top right of outer div */}
                                     <div style={{ position: 'absolute', top: 24, right: 32, display: 'flex', gap: 10, zIndex: 2 }}>
                                         <button
                                             style={{ background: '#17a2b8', color: 'white', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 15, cursor: 'pointer' }}
@@ -1023,27 +942,15 @@ const Home = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Tabbing Services Section */}
                 <TabbingServices />
-
-                {/* Helped Industries Section */}
                 <HelpedIndustries />
-
-                {/* Why Choose Us Section */}
                 <WhyChooseUs />
-
-                {/* Our Association Section */}
                 <OurAssociation />
-
-                {/* Home FAQs Section */}
                 <HomeFAQs />
             </div>
         </div>
     );
 };
-
-// Tabbing Services Component
 const TabbingServices = () => {
     const [activeTab, setActiveTab] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
@@ -1070,13 +977,9 @@ const TabbingServices = () => {
     const [fetchingServices, setFetchingServices] = useState(true);
 
     const [tabbingServices, setTabbingServices] = useState([]);
-
-    // Fetch services from database
     const fetchTabbingServices = async () => {
         try {
             setFetchingServices(true);
-
-            // Fetch services and settings in parallel
             const [servicesResponse, settingsResponse] = await Promise.all([
                 servicesAPI.getAll(),
                 tabbingServicesSettingsAPI.getSettings().catch(err => {
@@ -1087,7 +990,6 @@ const TabbingServices = () => {
 
             // Load services
             if (servicesResponse.data && servicesResponse.data.data) {
-                // Transform backend data to match frontend structure
                 const transformedServices = servicesResponse.data.data.map((service, index) => ({
                     id: service._id || service.id,
                     tabTitle: service.tabTitle || service.title || `Service ${index + 1}`,
@@ -1098,18 +1000,12 @@ const TabbingServices = () => {
                     color: service.color || ['primary', 'success', 'info', 'warning', 'dark', 'danger', 'secondary'][index % 7]
                 }));
                 setTabbingServices(transformedServices);
-                console.log('Loaded services from database:', transformedServices);
             }
-
-            // Load common background image settings
             if (settingsResponse && settingsResponse.data && settingsResponse.data.data) {
                 const settings = settingsResponse.data.data;
                 if (settings.commonBackgroundImage && settings.commonBackgroundImage.url) {
                     setCommonImage(getImageUrl(settings.commonBackgroundImage.url));
-                    console.log('Loaded common background image:', settings.commonBackgroundImage.url);
                 }
-
-                // Load common section description and button
                 if (settings.commonImageDescription) {
                     setCommonImageDescription(settings.commonImageDescription);
                 }
@@ -1119,14 +1015,9 @@ const TabbingServices = () => {
                         link: settings.commonImageButton.link || '#'
                     });
                 }
-                console.log('Loaded common section settings:', {
-                    description: settings.commonImageDescription,
-                    button: settings.commonImageButton
-                });
             }
         } catch (error) {
             console.error('Error fetching services:', error);
-            // Fallback to default services if database fetch fails
             setTabbingServices([
                 {
                     id: 'temp-1',
@@ -1142,13 +1033,9 @@ const TabbingServices = () => {
             setFetchingServices(false);
         }
     };
-
-    // Load services on component mount
     useEffect(() => {
         fetchTabbingServices();
     }, []);
-
-    // Handle editing functions
     const handleEditClick = (index) => {
         setEditingIndex(index);
         const service = tabbingServices[index];
@@ -1157,56 +1044,35 @@ const TabbingServices = () => {
             contentTitle: service.contentTitle,
             description: service.description,
             buttonText: service.buttonText,
-            icon: service.icon || service.image // Use icon if available, fallback to image
+            icon: service.icon || service.image
         });
         setImagePreview(null);
         setSelectedImageFile(null);
         setIsEditing(true);
     };
-
     const handleSaveEdit = async () => {
         try {
             setLoading(true);
             const service = tabbingServices[editingIndex];
-
-            // Create FormData for file upload
             const formData = new FormData();
-            formData.append('title', editFormData.contentTitle); // Use contentTitle as main title
+            formData.append('title', editFormData.contentTitle);
             formData.append('tabTitle', editFormData.tabTitle);
             formData.append('contentTitle', editFormData.contentTitle);
             formData.append('description', editFormData.description);
             formData.append('buttonText', editFormData.buttonText);
-
-            // Add image if selected
             if (selectedImageFile) {
                 formData.append('image', selectedImageFile);
             }
-
-            console.log('Sending form data:', {
-                title: editFormData.contentTitle,
-                tabTitle: editFormData.tabTitle,
-                contentTitle: editFormData.contentTitle,
-                description: editFormData.description,
-                buttonText: editFormData.buttonText,
-                hasImage: !!selectedImageFile
-            });
-
             let response;
             if (service.id && !service.id.toString().startsWith('temp-')) {
-                // Update existing service
                 response = await servicesAPI.updateWithFile(service.id, formData);
             } else {
-                // Create new service
                 response = await servicesAPI.createWithFile(formData);
             }
-
             if (response.data && response.data.data) {
-                // Refresh services from database
                 await fetchTabbingServices();
-                console.log('Service saved successfully:', response.data.data);
                 alert('Service updated successfully!');
             }
-
             handleCancelEdit();
         } catch (error) {
             console.error('Error saving service:', error);
@@ -1215,7 +1081,6 @@ const TabbingServices = () => {
             setLoading(false);
         }
     };
-
     const handleCancelEdit = () => {
         setIsEditing(false);
         setEditingIndex(null);
@@ -1231,19 +1096,15 @@ const TabbingServices = () => {
         setSelectedImageFile(null);
         setSelectedCommonImageFile(null);
     };
-
     const handleInputChange = (field, value) => {
         setEditFormData(prev => ({
             ...prev,
             [field]: value
         }));
     };
-
-    // Handle individual tab image change
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Validate file type
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/svg+xml'];
             if (!validTypes.includes(file.type)) {
                 alert('Please select a valid image file (JPG, PNG, or SVG)');
@@ -1255,40 +1116,28 @@ const TabbingServices = () => {
                 alert('Image file size should be less than 5MB');
                 return;
             }
-
             setSelectedImageFile(file);
-
-            // Create preview URL
             const reader = new FileReader();
             reader.onload = (e) => {
                 setImagePreview(e.target.result);
-                // Update form data with preview for immediate display
                 handleInputChange('icon', e.target.result);
             };
             reader.readAsDataURL(file);
         }
     };
-
-    // Handle common image change
     const handleCommonImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Validate file type
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/svg+xml'];
             if (!validTypes.includes(file.type)) {
                 alert('Please select a valid image file (JPG, PNG, or SVG)');
                 return;
             }
-
-            // Validate file size (max 5MB)
             if (file.size > 5 * 1024 * 1024) {
                 alert('Image file size should be less than 5MB');
                 return;
             }
-
             setSelectedCommonImageFile(file);
-
-            // Create preview URL
             const reader = new FileReader();
             reader.onload = (e) => {
                 setCommonImagePreview(e.target.result);
@@ -1296,32 +1145,21 @@ const TabbingServices = () => {
             reader.readAsDataURL(file);
         }
     };
-
-    // Save common image
     const handleSaveCommonImage = async () => {
         if (!selectedCommonImageFile) {
             alert('Please select an image first');
             return;
         }
-
         try {
             setLoading(true);
-
-            // Create FormData
             const formData = new FormData();
             formData.append('commonBackgroundImage', selectedCommonImageFile);
-
-            // Upload to server
             const response = await tabbingServicesSettingsAPI.updateCommonBackgroundImage(formData);
-
             if (response.data.success) {
-                // Update local state with the new image URL from server
                 const newImageUrl = getImageUrl(response.data.data.commonBackgroundImage.url);
                 setCommonImage(newImageUrl);
                 setCommonImagePreview(null);
                 setSelectedCommonImageFile(null);
-
-                console.log('Common image updated successfully:', response.data.data);
                 alert('Common background image updated successfully!');
             } else {
                 throw new Error(response.data.message || 'Failed to update image');
@@ -1333,25 +1171,17 @@ const TabbingServices = () => {
             setLoading(false);
         }
     };
-
-    // Reset common background image to default
     const handleResetCommonImage = async () => {
         if (!window.confirm('Are you sure you want to reset the common background image to default?')) {
             return;
         }
-
         try {
             setLoading(true);
-
             const response = await tabbingServicesSettingsAPI.resetCommonBackgroundImage();
-
             if (response.data.success) {
-                // Update local state with the default image
                 setCommonImage('/images/services/default-service.svg');
                 setCommonImagePreview(null);
                 setSelectedCommonImageFile(null);
-
-                console.log('Common image reset to default');
                 alert('Common background image reset to default successfully!');
             } else {
                 throw new Error(response.data.message || 'Failed to reset image');
@@ -1363,13 +1193,9 @@ const TabbingServices = () => {
             setLoading(false);
         }
     };
-
-    // Add new tab function
     const handleAddNewTab = async () => {
         try {
             setLoading(true);
-
-            // Create FormData for new service
             const formData = new FormData();
             formData.append('title', 'New Service');
             formData.append('tabTitle', 'New Tab');
@@ -1377,13 +1203,9 @@ const TabbingServices = () => {
             formData.append('description', 'This is a new service description. Click edit to customize it.');
             formData.append('buttonText', 'Learn More');
             formData.append('color', 'primary');
-
             const response = await servicesAPI.createWithFile(formData);
-
             if (response.data && response.data.data) {
-                // Refresh services from database
                 await fetchTabbingServices();
-                console.log('New tab created successfully:', response.data.data);
                 alert('New tab created successfully!');
             }
         } catch (error) {
@@ -1393,57 +1215,35 @@ const TabbingServices = () => {
             setLoading(false);
         }
     };
-
-    // Delete tab function
     const handleDeleteTab = async (index) => {
         if (!window.confirm('Are you sure you want to delete this tab? This action cannot be undone.')) {
             return;
         }
-
         try {
             setLoading(true);
             const service = tabbingServices[index];
-
-            console.log('Attempting to delete tab:', { index, service });
-
             if (service.id && !service.id.toString().startsWith('temp-')) {
-                // Delete from database
-                console.log('Deleting service with ID:', service.id);
                 const response = await servicesAPI.delete(service.id);
-                console.log('Delete API response:', response);
-
-                // Reset editing state if we were editing the deleted tab
                 if (editingIndex === index) {
                     handleCancelEdit();
                 }
-
-                // Refresh services from database to get updated list
                 await fetchTabbingServices();
-
-                // Adjust active tab if necessary
                 const remainingServices = tabbingServices.length - 1;
                 if (activeTab >= remainingServices) {
                     setActiveTab(Math.max(0, remainingServices - 1));
                 } else if (activeTab > index) {
-                    // If active tab is after the deleted tab, adjust index
                     setActiveTab(activeTab - 1);
                 }
-
-                console.log('Tab deleted successfully');
                 alert('Tab deleted successfully!');
             } else {
-                // For temp services, just remove from local state
                 console.log('Removing temp service from local state');
                 const updatedServices = tabbingServices.filter((_, i) => i !== index);
                 setTabbingServices(updatedServices);
-
-                // Adjust active tab for local deletion
                 if (activeTab >= updatedServices.length) {
                     setActiveTab(Math.max(0, updatedServices.length - 1));
                 } else if (activeTab > index) {
                     setActiveTab(activeTab - 1);
                 }
-
                 alert('Tab removed successfully!');
             }
         } catch (error) {
@@ -1453,22 +1253,17 @@ const TabbingServices = () => {
             setLoading(false);
         }
     };
-
-    // Common section editing functions
     const handleEditCommonSection = () => {
         setEditingCommonSection(true);
     };
-
     const handleSaveCommonSection = async () => {
         try {
             setLoading(true);
-
             const response = await tabbingServicesSettingsAPI.updateCommonSettings({
                 description: commonImageDescription,
                 buttonText: commonImageButton.text,
                 buttonLink: commonImageButton.link
             });
-
             if (response.data.success) {
                 setEditingCommonSection(false);
                 console.log('Common section updated successfully');
@@ -1483,13 +1278,10 @@ const TabbingServices = () => {
             setLoading(false);
         }
     };
-
     const handleCancelCommonSection = () => {
         setEditingCommonSection(false);
-        // Reset to original values by refetching
         fetchTabbingServices();
     };
-
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -1561,7 +1353,6 @@ const TabbingServices = () => {
                             </div>
                         </div>
                         <div className="dashboard-card-body px-4 py-4">
-                            {/* Common Image Section */}
                             <div className="mb-4 p-3 border rounded">
                                 <div className="row align-items-center">
                                     <div className="col-md-4">
@@ -1656,8 +1447,6 @@ const TabbingServices = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Common Section Description and Button */}
                             <div className="mb-4 p-3 border rounded">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <h6 className="mb-0">
@@ -1675,7 +1464,6 @@ const TabbingServices = () => {
                                         </button>
                                     )}
                                 </div>
-
                                 {!editingCommonSection ? (
                                     <div className="row">
                                         <div className="col-md-8">
@@ -1773,7 +1561,6 @@ const TabbingServices = () => {
                                     </div>
                                 )}
                             </div>
-
                             {/* Editing Form */}
                             {isEditing && (
                                 <div className="mb-4 p-3 bg-light rounded">
@@ -1872,8 +1659,6 @@ const TabbingServices = () => {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Loading State */}
                             {fetchingServices && (
                                 <div className="text-center py-5">
                                     <div className="spinner-border text-success" role="status">
@@ -1882,8 +1667,6 @@ const TabbingServices = () => {
                                     <p className="mt-3 text-muted">Loading services from database...</p>
                                 </div>
                             )}
-
-                            {/* Empty State */}
                             {!fetchingServices && tabbingServices.length === 0 && (
                                 <div className="text-center py-5">
                                     <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
@@ -1898,8 +1681,6 @@ const TabbingServices = () => {
                                     </button>
                                 </div>
                             )}
-
-                            {/* Tab Navigation */}
                             {!fetchingServices && tabbingServices.length > 0 && (
                                 <div className="row mb-4">
                                     <div className="col-12">
@@ -1940,7 +1721,6 @@ const TabbingServices = () => {
                                                                 )}
                                                             </span>
                                                         </div>
-                                                        {/* Delete button inside tab */}
                                                         {tabbingServices.length > 1 && !isEditing && (
                                                             <button
                                                                 type="button"
@@ -1975,8 +1755,6 @@ const TabbingServices = () => {
                                                     </button>
                                                 </div>
                                             ))}
-
-                                            {/* Add new tab button */}
                                             {!isEditing && (
                                                 <button
                                                     type="button"
@@ -2005,8 +1783,6 @@ const TabbingServices = () => {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Active Tab Content */}
                             {!fetchingServices && tabbingServices.length > 0 && tabbingServices[activeTab] && (
                                 <div className={`row ${isEditing ? 'border border-warning rounded p-3' : ''}`}>
                                     {isEditing && (
@@ -2019,7 +1795,6 @@ const TabbingServices = () => {
                                     )}
                                     <div className="col-lg-4 col-md-6 mb-4">
                                         <div className="text-center">
-                                            {/* Tab Specific Image */}
                                             <img
                                                 src={tabbingServices[activeTab].icon || '/images/services/default-service.svg'}
                                                 alt={tabbingServices[activeTab].contentTitle}
@@ -2079,8 +1854,6 @@ const TabbingServices = () => {
         </div>
     );
 };
-
-// Helped Industries Component
 const HelpedIndustries = () => {
     const [helpedIndustries, setHelpedIndustries] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -2100,7 +1873,6 @@ const HelpedIndustries = () => {
     useEffect(() => {
         fetchHelpedIndustries();
     }, []);
-
     const fetchHelpedIndustries = async () => {
         try {
             setLoading(true);
@@ -2115,10 +1887,8 @@ const HelpedIndustries = () => {
             setLoading(false);
         }
     };
-
     const handleChange = (e, index = null, field = null) => {
         const { name, value } = e.target;
-
         if (field === 'industry') {
             const updatedIndustries = [...formData.industries];
             updatedIndustries[index][name] = value;
@@ -2133,70 +1903,51 @@ const HelpedIndustries = () => {
             }));
         }
     };
-
     const handleAddIndustry = () => {
         setFormData(prev => ({
             ...prev,
             industries: [...prev.industries, { name: '', icon: '' }]
         }));
     };
-
     const handleRemoveIndustry = (index) => {
         setFormData(prev => ({
             ...prev,
             industries: prev.industries.filter((_, i) => i !== index)
         }));
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
-
         try {
-            console.log('=== Helped Industries Form Submission ===');
-            console.log('Form data:', formData);
-
-            // Filter out empty industries
             const validIndustries = formData.industries.filter(
                 industry => industry.name.trim() && industry.icon.trim()
             );
-
-            console.log('Valid industries:', validIndustries);
-
             if (validIndustries.length === 0) {
-                setMessage('❌ Please add at least one industry with name and icon.');
+                setMessage('Please add at least one industry with name and icon.');
                 return;
             }
-
             const submitData = {
                 ...formData,
                 industries: validIndustries
             };
-
-            console.log('Submit data:', submitData);
-
             let response;
             if (isEditing) {
                 response = await helpedIndustriesAPI.update(editingId, submitData);
-                setMessage('✅ Helped industries updated successfully!');
+                setMessage('Helped industries updated successfully!');
             } else {
-                console.log('Creating new helped industries...');
                 response = await helpedIndustriesAPI.create(submitData);
-                setMessage('✅ Helped industries created successfully!');
+                setMessage('Helped industries created successfully!');
             }
-
-            console.log('API response:', response);
             await fetchHelpedIndustries();
             resetForm();
         } catch (error) {
             console.error('Error saving helped industries:', error);
-            setMessage(`❌ Failed to save helped industries. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to save helped industries. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleEdit = (item) => {
         setFormData({
             heading: item.heading,
@@ -2208,107 +1959,84 @@ const HelpedIndustries = () => {
         setShowForm(true);
         setMessage('');
     };
-
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this helped industries entry?')) {
             return;
         }
-
         try {
             setLoading(true);
             await helpedIndustriesAPI.delete(id);
-            setMessage('✅ Helped industries deleted successfully!');
+            setMessage('Helped industries deleted successfully!');
             await fetchHelpedIndustries();
         } catch (error) {
             console.error('Error deleting helped industries:', error);
-            setMessage(`❌ Failed to delete helped industries. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to delete helped industries. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleDeleteIndustry = async (itemId, industryIndex) => {
         if (!window.confirm('Are you sure you want to delete this industry?')) {
             return;
         }
-
         try {
             setLoading(true);
-
-            // Find the item and remove the specific industry
             const item = helpedIndustries.find(h => h._id === itemId);
             if (!item) {
-                setMessage('❌ Item not found');
+                setMessage('Item not found');
                 return;
             }
-
-            // Create updated industries array without the deleted industry
             const updatedIndustries = item.industries.filter((_, index) => index !== industryIndex);
-
-            // Check if at least one industry will remain
             if (updatedIndustries.length === 0) {
-                setMessage('❌ Cannot delete the last industry. At least one industry is required.');
+                setMessage('Cannot delete the last industry. At least one industry is required.');
                 return;
             }
-
-            // Update the item with the new industries array
             const updateData = {
                 heading: item.heading,
                 description: item.description,
                 industries: updatedIndustries
             };
-
             await helpedIndustriesAPI.update(itemId, updateData);
-            setMessage('✅ Industry deleted successfully!');
+            setMessage('Industry deleted successfully!');
             await fetchHelpedIndustries();
         } catch (error) {
             console.error('Error deleting industry:', error);
-            setMessage(`❌ Failed to delete industry. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to delete industry. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleAddIndustryToEntry = async (itemId) => {
         if (!newIndustry.name.trim() || !newIndustry.icon.trim()) {
-            setMessage('❌ Please fill in both industry name and icon');
+            setMessage('Please fill in both industry name and icon');
             return;
         }
-
         try {
             setLoading(true);
-
-            // Find the item and add the new industry
             const item = helpedIndustries.find(h => h._id === itemId);
             if (!item) {
-                setMessage('❌ Item not found');
+                setMessage('Item not found');
                 return;
             }
-
-            // Create updated industries array with the new industry
             const updatedIndustries = [...item.industries, { ...newIndustry }];
-
-            // Update the item with the new industries array
             const updateData = {
                 heading: item.heading,
                 description: item.description,
                 industries: updatedIndustries
             };
-
             await helpedIndustriesAPI.update(itemId, updateData);
-            setMessage('✅ Industry added successfully!');
+            setMessage('Industry added successfully!');
             setNewIndustry({ name: '', icon: '' });
             setShowIndustryForm(false);
             setAddingIndustryTo(null);
             await fetchHelpedIndustries();
         } catch (error) {
             console.error('Error adding industry:', error);
-            setMessage(`❌ Failed to add industry. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to add industry. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const resetForm = () => {
         setFormData({
             heading: '',
@@ -2323,7 +2051,6 @@ const HelpedIndustries = () => {
         setNewIndustry({ name: '', icon: '' });
         setShowIndustryForm(false);
     };
-
     return (
         <div className="container-fluid py-4">
             <div className="row mb-4">
@@ -2342,14 +2069,12 @@ const HelpedIndustries = () => {
                                     onClose={() => setMessage('')}
                                 />
                             )}
-
-                            {/* Add/Edit Form */}
                             {showForm && (
                                 <div className="mb-4">
                                     <div className="dashboard-card border-primary" style={{ borderRadius: 14, background: '#e3fcec' }}>
                                         <div className="dashboard-card-header px-3 py-2" style={{ background: '#22c55e', color: '#fff', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
                                             <h5 className="mb-0">
-                                                {isEditing ? '✏️ Edit Helped Industries' : '➕ Add New Helped Industries'}
+                                                {isEditing ? 'Edit Helped Industries' : 'Add New Helped Industries'}
                                             </h5>
                                         </div>
                                         <div className="dashboard-card-body px-3 py-3">
@@ -2393,7 +2118,6 @@ const HelpedIndustries = () => {
                                                         />
                                                     </div>
                                                 </div>
-
                                                 <div className="mb-3">
                                                     <label className="form-label">Industries *</label>
                                                     {formData.industries.map((industry, index) => (
@@ -2472,8 +2196,6 @@ const HelpedIndustries = () => {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Add New Button */}
                             {!showForm && (
                                 <div className="mb-3">
                                     <button
@@ -2485,8 +2207,6 @@ const HelpedIndustries = () => {
                                     </button>
                                 </div>
                             )}
-
-                            {/* Data Display */}
                             {loading ? (
                                 <div className="text-center py-4">
                                     <div className="spinner-border text-info" role="status">
@@ -2521,15 +2241,12 @@ const HelpedIndustries = () => {
                                                 </div>
                                                 <div className="dashboard-card-body px-3 py-3">
                                                     <div className="row">
-                                                        {/* Left side - Heading and Description */}
                                                         <div className="col-md-6">
                                                             <div className="mb-3">
                                                                 <h6 className="text-muted">Description:</h6>
                                                                 <div dangerouslySetInnerHTML={{ __html: item.description }} />
                                                             </div>
                                                         </div>
-
-                                                        {/* Right side - Industries */}
                                                         <div className="col-md-6">
                                                             <div className="d-flex justify-content-between align-items-center mb-3">
                                                                 <h6 className="text-muted mb-0">Industries:</h6>
@@ -2543,8 +2260,6 @@ const HelpedIndustries = () => {
                                                                     <i className="fas fa-plus"></i> Add Industry
                                                                 </button>
                                                             </div>
-
-                                                            {/* Add Industry Form */}
                                                             {showIndustryForm && addingIndustryTo === item._id && (
                                                                 <div className="dashboard-card border-success mb-3" style={{ background: '#fff', borderRadius: 10 }}>
                                                                     <div className="dashboard-card-body p-3">
@@ -2589,7 +2304,6 @@ const HelpedIndustries = () => {
                                                                     </div>
                                                                 </div>
                                                             )}
-
                                                             {/* Industries Grid */}
                                                             <div className="row g-3">
                                                                 {item.industries.map((industry, index) => (
@@ -2643,11 +2357,9 @@ const WhyChooseUs = () => {
         button: { text: 'Get Started', link: '#' },
         image: null
     });
-
     useEffect(() => {
         fetchWhyChooseUs();
     }, []);
-
     const fetchWhyChooseUs = async () => {
         try {
             setLoading(true);
@@ -2655,23 +2367,19 @@ const WhyChooseUs = () => {
             setWhyChooseUs(response.data.data || []);
         } catch (error) {
             console.error('Error fetching why choose us:', error);
-            setMessage(`❌ Failed to fetch why choose us entries. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to fetch why choose us entries. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!formData.heading.trim() || !formData.description.trim()) {
-            setMessage('❌ Please fill in all required fields');
+            setMessage('Please fill in all required fields');
             return;
         }
-
         try {
             setLoading(true);
-
             const submitFormData = new FormData();
             submitFormData.append('heading', formData.heading);
             submitFormData.append('description', formData.description);
@@ -2681,25 +2389,22 @@ const WhyChooseUs = () => {
             if (formData.image) {
                 submitFormData.append('image', formData.image);
             }
-
             if (isEditing) {
                 await whyChooseUsAPI.update(editingId, submitFormData);
-                setMessage('✅ Why choose us entry updated successfully!');
+                setMessage('Why choose us entry updated successfully!');
             } else {
                 await whyChooseUsAPI.create(submitFormData);
-                setMessage('✅ Why choose us entry created successfully!');
+                setMessage('Why choose us entry created successfully!');
             }
-
             resetForm();
             await fetchWhyChooseUs();
         } catch (error) {
             console.error('Error saving why choose us entry:', error);
-            setMessage(`❌ Failed to save why choose us entry. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to save why choose us entry. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleEdit = (item) => {
         setFormData({
             heading: item.heading,
@@ -2713,32 +2418,28 @@ const WhyChooseUs = () => {
         setShowForm(true);
         setMessage('');
     };
-
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this why choose us entry?')) {
             return;
         }
-
         try {
             setLoading(true);
             await whyChooseUsAPI.delete(id);
-            setMessage('✅ Why choose us entry deleted successfully!');
+            setMessage('Why choose us entry deleted successfully!');
             await fetchWhyChooseUs();
         } catch (error) {
             console.error('Error deleting why choose us entry:', error);
-            setMessage(`❌ Failed to delete why choose us entry. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to delete why choose us entry. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const addPoint = () => {
         setFormData({
             ...formData,
             points: [...formData.points, { text: '', icon: 'fas fa-check' }]
         });
     };
-
     const removePoint = (index) => {
         if (formData.points.length > 1) {
             setFormData({
@@ -2747,7 +2448,6 @@ const WhyChooseUs = () => {
             });
         }
     };
-
     const updatePoint = (index, field, value) => {
         const updatedPoints = [...formData.points];
         updatedPoints[index][field] = value;
@@ -2756,7 +2456,6 @@ const WhyChooseUs = () => {
             points: updatedPoints
         });
     };
-
     const resetForm = () => {
         setFormData({
             heading: '',
@@ -2770,7 +2469,6 @@ const WhyChooseUs = () => {
         setShowForm(false);
         setMessage('');
     };
-
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -2799,7 +2497,6 @@ const WhyChooseUs = () => {
                                     onClose={() => setMessage('')}
                                 />
                             )}
-
                             {/* Add/Edit Form */}
                             {showForm && (
                                 <div className="card border-primary mb-4">
@@ -2956,7 +2653,6 @@ const WhyChooseUs = () => {
                                     </div>
                                 </div>
                             )}
-
                             {/* Data Display */}
                             {loading ? (
                                 <div className="text-center py-4">
@@ -3050,7 +2746,6 @@ const WhyChooseUs = () => {
     );
 };
 
-// Our Association Component
 const OurAssociation = () => {
     const [ourAssociation, setOurAssociation] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -3069,11 +2764,9 @@ const OurAssociation = () => {
         rowTwoFiles: [],
         rowThreeFiles: []
     });
-
     useEffect(() => {
         fetchOurAssociation();
     }, []);
-
     const fetchOurAssociation = async () => {
         try {
             setLoading(true);
@@ -3081,33 +2774,27 @@ const OurAssociation = () => {
             setOurAssociation(response.data.data || []);
         } catch (error) {
             console.error('Error fetching our association:', error);
-            setMessage(`❌ Failed to fetch our association entries. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to fetch our association entries. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!formData.heading.trim() || !formData.description.trim()) {
-            setMessage('❌ Please fill in all required fields');
+            setMessage('Please fill in all required fields');
             return;
         }
-
         try {
             setLoading(true);
-
             const submitFormData = new FormData();
             submitFormData.append('heading', formData.heading);
             submitFormData.append('description', formData.description);
             submitFormData.append('button', JSON.stringify(formData.button));
-
             // Add row data
             submitFormData.append('rowOneData', JSON.stringify(formData.rowOne));
             submitFormData.append('rowTwoData', JSON.stringify(formData.rowTwo));
             submitFormData.append('rowThreeData', JSON.stringify(formData.rowThree));
-
             // Add files for each row
             formData.rowOneFiles.forEach((file, index) => {
                 if (file) submitFormData.append(`rowOne_${index}`, file);
@@ -3118,25 +2805,22 @@ const OurAssociation = () => {
             formData.rowThreeFiles.forEach((file, index) => {
                 if (file) submitFormData.append(`rowThree_${index}`, file);
             });
-
             if (isEditing) {
                 await ourAssociationAPI.update(editingId, submitFormData);
-                setMessage('✅ Our association entry updated successfully!');
+                setMessage('Our association entry updated successfully!');
             } else {
                 await ourAssociationAPI.create(submitFormData);
-                setMessage('✅ Our association entry created successfully!');
+                setMessage('Our association entry created successfully!');
             }
-
             resetForm();
             await fetchOurAssociation();
         } catch (error) {
             console.error('Error saving our association entry:', error);
-            setMessage(`❌ Failed to save our association entry. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to save our association entry. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleEdit = (item) => {
         setFormData({
             heading: item.heading,
@@ -3154,32 +2838,28 @@ const OurAssociation = () => {
         setShowForm(true);
         setMessage('');
     };
-
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this our association entry?')) {
             return;
         }
-
         try {
             setLoading(true);
             await ourAssociationAPI.delete(id);
-            setMessage('✅ Our association entry deleted successfully!');
+            setMessage('Our association entry deleted successfully!');
             await fetchOurAssociation();
         } catch (error) {
             console.error('Error deleting our association entry:', error);
-            setMessage(`❌ Failed to delete our association entry. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to delete our association entry. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const addImageToRow = (rowName) => {
         setFormData({
             ...formData,
             [rowName]: [...formData[rowName], { url: '', alt: '', originalName: '', filename: '' }]
         });
     };
-
     const removeImageFromRow = (rowName, index) => {
         const updatedRow = formData[rowName].filter((_, i) => i !== index);
         const updatedFiles = formData[`${rowName}Files`].filter((_, i) => i !== index);
@@ -3189,7 +2869,6 @@ const OurAssociation = () => {
             [`${rowName}Files`]: updatedFiles
         });
     };
-
     const updateImageInRow = (rowName, index, field, value) => {
         const updatedRow = [...formData[rowName]];
         updatedRow[index][field] = value;
@@ -3198,7 +2877,6 @@ const OurAssociation = () => {
             [rowName]: updatedRow
         });
     };
-
     const handleFileChange = (rowName, index, file) => {
         const updatedFiles = [...formData[`${rowName}Files`]];
         updatedFiles[index] = file;
@@ -3207,7 +2885,6 @@ const OurAssociation = () => {
             [`${rowName}Files`]: updatedFiles
         });
     };
-
     const resetForm = () => {
         setFormData({
             heading: '',
@@ -3225,7 +2902,6 @@ const OurAssociation = () => {
         setShowForm(false);
         setMessage('');
     };
-
     const renderRowSection = (rowName, rowTitle, rowData, rowFiles) => (
         <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -3282,7 +2958,6 @@ const OurAssociation = () => {
             ))}
         </div>
     );
-
     return (
         <div className="container-fluid py-4">
             <div className="row">
@@ -3296,7 +2971,6 @@ const OurAssociation = () => {
                         </div>
 
                         <div className="dashboard-card-body px-4 py-4">
-                            {/* Alert Messages */}
                             {message && (
                                 <Alert
                                     type={message.includes('✅') ? 'success' : 'danger'}
@@ -3304,8 +2978,6 @@ const OurAssociation = () => {
                                     onClose={() => setMessage('')}
                                 />
                             )}
-
-                            {/* Add/Edit Form */}
                             {showForm && (
                                 <div className="dashboard-card border-primary mb-4" style={{ borderRadius: 14, background: '#e3fcec' }}>
                                     <div className="dashboard-card-header px-3 py-2" style={{ background: '#22c55e', color: '#fff', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
@@ -3414,8 +3086,6 @@ const OurAssociation = () => {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Data Display */}
                             {loading ? (
                                 <div className="text-center py-4">
                                     <div className="spinner-border text-primary" role="status">
@@ -3450,7 +3120,6 @@ const OurAssociation = () => {
                                                 </div>
                                                 <div className="dashboard-card-body px-3 py-3">
                                                     <div className="row">
-                                                        {/* Left side - Description and Button */}
                                                         <div className="col-md-4">
                                                             <div className="mb-3">
                                                                 <h6 className="text-muted">Description:</h6>
@@ -3470,12 +3139,9 @@ const OurAssociation = () => {
                                                                 </div>
                                                             )}
                                                         </div>
-
-                                                        {/* Right side - Image Rows */}
                                                         <div className="col-md-8">
                                                             <h6 className="text-muted mb-3">Association Images:</h6>
 
-                                                            {/* Row 1 */}
                                                             {item.rowOne && item.rowOne.length > 0 && (
                                                                 <div className="mb-3">
                                                                     <small className="text-muted">Images :</small>
@@ -3557,11 +3223,9 @@ const HomeFAQs = () => {
         description: '',
         faqs: [{ question: '', answer: '' }]
     });
-
     useEffect(() => {
         fetchFAQs();
     }, []);
-
     const fetchFAQs = async () => {
         try {
             setLoading(true);
@@ -3569,30 +3233,24 @@ const HomeFAQs = () => {
             setFaqSections(response.data.data || []);
         } catch (error) {
             console.error('Error fetching FAQ sections:', error);
-            setMessage(`❌ Failed to fetch FAQ sections. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to fetch FAQ sections. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!formData.heading.trim() || !formData.description.trim()) {
-            setMessage('❌ Please fill in heading and description');
+            setMessage('Please fill in heading and description');
             return;
         }
-
-        // Validate FAQs
         const validFAQs = formData.faqs.filter(faq => faq.question.trim() && faq.answer.trim());
         if (validFAQs.length === 0) {
-            setMessage('❌ Please add at least one question and answer');
+            setMessage('Please add at least one question and answer');
             return;
         }
-
         try {
             setLoading(true);
-
             const submitData = {
                 heading: formData.heading,
                 description: formData.description,
@@ -3601,23 +3259,20 @@ const HomeFAQs = () => {
 
             if (isEditing) {
                 await homeFAQsAPI.update(editingId, submitData);
-                setMessage('✅ FAQ section updated successfully!');
+                setMessage('FAQ section updated successfully!');
             } else {
                 await homeFAQsAPI.create(submitData);
-                setMessage('✅ FAQ section created successfully!');
+                setMessage('FAQ section created successfully!');
             }
-
-            // Reset form and refresh data
             resetForm();
             await fetchFAQs();
         } catch (error) {
             console.error('Error saving FAQ section:', error);
-            setMessage(`❌ Failed to save FAQ section. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to save FAQ section. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const handleEdit = (faqSection) => {
         setFormData({
             heading: faqSection.heading,
@@ -3629,25 +3284,22 @@ const HomeFAQs = () => {
         setShowForm(true);
         setMessage('');
     };
-
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this FAQ section?')) {
             return;
         }
-
         try {
             setLoading(true);
             await homeFAQsAPI.delete(id);
-            setMessage('✅ FAQ section deleted successfully!');
+            setMessage('FAQ section deleted successfully!');
             await fetchFAQs();
         } catch (error) {
             console.error('Error deleting FAQ section:', error);
-            setMessage(`❌ Failed to delete FAQ section. ${error.response?.data?.message || error.message}`);
+            setMessage(`Failed to delete FAQ section. ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
     };
-
     const resetForm = () => {
         setFormData({
             heading: '',
@@ -3659,7 +3311,6 @@ const HomeFAQs = () => {
         setShowForm(false);
         setMessage('');
     };
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -3667,7 +3318,6 @@ const HomeFAQs = () => {
             [name]: value
         }));
     };
-
     const handleFAQChange = (index, field, value) => {
         setFormData(prev => ({
             ...prev,
@@ -3676,14 +3326,12 @@ const HomeFAQs = () => {
             )
         }));
     };
-
     const addFAQ = () => {
         setFormData(prev => ({
             ...prev,
             faqs: [...prev.faqs, { question: '', answer: '' }]
         }));
     };
-
     const removeFAQ = (index) => {
         if (formData.faqs.length > 1) {
             setFormData(prev => ({
@@ -3711,8 +3359,6 @@ const HomeFAQs = () => {
                                     onClose={() => setMessage('')}
                                 />
                             )}
-
-                            {/* Add/Edit Form */}
                             {showForm && (
                                 <div className="mb-4">
                                     <div className="card border-primary">
@@ -3768,7 +3414,6 @@ const HomeFAQs = () => {
                                                             Add FAQ
                                                         </button>
                                                     </div>
-
                                                     {formData.faqs.map((faq, index) => (
                                                         <div key={index} className="border rounded p-3 mb-3">
                                                             <div className="d-flex justify-content-between align-items-center mb-2">

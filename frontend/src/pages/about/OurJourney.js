@@ -4,7 +4,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ourJourneyAPI } from '../../services/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-
 const OurJourney = () => {
     const { isAuthenticated } = useAuth();
     const [journeyData, setJourneyData] = useState([]);
@@ -14,30 +13,23 @@ const OurJourney = () => {
     const [showForm, setShowForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
-
-    // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
-
-    // Card management
     const [showCardForm, setShowCardForm] = useState(false);
     const [cardFormData, setCardFormData] = useState({
         year: '',
         heading: '',
         description: ''
     });
-
     const [formData, setFormData] = useState({
         heading: '',
         description: '',
         cards: []
     });
-
     useEffect(() => {
         fetchJourneyData();
     }, []);
-
     const fetchJourneyData = async () => {
         setFetchLoading(true);
         try {
@@ -45,12 +37,11 @@ const OurJourney = () => {
             setJourneyData(response.data.data || []);
         } catch (error) {
             console.error('Error fetching our journey data:', error);
-            setMessage('❌ Failed to fetch our journey content.');
+            setMessage('Failed to fetch our journey content.');
         } finally {
             setFetchLoading(false);
         }
     };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -58,7 +49,6 @@ const OurJourney = () => {
             [name]: value
         }));
     };
-
     const handleCardChange = (e) => {
         const { name, value } = e.target;
         setCardFormData(prev => ({
@@ -66,85 +56,71 @@ const OurJourney = () => {
             [name]: value
         }));
     };
-
     const addCard = () => {
         if (!cardFormData.year || !cardFormData.heading || !cardFormData.description) {
-            setMessage('❌ Year, heading, and description are required for cards.');
+            setMessage('Year, heading, and description are required for cards.');
             return;
         }
-
         const newCard = {
             ...cardFormData,
             order: formData.cards.length
         };
-
         setFormData(prev => ({
             ...prev,
             cards: [...prev.cards, newCard]
         }));
-
-        // Reset card form
         setCardFormData({
             year: '',
             heading: '',
             description: ''
         });
         setShowCardForm(false);
-        setMessage('✅ Card added successfully!');
+        setMessage('Card added successfully!');
     };
-
     const removeCard = (index) => {
         setFormData(prev => ({
             ...prev,
             cards: prev.cards.filter((_, i) => i !== index)
         }));
-        setMessage('✅ Card removed successfully!');
+        setMessage('Card removed successfully!');
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
-
-        // Validate required fields
         if (!formData.heading.trim()) {
-            setMessage('❌ Heading is required.');
+            setMessage('Heading is required.');
             setLoading(false);
             return;
         }
-
         if (!formData.description.trim() || formData.description === '<p><br></p>') {
-            setMessage('❌ Description is required.');
+            setMessage('Description is required.');
             setLoading(false);
             return;
         }
-
         try {
             const submitData = {
                 heading: formData.heading,
                 description: formData.description,
                 cards: formData.cards
             };
-
             let response;
             if (isEditing) {
                 response = await ourJourneyAPI.update(editingId, submitData);
-                setMessage('✅ Our Journey content updated successfully!');
+                setMessage('Our Journey content updated successfully!');
             } else {
                 response = await ourJourneyAPI.create(submitData);
-                setMessage('✅ Our Journey content created successfully!');
+                setMessage('Our Journey content created successfully!');
             }
-
             fetchJourneyData();
             resetForm();
         } catch (error) {
             console.error('Error saving our journey content:', error);
-            setMessage(error.response?.data?.message || '❌ Failed to save our journey content.');
+            setMessage(error.response?.data?.message || 'Failed to save our journey content.');
         } finally {
             setLoading(false);
         }
     };
-
     const handleEdit = (item) => {
         setFormData({
             heading: item.heading,
@@ -155,20 +131,18 @@ const OurJourney = () => {
         setEditingId(item._id);
         setShowForm(true);
     };
-
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this journey content?')) {
             try {
                 await ourJourneyAPI.delete(id);
-                setMessage('✅ Journey content deleted successfully!');
+                setMessage('Journey content deleted successfully!');
                 fetchJourneyData();
             } catch (error) {
                 console.error('Error deleting journey content:', error);
-                setMessage('❌ Failed to delete journey content.');
+                setMessage('Failed to delete journey content.');
             }
         }
     };
-
     const resetForm = () => {
         setFormData({
             heading: '',
@@ -186,8 +160,6 @@ const OurJourney = () => {
         setEditingId(null);
         setMessage('');
     };
-
-    // Filter and pagination logic
     const filteredItems = journeyData.filter(journey =>
         journey.heading.toLowerCase().includes(searchTerm.toLowerCase()) ||
         journey.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -197,12 +169,10 @@ const OurJourney = () => {
             card.year.toLowerCase().includes(searchTerm.toLowerCase())
         )
     );
-
     const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const currentItems = filteredItems.slice(startIndex, endIndex);
-
     return (
         <div className="container-fluid py-4">
             <div className="row mb-4">
@@ -237,7 +207,6 @@ const OurJourney = () => {
                     </div>
                 </div>
             </div>
-
             {message && (
                 <div className="row mb-4">
                     <div className="col-12">

@@ -1,14 +1,10 @@
 "use client"
-
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-
 import Footer from '../../home/footer';
 import Cta from '../../home/cta-section';
 import Navbar from '../../../components/navigation';
-
-// Calculator section components
 import CalculatorSection from '../sections/CalculatorSection';
 import FAQsSection from '../sections/FAQsSection';
 import AssociationSection from '../sections/AssociationSection';
@@ -18,7 +14,6 @@ import HeroSection from '../sections/HeroSection';
 import AboutSolutionsSection from '../sections/AboutSolutionsSection';
 import OurProcessSection from '../sections/OurProcessSection';
 import AdsSection from '../../home/ads-section';
-
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000/api';
 
 function normalizeType(type) {
@@ -31,11 +26,9 @@ function normalizeType(type) {
         .replace(/_/g, '-')
         .replace(/[^a-z0-9\-]/g, '');
 }
-
 function SectionRenderer({ section }) {
     const rawType = section.type || section.sectionType || section.name || section.sectionName;
     const type = normalizeType(rawType);
-
     if (["calculator", "calculator-section", "calculators", "calculatorsection"].includes(type)) {
         return <CalculatorSection section={section} />;
     }
@@ -60,7 +53,6 @@ function SectionRenderer({ section }) {
     if (["our-process", "process", "steps"].includes(type)) {
         return <OurProcessSection section={section} />;
     }
-    // fallback UI
     return (
         <div className="bg-white rounded-lg shadow-xl p-8 mb-10">
             <h2 className="text-3xl font-serif font-bold text-gray-900 mb-4">{section.heading || section.sectionName}</h2>
@@ -70,12 +62,10 @@ function SectionRenderer({ section }) {
         </div>
     );
 }
-
 export default function CalculatorPage() {
     const { slug } = useParams();
     const [page, setPage] = useState(null);
     const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         setLoading(true);
         axios.get(`${API_BASE}/calculators/pages/slug/${slug}`)
@@ -88,23 +78,16 @@ export default function CalculatorPage() {
                 setLoading(false);
             });
     }, [slug]);
-
     if (loading) return <div>Loading...</div>;
     if (!page) return <div>Calculator not found.</div>;
-
-
-    // Find FAQ sections
     const faqSections = page.sections?.filter(section => {
         const type = normalizeType(section.type || section.sectionType || section.name || section.sectionName);
         return ['faqs', 'faq', 'frequently-asked-questions'].includes(type);
     }) || [];
-
-    // All other sections
     const otherSections = page.sections?.filter(section => {
         const type = normalizeType(section.type || section.sectionType || section.name || section.sectionName);
         return !['faqs', 'faq', 'frequently-asked-questions'].includes(type);
     }) || [];
-
     return (
         <div className="min-h-screen bg-white flex flex-col">
             <Navbar />
@@ -116,7 +99,6 @@ export default function CalculatorPage() {
                             <p className="text-xl text-gray-600 mb-2 max-w-3xl mx-auto font-sans">{page.description}</p>
                         )}
                     </div>
-                    {/* Render all sections except FAQs and testimonials */}
                     <div className="grid grid-cols-1 gap-10">
                         {otherSections.length > 0 ? (
                             otherSections.map(section => (
@@ -126,7 +108,6 @@ export default function CalculatorPage() {
                             <div className="text-gray-500">No sections found for this calculator.</div>
                         )}
                     </div>
-                    {/* Global Testimonials Section (always above FAQs) */}
                     <div className="mt-16">
                         {page.sections?.filter(section => {
                             const type = normalizeType(section.type || section.sectionType || section.name || section.sectionName);
@@ -135,11 +116,9 @@ export default function CalculatorPage() {
                             <SectionRenderer key={section._id || section.sectionName} section={section} />
                         ))}
                     </div>
-                    {/* Render AdsSection before FAQs */}
                     <div className="mt-16">
                         <AdsSection />
                     </div>
-                    {/* Render FAQs section(s) below AdsSection */}
                     <div className="mt-16 faq-question">
                         {faqSections.map(section => (
                             <SectionRenderer key={section._id || section.sectionName} section={section} />

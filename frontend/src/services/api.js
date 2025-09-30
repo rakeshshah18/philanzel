@@ -1,61 +1,42 @@
 import axios from 'axios';
-// Career API
 export const careerAPI = {
-    // Submit career application
     submit: (formData) => API.post('/user/career-inquiry', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-    // Get all career applications (admin)
     getAll: () => API.get('/user/applications'),
-    // Get application by ID
     getById: (id) => API.get(`/user/career/${id}`),
-    // Update application status
     updateStatus: (id, status) => API.put(`/user/career/${id}/status`, { status }),
-    // Delete application
     delete: (id) => API.delete(`/user/career/${id}`)
 };
-
-// Home Page API
 export const homePageAPI = {
-    // Create homepage content
     create: (data) => API.post('/admin/homepage', data),
-    // Create homepage content with file upload
     createWithFile: (formData) => API.post('/admin/homepage', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-    // Get all homepage content (public endpoint, use 'homepage' so baseURL + 'homepage' = /api/homepage)
     getAll: () => API.get('homepage'),
-    // Get homepage content by ID
     getById: (id) => API.get(`/admin/homepage/${id}`),
-    // Update homepage content
     update: (id, data) => API.put(`/admin/homepage/${id}`, data),
-    // Update homepage content with file upload
     updateWithFile: (id, formData) => API.put(`/admin/homepage/${id}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-    // Delete homepage content
     delete: (id) => API.delete(`/admin/homepage/${id}`)
 };
-
-// Create axios instance with base configuration
 const API = axios.create({
     baseURL: process.env.NODE_ENV === 'production'
-        ? 'https://philanzel-54pd.vercel.app/api' // <-- replace with your actual backend URL
+        ? 'https://philanzel-54pd.vercel.app/api'
         : 'http://localhost:8000/api',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: true, // Enable cookies for refresh tokens
+    withCredentials: true,
 });
-// philanzel-54pd.vercel.app
-// GLOBAL REFRESH LOGIC
 let isRefreshing = false;
 let failedQueue = [];
 let globalRefreshRetryCount = 0;
@@ -71,8 +52,6 @@ const processQueue = (error, token = null) => {
     });
     failedQueue = [];
 };
-
-// Add auth token to requests
 API.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('adminToken');
@@ -86,7 +65,6 @@ API.interceptors.request.use(
     },
     (error) => Promise.reject(error)
 );
-
 API.interceptors.response.use(
     response => response,
     async error => {
@@ -94,7 +72,6 @@ API.interceptors.response.use(
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             if (globalRefreshRetryCount >= MAX_GLOBAL_REFRESH_RETRIES) {
-                // Only redirect to login if not already on login page and the request was to an /admin/ endpoint
                 if (originalRequest && originalRequest.url && /\/admin\//.test(originalRequest.url)) {
                     if (window.location.pathname !== '/login') {
                         window.location.href = '/login';
@@ -106,7 +83,6 @@ API.interceptors.response.use(
             if (!isRefreshing) {
                 isRefreshing = true;
                 try {
-                    // Use the same endpoint as adminAuthAPI.refreshToken
                     const { data } = await API.post('/admin/auth/refresh-token');
                     API.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
                     localStorage.setItem('adminToken', data.accessToken);
@@ -114,7 +90,6 @@ API.interceptors.response.use(
                     return API(originalRequest);
                 } catch (err) {
                     processQueue(err, null);
-                    // Only redirect after refresh fails and not already on login page
                     if (originalRequest && originalRequest.url && /\/admin\//.test(originalRequest.url)) {
                         if (window.location.pathname !== '/login') {
                             window.location.href = '/login';
@@ -133,7 +108,6 @@ API.interceptors.response.use(
                     return API(originalRequest);
                 })
                 .catch(err => {
-                    // Only redirect after refresh fails and not already on login page
                     if (window.location.pathname !== '/login') {
                         window.location.href = '/login';
                     }
@@ -144,216 +118,111 @@ API.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-
-
 export default API;
-
 export const aboutUsAPI = {
-    // Create about us content
     create: (formData) => API.post('/admin/about-us', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-
-    // Get all about us content (public endpoint, baseURL=/api)
     getAll: (params = {}) => API.get('about-us', { params }),
-
-    // Get about us content by ID (public endpoint, baseURL=/api)
     getById: (id) => API.get(`about-us/${id}`),
-
-    // Update about us content
     update: (id, formData) => API.put(`/admin/about-us/${id}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-
-    // Delete about us content
     delete: (id) => API.delete(`/admin/about-us/${id}`)
 };
-
 export const ourJourneyAPI = {
-    // Create our journey content
     create: (data) => API.post('admin/our-journey', data),
-
-    // Get all our journey content (public endpoint, baseURL=/api)
     getAll: (params = {}) => API.get('our-journey', { params }),
-
-    // Get our journey content by ID (public endpoint, baseURL=/api)
     getById: (id) => API.get(`our-journey/${id}`),
-
-    // Update our journey content
     update: (id, data) => API.put(`admin/our-journey/${id}`, data),
-
-    // Delete our journey content
     delete: (id) => API.delete(`admin/our-journey/${id}`),
-
-    // Add card to our journey
     addCard: (id, cardData) => API.post(`admin/our-journey/${id}/cards`, cardData),
-
-    // Remove card from our journey
     removeCard: (id, cardIndex) => API.delete(`admin/our-journey/${id}/cards/${cardIndex}`)
 };
-
 export const ourFounderAPI = {
-    // Create our founder content
     create: (formData) => API.post('/admin/about/our-founder', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-
-    // Get all our founder content (public route)
     getAll: (params = {}) => API.get('/about/our-founder', { params }),
-
-    // Get our founder content by ID (public route)
     getById: (id) => API.get(`/about/our-founder/${id}`),
-
-    // Update our founder content
     update: (id, formData) => API.put(`/admin/about/our-founder/${id}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-
-    // Delete our founder content
     delete: (id) => API.delete(`/admin/about/our-founder/${id}`)
 };
 
 export const aboutWhyChooseUsAPI = {
-    // Temporarily use home WhyChooseUs data for About Us page
-    // Create why choose us content  
     create: (formData) => API.post('/admin/why-choose-us', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-
-    // Get all why choose us content
     getAll: (params = {}) => API.get('/admin/why-choose-us', { params }),
-
-    // Get why choose us content by ID
     getById: (id) => API.get(`/admin/why-choose-us/${id}`),
-
-    // Update why choose us content
     update: (id, formData) => API.put(`/admin/why-choose-us/${id}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-
-    // Delete why choose us content
     delete: (id) => API.delete(`/admin/why-choose-us/${id}`),
-
-    // Add point to why choose us
     addPoint: (id, pointData) => API.post(`/admin/why-choose-us/${id}/points`, pointData),
-
-    // Remove point from why choose us
     removePoint: (id, pointId) => API.delete(`/admin/why-choose-us/${id}/points/${pointId}`)
 };
 
 export const newsAPI = {
-    // Create news article
     create: (data) => API.post('/admin/news', data),
-
-    // Create news article with file upload
     createWithFile: (formData) => API.post('/admin/news', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-
-    // Get all news articles
     getAll: (params = {}) => API.get('/admin/news', { params }),
-
-    // Get news article by ID
     getById: (id) => API.get(`/admin/news/${id}`),
-
-    // Update news article
     update: (id, data) => API.put(`/admin/news/${id}`, data),
-
-    // Update news article with file upload
     updateWithFile: (id, formData) => API.put(`/admin/news/${id}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     }),
-
-    // Delete news article
     delete: (id) => API.delete(`/admin/news/${id}`),
-
-    // Get categories
     getCategories: () => API.get('/admin/news/categories')
 };
 
-// Admin Authentication API
 export const adminAuthAPI = {
-    // Register new admin
     register: (data) => API.post('/admin/auth/register', data),
-
-    // Login admin
     login: (data) => API.post('/admin/auth/login', data),
-
-    // Logout admin
     logout: () => API.post('/admin/auth/logout'),
-
-    // Refresh access token
     refreshToken: () => API.post('/admin/auth/refresh-token'),
-
-    // Get current admin profile
     getProfile: () => API.get('/admin/auth/profile'),
-
-    // Update admin profile
     updateProfile: (data) => API.put('/admin/auth/profile', data),
-
-    // Change password
     changePassword: (data) => API.put('/admin/auth/change-password', data),
-
-    // Get all admins (super admin only)
     getAllAdmins: (params = {}) => API.get('/admin/auth/all', { params }),
-
-    // Delete admin (super admin only)
     deleteAdmin: (id) => API.delete(`/admin/auth/${id}`),
-
-    // Super admin: assign allowedTabs to an admin
     assignTabs: (adminId, allowedTabs) => API.put(`/admin/auth/${adminId}/assign-tabs`, { allowedTabs }),
-    // Super admin: get allowedTabs for an admin
     getAssignedTabs: (adminId) => API.get(`/admin/auth/${adminId}/assigned-tabs`),
-    // Super admin: get all assigned tabs for all admins
     getAllAssignedTabs: () => API.get('/admin/auth/all-assigned-tabs'),
 };
 
-// OurTrack API
 export const ourTrackAPI = {
-    // Get track record
     get: () => API.get('/admin/our-track'),
-
-    // Create new track record
     create: (data) => API.post('/admin/our-track', data),
-
-    // Update track record
     update: (data) => API.put('/admin/our-track', data),
-
-    // Delete track record
     delete: () => API.delete('/admin/our-track')
 };
 
-// Services API
 export const servicesAPI = {
-    // Get all services
     getAll: () => API.get('/admin/services'),
-
-    // Get all services (public)
     getAll: () => API.get('/services'),
-
-    // Create new service
     create: (data) => API.post('/admin/services', data),
-
-    // Update service
     update: (id, data) => API.put(`/admin/services/${id}`, data),
-
-    // Update service with form data (for file uploads)
     updateWithFile: (id, formData) => {
         return API.put(`/admin/services/${id}`, formData, {
             headers: {
@@ -361,8 +230,6 @@ export const servicesAPI = {
             },
         });
     },
-
-    // Create service with form data (for file uploads)
     createWithFile: (formData) => {
         return API.post('/admin/services', formData, {
             headers: {
@@ -370,20 +237,11 @@ export const servicesAPI = {
             },
         });
     },
-
-    // Delete service
     delete: (id) => API.delete(`/admin/services/${id}`)
 };
-
-// Tabbing Services Settings API
 export const tabbingServicesSettingsAPI = {
-    // Get tabbing services settings
     getSettings: () => API.get('/admin/tabbing-services/settings'),
-
-    // Public endpoint to get tabbing services settings
     getSettings: () => API.get('/tabbing-services/settings'),
-
-    // Update common background image
     updateCommonBackgroundImage: (formData) => {
         return API.put('/admin/tabbing-services/settings/common-background', formData, {
             headers: {
@@ -391,44 +249,21 @@ export const tabbingServicesSettingsAPI = {
             },
         });
     },
-
-    // Reset common background image to default
     resetCommonBackgroundImage: () => API.put('/admin/tabbing-services/settings/reset-common-background'),
-
-    // Update common section settings (description and button)
     updateCommonSettings: (data) => API.put('/admin/tabbing-services/settings/common-section', data)
 };
-
-// Helped Industries API
 export const helpedIndustriesAPI = {
-    // Get all helped industries
     getAll: () => API.get('/admin/helped-industries'),
-
-    // Get single helped industries by ID
     getById: (id) => API.get(`/admin/helped-industries/${id}`),
-
-    // Create new helped industries
     create: (data) => API.post('/admin/helped-industries', data),
-
-    // Update helped industries
     update: (id, data) => API.put(`/admin/helped-industries/${id}`, data),
-
-    // Delete helped industries
     delete: (id) => API.delete(`/admin/helped-industries/${id}`)
 };
 
-// Why Choose Us API endpoints
 export const whyChooseUsAPI = {
-    // Get all why choose us entries
     getAll: () => API.get('/admin/why-choose-us'),
-
-    // Public endpoint to get all why choose us entries
     getAll: () => API.get('/why-choose-us'),
-
-    // Get single why choose us entry by ID
     getById: (id) => API.get(`/admin/why-choose-us/${id}`),
-
-    // Create new why choose us entry
     create: (formData) => {
         return API.post('/admin/why-choose-us', formData, {
             headers: {
@@ -436,8 +271,6 @@ export const whyChooseUsAPI = {
             },
         });
     },
-
-    // Update why choose us entry
     update: (id, formData) => {
         return API.put(`/admin/why-choose-us/${id}`, formData, {
             headers: {
@@ -445,20 +278,11 @@ export const whyChooseUsAPI = {
             },
         });
     },
-
-    // Delete why choose us entry
     delete: (id) => API.delete(`/admin/why-choose-us/${id}`)
 };
-
-// Our Association API endpoints
 export const ourAssociationAPI = {
-    // Get all our association entries
     getAll: () => API.get('/admin/our-association'),
-
-    // Get single our association entry by ID
     getById: (id) => API.get(`/admin/our-association/${id}`),
-
-    // Create new our association entry
     create: (formData) => {
         return API.post('/admin/our-association', formData, {
             headers: {
@@ -466,8 +290,6 @@ export const ourAssociationAPI = {
             },
         });
     },
-
-    // Update our association entry
     update: (id, formData) => {
         return API.put(`/admin/our-association/${id}`, formData, {
             headers: {
@@ -475,69 +297,29 @@ export const ourAssociationAPI = {
             },
         });
     },
-
-    // Delete our association entry
     delete: (id) => API.delete(`/admin/our-association/${id}`)
 };
-
-// Home FAQs API endpoints
 export const homeFAQsAPI = {
-    // Get all FAQs
     getAll: () => API.get('/admin/home-faqs'),
-
-    // Get FAQs with pagination
     getPaginated: (page = 1, limit = 10) => API.get(`/admin/home-faqs/paginated?page=${page}&limit=${limit}`),
-
-    // Search FAQs
     search: (query) => API.get(`/admin/home-faqs/search?query=${encodeURIComponent(query)}`),
-
-    // Get single FAQ by ID
     getById: (id) => API.get(`/admin/home-faqs/${id}`),
-
-    // Create new FAQ
     create: (data) => API.post('/admin/home-faqs', data),
-
-    // Update FAQ
     update: (id, data) => API.put(`/admin/home-faqs/${id}`, data),
-
-    // Delete FAQ
     delete: (id) => API.delete(`/admin/home-faqs/${id}`)
 };
-
-// Review Sections API endpoints
 export const reviewSectionsAPI = {
-
-    // Get all review sections (public)
     getAll: () => API.get('/review-sections/active'),
-
-    // Get active review sections (alias for getAll)
     getActive: () => API.get('/review-sections/active'),
-
-    // Get single review section by ID
     getById: (id) => API.get(`/admin/review-sections/${id}`),
-
-    // Create new review section
     create: (data) => API.post('/admin/review-sections', data),
-
-    // Update review section
     update: (id, data) => API.put(`/admin/review-sections/${id}`, data),
-
-    // Add review to existing section
     addReview: (id, reviewData) => API.post(`/admin/review-sections/${id}/reviews`, reviewData),
-
-    // Recalculate all ratings
     recalculateRatings: () => API.post('/admin/review-sections/recalculate/ratings'),
-
-    // Delete review section
     delete: (id) => API.delete(`/admin/review-sections/${id}`)
 };
-
-// Ads Sections API endpoints
 export const adsSectionsAPI = {
-    // Get all visible ads sections (public)
     getAll: () => API.get('/ads-sections/active'),
-
-    // Admin endpoints (unchanged, but use only in admin context)
     getAllAdmin: () => API.get('/admin/ads-sections'),
     getPaginated: (page = 1, limit = 10) => API.get(`/admin/ads-sections/paginated?page=${page}&limit=${limit}`),
     search: (query) => API.get(`/admin/ads-sections/search?query=${encodeURIComponent(query)}`),
@@ -556,39 +338,21 @@ export const adsSectionsAPI = {
     }),
     delete: (id) => API.delete(`/admin/ads-sections/${id}`)
 };
-
-// Footer API endpoints
 export const footerAPI = {
-    // Get public footer data (no auth required)
     getPublic: () => API.get('/footer/public'),
-
-    // Admin operations
     admin: {
-        // Get footer data for admin
         get: () => API.get('/admin/footer'),
-
-        // Update footer data
         update: (data) => API.put('/admin/footer', data),
-
-        // Quick links operations
         addQuickLink: (data) => API.post('/admin/footer/quick-links', data),
         updateQuickLink: (id, data) => API.put(`/admin/footer/quick-links/${id}`, data),
         deleteQuickLink: (id) => API.delete(`/admin/footer/quick-links/${id}`),
-
-        // Services operations
         addService: (data) => API.post('/admin/footer/services', data),
         updateService: (id, data) => API.put(`/admin/footer/services/${id}`, data),
         deleteService: (id) => API.delete(`/admin/footer/services/${id}`),
-
-        // Calculators operations
         addCalculator: (data) => API.post('/admin/footer/calculators', data),
         updateCalculator: (id, data) => API.put(`/admin/footer/calculators/${id}`, data),
         deleteCalculator: (id) => API.delete(`/admin/footer/calculators/${id}`),
-
-        // Social links operations
         addSocialLink: (data) => API.post('/admin/footer/social-links', data),
-
-        // Optimize strategy operations (can also use optimizeStrategyAPI)
         optimizeStrategy: {
             getAll: () => API.get('/admin/footer/optimize-strategies'),
             getPaginated: (page = 1, limit = 10) => API.get(`/admin/footer/optimize-strategies/paginated?page=${page}&limit=${limit}`),
@@ -603,36 +367,22 @@ export const footerAPI = {
 };
 
 export const contactInfoAPI = {
-    // Get all contact info
     getAll: () => API.get('/contact-us/info'),
-
-    // Get contact info by ID
     getById: (id) => API.get(`/contact-us/info/${id}`),
-
-    // Create new contact info
     create: (data) => API.post('/contact-us/info', data),
-
-    // Update contact info
     update: (id, data) => API.put(`/contact-us/info/${id}`, data),
-
-    // Delete contact info
     delete: (id) => API.delete(`/contact-us/info/${id}`)
 };
 
-// Calculator Pages API
 export const calculatorPagesAPI = {
     getAll: () => API.get('/calculators/pages'),
     getById: (id) => API.get(`/calculators/pages/${id}`),
     create: (data) => API.post('/calculators/pages', data),
     update: (id, data) => API.put(`/calculators/pages/${id}`, data),
     delete: (id) => API.delete(`/calculators/pages/${id}`),
-    // Add section to calculator page by id
     addSectionToPage: (id, sectionId) => API.post(`/calculators/pages/${id}/add-section`, { sectionId }),
-    // Get calculator page by slug
     getBySlug: (slug) => API.get(`/calculators/pages/slug/${slug}`),
-    // Edit a section in a calculator page's embedded sections array
     editSectionInPage: (pageId, sectionId, data) => API.put(`/calculators/pages/${pageId}/sections/${sectionId}`, data),
-    // Delete a section from a calculator page's embedded sections array
     deleteSectionFromPage: (pageId, sectionId) => API.delete(`/calculators/pages/${pageId}/sections/${sectionId}`)
 };
 
@@ -644,7 +394,6 @@ export const calculatorSectionsAPI = {
     delete: (id) => API.delete(`/calculators/sections/${id}`)
 };
 
-// Sidebar API
 export const sidebarAPI = {
     getAll: () => API.get('/sidebar'),
     getById: (id) => API.get(`/sidebar/${id}`),

@@ -1,5 +1,3 @@
-// List of all assignable pages for admin assignment
-// Update this list as new pages are added to the system
 export const ASSIGNABLE_PAGES = [
     { key: 'home', label: 'Home' },
     { key: 'about-us', label: 'About Us' },
@@ -11,5 +9,4 @@ export const ASSIGNABLE_PAGES = [
     { key: 'contact-info', label: 'Contact Info' },
     { key: 'career', label: 'Career' },
     { key: 'calculator-pages', label: 'Calculator Pages' },
-    // Add more as needed
 ];

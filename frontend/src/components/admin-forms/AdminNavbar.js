@@ -1,13 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
 const AdminNavbar = ({ onLoginClick, onRegisterClick, isAuthenticated, admin, onLogout, onDeleteAdminClick }) => {
     const navigate = useNavigate();
-
     const handleLoginClick = () => {
         navigate('/login');
     };
-
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container-fluid">

@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import ReviewSections from './ReviewSections';
 import Alert from '../../components/Alert';
-
 const Sections = () => {
     const [activeTab, setActiveTab] = useState('review');
     const [message, setMessage] = useState('');
 
     const tabs = [
-        { id: 'review', label: '⭐ Review Sections', icon: 'bi bi-star' },
-        { id: 'ads', label: '📢 Advertisements', icon: 'bi bi-bullhorn' },
-        { id: 'footer', label: '🦶 Footer', icon: 'bi bi-grip-horizontal' },
-        { id: 'sidebar', label: '🔧 Sidebar Management', icon: 'bi bi-bars' }
+        { id: 'review', label: 'Review Sections', icon: 'bi bi-star' },
+        { id: 'ads', label: 'Advertisements', icon: 'bi bi-bullhorn' },
+        { id: 'footer', label: 'Footer', icon: 'bi bi-grip-horizontal' },
+        { id: 'sidebar', label: 'Sidebar Management', icon: 'bi bi-bars' }
     ];
 
     const renderTabContent = () => {

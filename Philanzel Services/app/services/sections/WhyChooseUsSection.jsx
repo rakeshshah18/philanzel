@@ -34,7 +34,6 @@ export default function WhyChooseUsSection({ section }) {
     if (loading) return <section className="py-20 bg-white"><div className="max-w-7xl mx-auto px-4"><p className="text-gray-600">Loading...</p></div></section>
     if (error) return <section className="py-20 bg-white"><div className="max-w-7xl mx-auto px-4"><p className="text-red-500">Error: {error}</p></div></section>;
     if (!data) return null;
-    console.log('WhyChooseUsSection data:', data);
 
     const imageUrl = data.images?.[0] || data.image || "";
     const fullImageUrl = imageUrl && !imageUrl.startsWith('http') ? `${BASE_URL}${imageUrl}` : imageUrl;
@@ -57,7 +56,6 @@ export default function WhyChooseUsSection({ section }) {
                                 const pointsArr = data.points || data.items || data.list || [];
                                 if (Array.isArray(pointsArr) && pointsArr.length > 0) {
                                     return pointsArr.map((point, i) => {
-                                        // If point is a string, render directly
                                         if (typeof point === "string") {
                                             return (
                                                 <li key={i} className="flex items-start">
@@ -66,7 +64,6 @@ export default function WhyChooseUsSection({ section }) {
                                                 </li>
                                             );
                                         }
-                                        // If point is an object, use fallback logic
                                         return (
                                             <li key={i} className="flex items-start">
                                                 <CheckCircle className="text-cyan-600 mr-2 mt-1" size={20} />

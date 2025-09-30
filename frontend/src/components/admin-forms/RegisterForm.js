@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect } from 'react';
-
 const RegisterForm = ({ show, onClose, onRegister, onVerifyOtp, loading, otpRequired, emailForOtp }) => {
     const [formData, setFormData] = useState({
         name: '',
@@ -11,12 +9,9 @@ const RegisterForm = ({ show, onClose, onRegister, onVerifyOtp, loading, otpRequ
     const [otp, setOtp] = useState('');
     const [showOtpField, setShowOtpField] = useState(false);
     const [formErrors, setFormErrors] = useState({});
-
-    // Keep OTP field in sync with parent prop
     useEffect(() => {
         setShowOtpField(otpRequired);
     }, [otpRequired]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -24,7 +19,6 @@ const RegisterForm = ({ show, onClose, onRegister, onVerifyOtp, loading, otpRequ
             [name]: value
         }));
     };
-
     const validate = () => {
         const errors = {};
         if (!formData.name.trim()) {
@@ -53,7 +47,6 @@ const RegisterForm = ({ show, onClose, onRegister, onVerifyOtp, loading, otpRequ
         }
         return errors;
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         const errors = validate();
@@ -62,29 +55,23 @@ const RegisterForm = ({ show, onClose, onRegister, onVerifyOtp, loading, otpRequ
             return;
         }
         await onRegister(formData);
-        // showOtpField will be set by useEffect if needed
     };
-
     const handleClose = () => {
         setFormData({ name: '', email: '', password: '', confirmPassword: '' });
         setOtp('');
         setShowOtpField(false);
         onClose();
     };
-
     const handleOtpChange = (e) => {
         setOtp(e.target.value);
     };
-
     const handleVerifyOtp = (e) => {
         e.preventDefault();
         if (onVerifyOtp) {
             onVerifyOtp({ email: emailForOtp || formData.email, otp });
         }
     };
-
     if (!show) return null;
-
     return (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
             <div className="modal-dialog modal-dialog-centered">

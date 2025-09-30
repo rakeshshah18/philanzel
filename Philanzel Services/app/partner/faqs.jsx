@@ -7,11 +7,7 @@ export default function FAQsSection() {
     const [faqsData, setFaqsData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
     const [openFAQ, setOpenFAQ] = useState(null)
-
-    // Define the backend base URL
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
-    // Fetch FAQs data from API
     useEffect(() => {
         const fetchFAQsData = async () => {
             try {
@@ -24,9 +20,7 @@ export default function FAQsSection() {
                     
                     if (result.status === "success" && result.data && result.data.length > 0) {
                         setFaqsData(result.data[0])
-                        console.log('Loaded FAQs data:', result.data[0])
                     } else {
-                        console.log('Using static data as API response structure is unexpected:', result)
                         setFaqsData(getStaticFAQsData())
                     }
                 } else {
@@ -44,7 +38,6 @@ export default function FAQsSection() {
         fetchFAQsData()
     }, [])
 
-    // Static fallback data
     const getStaticFAQsData = () => ({
         heading: "Frequently Asked Questions",
         description: "<p>Find answers to the most common questions and get all the information you need to start your journey with Philanzel.</p>",
@@ -76,12 +69,8 @@ export default function FAQsSection() {
             }
         ]
     })
-
-    // Function to safely render HTML content
     const renderHTMLContent = (htmlString) => {
         if (!htmlString) return null
-        
-        // Clean and decode HTML entities
         const cleanHTML = htmlString
             .replace(/\\u003C/g, '<')
             .replace(/\\u003E/g, '>')
@@ -89,8 +78,6 @@ export default function FAQsSection() {
         
         return <div dangerouslySetInnerHTML={{ __html: cleanHTML }} />
     }
-
-    // Toggle FAQ open/close
     const toggleFAQ = (faqId) => {
         setOpenFAQ(openFAQ === faqId ? null : faqId)
     }
@@ -121,15 +108,12 @@ export default function FAQsSection() {
                         {renderHTMLContent(faqsData?.description)}
                     </div>
                 </div>
-
-                {/* FAQs List */}
                 <div className="space-y-4">
                     {faqsData?.faqs?.map((faq, index) => (
                         <div 
                             key={faq._id || index} 
                             className="border border-gray-300 rounded-lg overflow-hidden hover:border-cyan-300 transition-colors duration-200"
                         >
-                            {/* Question */}
                             <button
                                 onClick={() => toggleFAQ(faq._id || index)}
                                 className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
@@ -147,8 +131,6 @@ export default function FAQsSection() {
                                     )}
                                 </div>
                             </button>
-
-                            {/* Answer */}
                             {openFAQ === (faq._id || index) && (
                                 <div className="px-6 pb-4 border-t border-gray-100">
                                     <div className="pt-4 text-gray-600 font-sans leading-relaxed prose prose-lg max-w-none">

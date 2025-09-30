@@ -1,6 +1,4 @@
-
 "use client"
-
 import Navigation from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,23 +24,17 @@ export default function CareersPage() {
     resume: null,
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
-
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
-
   const handleFileChange = (e) => {
     const file = e.target.files?.[0] || null
     setFormData((prev) => ({ ...prev, resume: file }))
   }
-
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Handle form submission logic here
-    console.log("Career application submission:", formData)
     setIsSubmitted(true)
   }
-
   if (isSubmitted) {
     return (
       <div className="min-h-screen bg-white">
@@ -78,8 +70,6 @@ export default function CareersPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
-
-      {/* Hero Section */}
       <section className="bg-gradient-to-br from-gray-50 to-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -92,14 +82,8 @@ export default function CareersPage() {
           </div>
         </div>
       </section>
-
-      {/* Join Team Section */}
       <JoinTeam />
-
-      {/* Footer */}
       <Footer />
-            
-
     </div>
   )
 }

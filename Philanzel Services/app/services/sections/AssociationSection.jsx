@@ -13,7 +13,6 @@ export default function AssociationSection({ section }) {
         setError(null);
 
         if (section) {
-            // Use section data directly
             const sectionImages = (section.images || []).map((imgUrl, index) => {
                 const imageUrl =
                     imgUrl && !imgUrl.startsWith("http")
@@ -28,11 +27,9 @@ export default function AssociationSection({ section }) {
                 };
             });
 
-            console.log("Section Associations:", sectionImages);
             setAssociations(sectionImages);
             setLoading(false);
         } else {
-            // Fallback: fetch from API
             fetch(`${BASE_URL}/api/partner/public`)
                 .then(res => {
                     if (!res.ok) throw new Error(`Network response was not ok: ${res.statusText}`);
@@ -54,7 +51,6 @@ export default function AssociationSection({ section }) {
                             };
                         });
 
-                        console.log("API Associations:", allImages);
                         setAssociations(allImages);
                     } else {
                         throw new Error(result.message || "Failed to fetch association data");
@@ -95,12 +91,8 @@ export default function AssociationSection({ section }) {
                     {section?.name || "OUR PARTNERS"}
                 </p>
                 <h2 className="text-4xl font-serif font-black text-gray-900 mb-6 text-center">
-                    {section?.title || "Our Partners"}
+                    {section?.title || ""}
                 </h2>
-                <div
-                    className="text-lg text-gray-600 mb-10 text-center"
-                    dangerouslySetInnerHTML={{ __html: section?.heading?.[0] || "" }}
-                />
                 <div
                     className="text-lg text-gray-600 mb-10 text-center"
                     dangerouslySetInnerHTML={{ __html: section?.description?.[0] || "" }}

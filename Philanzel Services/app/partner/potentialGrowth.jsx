@@ -1,15 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-
 export default function PotentialGrowthSection() {
     const [growthData, setGrowthData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
-
-    // Define the backend base URL
     const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-
-    // Fetch potential growth data from API
     useEffect(() => {
         const fetchGrowthData = async () => {
             try {
@@ -22,9 +17,7 @@ export default function PotentialGrowthSection() {
                     
                     if (Array.isArray(result) && result.length > 0) {
                         setGrowthData(result[0])
-                        console.log('Loaded potential growth data:', result[0])
                     } else {
-                        console.log('Using static data as API response structure is unexpected:', result)
                         setGrowthData(getStaticGrowthData())
                     }
                 } else {
@@ -41,8 +34,6 @@ export default function PotentialGrowthSection() {
 
         fetchGrowthData()
     }, [])
-
-    // Static fallback data
     const getStaticGrowthData = () => ({
         commonHeading: "Multi-Product Offerings to Expand Your Client Solutions",
         commonDescription: "<p>As a Philanzel POSP Partner, you're not limited to just insurance. You get the advantage of offering a diverse range of financial</p><p>products—enhancing your income potential and helping your clients make smarter financial choices.</p>",
@@ -70,11 +61,8 @@ export default function PotentialGrowthSection() {
         ]
     })
 
-    // Function to safely render HTML content
     const renderHTMLContent = (htmlString) => {
         if (!htmlString) return null
-        
-        // Clean and decode HTML entities
         const cleanHTML = htmlString
             .replace(/\\u003C/g, '<')
             .replace(/\\u003E/g, '>')
@@ -99,7 +87,6 @@ export default function PotentialGrowthSection() {
     return (
         <section className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header */}
                 <div className="text-center mb-16">
                     <p className="text-sm font-semibold text-cyan-600 uppercase tracking-wide mb-2">Unlock the Potential of Growth</p>
                     <h2 className="text-4xl font-serif font-bold text-gray-900 mb-6">
@@ -109,8 +96,6 @@ export default function PotentialGrowthSection() {
                         {renderHTMLContent(growthData?.commonDescription)}
                     </div>
                 </div>
-
-                {/* Solutions Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {growthData?.solutions?.map((solution, index) => (
                         <div 
@@ -136,8 +121,6 @@ export default function PotentialGrowthSection() {
                                     )}
                                 </div>
                             </div>
-
-                            {/* Content */}
                             <div className="text-center">
                                 <h3 className="text-lg font-serif font-bold text-gray-900 mb-3">
                                     {solution.heading}
