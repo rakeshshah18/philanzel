@@ -212,7 +212,7 @@ export const adminAuthAPI = {
 };
 
 export const ourTrackAPI = {
-    get: () => API.get('/admin/our-track'),
+    get: () => API.get('/our-track'),
     create: (data) => API.post('/admin/our-track', data),
     update: (data) => API.put('/admin/our-track', data),
     delete: () => API.delete('/admin/our-track')
@@ -402,5 +402,3 @@ export const sidebarAPI = {
     delete: (id) => API.delete(`/sidebar/${id}`),
     reorder: (items) => API.put('/sidebar/reorder', { items })
 };
-
-

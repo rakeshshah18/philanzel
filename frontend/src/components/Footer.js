@@ -265,7 +265,7 @@ const Footer = () => {
                             <div className="d-flex flex-wrap justify-content-md-end gap-3">
                                 <a
                                     href="/privacy-policy"
-                                    className="text-decoration-none small" Quick Links
+                                    className="text-decoration-none small"
                                     style={{ color: 'inherit', opacity: 0.8 }}
                                     onMouseOver={(e) => e.target.style.opacity = 1}
                                     onMouseOut={(e) => e.target.style.opacity = 0.8}

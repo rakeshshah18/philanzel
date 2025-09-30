@@ -58,7 +58,7 @@ const OurTrack = () => {
             };
             for (const [key, value] of Object.entries(submitData)) {
                 if (isNaN(value) || value < 0) {
-                    setMessage(`❌ ${key} must be a valid positive number.`);
+                    setMessage(`${key} must be a valid positive number.`);
                     setLoading(false);
                     return;
                 }
