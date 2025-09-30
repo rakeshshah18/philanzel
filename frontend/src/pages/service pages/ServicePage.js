@@ -124,7 +124,11 @@ const ServicePage = () => {
         <div className="container-fluid py-4" style={{ minHeight: '100vh' }}>
             <div className="dashboard-card shadow-sm" style={{ borderRadius: 18, background: isDarkMode ? '#23272f' : '#f8fafc', border: 'none', boxShadow: isDarkMode ? '0 2px 12px #0006' : '0 2px 12px #e0e7ef' }}>
                 <div className="dashboard-card-header px-4 py-3 d-flex justify-content-between align-items-center" style={{ background: isDarkMode ? '#1e293b' : '#1565c0', color: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
-                    <h1 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>{service.name}</h1>
+                    <h1 className="mb-0" style={{ fontWeight: 700, letterSpacing: 1 }}>
+                        {service.name
+                            .replace(/-/g, " ")
+                            .replace(/\b\w/g, char => char.toUpperCase())}
+                    </h1>
                     <button className="btn btn-light btn-sm ms-2" onClick={() => setShowAddSectionModal(true)}>
                         <i className="fas fa-plus me-1"></i> Add Section
                     </button>

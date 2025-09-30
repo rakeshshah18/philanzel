@@ -135,7 +135,14 @@ export default function UserServicePage() {
             <section className="py-20 bg-white flex-1">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-12">
-                        <h1 className="text-5xl md:text-6xl font-serif font-black text-gray-900 mb-6" dangerouslySetInnerHTML={{ __html: service.name }} />
+                        <h1
+                            className="text-5xl md:text-6xl font-serif font-black text-gray-900 mb-6"
+                            dangerouslySetInnerHTML={{
+                                __html: service.name
+                                    ?.replace(/-/g, " ")
+                                    .replace(/\b\w/g, char => char.toUpperCase())
+                            }}
+                        />
                         {service.description && (
                             <p className="text-xl text-gray-600 mb-2 max-w-3xl mx-auto font-sans" dangerouslySetInnerHTML={{ __html: service.description }} />
                         )}
