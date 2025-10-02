@@ -1,7 +1,4 @@
-// ...existing code...
-// ...existing code...
 import sectionRoutes from './all services/sectionRoutes.js';
-// import serviceRoutes from './all services/serviceRoutes.js';
 import partnerAssociationImageRoutes from './partner/partnerAssociationImageRoutes.js';
 import contactUsRoutes from './contactUs/contactUsRoutes.js';
 import whyChoosePhilanzelRoutes from './partner/whyChoosePhilanzel.js';
@@ -17,7 +14,6 @@ import aboutUsRoutes from './about/aboutUsRoutes.js';
 import ourJourneyRoutes from './about/ourJourneyRoutes.js';
 import ourFounderRoutes from './about/ourFounderRoutes.js';
 import { routes as adminAuthRoutes } from '../adminAuth/index.js';
-
 import ourTrackRoutes from './home/ourTrackRoutes.js';
 import servicesRoutes from './servicesRoutes.js';
 import tabbingServicesSettingsRoutes from './tabbingServicesSettingsRoutes.js';
@@ -38,6 +34,7 @@ import aboutServiceRoutes from './all services/aboutServiceRoutes.js';
 import calculatorPagesRoutes from './calculators/pagesRoutes.js';
 import calculatorSectionRoutes from './calculators/sectionRoutes.js';
 import sidebarRoutes from './sidebarRoutes.js';
+import blogRoutes from './blog/blogRoutes.js'
 
 
 const router = express.Router();
@@ -54,6 +51,7 @@ router.use('/ads-sections', adsSectionRoutes);
 router.use('/services', servicesRoutes);
 
 // Debug logging middleware removed for production
+router.use('/blog', blogRoutes);
 
 router.use('/user', newInquiryRoute);
 router.use('/user', careerInquery);

@@ -127,13 +127,13 @@ export default function Navigation() {
               <div className="flex items-baseline space-x-6">
                 <Link
                   href="/"
-                  className="text-gray-600 hover:text-cyan-600 px-3 py-2 text-sm font-medium transition-colors"
+                  className="text-gray-600 hover:text-cyan-600 px-2 py-2 text-sm font-medium transition-colors"
                 >
                   Home
                 </Link>
                 <Link
                   href="/about"
-                  className="text-gray-600 hover:text-cyan-600 px-3 py-2 text-sm font-medium transition-colors"
+                  className="text-gray-600 hover:text-cyan-600 px-2 py-2 text-sm font-medium transition-colors"
                 >
                   About Us
                 </Link>
@@ -144,7 +144,7 @@ export default function Navigation() {
                   onMouseEnter={() => setIsServicesDropdownOpen(true)}
                   onMouseLeave={() => setIsServicesDropdownOpen(false)}
                 >
-                  <button className="text-gray-600 hover:text-cyan-600 px-3 py-2 text-sm font-medium transition-colors flex items-center space-x-1">
+                  <button className="text-gray-600 hover:text-cyan-600 px-2 py-2 text-sm font-medium transition-colors flex items-center space-x-1">
                     <span>Our Services</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${isServicesDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -176,7 +176,7 @@ export default function Navigation() {
                   onMouseEnter={() => setIsCalculatorsDropdownOpen(true)}
                   onMouseLeave={() => setIsCalculatorsDropdownOpen(false)}
                 >
-                  <button className="text-gray-600 hover:text-cyan-600 px-3 py-2 text-sm font-medium transition-colors flex items-center space-x-1">
+                  <button className="text-gray-600 hover:text-cyan-600 px-2 py-2 text-sm font-medium transition-colors flex items-center space-x-1">
                     <span>Calculators</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${isCalculatorsDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -203,27 +203,33 @@ export default function Navigation() {
                 </div>
                 <Link
                   href="/events"
-                  className="text-gray-600 hover:text-cyan-600 px-3 py-2 text-sm font-medium transition-colors"
+                  className="text-gray-600 hover:text-cyan-600 px-2 py-2 text-sm font-medium transition-colors"
                 >
                   Events
                 </Link>
                 <Link
                   href="/careers"
-                  className="text-gray-600 hover:text-cyan-600 px-3 py-2 text-sm font-medium transition-colors"
+                  className="text-gray-600 hover:text-cyan-600 px-2 py-2 text-sm font-medium transition-colors"
                 >
                   Careers
                 </Link>
                 <Link
                   href="/partner"
-                  className="text-gray-600 hover:text-cyan-600 px-3 py-2 text-sm font-medium transition-colors"
+                  className="text-gray-600 hover:text-cyan-600 px-2 py-2 text-sm font-medium transition-colors"
                 >
                   Become a Partner
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-gray-600 hover:text-cyan-600 px-3 py-2 text-sm font-medium transition-colors"
+                  className="text-gray-600 hover:text-cyan-600 px-2 py-2 text-sm font-medium transition-colors"
                 >
                   Contact Us
+                </Link>
+                <Link
+                  href="/blog"
+                  className="text-gray-600 hover:text-cyan-600 px-2 py-2 text-sm font-medium transition-colors"
+                >
+                  Blogs
                 </Link>
               </div>
             </div>
