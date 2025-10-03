@@ -16,6 +16,7 @@ async function fetchBlogData(slug) {
     const res = await fetch(`${BASE_URL}/api/blog/${slug}`, { cache: "no-store" });
     if (!res.ok) return { post: null, allPosts: [] };
     const postData = await res.json();
+
     const allPostsRes = await fetch(`${BASE_URL}/api/blog/public`, { cache: "no-store" });
     const allPostsData = await allPostsRes.json();
 
@@ -47,12 +48,12 @@ export default async function BlogPostPage({ params }) {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/blog"
-            className="inline-flex items-center text-cyan-600 hover:text-cyan-700 mb-8 font-sans"
+            className="inline-flex items-center text-cyan-600 hover:text-cyan-700 mb-8 font-sans px-2"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Blog
           </Link>
-          <Badge className="bg-cyan-600 text-white mb-4">{post.category}</Badge>
+          <Badge className="bg-cyan-600 text-white mb-4 ">{post.category}</Badge>
 
           <h1 className="text-4xl md:text-5xl font-serif font-black text-gray-900 mb-6 leading-tight">
             {post.title}
@@ -65,17 +66,18 @@ export default async function BlogPostPage({ params }) {
           <div className="flex items-center space-x-6 text-gray-500 font-sans">
             <div className="flex items-center">
               <User className="h-5 w-5 mr-2" />
-              <span className="font-medium">Philanzel Author</span>
+              <span className="font-medium">{post.author}</span>
             </div>
             <div className="flex items-center">
-              <Calendar className="h-5 w-5 mr-2" />
-              <span>
-                {new Date(post.createdAt).toLocaleDateString("en-US", {
+              <Calendar className="h-4 w-4 mr-1" />
+              {new Date(post.createdAt).toLocaleDateString(
+                "en-US",
+                {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
-                })}
-              </span>
+                }
+              )}
             </div>
             <div className="flex items-center">
               <Clock className="h-5 w-5 mr-2" />
@@ -91,7 +93,7 @@ export default async function BlogPostPage({ params }) {
           <img
             src={post.coverImage}
             alt={post.title}
-            className="w-full h-48 object-cover"
+            className="w-full h-64 md:h-96 object-cover rounded-lg shadow-xl"
           />
         </div>
       </section>
@@ -192,7 +194,7 @@ export default async function BlogPostPage({ params }) {
                 >
                   <div className="relative">
                     <img
-                      src={relatedPost.thumbnail || "/placeholder.svg"}
+                      src={relatedPost.coverImage || "/placeholder.svg"}
                       alt={relatedPost.title}
                       className="w-full h-48 object-cover"
                     />
@@ -213,8 +215,19 @@ export default async function BlogPostPage({ params }) {
                         {relatedPost.author}
                       </div>
                       <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        {new Date(relatedPost.createdAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
+                      </div>
+                      <div className="flex items-center">
                         <Clock className="h-3 w-3 mr-1" />
-                        {relatedPost.readTime}
+                        {relatedPost.readTime} min
                       </div>
                     </div>
                     <Link href={`/blog/${relatedPost.slug}`}>

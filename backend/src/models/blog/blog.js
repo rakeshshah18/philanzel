@@ -29,6 +29,10 @@ const blogSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
+        author: {
+            type: String,
+            default: "Rajdeep Singh",
+        },
         isPublished: {
             type: Boolean,
             default: false,

@@ -1,87 +1,92 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
+import { useParams } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ThumbsUp, ThumbsDown, MessageSquare, Send } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
-const initialComments = [
-    {
-        id: 1,
-        author: "Alex Johnson",
-        avatar: "/images/avatar/avatar-2.jpg",
-        date: "2024-05-20T10:00:00Z",
-        text: "Great article! Really insightful analysis of the current market trends. I've been looking for a clear explanation like this.",
-        likes: 15,
-        dislikes: 1,
-        replies: [
-            {
-                id: 3,
-                author: "Samantha Lee",
-                avatar: "/images/avatar/avatar-3.jpg",
-                date: "2024-05-20T11:30:00Z",
-                text: "I agree! The section on emerging markets was particularly helpful.",
-                likes: 4,
-                dislikes: 0,
-                replies: [],
-            },
-        ],
-    },
-    {
-        id: 2,
-        author: "Maria Garcia",
-        avatar: "/images/avatar/avatar-4.jpg",
-        date: "2024-05-21T14:20:00Z",
-        text: "I have a slightly different perspective on the risk assessment part. Has the author considered the impact of recent regulatory changes?",
-        likes: 8,
-        dislikes: 3,
-        replies: [],
-    },
-]
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
-function Comment({ comment, onReply }) {
+// Helper to get or create a unique user ID from localStorage
+const getUserId = () => {
+    if (typeof window === 'undefined') return null;
+    let userId = localStorage.getItem('commentUserId');
+    if (!userId) {
+        userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        localStorage.setItem('commentUserId', userId);
+    }
+    return userId;
+};
+
+// ✅ Single Comment Component (recursive for replies)
+function Comment({ comment, onReply, onLike, onDislike }) {
     const [isReplying, setIsReplying] = useState(false)
     const [replyText, setReplyText] = useState("")
 
     const handleReplySubmit = () => {
         if (replyText.trim()) {
-            onReply(comment.id, replyText)
+            onReply(comment._id, replyText);
             setReplyText("")
             setIsReplying(false)
         }
     }
 
+    const userId = getUserId();
+    const isLiked = useMemo(() => comment.likedBy?.includes(userId), [comment.likedBy, userId]);
+    const isDisliked = useMemo(() => comment.dislikedBy?.includes(userId), [comment.dislikedBy, userId]);
+
     return (
         <div className="flex space-x-4">
             <Avatar>
                 <AvatarImage src={comment.avatar} alt={comment.author} />
-                <AvatarFallback>{comment.author.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{comment.author ? comment.author.charAt(0) : 'U'}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
+                {/* Author + Date */}
                 <div className="flex items-center justify-between">
                     <div className="font-bold text-gray-800">{comment.author}</div>
                     <div className="text-xs text-gray-500">
-                        {new Date(comment.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                        })}
                     </div>
                 </div>
-                <p className="text-gray-700 mt-1">{comment.text}</p>
+
+                {/* Comment text */}
+                <p className="text-gray-700 mt-1">{comment.content}</p>
+
+                {/* Actions */}
                 <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
-                    <button className="flex items-center space-x-1 hover:text-cyan-600">
-                        <ThumbsUp className="h-4 w-4" />
+                    <button
+                        onClick={() => onLike(comment._id)}
+                        className={`flex items-center space-x-1 transition-colors ${isLiked ? 'text-cyan-600' : 'hover:text-cyan-600'
+                            }`}
+                    >
+                        <ThumbsUp className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
                         <span>{comment.likes}</span>
                     </button>
-                    <button className="flex items-center space-x-1 hover:text-red-600">
-                        <ThumbsDown className="h-4 w-4" />
+                    <button
+                        onClick={() => onDislike(comment._id)}
+                        className={`flex items-center space-x-1 transition-colors ${isDisliked ? 'text-red-600' : 'hover:text-red-600'
+                            }`}
+                    >
+                        <ThumbsDown className={`h-4 w-4 ${isDisliked ? 'fill-current' : ''}`} />
                         <span>{comment.dislikes}</span>
                     </button>
-                    <button onClick={() => setIsReplying(!isReplying)} className="flex items-center space-x-1 hover:text-cyan-600">
+                    <button
+                        onClick={() => setIsReplying(!isReplying)}
+                        className="flex items-center space-x-1 hover:text-cyan-600"
+                    >
                         <MessageSquare className="h-4 w-4" />
                         <span>Reply</span>
                     </button>
                 </div>
 
+                {/* Reply form */}
                 {isReplying && (
                     <div className="mt-4 flex space-x-3">
                         <Avatar className="w-8 h-8">
@@ -99,7 +104,11 @@ function Comment({ comment, onReply }) {
                                 <Button variant="ghost" size="sm" onClick={() => setIsReplying(false)}>
                                     Cancel
                                 </Button>
-                                <Button size="sm" onClick={handleReplySubmit} className="bg-cyan-600 hover:bg-cyan-700">
+                                <Button
+                                    size="sm"
+                                    onClick={handleReplySubmit}
+                                    className="bg-cyan-600 hover:bg-cyan-700"
+                                >
                                     Post Reply
                                 </Button>
                             </div>
@@ -107,9 +116,10 @@ function Comment({ comment, onReply }) {
                     </div>
                 )}
 
+                {/* Replies */}
                 <div className="mt-4 space-y-4 pl-8 border-l border-gray-200">
                     {comment.replies?.map((reply) => (
-                        <Comment key={reply.id} comment={reply} onReply={onReply} />
+                        <Comment key={reply._id} comment={reply} onReply={onReply} onLike={onLike} onDislike={onDislike} />
                     ))}
                 </div>
             </div>
@@ -117,58 +127,174 @@ function Comment({ comment, onReply }) {
     )
 }
 
+// ✅ Comment Section (Main Component)
 export default function CommentSection() {
-    const [comments, setComments] = useState(initialComments)
-    const [newComment, setNewComment] = useState("")
+    const params = useParams();
+    const slug = params.slug;
 
-    const handleAddComment = () => {
+    const [comments, setComments] = useState([])
+    const [newComment, setNewComment] = useState("")
+    const [loading, setLoading] = useState(true);
+
+    // Fetch comments from API
+    useEffect(() => {
+        if (slug) {
+            fetch(`${BASE_URL}/api/blog/${slug}/comments`)
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.status === 'success') {
+                        setComments(data.data || [])
+                    }
+                })
+                .finally(() => setLoading(false));
+        }
+    }, [slug])
+
+    // Add new comment
+    const handleAddComment = async () => {
         if (newComment.trim()) {
-            const newCommentObj = {
-                id: Date.now(),
-                author: "Current User", // Replace with actual user data
-                avatar: "/images/avatar/avatar-1.jpg",
-                date: new Date().toISOString(),
-                text: newComment,
-                likes: 0,
-                dislikes: 0,
-                replies: [],
+            const res = await fetch(`${BASE_URL}/api/blog/${slug}/comments`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    author: "Current User", // Replace with logged-in user
+                    content: newComment,
+                }),
+            })
+            if (res.ok) {
+                const savedComment = await res.json()
+                setComments([savedComment.data, ...comments])
+                setNewComment("")
             }
-            setComments([newCommentObj, ...comments])
-            setNewComment("")
         }
     }
 
-    const handleAddReply = (commentId, text) => {
-        const newReply = {
-            id: Date.now(),
-            author: "Current User",
-            avatar: "/images/avatar/avatar-1.jpg",
-            date: new Date().toISOString(),
-            text,
-            likes: 0,
-            dislikes: 0,
-            replies: [],
-        }
+    // Add reply
+    const handleAddReply = async (commentId, text) => {
+        const response = await fetch(`${BASE_URL}/api/blog/${slug}/comments`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                author: "Current User", // Replace with logged-in user
+                content: text,
+                parentComment: commentId,
+            }),
+        })
 
-        const addReplyToComment = (commentsList) => {
-            return commentsList.map((comment) => {
-                if (comment.id === commentId) {
-                    return { ...comment, replies: [newReply, ...comment.replies] }
+        if (response.ok) {
+            const newReply = await response.json();
+
+            // Function to recursively add the reply to the correct comment in the state
+            const addReplyToState = (commentsList) => {
+                return commentsList.map(comment => {
+                    if (comment._id === commentId) {
+                        // Add the new reply to the beginning of the replies array
+                        return { ...comment, replies: [newReply.data, ...(comment.replies || [])] };
+                    }
+                    if (comment.replies && comment.replies.length > 0) {
+                        return { ...comment, replies: addReplyToState(comment.replies) };
+                    }
+                    return comment;
+                });
+            };
+
+            setComments(prevComments => addReplyToState(prevComments));
+        }
+    }
+
+    const handleLike = async (commentId) => {
+        const userId = getUserId();
+        if (!userId) return;
+
+        // --- Optimistic Update ---
+        // 1. Save the current state in case we need to revert.
+        const originalComments = JSON.parse(JSON.stringify(comments));
+
+        // 2. Update the UI immediately.
+        const optimisticallyUpdateState = (commentsList) => {
+            return commentsList.map(comment => {
+                if (comment._id === commentId) {
+                    const hasLiked = comment.likedBy.includes(userId);
+                    const newLikedBy = hasLiked
+                        ? comment.likedBy.filter(id => id !== userId) // Unlike
+                        : [...comment.likedBy, userId]; // Like
+                    const newDislikedBy = comment.dislikedBy.filter(id => id !== userId); // Always remove from dislikes
+                    return { ...comment, likedBy: newLikedBy, dislikedBy: newDislikedBy };
                 }
                 if (comment.replies && comment.replies.length > 0) {
-                    return { ...comment, replies: addReplyToComment(comment.replies) }
+                    return { ...comment, replies: optimisticallyUpdateState(comment.replies) };
                 }
-                return comment
-            })
-        }
+                return comment;
+            });
+        };
+        setComments(prevComments => optimisticallyUpdateState(prevComments));
 
-        setComments(addReplyToComment(comments))
-    }
+        // 3. Make the API call in the background.
+        try {
+            const response = await fetch(`${BASE_URL}/api/blog/comments/${commentId}/like`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId }),
+            });
+
+            if (!response.ok) {
+                // If the API call fails, revert the state.
+                throw new Error("Failed to update like on the server.");
+            }
+        } catch (error) {
+            console.error("Optimistic update failed:", error);
+            // On error, revert to the original state.
+            setComments(originalComments);
+        }
+    };
+
+    const handleDislike = async (commentId) => {
+        const userId = getUserId();
+        if (!userId) return;
+
+        // --- Optimistic Update ---
+        const originalComments = JSON.parse(JSON.stringify(comments));
+
+        const optimisticallyUpdateState = (commentsList) => {
+            return commentsList.map(comment => {
+                if (comment._id === commentId) {
+                    const hasDisliked = comment.dislikedBy.includes(userId);
+                    const newDislikedBy = hasDisliked
+                        ? comment.dislikedBy.filter(id => id !== userId) // Remove dislike
+                        : [...comment.dislikedBy, userId]; // Add dislike
+                    const newLikedBy = comment.likedBy.filter(id => id !== userId); // Always remove from likes
+                    return { ...comment, likedBy: newLikedBy, dislikedBy: newDislikedBy };
+                }
+                if (comment.replies && comment.replies.length > 0) {
+                    return { ...comment, replies: optimisticallyUpdateState(comment.replies) };
+                }
+                return comment;
+            });
+        };
+        setComments(prevComments => optimisticallyUpdateState(prevComments));
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/blog/comments/${commentId}/dislike`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update dislike on the server.");
+            }
+        } catch (error) {
+            console.error("Optimistic update failed:", error);
+            setComments(originalComments);
+        }
+    };
 
     return (
         <section className="py-12 bg-gray-50">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-3xl font-serif font-black text-gray-900 mb-8">Join the Conversation</h2>
+                <h2 className="text-3xl font-serif font-black text-gray-900 mb-8">
+                    Join the Conversation
+                </h2>
 
                 {/* New Comment Form */}
                 <Card className="mb-12 shadow-lg">
@@ -186,7 +312,10 @@ export default function CommentSection() {
                                     className="w-full mb-2"
                                 />
                                 <div className="flex justify-end">
-                                    <Button onClick={handleAddComment} className="bg-cyan-600 hover:bg-cyan-700">
+                                    <Button
+                                        onClick={handleAddComment}
+                                        className="bg-cyan-600 hover:bg-cyan-700"
+                                    >
                                         <Send className="h-4 w-4 mr-2" />
                                         Post Comment
                                     </Button>
@@ -198,9 +327,15 @@ export default function CommentSection() {
 
                 {/* Comments List */}
                 <div className="space-y-8">
-                    {comments.map((comment) => (
-                        <Comment key={comment.id} comment={comment} onReply={handleAddReply} />
-                    ))}
+                    {loading ? (
+                        <p className="text-gray-500">Loading comments...</p>
+                    ) : comments.length > 0 ? (
+                        comments.map((comment) => (
+                            <Comment key={comment._id} comment={comment} onReply={handleAddReply} onLike={handleLike} onDislike={handleDislike} />
+                        ))
+                    ) : (
+                        <p className="text-gray-500">No comments yet. Be the first to share your thoughts!</p>
+                    )}
                 </div>
             </div>
         </section>

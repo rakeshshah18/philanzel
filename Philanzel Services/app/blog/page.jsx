@@ -71,7 +71,7 @@ export default async function BlogPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 <div className="relative">
                   <img
-                    src={featuredPost.coverImage || "/images/blog-placeholder-1.jpg"}
+                    src={featuredPost.coverImage || "/placeholder.svg"}
                     alt={featuredPost.title}
                     className="w-full h-64 lg:h-full object-cover"
                   />
@@ -92,7 +92,7 @@ export default async function BlogPage() {
                     <div className="flex items-center space-x-4 text-sm text-gray-500 font-sans mb-6">
                       <div className="flex items-center">
                         <User className="h-4 w-4 mr-1" />
-                        Philanzel Author
+                        {featuredPost.author}
                       </div>
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 mr-1" />
@@ -138,7 +138,7 @@ export default async function BlogPage() {
               >
                 <div className="relative">
                   <img
-                    src={post.coverImage}
+                    src={post.coverImage || "/placeholder.svg"}
                     alt={post.title}
                     className="w-full h-48 object-cover"
                   />
@@ -159,7 +159,7 @@ export default async function BlogPage() {
                     <div className="flex items-center space-x-3">
                       <div className="flex items-center">
                         <User className="h-3 w-3 mr-1" />
-                        Philanzel Author
+                        {post.author}
                       </div>
                       <div className="flex items-center">
                         <Clock className="h-3 w-3 mr-1" />
@@ -167,15 +167,12 @@ export default async function BlogPage() {
                       </div>
                     </div>
                     <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      {new Date(featuredPost.createdAt).toLocaleDateString(
-                        "en-US",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
-                      )}
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {new Date(post.createdAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2 mb-4">
