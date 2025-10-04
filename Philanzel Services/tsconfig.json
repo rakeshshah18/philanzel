@@ -34,6 +34,6 @@
     "components/navigation.tsx",
     "app/careers/page.jsx",
     "app/home/testimonials.jsx"
-, "app/home/tabbing-section.jsx", "app/services/mutual-fund-distribution/page.jsx", "app/services/pms/page.jsx", "app/blog/[slug]/page.jsx", "app/blog/CommentSection.tsx", "app/blog/page.jsx", "app/about/page.jsx"  ],
+, "app/home/tabbing-section.jsx", "app/services/mutual-fund-distribution/page.jsx", "app/services/pms/page.jsx", "app/blog/[slug]/page.jsx", "app/blog/CommentSection.tsx", "app/blog/page.jsx", "app/about/page.jsx", "app/register/page.jsx", "app/login/page.jsx", "app/forgot-password/page.jsx"  ],
   "exclude": ["node_modules"]
 }

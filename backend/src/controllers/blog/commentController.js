@@ -1,50 +1,70 @@
 import Comment from "../../models/blog/commentModel.js";
 import Blog from "../../models/blog/blog.js";
+import fetch from "node-fetch";
 
-// CREATE COMMENT
+// ✅ CREATE COMMENT (with CAPTCHA verification)
 export const createComment = async (req, res) => {
     try {
-        const { author, content, parentComment } = req.body;
+        const { author, content, parentComment, captchaToken } = req.body;
         const { slug } = req.params;
 
-        // Validate required fields
-        if (!author || !content) {
+        // --- Step 1: Verify CAPTCHA ---
+        if (!captchaToken) {
             return res.status(400).json({
-                status: "error",
-                message: "Author and content are required"
+                status: "fail",
+                message: "Captcha token is required.",
             });
         }
 
-        // Find blog by slug
+        const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captchaToken}`;
+
+        const captchaRes = await fetch(verifyUrl, { method: "POST" });
+        const captchaData = await captchaRes.json();
+
+        if (!captchaData.success) {
+            return res.status(400).json({
+                status: "fail",
+                message: "Captcha verification failed.",
+            });
+        }
+
+        // --- Step 2: Validate fields ---
+        if (!author || !content) {
+            return res.status(400).json({
+                status: "error",
+                message: "Author and content are required.",
+            });
+        }
+
+        // --- Step 3: Find the blog ---
         const blog = await Blog.findOne({ slug });
         if (!blog) {
             return res.status(404).json({
                 status: "error",
-                message: "Blog not found"
+                message: "Blog not found.",
             });
         }
 
-        let depth = 1; // top-level comment
-
-        // Check depth if it's a reply
+        // --- Step 4: Handle reply depth (max 3 levels) ---
+        let depth = 1;
         if (parentComment) {
             const parent = await Comment.findById(parentComment);
             if (!parent) {
                 return res.status(404).json({
                     status: "error",
-                    message: "Parent comment not found"
+                    message: "Parent comment not found.",
                 });
             }
 
-            // Verify parent belongs to same blog
             if (parent.blog.toString() !== blog._id.toString()) {
                 return res.status(400).json({
                     status: "error",
-                    message: "Parent comment belongs to different blog"
+                    message: "Parent comment belongs to a different blog.",
                 });
             }
 
-            // Calculate depth by traversing up
+            // Count depth up to 3
             let current = parent;
             depth = 2;
             while (current.parentComment) {
@@ -53,13 +73,13 @@ export const createComment = async (req, res) => {
                 if (depth > 3) {
                     return res.status(400).json({
                         status: "error",
-                        message: "Reply depth limit (3) exceeded"
+                        message: "Reply depth limit (3) exceeded.",
                     });
                 }
             }
         }
 
-        // Create new comment
+        // --- Step 5: Create new comment ---
         const comment = await Comment.create({
             blog: blog._id,
             author,
@@ -67,26 +87,30 @@ export const createComment = async (req, res) => {
             parentComment: parentComment || null,
         });
 
-        // If it's a reply, push it to parent's replies array
+        // --- Step 6: If it's a reply, link it to the parent ---
         if (parentComment) {
-            await Comment.findByIdAndUpdate(
-                parentComment,
-                { $push: { replies: comment._id } }
-            );
+            await Comment.findByIdAndUpdate(parentComment, {
+                $push: { replies: comment._id },
+            });
         }
 
+        // --- Step 7: Success response ---
         res.status(201).json({
             status: "success",
+            message: "Comment posted successfully.",
             data: comment,
-            depth
+            depth,
         });
     } catch (error) {
+        console.error("Error creating comment:", error);
         res.status(500).json({
             status: "error",
-            message: error.message
+            message: "Internal server error.",
+            error: error.message,
         });
     }
 };
+
 
 // GET ALL COMMENTS FOR A BLOG (with nested replies)
 export const getCommentsByBlog = async (req, res) => {

@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-
+import React, { useState } from "react"
 import Navigation from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,8 +10,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Eye, EyeOff, ArrowRight, UserPlus } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Footer from "../home/footer"
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -28,13 +29,64 @@ export default function RegisterPage() {
     agreeToTerms: false,
     agreeToMarketing: false,
   })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const router = useRouter()
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setError("")
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.")
+      return
+    }
+    if (!formData.agreeToTerms) {
+      setError("You must agree to the Terms of Service.")
+      return
+    }
+    if (!formData.investmentExperience) {
+      setError("Please select your investment experience.")
+      return
+    }
+    setLoading(true)
+
+    try {
+      // Construct the payload to match the backend controller's expectations
+      const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        investmentExperience: formData.investmentExperience,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        termsAccepted: formData.agreeToTerms,
+        receiveUpdates: formData.agreeToMarketing,
+      };
+
+      const response = await fetch(`${BASE_URL}/api/user/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      const data = await response.json()
+      if (!response.ok || data.status !== "success") {
+        throw new Error(data.message || "Registration failed.")
+      }
+
+      localStorage.setItem("authToken", data.data.token)
+      localStorage.setItem("user", JSON.stringify(data.data.user))
+      router.push("/")
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -61,13 +113,17 @@ export default function RegisterPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                  {error}
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-sm font-medium text-gray-700 font-sans">
-                      First Name
-                    </Label>
+                    <Label htmlFor="firstName" className="text-sm font-medium text-gray-700 font-sans">First Name</Label>
                     <Input
                       id="firstName"
                       name="firstName"
@@ -81,9 +137,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="lastName" className="text-sm font-medium text-gray-700 font-sans">
-                      Last Name
-                    </Label>
+                    <Label htmlFor="lastName" className="text-sm font-medium text-gray-700 font-sans">Last Name</Label>
                     <Input
                       id="lastName"
                       name="lastName"
@@ -98,9 +152,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-gray-700 font-sans">
-                    Email Address
-                  </Label>
+                  <Label htmlFor="email" className="text-sm font-medium text-gray-700 font-sans">Email Address</Label>
                   <Input
                     id="email"
                     name="email"
@@ -115,9 +167,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-sm font-medium text-gray-700 font-sans">
-                    Phone Number
-                  </Label>
+                  <Label htmlFor="phone" className="text-sm font-medium text-gray-700 font-sans">Phone Number</Label>
                   <Input
                     id="phone"
                     name="phone"
@@ -131,18 +181,16 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="investmentExperience" className="text-sm font-medium text-gray-700 font-sans">
-                    Investment Experience
-                  </Label>
+                  <Label htmlFor="investmentExperience" className="text-sm font-medium text-gray-700 font-sans">Investment Experience</Label>
                   <Select onValueChange={(value) => handleInputChange("investmentExperience", value)}>
                     <SelectTrigger className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 font-sans">
                       <SelectValue placeholder="Select your investment experience" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="beginner">Beginner (0-2 years)</SelectItem>
-                      <SelectItem value="intermediate">Intermediate (2-5 years)</SelectItem>
-                      <SelectItem value="experienced">Experienced (5-10 years)</SelectItem>
-                      <SelectItem value="expert">Expert (10+ years)</SelectItem>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                      <SelectItem value="expert">Expert</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -150,9 +198,7 @@ export default function RegisterPage() {
                 {/* Password Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-sm font-medium text-gray-700 font-sans">
-                      Password
-                    </Label>
+                    <Label htmlFor="password" className="text-sm font-medium text-gray-700 font-sans">Password</Label>
                     <div className="relative">
                       <Input
                         id="password"
@@ -169,19 +215,13 @@ export default function RegisterPage() {
                         className="absolute inset-y-0 right-0 pr-3 flex items-center"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
-                        )}
+                        {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
                       </button>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700 font-sans">
-                      Confirm Password
-                    </Label>
+                    <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700 font-sans">Confirm Password</Label>
                     <div className="relative">
                       <Input
                         id="confirmPassword"
@@ -198,11 +238,7 @@ export default function RegisterPage() {
                         className="absolute inset-y-0 right-0 pr-3 flex items-center"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
-                        )}
+                        {showConfirmPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
                       </button>
                     </div>
                   </div>
@@ -214,18 +250,14 @@ export default function RegisterPage() {
                     <Checkbox
                       id="agreeToTerms"
                       checked={formData.agreeToTerms}
-                      onCheckedChange={(checked) => handleInputChange("agreeToTerms", checked as boolean)}
+                      onCheckedChange={(checked) => handleInputChange("agreeToTerms", checked)}
                       className="mt-1"
                     />
                     <Label htmlFor="agreeToTerms" className="text-sm text-gray-600 font-sans leading-relaxed">
                       I agree to the{" "}
-                      <Link href="/terms" className="text-cyan-600 hover:text-cyan-700 font-medium">
-                        Terms of Service
-                      </Link>{" "}
+                      <Link href="/terms" className="text-cyan-600 hover:text-cyan-700 font-medium">Terms of Service</Link>{" "}
                       and{" "}
-                      <Link href="/privacy" className="text-cyan-600 hover:text-cyan-700 font-medium">
-                        Privacy Policy
-                      </Link>
+                      <Link href="/privacy" className="text-cyan-600 hover:text-cyan-700 font-medium">Privacy Policy</Link>
                     </Label>
                   </div>
 
@@ -233,7 +265,7 @@ export default function RegisterPage() {
                     <Checkbox
                       id="agreeToMarketing"
                       checked={formData.agreeToMarketing}
-                      onCheckedChange={(checked) => handleInputChange("agreeToMarketing", checked as boolean)}
+                      onCheckedChange={(checked) => handleInputChange("agreeToMarketing", checked)}
                       className="mt-1"
                     />
                     <Label htmlFor="agreeToMarketing" className="text-sm text-gray-600 font-sans leading-relaxed">
@@ -244,11 +276,11 @@ export default function RegisterPage() {
 
                 <Button
                   type="submit"
-                  disabled={!formData.agreeToTerms}
+                  disabled={!formData.agreeToTerms || loading}
                   className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed font-sans"
                 >
-                  Create Account
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  {loading ? "Creating Account..." : "Create Account"}
+                  {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
                 </Button>
               </form>
 
@@ -279,8 +311,7 @@ export default function RegisterPage() {
           {/* Security Notice */}
           <div className="text-center">
             <p className="text-xs text-gray-500 font-sans">
-              Your personal information is encrypted and secure. We are SEBI registered and follow strict compliance
-              standards.
+              Your personal information is encrypted and secure. We are SEBI registered and follow strict compliance standards.
             </p>
           </div>
         </div>

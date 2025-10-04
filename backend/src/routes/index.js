@@ -36,6 +36,7 @@ import calculatorSectionRoutes from './calculators/sectionRoutes.js';
 import sidebarRoutes from './sidebarRoutes.js';
 import blogRoutes from './blog/blogRoutes.js'
 import commentRoutes from './blog/commentRoutes.js'
+import userRoutes from './users/userRoutes.js'
 
 
 
@@ -55,6 +56,7 @@ router.use('/services', servicesRoutes);
 // Debug logging middleware removed for production
 router.use('/blog', blogRoutes);
 router.use('/blog', commentRoutes);
+router.use('/user', userRoutes);
 
 router.use('/user', newInquiryRoute);
 router.use('/user', careerInquery);

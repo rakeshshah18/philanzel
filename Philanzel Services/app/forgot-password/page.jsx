@@ -1,5 +1,5 @@
 "use client"
-import type React from "react"
+import React, { useState } from "react"
 import Navigation from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,19 +7,44 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowRight, ArrowLeft, Mail, CheckCircle } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
 import Footer from "../home/footer"
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log("Password reset request for:", email)
-    setIsSubmitted(true)
+    setLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }), // This is correct
+      })
+
+      const data = await response.json()
+      if (!response.ok || data.status !== "success") {
+        throw new Error(data.message || "Failed to send reset instructions.")
+      }
+      setIsSubmitted(true)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
+
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
+
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           {!isSubmitted ? (
@@ -44,6 +69,15 @@ export default function ForgotPasswordPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {error && (
+                    <div
+                      className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                      role="alert"
+                    >
+                      {error}
+                    </div>
+                  )}
+
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
                       <Label htmlFor="email" className="text-sm font-medium text-gray-700 font-sans">
@@ -64,10 +98,11 @@ export default function ForgotPasswordPage() {
 
                     <Button
                       type="submit"
+                      disabled={loading}
                       className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 font-sans"
                     >
-                      Send Reset Instructions
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      {loading ? "Sending..." : "Send Reset Instructions"}
+                      {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
                     </Button>
                   </form>
 
@@ -114,7 +149,7 @@ export default function ForgotPasswordPage() {
                   <div className="text-center space-y-4">
                     <div className="bg-cyan-50 rounded-lg p-4">
                       <p className="text-sm text-cyan-800 font-sans">
-                        <strong>Email sent to:</strong> {email}
+                        <strong>Email sent to: </strong> {email}
                       </p>
                     </div>
 

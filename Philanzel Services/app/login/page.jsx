@@ -1,5 +1,5 @@
 "use client"
-import type React from "react"
+import React, { useState } from "react"
 import Navigation from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,18 +8,48 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff, ArrowRight, Shield } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Footer from "../home/footer"
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log("Login attempt:", { email, password, rememberMe })
+    setLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, rememberMe }), // This is correct
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || data.status !== "success") {
+        throw new Error(data.message || "Login failed. Please check your credentials.")
+      }
+
+      localStorage.setItem("authToken", data.data.token)
+      localStorage.setItem("user", JSON.stringify(data.data.user))
+      router.push("/")
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -41,14 +71,20 @@ export default function LoginPage() {
           <Card className="border-0 shadow-xl">
             <CardHeader className="text-center pb-4">
               <CardTitle className="text-2xl font-serif font-bold">Sign In</CardTitle>
-              <CardDescription className="font-sans">Enter your credentials to access your account</CardDescription>
+              <CardDescription className="font-sans">
+                Enter your credentials to access your account
+              </CardDescription>
             </CardHeader>
             <CardContent>
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                  {error}
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-gray-700 font-sans">
-                    Email Address
-                  </Label>
+                  <Label htmlFor="email" className="text-sm font-medium text-gray-700 font-sans">Email Address</Label>
                   <Input
                     id="email"
                     name="email"
@@ -63,9 +99,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-700 font-sans">
-                    Password
-                  </Label>
+                  <Label htmlFor="password" className="text-sm font-medium text-gray-700 font-sans">Password</Label>
                   <div className="relative">
                     <Input
                       id="password"
@@ -83,11 +117,7 @@ export default function LoginPage() {
                       className="absolute inset-y-0 right-0 pr-3 flex items-center"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-gray-400" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-gray-400" />
-                      )}
+                      {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
                     </button>
                   </div>
                 </div>
@@ -97,27 +127,23 @@ export default function LoginPage() {
                     <Checkbox
                       id="remember-me"
                       checked={rememberMe}
-                      onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                      onCheckedChange={(checked) => setRememberMe(checked)}
                     />
-                    <Label htmlFor="remember-me" className="text-sm text-gray-600 font-sans">
-                      Remember me
-                    </Label>
+                    <Label htmlFor="remember-me" className="text-sm text-gray-600 font-sans">Remember me</Label>
                   </div>
 
-                  <Link
-                    href="/forgot-password"
-                    className="text-sm text-cyan-600 hover:text-cyan-700 font-sans font-medium"
-                  >
+                  <Link href="/forgot-password" className="text-sm text-cyan-600 hover:text-cyan-700 font-sans font-medium">
                     Forgot password?
                   </Link>
                 </div>
 
                 <Button
                   type="submit"
+                  disabled={loading}
                   className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 font-sans"
                 >
-                  Sign In
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  {loading ? "Signing In..." : "Sign In"}
+                  {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
                 </Button>
               </form>
 

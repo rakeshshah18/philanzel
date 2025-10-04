@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { useParams } from "next/navigation"
+import ReCAPTCHA from "react-google-recaptcha"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -9,6 +10,7 @@ import { ThumbsUp, ThumbsDown, MessageSquare, Send } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
 // Helper to get or create a unique user ID from localStorage
 const getUserId = () => {
@@ -134,6 +136,7 @@ export default function CommentSection() {
 
     const [comments, setComments] = useState([])
     const [newComment, setNewComment] = useState("")
+    const [captchaToken, setCaptchaToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
     // Fetch comments from API
@@ -150,8 +153,17 @@ export default function CommentSection() {
         }
     }, [slug])
 
+    const handleCaptchaChange = (token) => {
+        setCaptchaToken(token);
+    };
+
     // Add new comment
     const handleAddComment = async () => {
+        if (!captchaToken) {
+            alert("Please complete the reCAPTCHA verification before posting.");
+            return;
+        }
+
         if (newComment.trim()) {
             const res = await fetch(`${BASE_URL}/api/blog/${slug}/comments`, {
                 method: "POST",
@@ -159,12 +171,18 @@ export default function CommentSection() {
                 body: JSON.stringify({
                     author: "Current User", // Replace with logged-in user
                     content: newComment,
+                    captchaToken,
                 }),
             })
-            if (res.ok) {
-                const savedComment = await res.json()
+
+            const savedComment = await res.json();
+
+            if (savedComment.status === "success") {
                 setComments([savedComment.data, ...comments])
                 setNewComment("")
+                setCaptchaToken(null); // Reset captcha
+            } else {
+                alert(`Failed to post comment: ${savedComment.message || 'Please try again.'}`);
             }
         }
     }
@@ -311,6 +329,18 @@ export default function CommentSection() {
                                     placeholder="Write a comment..."
                                     className="w-full mb-2"
                                 />
+
+                                {RECAPTCHA_SITE_KEY ? (
+                                    <ReCAPTCHA
+                                        sitekey={RECAPTCHA_SITE_KEY}
+                                        onChange={handleCaptchaChange}
+                                        className="mb-4"
+                                    />
+                                ) : (
+                                    <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md mb-4">
+                                        reCAPTCHA is not configured. Please set NEXT_PUBLIC_RECAPTCHA_SITE_KEY in your environment variables.
+                                    </div>
+                                )}
                                 <div className="flex justify-end">
                                     <Button
                                         onClick={handleAddComment}
