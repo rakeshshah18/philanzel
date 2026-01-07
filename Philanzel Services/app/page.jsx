@@ -1,11 +1,11 @@
 "use client";
+import Navigation from "@/components/navigation.jsx";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import Navigation from "@/components/navigation";
 import {
   ArrowRight, Shield, TrendingUp, Users, CheckCircle, Star,
   Landmark, HeartPulse, Settings2, Zap, Truck, Factory, ShieldCheck, ShoppingBag, Home, GraduationCap, Briefcase

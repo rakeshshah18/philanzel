@@ -1,4 +1,4 @@
-import Navigation from "@/components/navigation"
+import Navigation from "@/components/navigation.jsx"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -7,10 +7,9 @@ import Link from "next/link"
 import CtaSection from "../home/cta-section"
 import Footer from "../home/footer"
 
-// Fetch blogs from backend
 async function fetchBlogs() {
   const res = await fetch("http://localhost:8000/api/blog/public", {
-    cache: "no-store", // disable caching so you always get latest
+    cache: "no-store",
   })
 
   if (!res.ok) {
@@ -18,7 +17,7 @@ async function fetchBlogs() {
   }
 
   const data = await res.json()
-  return data.data // <- array of blogs
+  return data.data
 }
 
 export default async function BlogPage() {
