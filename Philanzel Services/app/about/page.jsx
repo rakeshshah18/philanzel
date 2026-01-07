@@ -1,4 +1,4 @@
-import Navigation from "@/components/navigation"
+import Navigation from "../../components/navigation.jsx"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, Award, Shield, Target } from "lucide-react"

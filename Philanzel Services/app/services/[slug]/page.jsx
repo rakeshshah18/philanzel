@@ -7,7 +7,7 @@ import Footer from '../../home/footer';
 import Cta from '../../home/cta-section';
 import Testimonials from '../../home/testimonials';
 import AdsSection from '../../home/ads-section';
-import Navbar from '../../../components/navigation';
+import Navbar from '../../../components/navigation.jsx';
 
 
 const HeroSection = dynamic(() => import('../sections/HeroSection'));

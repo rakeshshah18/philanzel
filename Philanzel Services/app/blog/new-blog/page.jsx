@@ -1,4 +1,4 @@
-import Navigation from "@/components/navigation"
+import Navigation from "@/components/navigation.jsx"
 import BlogForm from "./blogForm"
 
 export default function NewBlogPage() {

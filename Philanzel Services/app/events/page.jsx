@@ -1,5 +1,5 @@
 "use client";
-import Navigation from "@/components/navigation";
+import Navigation from "@/components/navigation.jsx";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight } from "lucide-react";

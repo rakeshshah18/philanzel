@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Footer from '../../home/footer';
 import Cta from '../../home/cta-section';
-import Navbar from '../../../components/navigation';
+import Navbar from '../../../components/navigation.jsx';
 import CalculatorSection from '../sections/CalculatorSection';
 import FAQsSection from '../sections/FAQsSection';
 import AssociationSection from '../sections/AssociationSection';

@@ -1,6 +1,6 @@
 "use client"
 
-import Navigation from "@/components/navigation"
+import Navigation from "@/components/navigation.jsx"
 import PartnerAbout from "./about"
 import AssociationSection from "./association"
 import OurProcessSection from "./ourProcess"
@@ -81,7 +81,7 @@ export default function PartnerPage() {
         <div className="min-h-screen bg-white">
             <Navigation />
             <section className="bg-gradient-to-br from-gray-50 to-white py-5">
-            <PartnerAbout />
+                <PartnerAbout />
             </section>
             <AssociationSection />
             <OurProcessSection />

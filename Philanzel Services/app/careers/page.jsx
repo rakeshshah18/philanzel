@@ -1,5 +1,5 @@
 "use client"
-import Navigation from "@/components/navigation"
+import Navigation from "@/components/navigation.jsx"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -78,7 +78,7 @@ export default function CareersPage() {
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto font-sans">
               Join our team of industry experts and make a meaningful impact. Discover opportunities to grow your career with us in a dynamic & rewarding environment.
-            </p> 
+            </p>
           </div>
         </div>
       </section>

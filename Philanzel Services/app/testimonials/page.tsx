@@ -1,4 +1,4 @@
-import Navigation from "@/components/navigation"
+import Navigation from "@/components/navigation.jsx"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, Quote, TrendingUp, Shield, Users } from "lucide-react"
