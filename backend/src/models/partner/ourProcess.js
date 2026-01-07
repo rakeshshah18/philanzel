@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const stepSchema = new mongoose.Schema({
     icon: {
         type: String,
-        // required: true
     },
     name: {
         type: String,
@@ -28,7 +27,7 @@ const ourProcessSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    steps: [stepSchema] // Flexible array of steps
+    steps: [stepSchema]
 });
 
 const OurProcess = mongoose.model("OurProcess", ourProcessSchema);

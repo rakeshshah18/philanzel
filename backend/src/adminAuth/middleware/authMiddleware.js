@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import Admin from '../models/Admin.js';
 
-// Verify JWT token middleware
 const verifyToken = async (req, res, next) => {
     console.log('--- verifyToken: Incoming request headers ---');
     console.log(req.headers);
@@ -24,7 +23,6 @@ const verifyToken = async (req, res, next) => {
             });
         }
 
-        // Check if JWT secret is configured
         const accessSecret = process.env.JWT_ACCESS_SECRET;
         if (!accessSecret) {
             console.error('JWT_ACCESS_SECRET environment variable is not set');
@@ -35,7 +33,6 @@ const verifyToken = async (req, res, next) => {
             });
         }
 
-        // Check blacklist
         const { isTokenBlacklisted } = await import('../utils/tokenBlacklist.js');
         if (isTokenBlacklisted(token)) {
             console.log('Token is blacklisted');
@@ -46,8 +43,6 @@ const verifyToken = async (req, res, next) => {
                 debug: 'Token found in blacklist'
             });
         }
-
-        // Verify token
         let decoded;
         try {
             decoded = jwt.verify(token, accessSecret);
@@ -82,7 +77,6 @@ const verifyToken = async (req, res, next) => {
             }
         }
 
-        // Check if admin exists and is active
         const admin = await Admin.findById(decoded.id);
         if (!admin || !admin.isActive) {
             console.log('Admin not found or inactive for token:', decoded.id);
@@ -94,7 +88,6 @@ const verifyToken = async (req, res, next) => {
             });
         }
 
-        // Add admin info to request
         req.admin = {
             id: decoded.id,
             email: decoded.email,
@@ -123,7 +116,6 @@ const verifyToken = async (req, res, next) => {
     }
 };
 
-// Check if admin has required role
 const requireRole = (roles) => {
     return (req, res, next) => {
         console.log('--- requireRole middleware ---');
@@ -154,10 +146,8 @@ const requireRole = (roles) => {
     };
 };
 
-// Super admin only middleware
 const requireSuperAdmin = requireRole('super_admin');
 
-// Admin or super admin middleware
 const requireAdmin = requireRole(['admin', 'super_admin']);
 
 

@@ -9,7 +9,6 @@ const homeFAQsSchema = new mongoose.Schema({
     description: {
         type: String,
         required: [true, 'Description is required'],
-        // Removed trim for HTML content from Quill
     },
     faqs: {
         type: [{
@@ -23,7 +22,6 @@ const homeFAQsSchema = new mongoose.Schema({
             answer: {
                 type: String,
                 required: [true, 'Answer is required for FAQ item'],
-                // Removed trim and length restrictions for HTML content from Quill
             }
         }],
         validate: {

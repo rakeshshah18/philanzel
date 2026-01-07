@@ -45,7 +45,6 @@ const tabbingServicesSettingsSchema = new mongoose.Schema({
             trim: true
         }
     },
-    // Future settings can be added here
     isActive: {
         type: Boolean,
         default: true
@@ -53,7 +52,5 @@ const tabbingServicesSettingsSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
 const TabbingServicesSettings = mongoose.model("TabbingServicesSettings", tabbingServicesSettingsSchema);
-
 export default TabbingServicesSettings;

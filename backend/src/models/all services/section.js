@@ -12,10 +12,8 @@ const sectionSchema = new mongoose.Schema({
     subheading: [{ type: String, default: '' }],
     subdescription: [{ type: String, default: '' }],
     points: [{ type: String, default: '' }],
-    images: [{ type: String, default: '' }], // Array of image URLs
-    faqs: { type: [faqSchema], default: [] },          // Array of FAQ objects
-    // Removed extraSubheading, extraSubdescription, extraImage
-    // Add more optional fields here as needed
+    images: [{ type: String, default: '' }],
+    faqs: { type: [faqSchema], default: [] },
 }, { timestamps: true });
 
 export default mongoose.model("Section", sectionSchema);

@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const reviewSectionSchema = new mongoose.Schema({
-    // Common section information
     heading: {
         type: String,
         required: [true, 'Heading is required'],
@@ -22,7 +21,6 @@ const reviewSectionSchema = new mongoose.Schema({
         default: 'Google'
     },
 
-    // Overall review statistics
     averageRating: {
         type: Number,
         required: [true, 'Average rating is required'],
@@ -37,7 +35,6 @@ const reviewSectionSchema = new mongoose.Schema({
         default: 0
     },
 
-    // Write review button configuration
     writeReviewButton: {
         text: {
             type: String,
@@ -56,7 +53,6 @@ const reviewSectionSchema = new mongoose.Schema({
         }
     },
 
-    // Individual review cards
     reviews: [{
         userName: {
             type: String,
@@ -67,7 +63,7 @@ const reviewSectionSchema = new mongoose.Schema({
         userProfilePhoto: {
             type: String,
             trim: true,
-            default: null // Can be null if no profile photo
+            default: null
         },
         reviewProviderLogo: {
             type: String,
@@ -101,7 +97,6 @@ const reviewSectionSchema = new mongoose.Schema({
         }
     }],
 
-    // Section configuration
     isActive: {
         type: Boolean,
         default: true
@@ -111,7 +106,6 @@ const reviewSectionSchema = new mongoose.Schema({
         default: 0
     },
 
-    // Timestamps
     createdAt: {
         type: Date,
         default: Date.now
@@ -122,31 +116,24 @@ const reviewSectionSchema = new mongoose.Schema({
     }
 });
 
-// Pre-save middleware to update timestamps and calculate average rating
 reviewSectionSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
 
-    // Calculate average rating based on visible reviews only
     if (this.reviews && this.reviews.length > 0) {
         const visibleReviews = this.reviews.filter(review => review.isVisible);
 
         if (visibleReviews.length > 0) {
-            // Calculate total stars from all visible reviews
             const totalStars = visibleReviews.reduce((sum, review) => sum + review.rating, 0);
-            // Calculate average: total stars / number of visible reviews
             const average = totalStars / visibleReviews.length;
-            // Round to 1 decimal place for display
             this.averageRating = Math.round(average * 10) / 10;
             this.totalReviewCount = visibleReviews.length;
 
             console.log(`Rating calculation: Total stars: ${totalStars}, Total reviews: ${visibleReviews.length}, Average: ${this.averageRating}`);
         } else {
-            // No visible reviews
             this.averageRating = 0;
             this.totalReviewCount = 0;
         }
     } else {
-        // No reviews at all
         this.averageRating = 0;
         this.totalReviewCount = 0;
     }
@@ -154,18 +141,15 @@ reviewSectionSchema.pre('save', function (next) {
     next();
 });
 
-// Instance method to add a new review
 reviewSectionSchema.methods.addReview = function (reviewData) {
     this.reviews.push(reviewData);
     return this.save();
 };
 
-// Instance method to get visible reviews only
 reviewSectionSchema.methods.getVisibleReviews = function () {
     return this.reviews.filter(review => review.isVisible);
 };
 
-// Static method to get active review sections
 reviewSectionSchema.statics.getActiveReviewSections = function () {
     return this.find({ isActive: true }).sort({ displayOrder: 1 });
 };

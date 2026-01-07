@@ -29,7 +29,6 @@ const userSchema = new mongoose.Schema({
     investmentExperience: {
         type: String,
         required: [true, 'Investment experience is required'],
-        // Accept both lowercase and capitalized versions
         enum: ['beginner', 'intermediate', 'advanced', 'expert', 'Beginner', 'Intermediate', 'Advanced', 'Expert']
     },
     password: {
@@ -62,7 +61,6 @@ const userSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Hash password before saving
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
@@ -73,7 +71,6 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
-// Compare password method
 userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };

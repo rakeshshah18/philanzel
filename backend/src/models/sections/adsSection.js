@@ -8,27 +8,26 @@ const adsSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: false, // Made optional
-        // Removed trim to support HTML content from rich text editor
+        required: false,
     },
     hashtag: {
         type: String,
-        required: false, // Made optional
+        required: false,
         trim: true,
     },
     imageUrl: {
         type: String,
-        required: false, // Main image - can be uploaded file or URL
+        required: false,
         trim: true,
     },
     linkUrl: {
         type: String,
-        required: false, // External link for the ad (where it redirects when clicked)
+        required: false,
         trim: true,
     },
     backgroundColor: {
         type: String,
-        default: '#ffffff', // Default white background
+        default: '#ffffff',
         validate: {
             validator: function (v) {
                 return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(v);

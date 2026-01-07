@@ -12,7 +12,6 @@ import {
 
 const router = express.Router();
 
-// Multer error handling middleware
 const handleMulterError = (err, req, res, next) => {
     if (err instanceof multer.MulterError) {
         if (err.code === 'LIMIT_FILE_SIZE') {
@@ -39,19 +38,9 @@ const handleMulterError = (err, req, res, next) => {
     next(err);
 };
 
-// Create new about us content (with file upload) - Admin only
 router.post('/about-us', verifyToken, requireRole(['admin', 'super_admin']), imageUpload.single('image'), handleMulterError, createAboutUs);
-
-// Get all about us content - Public/Admin
 router.get('/about-us', getAllAboutUs);
-
-// Get about us content by ID - Public/Admin
 router.get('/about-us/:id', getAboutUsById);
-
-// Update about us content (with file upload) - Admin only
 router.put('/about-us/:id', verifyToken, requireRole(['admin', 'super_admin']), imageUpload.single('image'), handleMulterError, updateAboutUs);
-
-// Delete about us content - Admin only
 router.delete('/about-us/:id', verifyToken, requireRole(['admin', 'super_admin']), deleteAboutUs);
-
 export default router;

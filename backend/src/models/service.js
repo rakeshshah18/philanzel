@@ -21,7 +21,6 @@ const ourServicesSchema = new mongoose.Schema({
             image: { type: String, default: '' },
         }
     ],
-    // Legacy fields for backward compatibility
     name: {
         type: String,
         trim: true
@@ -41,12 +40,9 @@ const ourServicesSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-
-    // New tabbing services fields
     title: {
         type: String,
         required: function () {
-            // Only require for new documents, not updates
             return this.isNew;
         },
         trim: true
@@ -54,7 +50,6 @@ const ourServicesSchema = new mongoose.Schema({
     tabTitle: {
         type: String,
         required: function () {
-            // Only require for new documents, not updates
             return this.isNew;
         },
         trim: true
@@ -62,7 +57,6 @@ const ourServicesSchema = new mongoose.Schema({
     contentTitle: {
         type: String,
         required: function () {
-            // Only require for new documents, not updates
             return this.isNew;
         },
         trim: true

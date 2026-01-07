@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const aboutServiceSchema = new mongoose.Schema({
     image: {
         type: String,
-        required: false // Optional, can be empty
+        required: false
     },
     heading: {
         type: String,

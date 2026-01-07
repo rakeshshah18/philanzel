@@ -34,7 +34,6 @@ const aboutUsSchema = new mongoose.Schema({
             required: true,
             trim: true
         },
-        // File upload properties
         originalName: {
             type: String,
             required: false
@@ -66,10 +65,8 @@ const aboutUsSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true,
-    collection: 'aboutus' // Explicitly set collection name to 'aboutus'
+    collection: 'aboutus' 
 });
-
-// Index for better performance
 aboutUsSchema.index({ order: 1, isActive: 1 });
 aboutUsSchema.index({ createdAt: -1 });
 

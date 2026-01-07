@@ -8,7 +8,6 @@ const contactFormSchema = new mongoose.Schema({
     servicesType: {
         type: String,
         required: true
-        // Removed static enum to make it dynamic
     },
     captchaToken: { type: String, required: false },
     createdAt: { type: Date, default: Date.now }

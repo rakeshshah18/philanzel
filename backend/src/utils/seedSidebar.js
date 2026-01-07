@@ -69,19 +69,16 @@ const sidebarData = [
 
 const seedSidebarItems = async () => {
     try {
-        // Check if sidebar items already exist
         const existingItems = await SidebarItem.find();
 
         if (existingItems.length > 0) {
-            console.log('✅ Sidebar items already exist, skipping seeding');
+            console.log('Sidebar items already exist, skipping seeding');
             return;
         }
-
-        // Create sidebar items
         await SidebarItem.insertMany(sidebarData);
-        console.log('✅ Sidebar items seeded successfully');
+        console.log('Sidebar items seeded successfully');
     } catch (error) {
-        console.error('❌ Error seeding sidebar items:', error);
+        console.error('Error seeding sidebar items:', error);
     }
 };
 

@@ -8,7 +8,7 @@ class AdminAuthController {
     async deleteAdmin(req, res) {
         try {
             const { id } = req.params;
-            const requestingAdmin = req.admin; // set by verifyToken
+            const requestingAdmin = req.admin;
             if (!requestingAdmin || requestingAdmin.role !== 'super_admin') {
                 return res.status(403).json({ success: false, message: 'Only super admin can delete admins.' });
             }
@@ -48,7 +48,6 @@ class AdminAuthController {
                         message: 'Super admin already exists. Cannot register another.'
                     });
                 }
-                // Allow direct registration for the first super_admin
                 const admin = new Admin({ name, email, password, role: 'super_admin' });
                 await admin.save();
                 const accessToken = admin.generateAccessToken();
@@ -57,9 +56,9 @@ class AdminAuthController {
                 await admin.save();
                 res.cookie('refreshToken', refreshToken, {
                     httpOnly: true,
-                    secure: false, // Always false for localhost (HTTP)
-                    sameSite: 'lax', // More permissive for local dev
-                    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+                    secure: false, 
+                    sameSite: 'lax',
+                    maxAge: 7 * 24 * 60 * 60 * 1000 
                 });
                 return res.status(201).json({
                     success: true,
@@ -75,7 +74,6 @@ class AdminAuthController {
                     message: 'Admin with this email already exists'
                 });
             }
-            // For normal admin, require OTP approval
             const superAdmin = await Admin.findOne({ role: 'super_admin' });
             if (!superAdmin) {
                 return res.status(500).json({ success: false, message: 'Super admin not found for OTP approval.' });
@@ -90,7 +88,6 @@ class AdminAuthController {
                 text: `OTP for approving new admin (${email}): ${otp}`,
                 html: `<p>OTP for approving new admin (<b>${email}</b>): <b>${otp}</b></p>`
             });
-            // Only return success, no admin object, to trigger OTP modal in frontend
             return res.status(200).json({ success: true, message: 'OTP sent to super admin for approval.' });
         } catch (error) {
             console.error('Registration error:', error);
@@ -135,9 +132,9 @@ class AdminAuthController {
             await admin.save();
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                secure: false, // Always false for localhost (HTTP)
-                sameSite: 'lax', // More permissive for local dev
-                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+                secure: false,
+                sameSite: 'lax',
+                maxAge: 7 * 24 * 60 * 60 * 1000 
             });
             delete global.pendingAdminRegs[email];
             return res.status(201).json({
@@ -178,9 +175,9 @@ class AdminAuthController {
             await admin.save();
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                secure: false, // Always false for localhost (HTTP)
-                sameSite: 'lax', // More permissive for local dev
-                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+                secure: false,
+                sameSite: 'lax',
+                maxAge: 7 * 24 * 60 * 60 * 1000
             });
             return res.status(200).json({
                 success: true,
@@ -203,27 +200,22 @@ class AdminAuthController {
                 return res.status(401).json({ success: false, message: 'No refresh token provided' });
             }
 
-            // Find admin with this refresh token
             const admin = await Admin.findOne({ refreshToken: oldRefreshToken });
             if (!admin) {
                 return res.status(403).json({ success: false, message: 'Invalid refresh token' });
             }
-
-            // Verify old refresh token
             let payload;
             try {
                 payload = jwt.verify(oldRefreshToken, process.env.JWT_REFRESH_SECRET || 'refresh_secret');
             } catch (err) {
                 return res.status(403).json({ success: false, message: 'Invalid or expired refresh token' });
             }
-
-            // Rotate refresh token: generate new, save, set cookie
             const newRefreshToken = admin.generateRefreshToken();
             admin.refreshToken = newRefreshToken;
             await admin.save();
             res.cookie('refreshToken', newRefreshToken, {
                 httpOnly: true,
-                secure: false, // Always false for localhost (HTTP)
+                secure: false,
                 sameSite: 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
@@ -254,7 +246,6 @@ class AdminAuthController {
             } else {
                 console.log('req.admin:', req.admin);
             }
-            // req.admin is set by verifyToken middleware
             if (!req.admin || !req.admin.id) {
                 console.log('getProfile: Unauthorized - missing req.admin or id');
                 return res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -296,14 +287,10 @@ class AdminAuthController {
             return res.status(500).json({ success: false, message: 'Internal server error' });
         }
     }
-
-    // Super admin: assign allowedPages to admin
-
     async assignTabs(req, res) {
         try {
-            const { id } = req.params; // admin user id
-            let { allowedTabs } = req.body; // array of tab names
-            // Ensure allowedTabs is always an array (never null/undefined)
+            const { id } = req.params;
+            let { allowedTabs } = req.body;
             if (!Array.isArray(allowedTabs)) allowedTabs = [];
             const requestingAdmin = req.admin;
             if (!requestingAdmin || requestingAdmin.role !== 'super_admin') {
@@ -316,7 +303,6 @@ class AdminAuthController {
             if (admin.role === 'super_admin') {
                 return res.status(400).json({ success: false, message: 'Cannot assign tabs to super admin.' });
             }
-            // Use findByIdAndUpdate to avoid VersionError
             await Admin.findByIdAndUpdate(id, { allowedTabs }, { new: true });
             return res.status(200).json({ success: true, message: 'Tabs assigned successfully.', allowedTabs });
         } catch (error) {
@@ -326,14 +312,10 @@ class AdminAuthController {
             return res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
         }
     }
-
-    // Super admin: get allowedPages for admin
-
     async getAssignedTabs(req, res) {
         try {
             const { id } = req.params;
             const requestingAdmin = req.admin;
-            // Allow super admin to fetch for anyone, or admin to fetch their own
             if (!requestingAdmin || (requestingAdmin.role !== 'super_admin' && requestingAdmin.id !== id)) {
                 return res.status(403).json({ success: false, message: 'Insufficient permissions' });
             }
@@ -347,9 +329,6 @@ class AdminAuthController {
             return res.status(500).json({ success: false, message: 'Internal server error' });
         }
     }
-
-    // Super admin: get all assigned pages for all admins
-
     async getAllAssignedTabs(req, res) {
         try {
             const requestingAdmin = req.admin;
@@ -357,7 +336,6 @@ class AdminAuthController {
                 return res.status(403).json({ success: false, message: 'Only super admin can view assigned tabs.' });
             }
             const admins = await Admin.find({ role: 'admin' }, 'email name allowedTabs');
-            // Flatten all assigned tabs
             const assignedTabs = admins.reduce((acc, admin) => {
                 (admin.allowedTabs || []).forEach(tab => {
                     if (!acc.includes(tab)) acc.push(tab);

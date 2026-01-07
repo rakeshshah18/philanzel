@@ -34,7 +34,6 @@ const homePageSchema = new mongoose.Schema({
             required: true,
             trim: true
         },
-        // File upload properties
         originalName: {
             type: String,
             required: false

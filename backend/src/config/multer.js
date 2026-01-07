@@ -6,17 +6,13 @@ const storage = multer.diskStorage({
         cb(null, './src/career/documents');
     },
     filename: (req, file, cb) => {
-        // Create unique filename to prevent conflicts
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const fileName = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
         console.log(`File uploaded: ${fileName} (Original: ${file.originalname})`);
         cb(null, fileName);
     },
 });
-
-// File filter to allow only specific file types
 const fileFilter = (req, file, cb) => {
-    // Allow only PDF, DOC, DOCX files
     const allowedTypes = /pdf|doc|docx/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype) || 
@@ -35,7 +31,7 @@ const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB file size limit
+        fileSize: 5 * 1024 * 1024, // 5MB
     },
     onError: (err, next) => {
         console.log('Multer error:', err);

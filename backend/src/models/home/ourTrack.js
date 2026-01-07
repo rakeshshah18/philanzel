@@ -22,11 +22,10 @@ const ourTrackSchema = new mongoose.Schema({
         min: [0, 'Happy customers cannot be negative']
     }
 }, {
-    timestamps: true, // Adds createdAt and updatedAt
-    collection: 'ourtracks' // Explicit collection name
+    timestamps: true,
+    collection: 'ourtracks' 
 });
 
-// Add a method to format the data
 ourTrackSchema.methods.toFormattedJSON = function() {
     return {
         id: this._id,

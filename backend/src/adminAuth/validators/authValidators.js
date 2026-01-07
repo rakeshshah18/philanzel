@@ -1,6 +1,5 @@
 import { body } from 'express-validator';
 
-// Registration validation
 const validateRegister = [
     body('name')
         .trim()
@@ -38,7 +37,6 @@ const validateLogin = [
         .withMessage('Password is required')
 ];
 
-// Profile update validation
 const validateProfileUpdate = [
     body('name')
         .optional()
@@ -54,8 +52,6 @@ const validateProfileUpdate = [
         .normalizeEmail()
         .withMessage('Please provide a valid email address')
 ];
-
-// Password change validation
 const validatePasswordChange = [
     body('currentPassword')
         .notEmpty()

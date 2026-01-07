@@ -18,7 +18,7 @@ const blogSchema = new mongoose.Schema(
             default: "Other",
         },
         readTime: {
-            type: Number, // in minutes
+            type: Number,
             required: false,
         },
         tags: {
@@ -40,8 +40,6 @@ const blogSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
-
-// Auto-generate slug from title
 blogSchema.pre("save", function (next) {
     if (this.isModified("title")) {
         this.slug = this.title

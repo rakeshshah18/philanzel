@@ -1,6 +1,5 @@
 import { body, validationResult } from 'express-validator';
 
-// Validation middleware for why choose us content
 export const validateWhyChooseUs = [
     body('heading')
         .trim()
@@ -68,7 +67,6 @@ export const validateWhyChooseUs = [
         .isInt({ min: 0 })
         .withMessage('Order must be a non-negative integer'),
 
-    // Custom validation middleware to check results
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -86,7 +84,6 @@ export const validateWhyChooseUs = [
     }
 ];
 
-// Validation for adding/updating points
 export const validatePoint = [
     body('icon')
         .trim()
@@ -114,7 +111,6 @@ export const validatePoint = [
         .isInt({ min: 0 })
         .withMessage('Order must be a non-negative integer'),
 
-    // Custom validation middleware to check results
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -132,7 +128,6 @@ export const validatePoint = [
     }
 ];
 
-// Validation for query parameters
 export const validateQuery = [
     body('page')
         .optional()
@@ -149,7 +144,6 @@ export const validateQuery = [
         .isIn(['true', 'false'])
         .withMessage('Active must be true or false'),
 
-    // Custom validation middleware to check results
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

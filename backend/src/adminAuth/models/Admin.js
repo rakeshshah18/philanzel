@@ -32,10 +32,9 @@ const adminSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    // Allowed sidebar tabs for this admin (set by super_admin)
     allowedTabs: {
         type: [String],
-        default: [], // empty array means no tabs allowed, undefined means all tabs allowed
+        default: [],
     },
     lastLogin: {
         type: Date
@@ -47,7 +46,6 @@ const adminSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Hash password before saving
 adminSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
 
@@ -60,12 +58,10 @@ adminSchema.pre('save', async function (next) {
     }
 });
 
-// Compare password method
 adminSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Generate JWT token
 adminSchema.methods.generateAccessToken = function () {
     const secret = process.env.JWT_ACCESS_SECRET;
     if (!secret) {
@@ -86,7 +82,6 @@ adminSchema.methods.generateAccessToken = function () {
     );
 };
 
-// Generate refresh token
 adminSchema.methods.generateRefreshToken = function () {
     const secret = process.env.JWT_REFRESH_SECRET;
     if (!secret) {
@@ -104,13 +99,11 @@ adminSchema.methods.generateRefreshToken = function () {
     );
 };
 
-// Update last login
 adminSchema.methods.updateLastLogin = function () {
     this.lastLogin = new Date();
     return this.save();
 };
 
-// Hide password in JSON output
 adminSchema.methods.toJSON = function () {
     const admin = this.toObject();
     delete admin.password;
@@ -120,7 +113,6 @@ adminSchema.methods.toJSON = function () {
 
 const AdminModel = mongoose.model('Admin', adminSchema);
 
-// Seed default super_admin if not exists
 async function seedSuperAdmin() {
     const defaultEmail = '21amtics464@gmail.com';
     const defaultPassword = 'Rakesh@125';

@@ -17,7 +17,6 @@ const commentSchema = new mongoose.Schema({
     parentComment: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment',
-        // default: null
     },
     replies: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -39,10 +38,7 @@ const commentSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Index for faster queries
 commentSchema.index({ blog: 1, parentComment: 1 });
-
-// Virtuals to get the count of likes and dislikes
 commentSchema.virtual('likes').get(function () {
     return this.likedBy.length;
 });

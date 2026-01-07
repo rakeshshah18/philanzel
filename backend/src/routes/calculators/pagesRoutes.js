@@ -11,8 +11,6 @@ import {
     editSectionInPage,
     deleteSectionFromPage
 } from '../../controllers/calculators/pageController.js';
-
-// Add a section to a calculator page by id
 router.post('/:id/add-section', addSectionToPage);
 
 // Edit a section in a calculator page's embedded sections array

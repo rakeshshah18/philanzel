@@ -11,8 +11,6 @@ import {
 import { validationResult } from 'express-validator';
 
 const router = express.Router();
-
-// Validation middleware
 const handleValidation = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -24,13 +22,9 @@ const handleValidation = (req, res, next) => {
     }
     next();
 };
-
-// Public routes - for frontend display
 router.get('/', ourFounderController.getAll);
-// router.get('/our-founder', ourFounderController.getAll);
 router.get('/:id', getOurFounderByIdValidation, handleValidation, ourFounderController.getById);
 
-// Protected routes - admin only
 router.post('/',
     verifyToken,
     requireAdmin,

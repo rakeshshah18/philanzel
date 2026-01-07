@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const footerSchema = new mongoose.Schema({
-    // About Us Section
     aboutUs: {
         description: {
             type: String,
@@ -27,7 +26,6 @@ const footerSchema = new mongoose.Schema({
         }
     },
 
-    // Quick Links Section
     quickLinks: {
         title: {
             type: String,
@@ -61,7 +59,6 @@ const footerSchema = new mongoose.Schema({
         }]
     },
 
-    // Our Services Section
     ourServices: {
         title: {
             type: String,
@@ -95,7 +92,6 @@ const footerSchema = new mongoose.Schema({
         }]
     },
 
-    // Calculators Section
     calculators: {
         title: {
             type: String,
@@ -135,7 +131,6 @@ const footerSchema = new mongoose.Schema({
         }]
     },
 
-    // Optimize Strategy Section
     optimizeStrategy: {
         title: {
             type: String,
@@ -197,7 +192,6 @@ const footerSchema = new mongoose.Schema({
         }
     },
 
-    // Contact Us Section
     contactUs: {
         title: {
             type: String,
@@ -299,7 +293,6 @@ const footerSchema = new mongoose.Schema({
         }
     },
 
-    // General Footer Settings
     isActive: {
         type: Boolean,
         default: true
@@ -321,7 +314,6 @@ const footerSchema = new mongoose.Schema({
         maxlength: [200, 'Copyright text cannot exceed 200 characters']
     },
 
-    // Legal Pages
     privacyPolicy: {
         title: {
             type: String,
@@ -377,56 +369,47 @@ const footerSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Add indexes for better query performance
 footerSchema.index({ isActive: 1 });
 footerSchema.index({ createdAt: -1 });
 
-// Virtual for formatted copyright text
 footerSchema.virtual('formattedCopyright').get(function () {
     const currentYear = new Date().getFullYear();
     return this.copyrightText.replace('{year}', currentYear);
 });
 
-// Static method to get active footer
 footerSchema.statics.getActiveFooter = function () {
     return this.findOne({ isActive: true });
 };
 
-// Method to get visible quick links
 footerSchema.methods.getVisibleQuickLinks = function () {
     return this.quickLinks.links
         .filter(link => link.isEnabled)
         .sort((a, b) => a.order - b.order);
 };
 
-// Method to get visible services
 footerSchema.methods.getVisibleServices = function () {
     return this.ourServices.services
         .filter(service => service.isEnabled)
         .sort((a, b) => a.order - b.order);
 };
 
-// Method to get visible calculators
 footerSchema.methods.getVisibleCalculators = function () {
     return this.calculators.calculatorList
         .filter(calculator => calculator.isEnabled)
         .sort((a, b) => a.order - b.order);
 };
 
-// Method to get visible social links
 footerSchema.methods.getVisibleSocialLinks = function () {
     return this.contactUs.followUs.socialLinks
         .filter(link => link.isEnabled)
         .sort((a, b) => a.order - b.order);
 };
 
-// Method to get full address string
 footerSchema.methods.getFullAddress = function () {
     const addr = this.contactUs.address;
     return `${addr.street}, ${addr.city}, ${addr.state} ${addr.zipCode}, ${addr.country}`;
 };
 
-// Method to get visible/active optimize strategies
 footerSchema.methods.getVisibleOptimizeStrategies = function () {
     return this.optimizeStrategy.strategies
         .filter(strategy => strategy.isVisible && strategy.isActive)
@@ -434,18 +417,15 @@ footerSchema.methods.getVisibleOptimizeStrategies = function () {
         .slice(0, this.optimizeStrategy.displayLimit);
 };
 
-// Method to get all optimize strategies for admin
 footerSchema.methods.getAllOptimizeStrategies = function () {
     return this.optimizeStrategy.strategies
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 };
 
-// Method to get active optimize strategy
 footerSchema.methods.getActiveOptimizeStrategy = function () {
     return this.optimizeStrategy.strategies.find(strategy => strategy.isActive);
 };
 
-// Method to search optimize strategies
 footerSchema.methods.searchOptimizeStrategies = function (query) {
     const regex = new RegExp(query, 'i');
     return this.optimizeStrategy.strategies

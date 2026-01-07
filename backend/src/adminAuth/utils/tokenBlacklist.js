@@ -1,4 +1,3 @@
-// Simple in-memory blacklist for demonstration. Use Redis or DB for production.
 const blacklistedTokens = new Set();
 
 export function blacklistToken(token) {
