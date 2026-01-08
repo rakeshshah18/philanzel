@@ -1,5 +1,5 @@
-"use client"
-import bodyParser from 'body-parser';
+// "use client"
+// import bodyParser from 'body-parser';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -10,7 +10,7 @@ import path from "path";
 import { fileURLToPath } from 'url';
 import connectDB from './src/db/index.js';
 import config from './src/config/config.js';
-dotenv.config({ quiet: true })
+// dotenv.config({ quiet: true })
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,12 +19,36 @@ dotenv.config()
 
 const app = express();
 
+// app.use(cors({
+//     origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'https://philanzelservices.com', 'https://www.philanzelservices.com'],
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }));
+
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
+    'http://localhost:3004',
+    'https://testingphilanzelservices.com',
+    'https://www.testingphilanzelservices.com',
+];
+
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004'],
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('CORS not allowed'));
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -56,9 +80,9 @@ connectDB().then(async () => {
     await seedSuperAdmin();
     await seedSidebarItems();
 });
-
-const server = app.listen(config.PORT, () => {
-    console.log(`Server bound to: 127.0.0.1:${config.PORT}`);
+const PORT = process.env.PORT || config.PORT || 8000;
+const server = app.listen(PORT, () => {
+    console.log(`Server bound to: 127.0.0.1:${PORT}`);
 });
 
 server.on('error', (err) => {
