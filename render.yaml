@@ -1,9 +1,11 @@
 services:
-  - type: web
-    name: philanzel-backend
-    env: node
+  - name: philanzel-backend
+    type: web_service
+    repo: https://github.com/rakeshshah18/philanzel
     branch: main
-    root: backend
+    rootDir: backend
+    runtime: node
+    env: node
     plan: free
     buildCommand: cd backend && npm ci
     startCommand: cd backend && npm start
