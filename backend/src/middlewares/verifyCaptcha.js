@@ -2,7 +2,7 @@ import axios from "axios";
 import config from "../config/config.js";
 
 const verifyCaptcha = async (req, res, next) => {
-    if (process.env.NODE_ENV === 'development' || req.body.recaptchaToken === 'dummy-token-for-development') {
+    if (process.env.NODE_ENV === 'production' || req.body.recaptchaToken === 'dummy-token-for-development') {
         console.log('reCAPTCHA verification bypassed for development');
         return next();
     }
@@ -24,7 +24,7 @@ const verifyCaptcha = async (req, res, next) => {
 
         const response = await axios.post(
             'https://www.google.com/recaptcha/api/siteverify',
-            formData,
+            formData.toString(),
             {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
