@@ -20,13 +20,15 @@
         "nodemon": "^3.1.10",
         "prettier": "^3.6.2"
     },
+    "engines": {
+        "node": "18.x"
+    },
     "keywords": [
         "philanzel",
         "backend"
     ],
     "dependencies": {
         "axios": "^1.11.0",
-        "bcrypt": "^3.0.2",
         "bcryptjs": "^3.0.2",
         "body-parser": "^2.2.0",
         "cookie-parser": "^1.4.7",
