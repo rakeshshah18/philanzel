@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: philanzel-backend
+    env: node
+    branch: main
+    root: backend
+    plan: free
+    buildCommand: cd backend && npm ci
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
