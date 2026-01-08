@@ -7,7 +7,6 @@ This file contains a short checklist and recommended Render configuration to dep
 1. Ensure Render runs the build/start inside the `backend` directory (or set `Root Directory` to `backend`).
 2. Ensure Node engine is 18.x (or compatible with `package.json` `engines`).
 3. Use the following Build and Start commands (either as the service commands or combined with `cd`):
-
    - Build Command (recommended):
      ```bash
      cd backend && npm ci
@@ -18,7 +17,6 @@ This file contains a short checklist and recommended Render configuration to dep
      ```
 
    Alternatively, if you want to build the frontend during Render build:
-
    - Build (monorepo style):
      ```bash
      cd backend && npm ci && npm run build:frontend
