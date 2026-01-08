@@ -8,6 +8,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "nodemon index.js",
+        "prestart": "node ./scripts/check_express.cjs",
         "start": "node index.js",
         "build": "npm run build:frontend",
         "build:frontend": "cd frontend && npm run build",
