@@ -8,7 +8,7 @@ const AddSectionToServiceModal = ({ serviceId, show, onClose, onSectionAdded }) 
         if (show) fetchSections();
     }, [show]);
     const API_BASE = process.env.NODE_ENV === 'production'
-        ? 'https://philanzel-backend.vercel.app/api'
+        ? 'https://philanzel-backend.onrender.com/api'
         : 'http://localhost:8000/api';
     const fetchSections = async () => {
         try {

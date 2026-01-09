@@ -10,7 +10,7 @@ const getImageUrl = (imageUrl) => {
         return imageUrl;
     }
     const baseUrl = process.env.NODE_ENV === 'production'
-        ? 'https://philanzel-backend.vercel.app'
+        ? 'https://philanzel-backend.onrender.com/'
         : 'http://localhost:8000';
     if (imageUrl.startsWith('/uploads/')) {
         return `${baseUrl}${imageUrl}`;
@@ -1188,7 +1188,7 @@ const AboutUs = () => {
                                                             src={(() => {
                                                                 const url = typeof item.image === 'string' ? item.image : item.image.url;
                                                                 return url && url.startsWith('/uploads/images/')
-                                                                    ? `${process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000'}${url}`
+                                                                    ? `${process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.onrender.com' : 'http://localhost:8000'}${url}`
                                                                     : `${window.location.origin}${url}`;
                                                             })()}
                                                             alt={item.heading}

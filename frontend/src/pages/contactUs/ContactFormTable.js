@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import axios from 'axios';
 const API_URL = process.env.NODE_ENV === 'production'
-    ? 'https://philanzel-backend.vercel.app/api/contact-us/forms'
+    ? 'https://philanzel-backend.onrender.com/api/contact-us/forms'
     : 'http://localhost:8000/api/contact-us/forms';
 const ContactFormTable = () => {
     const [currentPage, setCurrentPage] = useState(1);

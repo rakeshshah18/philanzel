@@ -10,7 +10,7 @@ const getImageUrl = (imageUrl) => {
         return imageUrl;
     }
     const baseUrl = process.env.NODE_ENV === 'production'
-        ? 'https://philanzel-backend.vercel.app'
+        ? 'https://philanzel-backend.onrender.com'
         : 'http://localhost:8000';
     if (imageUrl.startsWith('/uploads/')) {
         return `${baseUrl}${imageUrl}`;

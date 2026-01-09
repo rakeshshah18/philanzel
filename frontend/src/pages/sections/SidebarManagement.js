@@ -45,7 +45,7 @@ const SidebarManagement = () => {
             console.error('Error fetching sidebar items:', error);
             let errorMessage = 'Failed to fetch sidebar items';
             if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
-                errorMessage = 'Cannot connect to server. Please make sure the backend is running on http://localhost:8000';
+                errorMessage = 'Cannot connect to server. Please make sure the backend is running on https://philanzel-backend.onrender.com';
             } else if (error.response?.status === 404) {
                 errorMessage = 'Sidebar API endpoint not found. Please check if backend routes are properly configured.';
             } else if (error.response?.status === 401) {

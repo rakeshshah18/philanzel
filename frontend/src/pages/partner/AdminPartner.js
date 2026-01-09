@@ -338,7 +338,7 @@ function AdminPartner() {
                                                         {partnerImages.map((img) => (
                                                             <div key={img._id} className="position-relative dashboard-card p-2 d-flex align-items-center justify-content-center" style={{ minWidth: '120px', minHeight: '120px', background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #bae6fd' }}>
                                                                 <img
-                                                                    src={img.url?.startsWith('http') ? img.url : `${process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000'}${img.url}`}
+                                                                    src={img.url?.startsWith('http') ? img.url : `${process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.onrender.com' : 'http://localhost:8000'}${img.url}`}
                                                                     alt={img.alt || 'Association'}
                                                                     style={{ width: '90px', height: '90px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #ddd' }}
                                                                 />

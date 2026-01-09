@@ -43,7 +43,7 @@ const ServicePage = () => {
         if (editingSectionIdx === null) return;
         try {
             const token = localStorage.getItem('adminToken');
-            const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
+            const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.onrender.com/api' : 'http://localhost:8000/api';
             await axios.put(`${API_BASE}/services/${service._id}/sections/${editingSectionIdx}`, editingSectionData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -68,7 +68,7 @@ const ServicePage = () => {
         if (!window.confirm('Are you sure you want to delete this section?')) return;
         try {
             const token = localStorage.getItem('adminToken');
-            const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
+            const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.onrender.com/api' : 'http://localhost:8000/api';
             await axios.delete(`${API_BASE}/services/${service._id}/sections/${idx}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -82,7 +82,7 @@ const ServicePage = () => {
     };
     useEffect(() => {
         if (showAddSectionModal) {
-            const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
+            const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.onrender.com/api' : 'http://localhost:8000/api';
             axios.get(`${API_BASE}/sections`)
                 .then(res => setAvailableSections(res.data.data || []))
                 .catch(() => setAvailableSections([]));
@@ -344,7 +344,7 @@ const ServicePage = () => {
                                                 const headers = {
                                                     Authorization: `Bearer ${token}`,
                                                 };
-                                                const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app/api' : 'http://localhost:8000/api';
+                                                const API_BASE = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.onrender.com/api' : 'http://localhost:8000/api';
                                                 await axios.post(`${API_BASE}/services/${service._id}/sections`, { sectionId: selectedSectionId }, {
                                                     headers,
                                                 });

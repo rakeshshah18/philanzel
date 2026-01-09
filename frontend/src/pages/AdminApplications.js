@@ -36,7 +36,7 @@ const AdminApplications = () => {
             return;
         }
         const baseURL = process.env.NODE_ENV === 'production'
-            ? 'https://philanzel-backend.vercel.app'
+            ? 'https://philanzel-backend.onrender.com'
             : 'http://localhost:8000';
         const downloadUrl = `${baseURL}/uploads/${resume.filename}`;
         const link = document.createElement('a');

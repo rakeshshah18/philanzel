@@ -41,7 +41,7 @@ const ServicesSections = () => {
     const handleEditModalSave = async () => {
         if (!editingSection || !editingSection._id) return;
         try {
-            const res = await fetch(`http://localhost:8000/api/sections/${editingSection._id}`, {
+            const res = await fetch(`https://philanzel-backend.onrender.com/api/sections/${editingSection._id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ const ServicesSections = () => {
         setCreateLoading(true);
         setCreateError('');
         try {
-            const res = await fetch('http://localhost:8000/api/sections', {
+            const res = await fetch('https://philanzel-backend.onrender.com/api/sections', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newSection)
@@ -116,7 +116,7 @@ const ServicesSections = () => {
     }, []);
     const fetchSections = async () => {
         try {
-            const res = await fetch('http://localhost:8000/api/sections');
+            const res = await fetch('https://philanzel-backend.onrender.com/api/sections');
             const data = await res.json();
             // Deduplicate by _id
             const uniqueSections = [];

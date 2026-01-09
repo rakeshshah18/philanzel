@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Alert from '../../components/Alert';
 import api from '../../services/api';
 const getImageURL = (filename) => {
-    const baseURL = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.vercel.app' : 'http://localhost:8000';
+    const baseURL = process.env.NODE_ENV === 'production' ? 'https://philanzel-backend.onrender.com' : 'http://localhost:8000';
     return `${baseURL}/uploads/images/${filename}`;
 };
 const PublicCareer = () => {

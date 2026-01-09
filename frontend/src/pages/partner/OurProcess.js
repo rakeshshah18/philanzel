@@ -132,7 +132,7 @@ const OurProcess = () => {
                                     <ul className="mb-3">
                                         {proc.steps.map((step, idx) => (
                                             <li key={idx} className="mb-2 d-flex align-items-center">
-                                                {step.icon && <img src={step.icon.startsWith('/uploads/images/') ? `http://localhost:8000${step.icon}` : step.icon} alt="icon" style={{ width: 32, height: 32, marginRight: 8, borderRadius: 6, border: '1px solid #ddd' }} />}
+                                                {step.icon && <img src={step.icon.startsWith('/uploads/images/') ? `https://philanzel-backend.onrender.com${step.icon}` : step.icon} alt="icon" style={{ width: 32, height: 32, marginRight: 8, borderRadius: 6, border: '1px solid #ddd' }} />}
                                                 <div>
                                                     <b>{step.name}</b>: <span className="fw-semibold">{step.heading}</span> - {step.description}
                                                 </div>

@@ -116,7 +116,7 @@ const EmpoweringIndividual = () => {
     const getImageSrc = (img) => {
         if (!img) return '';
         return img.startsWith('/uploads/empowering-individuals/')
-            ? `http://localhost:8000${img}`
+            ? `https://philanzel-backend.onrender.com${img}`
             : img;
     };
     return (

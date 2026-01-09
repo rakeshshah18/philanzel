@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Button, Form } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const API_BASE = process.env.REACT_APP_API_URL || 'https://philanzel-backend.onrender.com/api';
 export default function PartnerFAQs() {
     const [faqs, setFaqs] = useState([]);
     const [loading, setLoading] = useState(true);

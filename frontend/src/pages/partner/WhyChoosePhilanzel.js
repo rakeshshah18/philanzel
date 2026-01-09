@@ -98,7 +98,7 @@ const WhyChoosePhilanzel = () => {
                                     <div className="dashboard-card h-100" style={{ borderRadius: 14, background: '#e0f2fe', border: 'none', boxShadow: '0 2px 8px #bae6fd' }}>
                                         {item.image && (
                                             <img
-                                                src={`http://localhost:8000/uploads/images/${item.image}`}
+                                                src={`https://philanzel-backend.onrender.com/uploads/images/${item.image}`}
                                                 alt={item.heading}
                                                 className="card-img-top"
                                                 style={{ width: '100%', height: 'auto', objectFit: 'contain', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}

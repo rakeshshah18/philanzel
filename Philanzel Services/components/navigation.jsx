@@ -12,7 +12,7 @@ export default function Navigation({ loggedIn, user, onLogout }) {
   const [services, setServices] = useState([])
   const [calculators, setCalculators] = useState([])
 
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://philanzel-backend.onrender.com"
 
   useEffect(() => {
     const fetchServices = async () => {

@@ -432,7 +432,7 @@ const Ads = () => {
                                                             <img
                                                                 src={
                                                                     (adsSection.imageUrl && adsSection.imageUrl.startsWith('/uploads')
-                                                                        ? `http://localhost:8000${adsSection.imageUrl}`
+                                                                        ? `https://philanzel-backend.onrender.com${adsSection.imageUrl}`
                                                                         : adsSection.imageUrl) ||
                                                                     adsSection.image ||
                                                                     adsSection.link

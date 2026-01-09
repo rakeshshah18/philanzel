@@ -173,7 +173,7 @@ const PotentialGrowth = () => {
                                         <div className="dashboard-card-header px-3 py-2 d-flex align-items-center justify-content-between" style={{ background: '#0ea5e9', color: '#fff', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
                                             <div className="d-flex align-items-center">
                                                 {sol.icon && sol.icon.startsWith('/uploads') ? (
-                                                    <img src={process.env.NODE_ENV === 'production' ? sol.icon : `http://localhost:8000${sol.icon}`} alt="icon" style={{ maxWidth: '32px', maxHeight: '32px', marginRight: '8px', borderRadius: 6, border: '1px solid #ddd' }} />
+                                                    <img src={process.env.NODE_ENV === 'production' ? sol.icon : `https://philanzel-backend.onrender.com${sol.icon}`} alt="icon" style={{ maxWidth: '32px', maxHeight: '32px', marginRight: '8px', borderRadius: 6, border: '1px solid #ddd' }} />
                                                 ) : (
                                                     <span className="me-2" style={{ fontSize: '2rem' }}><i className="fas fa-lightbulb"></i></span>
                                                 )}
@@ -207,7 +207,7 @@ const PotentialGrowth = () => {
                                                 <ReactQuill theme="snow" value={solutionForm.description} onChange={value => setSolutionForm({ ...solutionForm, description: value })} className="mb-2" />
                                                 <input type="file" name="icon" accept="image/*" className="form-control mb-2" onChange={handleSolutionChange} required />
                                                 {solutionForm.icon && (
-                                                    <img src={solutionForm.icon.startsWith('/uploads') ? (process.env.NODE_ENV === 'production' ? solutionForm.icon : `http://localhost:8000${solutionForm.icon}`) : solutionForm.icon} alt="icon preview" style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '8px' }} />
+                                                    <img src={solutionForm.icon.startsWith('/uploads') ? (process.env.NODE_ENV === 'production' ? solutionForm.icon : `https://philanzel-backend.onrender.com${solutionForm.icon}`) : solutionForm.icon} alt="icon preview" style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '8px' }} />
                                                 )}
                                                 <button type="submit" className="btn btn-primary btn-sm me-2">Save</button>
                                                 <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setEditSolutionIdx(null); setSolutionForm({ heading: '', description: '', icon: '' }); }}>Cancel</button>
@@ -225,7 +225,7 @@ const PotentialGrowth = () => {
                         <ReactQuill theme="snow" value={solutionForm.description} onChange={value => setSolutionForm({ ...solutionForm, description: value })} className="mb-2" />
                         <input type="file" name="icon" accept="image/*" className="form-control mb-2" onChange={handleSolutionChange} required />
                         {solutionForm.icon && (
-                            <img src={solutionForm.icon.startsWith('/uploads') ? (process.env.NODE_ENV === 'production' ? solutionForm.icon : `http://localhost:8000${solutionForm.icon}`) : solutionForm.icon} alt="icon preview" style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '8px' }} />
+                            <img src={solutionForm.icon.startsWith('/uploads') ? (process.env.NODE_ENV === 'production' ? solutionForm.icon : `https://philanzel-backend.onrender.com${solutionForm.icon}`) : solutionForm.icon} alt="icon preview" style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '8px' }} />
                         )}
                         <button type="submit" className="btn btn-primary me-2">Add Solution</button>
                         <button type="button" className="btn btn-secondary" onClick={() => setShowSolutionForm(false)}>Cancel</button>

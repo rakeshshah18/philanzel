@@ -29,7 +29,7 @@ export const homePageAPI = {
 };
 const API = axios.create({
     baseURL: process.env.NODE_ENV === 'production'
-        ? 'https://philanzel-54pd.vercel.app/api'
+        ? 'https://philanzel-backend.onrender.com/api'
         : 'http://localhost:8000/api',
     timeout: 10000,
     headers: {
