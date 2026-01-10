@@ -19,6 +19,28 @@ dotenv.config()
 
 const app = express();
 
+// Ensure upload directories exist so Multer can write files.
+import fs from 'fs';
+const ensureUploadDirs = () => {
+    try {
+        const dirs = [
+            path.join(process.cwd(), 'uploads'),
+            path.join(process.cwd(), 'uploads', 'events'),
+            path.join(__dirname, 'src', 'uploads', 'images'),
+            path.join(process.cwd(), 'uploads', 'empowering-individuals'),
+        ];
+        dirs.forEach(d => {
+            if (!fs.existsSync(d)) {
+                fs.mkdirSync(d, { recursive: true });
+                console.log('Created upload dir:', d);
+            }
+        });
+    } catch (e) {
+        console.error('Failed to ensure upload directories:', e);
+    }
+};
+ensureUploadDirs();
+
 
 const allowedOrigins = [
     'http://localhost:3000',
@@ -66,6 +88,18 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api', routes);
+
+// Simple error handler to log errors and return JSON responses for API endpoints
+// This helps surface Multer/route errors as JSON instead of generic HTML pages.
+app.use((err, req, res, next) => {
+    console.error('Unhandled error:', err && (err.stack || err));
+    if (req.path && req.path.startsWith('/api')) {
+        const message = err?.message || 'Internal server error';
+        return res.status(500).json({ success: false, message });
+    }
+    // Fallback: let default handler handle non-API routes
+    next(err);
+});
 
 import { seedSuperAdmin } from './src/adminAuth/models/Admin.js';
 import { seedSidebarItems } from './src/utils/seedSidebar.js';

@@ -12,17 +12,21 @@ const Events = () => {
     useEffect(() => {
         fetchImages();
     }, []);
-    // Build image src that works in dev (proxy) and production (explicit backend URL).
+    // Configure API base: prefer env var, otherwise fall back to deployed backend so images/requests resolve.
+    const API_BASE = process.env.REACT_APP_API_BASE || 'https://philanzel-backend.onrender.com';
+    const api = axios.create({ baseURL: API_BASE });
+
+    // Build image src that works in dev (proxy), production (explicit backend URL), or when env var is missing.
     const getImageSrc = (url) => {
         if (!url) return '';
-        if (url.startsWith('http')) return url;
-        // If REACT_APP_API_BASE is set (production), prefix it so images load from backend origin.
-        const base = process.env.REACT_APP_API_BASE || '';
-        return base ? `${base}${url}` : url;
+        if (url.startsWith('http') || url.startsWith('//')) return url;
+        // Ensure leading slash
+        const normalized = url.startsWith('/') ? url : `/${url}`;
+        return `${API_BASE}${normalized}`;
     };
     const fetchImages = async () => {
         try {
-            const res = await axios.get('/api/event-images');
+            const res = await api.get('/api/event-images');
             setImages(res.data.data || []);
         } catch {
             setImages([]);
@@ -38,12 +42,14 @@ const Events = () => {
             formData.append('images', files[i]);
         }
         try {
-            await axios.post('/api/event-images/upload', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            // Do NOT set Content-Type header explicitly for multipart/form-data;
+            // letting the browser set it ensures the correct boundary is included.
+            await api.post('/api/event-images/upload', formData);
             fetchImages();
         } catch (err) {
-            setUploadError('Failed to upload images');
+            console.error('Upload error', err?.response || err);
+            const msg = err?.response?.data?.message || err?.message || 'Failed to upload images';
+            setUploadError(msg);
         }
         setUploading(false);
     };
@@ -136,7 +142,7 @@ const Events = () => {
                                 {admin && (
                                     <button type="button" className="btn btn-danger" style={{ borderRadius: '25px' }}
                                         onClick={async () => {
-                                            await axios.delete(`/api/event-images/${selectedImage._id}`);
+                                            await api.delete(`/api/event-images/${selectedImage._id}`);
                                             setShowPhotoModal(false); setSelectedImage(null); fetchImages();
                                         }}
                                     >
