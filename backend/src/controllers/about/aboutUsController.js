@@ -16,18 +16,22 @@ const createAboutUs = async (req, res) => {
         // Validate required fields
         const { heading, description, button, image } = req.body;
 
-        if (!heading || !description || !image) {
+        // Require heading and description. Image may be provided either as a file (req.file)
+        // or as an `image` object in the body. Accept either, but ensure we have an
+        // altText (from image.altText or req.body.altText) where possible.
+        if (!heading || !description) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Heading, description, and image alt text are required'
+                message: 'Heading and description are required'
             });
         }
 
-        // Validate image alt text
-        if (!image.altText) {
+        // If neither an uploaded file nor an image object/altText is provided, reject.
+        const providedAlt = image?.altText || req.body?.altText;
+        if (!req.file && !image && !providedAlt) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Image alt text is required for accessibility'
+                message: 'Image (file or image data) or alt text is required'
             });
         }
 
@@ -36,15 +40,18 @@ const createAboutUs = async (req, res) => {
             altText: image.altText
         };
 
-        // Add file information if uploaded
+        // Add file information if uploaded. Use an env-configured server base when
+        // available (recommended for production) so stored URLs point to the deployed
+        // backend instead of localhost. Fallback to relative path for compatibility.
         if (req.file) {
             imageData.originalName = req.file.originalname;
             imageData.filename = req.file.filename;
             imageData.path = req.file.path;
             imageData.size = req.file.size;
             imageData.mimetype = req.file.mimetype;
-            imageData.url = `/uploads/images/${req.file.filename}`;
-        } else if (image.url) {
+            const serverBase = process.env.SERVER_BASE_URL || process.env.BACKEND_URL || '';
+            imageData.url = serverBase ? `${serverBase}/uploads/images/${req.file.filename}` : `/uploads/images/${req.file.filename}`;
+        } else if (image?.url) {
             imageData.url = image.url;
         }
 
@@ -253,11 +260,11 @@ const updateAboutUs = async (req, res) => {
             };
         }
 
-        // Update image if provided
-        if (image) {
+        // Update image if provided either as an `image` object or as an uploaded file
+        if (image || req.file) {
             updateData.image = {
                 ...existingAboutUs.image,
-                altText: image.altText || existingAboutUs.image.altText
+                altText: image?.altText || req.body?.altText || existingAboutUs.image?.altText || ''
             };
 
             // Add new file information if uploaded
@@ -267,8 +274,9 @@ const updateAboutUs = async (req, res) => {
                 updateData.image.path = req.file.path;
                 updateData.image.size = req.file.size;
                 updateData.image.mimetype = req.file.mimetype;
-                updateData.image.url = `/uploads/images/${req.file.filename}`;
-            } else if (image.url) {
+                const serverBase = process.env.SERVER_BASE_URL || process.env.BACKEND_URL || '';
+                updateData.image.url = serverBase ? `${serverBase}/uploads/images/${req.file.filename}` : `/uploads/images/${req.file.filename}`;
+            } else if (image?.url) {
                 updateData.image.url = image.url;
             }
         }
