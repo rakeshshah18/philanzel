@@ -50,7 +50,10 @@ const createHomePage = async (req, res) => {
             imageData.path = req.file.path;
             imageData.size = req.file.size;
             imageData.mimetype = req.file.mimetype;
-            imageData.url = `${req.protocol}://${req.get('host')}/uploads/images/${req.file.filename}`;
+            // Prefer an explicit server URL from environment (set this in Render/production).
+            // Fallback to the request host when the env var isn't provided (keeps local dev working).
+            const serverBase = process.env.SERVER_BASE_URL || process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+            imageData.url = `${serverBase}/uploads/images/${req.file.filename}`;
         } else if (image.url) {
             imageData.url = image.url;
         } else {
@@ -237,7 +240,9 @@ const updateHomePage = async (req, res) => {
                 imageData.path = req.file.path;
                 imageData.size = req.file.size;
                 imageData.mimetype = req.file.mimetype;
-                imageData.url = `${req.protocol}://${req.get('host')}/uploads/images/${req.file.filename}`;
+                // Use env-configured server base when available (recommended for production).
+                const serverBase = 'https://philanzel-backend.onrender.com' || process.env.SERVER_BASE_URL || process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+                imageData.url = `${serverBase}/uploads/images/${req.file.filename}`;
             } else {
                 // Keep existing file data if no new file uploaded
                 imageData.originalName = existingHomePage.image?.originalName;
