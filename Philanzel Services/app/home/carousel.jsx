@@ -8,7 +8,7 @@ export default function Carousel() {
     const [animating, setAnimating] = useState(false);
     const prevIdx = useRef(0);
     const total = carouselData.length;
-    const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://philanzel-backend.onrender.com';
     useEffect(() => {
         async function fetchData() {
             try {

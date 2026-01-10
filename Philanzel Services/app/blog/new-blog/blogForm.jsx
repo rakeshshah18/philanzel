@@ -37,7 +37,7 @@ export default function BlogForm() {
 
         try {
             setLoading(true)
-            const res = await fetch("http://localhost:8000/api/blog/user", {
+            const res = await fetch("https://philanzel-backend.onrender.com/api/blog/user", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

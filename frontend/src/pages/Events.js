@@ -12,9 +12,17 @@ const Events = () => {
     useEffect(() => {
         fetchImages();
     }, []);
+    // Build image src that works in dev (proxy) and production (explicit backend URL).
+    const getImageSrc = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http')) return url;
+        // If REACT_APP_API_BASE is set (production), prefix it so images load from backend origin.
+        const base = process.env.REACT_APP_API_BASE || '';
+        return base ? `${base}${url}` : url;
+    };
     const fetchImages = async () => {
         try {
-            const res = await axios.get('api/event-images');
+            const res = await axios.get('/api/event-images');
             setImages(res.data.data || []);
         } catch {
             setImages([]);
@@ -30,7 +38,7 @@ const Events = () => {
             formData.append('images', files[i]);
         }
         try {
-            await axios.post('api/event-images/upload', formData, {
+            await axios.post('/api/event-images/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             fetchImages();
@@ -102,7 +110,7 @@ const Events = () => {
                             onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; }}
                             onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
                         >
-                            <img src={img.imageUrl} alt="Event" style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+                            <img src={getImageSrc(img.imageUrl)} alt="Event" style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
                         </div>
                     </div>
                 ))}
@@ -119,7 +127,7 @@ const Events = () => {
                                 <button type="button" className="btn-close" onClick={() => { setShowPhotoModal(false); setSelectedImage(null); }}></button>
                             </div>
                             <div className="modal-body p-4 text-center">
-                                <img src={selectedImage.imageUrl} alt="Event" style={{ maxWidth: '100%', maxHeight: '60vh', borderRadius: '12px' }} />
+                                <img src={getImageSrc(selectedImage.imageUrl)} alt="Event" style={{ maxWidth: '100%', maxHeight: '60vh', borderRadius: '12px' }} />
                             </div>
                             <div className="modal-footer border-0 pt-0">
                                 <button type="button" className="btn btn-secondary" onClick={() => { setShowPhotoModal(false); setSelectedImage(null); }} style={{ borderRadius: '25px' }}>

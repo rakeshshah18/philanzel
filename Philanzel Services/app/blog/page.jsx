@@ -8,7 +8,7 @@ import CtaSection from "../home/cta-section"
 import Footer from "../home/footer"
 
 async function fetchBlogs() {
-  const res = await fetch("http://localhost:8000/api/blog/public", {
+  const res = await fetch("https://philanzel-backend.onrender.com/api/blog/public", {
     cache: "no-store",
   })
 

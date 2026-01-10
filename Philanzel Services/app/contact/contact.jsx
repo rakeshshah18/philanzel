@@ -30,7 +30,7 @@ export default function ContactSection() {
     const recaptchaRef = useRef(null)
 
     // Define the backend base URL
-    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://philanzel-backend.onrender.com"
 
     // Function to fetch services (separated for reusability)
     const fetchServices = async () => {
@@ -40,7 +40,7 @@ export default function ContactSection() {
             
             console.log('Fetching services from API...')
             
-            const response = await fetch('http://localhost:8000/api/services/public', {
+            const response = await fetch('https://philanzel-backend.onrender.com/api/services/public', {
                 method: 'GET',
                 cache: 'no-store'
             })

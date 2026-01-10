@@ -9,7 +9,7 @@ import CommentSection from "../CommentSection.jsx"
 import CtaSection from "@/app/home/cta-section"
 import Footer from "@/app/home/footer"
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://philanzel-backend.onrender.com";
 
 async function fetchBlogData(slug) {
   try {

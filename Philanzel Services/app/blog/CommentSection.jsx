@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ThumbsUp, ThumbsDown, MessageSquare, Send } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://philanzel-backend.onrender.com";
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
 // Helper to get or create a unique user ID from localStorage

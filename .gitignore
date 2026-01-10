@@ -8,5 +8,5 @@
 /.vscode
 README.md
 /API_DOCUMENTATION.md
-/src/uploads
+/backend/uploads
 /node_modules
