@@ -63,7 +63,7 @@ export const createWhyChooseUs = async (req, res) => {
         if (req.file) {
             imageData = {
                 url: `/uploads/images/${req.file.filename}`,
-                altText: heading || 'Why Choose Us Image'
+                altText: 'Why Choose Us Image'
             };
             console.log('Image uploaded:', req.file.filename);
         } else {
