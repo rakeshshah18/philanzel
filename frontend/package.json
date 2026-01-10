@@ -43,5 +43,5 @@
             "last 1 safari version"
         ]
     },
-    "proxy": "https://philanzel-backend.onrender.com"
+    "proxy": "http://localhost:8000"
 }

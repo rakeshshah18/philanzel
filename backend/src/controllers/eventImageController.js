@@ -29,10 +29,7 @@ const eventImageController = {
             }));
             res.json({ success: true, data: images });
         } catch (err) {
-            // Log full error for debugging (remove or reduce verbosity in production)
-            console.error('Error in uploadMultipleEventImages:', err);
-            const msg = err?.message || 'Failed to upload images';
-            res.status(500).json({ success: false, message: msg });
+            res.status(500).json({ success: false, message: 'Failed to upload images' });
         }
     },
 
