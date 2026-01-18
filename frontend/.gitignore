@@ -1,13 +1,13 @@
-# /backend/node_modules
-/dist
-# /backend/.env
-/API_TEST_GUIDE.md
+/next
 /build
-frontend/node_modules
-/.env.example
-/.vscode
-README.md
-/API_DOCUMENTATION.md
-/src/uploads
-# /node_modules
-# /philanzel/node_modules
+.env.local
+.env.*.local
+.env
+.next/
+out/
+
+# Dependency directories
+node_modules/
+
+# Optional: Mac/Linux dotfiles
+.DS_Store

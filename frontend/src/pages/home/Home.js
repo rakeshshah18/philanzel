@@ -9,9 +9,7 @@ const getImageUrl = (imageUrl) => {
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
         return imageUrl;
     }
-    const baseUrl = process.env.NODE_ENV === 'production'
-        ? 'https://philanzel-backend.onrender.com'
-        : 'http://localhost:8000';
+    const baseUrl = 'https://philanzel-backend.onrender.com';
     if (imageUrl.startsWith('/uploads/')) {
         return `${baseUrl}${imageUrl}`;
     }
