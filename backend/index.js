@@ -20,15 +20,14 @@ dotenv.config()
 const app = express();
 
 
-const allowedOrigins = [
-    config.CORS_ORIGIN
-];
+const allowedOrigins = config.CORS_ORIGIN ? config.CORS_ORIGIN.split(',') : [];
 
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            console.log('Origin not allowed:', origin); // Added logging for debugging
             callback(new Error('CORS not allowed'));
         }
     },
