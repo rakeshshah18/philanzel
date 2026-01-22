@@ -23,18 +23,26 @@ const app = express();
 const allowedOrigins = config.CORS_ORIGIN ? config.CORS_ORIGIN.split(',') : [];
 
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true); // allow server-to-server
+
+        const allowedOrigins = config.CORS_ORIGIN
+            ? config.CORS_ORIGIN.split(',').map(o => o.trim())
+            : [];
+
+        if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            console.log('Origin not allowed:', origin); // Added logging for debugging
-            callback(new Error('CORS not allowed'));
+            callback(null, false); // ❗ DO NOT throw error
         }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+app.options('*', cors());
+
 
 app.use((req, res, next) => {
     res.set("Cache-Control", "no-store");
