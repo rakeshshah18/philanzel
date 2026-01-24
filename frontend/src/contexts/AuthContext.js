@@ -19,17 +19,25 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const checkAuthStatus = async () => {
-    try {
-        const response = await adminAuthAPI.getProfile();
-        setAdmin(response.data.data);
-        setIsAuthenticated(true);
-    } catch (error) {
-        setAdmin(null);
-        setIsAuthenticated(false);
-    } finally {
-        setLoading(false);
-    }
-};
+        try {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                setAdmin(null);
+                setIsAuthenticated(false);
+                setLoading(false);
+                return;
+            }
+            const response = await adminAuthAPI.getProfile();
+            setAdmin(response.data.data);
+            setIsAuthenticated(true);
+        } catch (error) {
+            localStorage.removeItem('adminToken');
+            setAdmin(null);
+            setIsAuthenticated(false);
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
     // const checkAuthStatus = async () => {
@@ -73,8 +81,8 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             const response = await adminAuthAPI.login({ email, password });
-            const { admin: adminData } = response.data.data;
-            // localStorage.setItem('adminToken', accessToken);
+            const { admin: adminData, accessToken } = response.data.data;
+            localStorage.setItem('adminToken', accessToken);
             setAdmin(adminData);
             setIsAuthenticated(true);
 
@@ -110,7 +118,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
-            // localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminToken');
             setAdmin(null);
             setIsAuthenticated(false);
         }
