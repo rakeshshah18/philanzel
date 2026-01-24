@@ -33,7 +33,11 @@ app.use(cors({
         if (allowedOrigins.includes(origin)) {
             callback(null, origin);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            if (process.env.NODE_ENV === 'production') {
+                callback(null, false);
+            } else {
+                callback(null, true);
+            }
         }
     },
     credentials: true,
@@ -55,8 +59,7 @@ app.options('*', cors({
         if (allowedOrigins.includes(origin)) {
             callback(null, origin);
         } else {
-            callback(new Error('Not allowed by CORS'));
-
+            callback(null, false);
         }
     },
     credentials: true,
