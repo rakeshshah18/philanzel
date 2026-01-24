@@ -54,10 +54,10 @@ const processQueue = (error, token = null) => {
 };
 API.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('adminToken');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
+        // const token = localStorage.getItem('adminToken');
+        // if (token) {
+        //     config.headers.Authorization = `Bearer ${token}`;
+        // }
         if (config.data instanceof FormData) {
             delete config.headers['Content-Type'];
         }
@@ -67,53 +67,61 @@ API.interceptors.request.use(
 );
 API.interceptors.response.use(
     response => response,
-    async error => {
-        const originalRequest = error.config;
-        if (error.response && error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            if (globalRefreshRetryCount >= MAX_GLOBAL_REFRESH_RETRIES) {
-                if (originalRequest && originalRequest.url && /\/admin\//.test(originalRequest.url)) {
-                    if (window.location.pathname !== '/login') {
-                        window.location.href = '/login';
-                    }
-                }
-                return Promise.reject(error);
+    // async error => {
+    //     const originalRequest = error.config;
+        // if (error.response && error.response.status === 401 && !originalRequest._retry) {
+        //     originalRequest._retry = true;
+        //     if (globalRefreshRetryCount >= MAX_GLOBAL_REFRESH_RETRIES) {
+        //         if (originalRequest && originalRequest.url && /\/admin\//.test(originalRequest.url)) {
+        //             if (window.location.pathname !== '/login') {
+        //                 window.location.href = '/login';
+        //             }
+        //         }
+        //         return Promise.reject(error);
+        //     }
+        //     globalRefreshRetryCount++;
+        //     if (!isRefreshing) {
+        //         isRefreshing = true;
+        //         try {
+        //             const { data } = await API.post('/admin/auth/refresh-token');
+        //             API.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+        //             localStorage.setItem('adminToken', data.accessToken);
+        //             processQueue(null, data.accessToken);
+        //             return API(originalRequest);
+        //         } catch (err) {
+        //             processQueue(err, null);
+        //             if (originalRequest && originalRequest.url && /\/admin\//.test(originalRequest.url)) {
+        //                 if (window.location.pathname !== '/login') {
+        //                     window.location.href = '/login';
+        //                 }
+        //             }
+        //             return Promise.reject(err);
+        //         } finally {
+        //             isRefreshing = false;
+        //         }
+        //     }
+        //     return new Promise(function (resolve, reject) {
+        //         failedQueue.push({ resolve, reject });
+        //     })
+        //         .then(token => {
+        //             originalRequest.headers['Authorization'] = 'Bearer ' + token;
+        //             return API(originalRequest);
+        //         })
+        //         .catch(err => {
+        //             if (window.location.pathname !== '/login') {
+        //                 window.location.href = '/login';
+        //             }
+        //             console.error('Auth failure after refresh attempt:', err);
+        //             return Promise.reject(err);
+        //         });
+        // }
+    //     return Promise.reject(error);
+    // }
+    error => {
+        if (error.response?.status === 401) {
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
             }
-            globalRefreshRetryCount++;
-            if (!isRefreshing) {
-                isRefreshing = true;
-                try {
-                    const { data } = await API.post('/admin/auth/refresh-token');
-                    API.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
-                    localStorage.setItem('adminToken', data.accessToken);
-                    processQueue(null, data.accessToken);
-                    return API(originalRequest);
-                } catch (err) {
-                    processQueue(err, null);
-                    if (originalRequest && originalRequest.url && /\/admin\//.test(originalRequest.url)) {
-                        if (window.location.pathname !== '/login') {
-                            window.location.href = '/login';
-                        }
-                    }
-                    return Promise.reject(err);
-                } finally {
-                    isRefreshing = false;
-                }
-            }
-            return new Promise(function (resolve, reject) {
-                failedQueue.push({ resolve, reject });
-            })
-                .then(token => {
-                    originalRequest.headers['Authorization'] = 'Bearer ' + token;
-                    return API(originalRequest);
-                })
-                .catch(err => {
-                    if (window.location.pathname !== '/login') {
-                        window.location.href = '/login';
-                    }
-                    console.error('Auth failure after refresh attempt:', err);
-                    return Promise.reject(err);
-                });
         }
         return Promise.reject(error);
     }

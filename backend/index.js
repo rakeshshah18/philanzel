@@ -31,7 +31,7 @@ app.use(cors({
             : [];
 
         if (allowedOrigins.includes(origin)) {
-            callback(null, true);
+            callback(null, origin);
         } else {
             callback(null, false); // ❗ DO NOT throw error
         }

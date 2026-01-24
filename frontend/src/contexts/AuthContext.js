@@ -17,49 +17,64 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         checkAuthStatus();
     }, []);
+
     const checkAuthStatus = async () => {
-        try {
-            let token = localStorage.getItem('adminToken');
-            const { isJwtExpired } = require('../utils/jwt');
-            if (!token || isJwtExpired(token)) {
-                try {
-                    const refreshResponse = await adminAuthAPI.refreshToken();
-                    const newAccessToken = refreshResponse.data.accessToken;
-                    if (newAccessToken) {
-                        localStorage.setItem('adminToken', newAccessToken);
-                        token = newAccessToken;
-                    } else {
-                        throw new Error('No access token returned from refresh');
-                    }
-                } catch (refreshError) {
-                    localStorage.removeItem('adminToken');
-                    setAdmin(null);
-                    setIsAuthenticated(false);
-                    setAlert({ show: true, message: 'Session expired. Please log in again.', type: 'warning' });
-                    setLoading(false);
-                    return;
-                }
-            }
-            const response = await adminAuthAPI.getProfile();
-            const adminData = response.data.data;
-            setAdmin(adminData);
-            setIsAuthenticated(true);
-        } catch (error) {
-            localStorage.removeItem('adminToken');
-            setAdmin(null);
-            setIsAuthenticated(false);
-            if (error?.response?.data?.message?.includes('jwt expired')) {
-                setAlert({ show: true, message: 'Session expired. Please log in again.', type: 'warning' });
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+    try {
+        const response = await adminAuthAPI.getProfile();
+        setAdmin(response.data.data);
+        setIsAuthenticated(true);
+    } catch (error) {
+        setAdmin(null);
+        setIsAuthenticated(false);
+    } finally {
+        setLoading(false);
+    }
+};
+
+
+    // const checkAuthStatus = async () => {
+    //     try {
+    //         let token = localStorage.getItem('adminToken');
+    //         const { isJwtExpired } = require('../utils/jwt');
+    //         if (!token || isJwtExpired(token)) {
+    //             try {
+    //                 const refreshResponse = await adminAuthAPI.refreshToken();
+    //                 const newAccessToken = refreshResponse.data.accessToken;
+    //                 if (newAccessToken) {
+    //                     localStorage.setItem('adminToken', newAccessToken);
+    //                     token = newAccessToken;
+    //                 } else {
+    //                     throw new Error('No access token returned from refresh');
+    //                 }
+    //             } catch (refreshError) {
+    //                 localStorage.removeItem('adminToken');
+    //                 setAdmin(null);
+    //                 setIsAuthenticated(false);
+    //                 setAlert({ show: true, message: 'Session expired. Please log in again.', type: 'warning' });
+    //                 setLoading(false);
+    //                 return;
+    //             }
+    //         }
+    //         const response = await adminAuthAPI.getProfile();
+    //         const adminData = response.data.data;
+    //         setAdmin(adminData);
+    //         setIsAuthenticated(true);
+    //     } catch (error) {
+    //         localStorage.removeItem('adminToken');
+    //         setAdmin(null);
+    //         setIsAuthenticated(false);
+    //         if (error?.response?.data?.message?.includes('jwt expired')) {
+    //             setAlert({ show: true, message: 'Session expired. Please log in again.', type: 'warning' });
+    //         }
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     const login = async (email, password) => {
         try {
             const response = await adminAuthAPI.login({ email, password });
-            const { admin: adminData, accessToken } = response.data.data;
-            localStorage.setItem('adminToken', accessToken);
+            const { admin: adminData } = response.data.data;
+            // localStorage.setItem('adminToken', accessToken);
             setAdmin(adminData);
             setIsAuthenticated(true);
 
@@ -78,7 +93,7 @@ export const AuthProvider = ({ children }) => {
                 return { success: true };
             }
             const { admin: adminData, accessToken } = response.data.data;
-            localStorage.setItem('adminToken', accessToken);
+            // localStorage.setItem('adminToken', accessToken);
             setAdmin(adminData);
             setIsAuthenticated(true);
             return { success: true, admin: adminData };
@@ -95,7 +110,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
-            localStorage.removeItem('adminToken');
+            // localStorage.removeItem('adminToken');
             setAdmin(null);
             setIsAuthenticated(false);
         }
