@@ -31,7 +31,7 @@ const API = axios.create({
     baseURL: process.env.NODE_ENV === 'production'
         ? 'https://philanzel-backend.onrender.com/api'
         : 'https://philanzel-backend.onrender.com/api',
-    timeout: 10000,
+    timeout: 60000,
     headers: {
         'Content-Type': 'application/json',
     },
