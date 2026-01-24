@@ -33,7 +33,7 @@ app.use(cors({
 
         const defaultOrigins = [
             'http://localhost:3000',
-            'https://philanzelpublic-hoedppxqs-rakeshs-projects-e83a0367.vercel.app'
+            'https://philanzelpublic.vercel.app'
         ];
 
         const allowedOrigins = [...new Set([...envOrigins, ...defaultOrigins])];
