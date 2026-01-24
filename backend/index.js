@@ -20,49 +20,35 @@ dotenv.config()
 const app = express();
 
 
-const allowedOrigins = config.CORS_ORIGIN ? config.CORS_ORIGIN.split(',') : [];
+
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin) return callback(null, true); // allow server-to-server
-
-        const allowedOrigins = config.CORS_ORIGIN
-            ? config.CORS_ORIGIN.split(',').map(o => o.trim())
-            : ['http://localhost:3000', 'https://philanzelpublic-hoedppxqs-rakeshs-projects-e83a0367.vercel.app'];
-
-        if (allowedOrigins.includes(origin)) {
-            callback(null, origin);
-        } else {
-            if (process.env.NODE_ENV === 'production') {
-                callback(null, false);
-            } else {
-                callback(null, true);
-            }
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-
-app.options('*', cors({
-    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
 
-        const allowedOrigins = config.CORS_ORIGIN
+        const envOrigins = config.CORS_ORIGIN
             ? config.CORS_ORIGIN.split(',').map(o => o.trim())
-            : [
-                'http://localhost:3000',
-                'https://philanzelpublic-hoedppxqs-rakeshs-projects-e83a0367.vercel.app'
-              ];
+            : [];
+
+        const defaultOrigins = [
+            'http://localhost:3000',
+            'https://philanzelpublic-hoedppxqs-rakeshs-projects-e83a0367.vercel.app'
+        ];
+
+        const allowedOrigins = [...new Set([...envOrigins, ...defaultOrigins])];
 
         if (allowedOrigins.includes(origin)) {
-            callback(null, origin);
+            callback(null, true);
         } else {
+            console.log(`Origin blocked by CORS: ${origin}`);
             callback(null, false);
         }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    exposedHeaders: ['Set-Cookie']
 }));
 
 
