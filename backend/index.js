@@ -33,7 +33,7 @@ app.use(cors({
         if (allowedOrigins.includes(origin)) {
             callback(null, origin);
         } else {
-            callback(null, false); // ❗ DO NOT throw error
+            callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
@@ -41,7 +41,27 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-app.options('*', cors());
+app.options('*', cors({
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = config.CORS_ORIGIN
+            ? config.CORS_ORIGIN.split(',').map(o => o.trim())
+            : [
+                'http://localhost:3000',
+                'https://philanzelpublic-hoedppxqs-rakeshs-projects-e83a0367.vercel.app'
+              ];
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, origin);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+
+        }
+    },
+    credentials: true,
+}));
+
 
 
 app.use((req, res, next) => {
