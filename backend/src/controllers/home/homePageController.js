@@ -204,7 +204,26 @@ const updateHomePage = async (req, res) => {
         }
 
         const { id } = req.params;
-        const { heading, description, button, image } = req.body;
+
+        // Debug logging
+        console.log('--- updateHomePage called ---');
+        console.log('Request body:', req.body);
+        console.log('Request file:', req.file);
+
+        // Handle both nested objects and flat form fields
+        const heading = req.body.heading;
+        const description = req.body.description;
+        const button = req.body.button || {
+            text: req.body['button[text]'],
+            link: req.body['button[link]']
+        };
+        const image = req.body.image || {
+            url: req.body['image[url]'],
+            altText: req.body['image[altText]']
+        };
+
+        console.log('Parsed button:', button);
+        console.log('Parsed image:', image);
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -225,10 +244,10 @@ const updateHomePage = async (req, res) => {
         const updateData = {};
         if (heading) updateData.heading = heading;
         if (description) updateData.description = description;
-        if (button) updateData.button = button;
+        if (button && (button.text || button.link)) updateData.button = button;
 
         // Handle image updates
-        if (image) {
+        if (image && (image.url || image.altText)) {
             const imageData = {
                 altText: image.altText || existingHomePage.image?.altText
             };
@@ -241,10 +260,19 @@ const updateHomePage = async (req, res) => {
                 imageData.size = req.file.size;
                 imageData.mimetype = req.file.mimetype;
                 // Use env-configured server base when available (recommended for production).
-                const serverBase = 'https://philanzel-backend.onrender.com' || process.env.SERVER_BASE_URL || process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+                const serverBase = process.env.SERVER_BASE_URL || process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
                 imageData.url = `${serverBase}/uploads/images/${req.file.filename}`;
+            } else if (image.url) {
+                // Use the provided image URL
+                imageData.url = image.url;
+                // Clear file-related fields when using external URL
+                imageData.originalName = null;
+                imageData.filename = null;
+                imageData.path = null;
+                imageData.size = null;
+                imageData.mimetype = null;
             } else {
-                // Keep existing file data if no new file uploaded
+                // Keep existing file data if no new file uploaded and no URL provided
                 imageData.originalName = existingHomePage.image?.originalName;
                 imageData.filename = existingHomePage.image?.filename;
                 imageData.path = existingHomePage.image?.path;
@@ -253,6 +281,7 @@ const updateHomePage = async (req, res) => {
                 imageData.url = existingHomePage.image?.url;
             }
 
+            console.log('Final imageData:', imageData);
             updateData.image = imageData;
         }
 
