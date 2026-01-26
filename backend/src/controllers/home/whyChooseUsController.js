@@ -141,6 +141,10 @@ class WhyChooseUsController {
             const { id } = req.params;
             const { heading, description, points, button } = req.body;
 
+            console.log('📍 WhyChooseUs update - Request body:', req.body);
+            console.log('📍 WhyChooseUs update - Request file:', req.file);
+            console.log('📍 WhyChooseUs update - image[url]:', req.body['image[url]']);
+
             const existingEntry = await WhyChooseUs.findById(id);
             if (!existingEntry) {
                 return res.status(404).json({
