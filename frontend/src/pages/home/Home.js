@@ -47,7 +47,7 @@ const Home = () => {
         heading: '',
         description: '',
         button: { text: '', link: '' },
-        image: { file: null, altText: '' }
+        image: { url: '', altText: '' }
     });
     const [trackData, setTrackData] = useState(null);
     const [trackLoading, setTrackLoading] = useState(false);
@@ -109,26 +109,16 @@ const Home = () => {
         }
     };
     const handleChange = (e) => {
-        const { name, value, files } = e.target;
+        const { name, value } = e.target;
         if (name.includes('.')) {
             const [parent, child] = name.split('.');
-            if (child === 'file') {
-                setFormData(prev => ({
-                    ...prev,
-                    [parent]: {
-                        ...prev[parent],
-                        [child]: files[0]
-                    }
-                }));
-            } else {
-                setFormData(prev => ({
-                    ...prev,
-                    [parent]: {
-                        ...prev[parent],
-                        [child]: value
-                    }
-                }));
-            }
+            setFormData(prev => ({
+                ...prev,
+                [parent]: {
+                    ...prev[parent],
+                    [child]: value
+                }
+            }));
         } else {
             setFormData(prev => ({
                 ...prev,
@@ -146,11 +136,9 @@ const Home = () => {
             submitData.append('description', formData.description);
             submitData.append('button[text]', formData.button.text);
             submitData.append('button[link]', formData.button.link);
+            submitData.append('image[url]', formData.image.url);
             submitData.append('image[altText]', formData.image.altText);
 
-            if (formData.image.file) {
-                submitData.append('image', formData.image.file);
-            }
             if (isEditing && editingId) {
                 await homePageAPI.updateWithFile(editingId, submitData);
                 setMessage('Banner updated successfully!');
@@ -162,6 +150,7 @@ const Home = () => {
             fetchHomePages();
             setShowForm(false);
         } catch (error) {
+            console.error('Submit error:', error);
             setMessage('Failed to save banner. Please try again.');
         } finally {
             setLoading(false);
@@ -172,12 +161,10 @@ const Home = () => {
             heading: '',
             description: '',
             button: { text: '', link: '' },
-            image: { file: null, altText: '' }
+            image: { url: '', altText: '' }
         });
         setIsEditing(false);
         setEditingId(null);
-        const fileInput = document.getElementById('image.file');
-        if (fileInput) fileInput.value = '';
     };
     const handleEdit = (page) => {
         setFormData({
@@ -188,7 +175,7 @@ const Home = () => {
                 link: page.button?.link || ''
             },
             image: {
-                file: null,
+                url: page.image?.url || '',
                 altText: page.image?.altText || ''
             }
         });
@@ -406,14 +393,16 @@ const Home = () => {
                                         />
                                     </div>
                                     <div className="col-md-6 mb-3">
-                                        <label htmlFor="image.file" className="form-label">Image</label>
+                                        <label htmlFor="image.url" className="form-label">Image URL *</label>
                                         <input
-                                            type="file"
+                                            type="url"
                                             className="form-control"
-                                            id="image.file"
-                                            name="image.file"
+                                            id="image.url"
+                                            name="image.url"
+                                            value={formData.image.url}
                                             onChange={handleChange}
-                                            accept="image/*"
+                                            placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+                                            required
                                         />
                                     </div>
                                 </div>
@@ -516,7 +505,7 @@ const Home = () => {
                 {/* Custom Home Slider */}
                 {homePages.length > 0 && (
                     <div className="custom-slider" style={{ position: 'relative', maxWidth: 900, margin: '0 auto 2rem', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', background: '#fff' }}>
-                       <div style={{ position: 'absolute', top: 24, left: 32, display: 'flex', gap: 10, zIndex: 2 }}>
+                        <div style={{ position: 'absolute', top: 24, left: 32, display: 'flex', gap: 10, zIndex: 2 }}>
                             <button
                                 className="btn btn-info"
                                 style={{ fontWeight: 500, fontSize: 18, borderRadius: 6, padding: '6px 18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -2353,7 +2342,7 @@ const WhyChooseUs = () => {
         description: '',
         points: [{ text: '', icon: 'fas fa-check' }],
         button: { text: 'Get Started', link: '#' },
-        image: null
+        imageUrl: ''
     });
     useEffect(() => {
         fetchWhyChooseUs();
@@ -2384,8 +2373,8 @@ const WhyChooseUs = () => {
             submitFormData.append('points', JSON.stringify(formData.points));
             submitFormData.append('button', JSON.stringify(formData.button));
 
-            if (formData.image) {
-                submitFormData.append('image', formData.image);
+            if (formData.imageUrl) {
+                submitFormData.append('image[url]', formData.imageUrl);
             }
             if (isEditing) {
                 await whyChooseUsAPI.update(editingId, submitFormData);
@@ -2409,7 +2398,7 @@ const WhyChooseUs = () => {
             description: item.description,
             points: item.points,
             button: item.button,
-            image: null
+            imageUrl: item.image?.url || ''
         });
         setIsEditing(true);
         setEditingId(item._id);
@@ -2460,7 +2449,7 @@ const WhyChooseUs = () => {
             description: '',
             points: [{ text: '', icon: 'fas fa-check' }],
             button: { text: 'Get Started', link: '#' },
-            image: null
+            imageUrl: ''
         });
         setIsEditing(false);
         setEditingId(null);
@@ -2520,12 +2509,14 @@ const WhyChooseUs = () => {
                                                 </div>
                                                 <div className="col-md-6">
                                                     <div className="mb-3">
-                                                        <label className="form-label">Image</label>
+                                                        <label className="form-label">Image URL *</label>
                                                         <input
-                                                            type="file"
+                                                            type="url"
                                                             className="form-control"
-                                                            accept="image/*"
-                                                            onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
+                                                            placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+                                                            value={formData.imageUrl}
+                                                            onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                                                            required
                                                         />
                                                     </div>
                                                 </div>
