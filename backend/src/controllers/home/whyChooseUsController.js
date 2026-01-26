@@ -85,7 +85,7 @@ class WhyChooseUsController {
                 }
             }
 
-            // Handle image upload
+            // Handle image upload or URL
             let imageData = {
                 url: '/images/services/default-service.svg',
                 originalName: '',
@@ -97,6 +97,13 @@ class WhyChooseUsController {
                     url: `/uploads/images/${req.file.filename}`,
                     originalName: req.file.originalname,
                     filename: req.file.filename
+                };
+            } else if (req.body['image[url]']) {
+                // Handle image URL from form data
+                imageData = {
+                    url: req.body['image[url]'],
+                    originalName: '',
+                    filename: ''
                 };
             }
 
@@ -162,7 +169,7 @@ class WhyChooseUsController {
                 }
             }
 
-            // Handle image upload
+            // Handle image upload or URL
             let imageData = existingEntry.image;
             if (req.file) {
                 // Delete old image if it's not the default
@@ -177,6 +184,13 @@ class WhyChooseUsController {
                     url: `/uploads/images/${req.file.filename}`,
                     originalName: req.file.originalname,
                     filename: req.file.filename
+                };
+            } else if (req.body['image[url]']) {
+                // Handle image URL from form data
+                imageData = {
+                    url: req.body['image[url]'],
+                    originalName: '',
+                    filename: ''
                 };
             }
 
