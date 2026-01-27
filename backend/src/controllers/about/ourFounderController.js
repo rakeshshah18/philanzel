@@ -172,10 +172,13 @@ class OurFounderController {
             }
 
             const updateData = {
-                image: imageData,
-                name: name || existingFounder.name,
-                designation: designation || existingFounder.designation,
-                description: description || existingFounder.description
+                $set: {
+                    'image.url': imageData.url,
+                    'image.altText': imageData.altText || name || existingFounder.name,
+                    name: name || existingFounder.name,
+                    designation: designation || existingFounder.designation,
+                    description: description || existingFounder.description
+                }
             };
 
             console.log('📍 Update data being sent:', JSON.stringify(updateData, null, 2));
