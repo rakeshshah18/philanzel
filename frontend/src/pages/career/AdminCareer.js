@@ -126,7 +126,7 @@ const AdminCareer = () => {
     const [postFormData, setPostFormData] = useState({
         heading: '',
         description: '',
-        image: null
+        imageUrl: ''
     });
     const [applications, setApplications] = useState([]);
     const [filteredApplications, setFilteredApplications] = useState([]);
@@ -292,10 +292,10 @@ const AdminCareer = () => {
         applyFilters(applications, searchTerm, dateRange);
     }, [applications, sortConfig, searchTerm, dateRange, applyFilters]);
     const handlePostFormChange = (e) => {
-        const { name, value, files } = e.target;
+        const { name, value } = e.target;
         setPostFormData(prev => ({
             ...prev,
-            [name]: files ? files[0] : value
+            [name]: value
         }));
     };
     const handlePostFormSubmit = async (e) => {
@@ -308,8 +308,8 @@ const AdminCareer = () => {
             const formData = new FormData();
             formData.append('heading', postFormData.heading.trim());
             formData.append('description', postFormData.description.trim());
-            if (postFormData.image) {
-                formData.append('image', postFormData.image);
+            if (postFormData.imageUrl) {
+                formData.append('image[url]', postFormData.imageUrl);
             }
             if (editingPost) {
                 const response = await api.put(`/admin/career-posts/${editingPost._id}`, formData, {
@@ -337,7 +337,7 @@ const AdminCareer = () => {
         }
     };
     const resetPostForm = () => {
-        setPostFormData({ heading: '', description: '', image: null });
+        setPostFormData({ heading: '', description: '', imageUrl: '' });
         setEditingPost(null);
         setShowPostForm(false);
     };
@@ -345,7 +345,7 @@ const AdminCareer = () => {
         setPostFormData({
             heading: post.heading,
             description: post.description,
-            image: null
+            imageUrl: post.image?.url || ''
         });
         setEditingPost(post);
         setShowPostForm(true);
@@ -524,16 +524,17 @@ const AdminCareer = () => {
                                                 />
                                             </div>
                                             <div className="mb-3">
-                                                <label htmlFor="image" className="form-label">Image</label>
+                                                <label htmlFor="imageUrl" className="form-label">Image URL</label>
                                                 <input
-                                                    type="file"
+                                                    type="url"
                                                     className="form-control"
-                                                    id="image"
-                                                    name="image"
-                                                    accept="image/*"
+                                                    id="imageUrl"
+                                                    name="imageUrl"
+                                                    value={postFormData.imageUrl}
                                                     onChange={handlePostFormChange}
+                                                    placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
                                                 />
-                                                <div className="form-text">Max file size: 5MB. Supported formats: JPG, PNG, GIF</div>
+                                                <div className="form-text">Paste a URL to an image for the career post</div>
                                             </div>
                                             <div className="d-flex gap-2">
                                                 <button type="submit" className="btn btn-primary">
@@ -565,9 +566,9 @@ const AdminCareer = () => {
                                         careerPosts.map((post) => (
                                             <div key={post._id} className="col-md-6 col-lg-4 mb-4">
                                                 <div className="dashboard-card h-100 shadow-sm" style={{ borderRadius: 16, background: '#fff', border: '1.5px solid #90caf9', boxShadow: '0 2px 8px #e0e7ef', transition: 'transform 0.18s, box-shadow 0.18s', overflow: 'hidden' }}>
-                                                    {post.image && (
+                                                    {post.image && post.image.url && (
                                                         <img
-                                                            src={getImageURL(post.image.filename)}
+                                                            src={post.image.url.startsWith('http') ? post.image.url : getImageURL(post.image.filename)}
                                                             className="card-img-top"
                                                             alt={post.heading}
                                                             style={{ height: '200px', objectFit: 'cover', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderBottom: '1.5px solid #e3eafc' }}

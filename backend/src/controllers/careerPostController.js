@@ -86,15 +86,22 @@ export const createCareerPost = async (req, res) => {
             description: description.trim()
         };
 
-        // Add image information if file was uploaded
+        // Add image information if file was uploaded or URL provided
         if (req.file) {
             careerPostData.image = {
                 originalName: req.file.originalname,
                 filename: req.file.filename,
                 path: req.file.path,
                 size: req.file.size,
-                mimetype: req.file.mimetype
+                mimetype: req.file.mimetype,
+                url: `/uploads/images/${req.file.filename}`
             };
+        } else if (req.body['image[url]']) {
+            // Handle image URL from FormData bracket notation
+            careerPostData.image = {
+                url: req.body['image[url]']
+            };
+            console.log('Image URL provided:', req.body['image[url]']);
         }
 
         const newCareerPost = new CareerPost(careerPostData);
@@ -162,7 +169,7 @@ export const updateCareerPost = async (req, res) => {
         if (heading) updateData.heading = heading.trim();
         if (description) updateData.description = description.trim();
 
-        // Handle image update
+        // Handle image update (file or URL)
         if (req.file) {
             // Delete old image if exists
             if (existingPost.image && existingPost.image.path) {
@@ -178,8 +185,15 @@ export const updateCareerPost = async (req, res) => {
                 filename: req.file.filename,
                 path: req.file.path,
                 size: req.file.size,
-                mimetype: req.file.mimetype
+                mimetype: req.file.mimetype,
+                url: `/uploads/images/${req.file.filename}`
             };
+        } else if (req.body['image[url]']) {
+            // Handle image URL from FormData bracket notation
+            updateData.image = {
+                url: req.body['image[url]']
+            };
+            console.log('Image URL updated:', req.body['image[url]']);
         }
 
         const updatedPost = await CareerPost.findByIdAndUpdate(
