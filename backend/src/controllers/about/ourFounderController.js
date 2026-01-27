@@ -119,6 +119,9 @@ class OurFounderController {
     async update(req, res) {
         try {
             console.log('📍 PUT /admin/about/our-founder/:id - request received');
+            console.log('📍 Request body:', req.body);
+            console.log('📍 Request file:', req.file);
+            console.log('📍 image[url]:', req.body['image[url]']);
             const { id } = req.params;
             const { name, designation, description } = req.body;
 
@@ -131,7 +134,9 @@ class OurFounderController {
             }
 
             // Handle image upload or URL
-            let imageData = existingFounder.image;
+            // Convert existing image to plain object to avoid Mongoose subdocument issues
+            let imageData = existingFounder.image ? existingFounder.image.toObject ? existingFounder.image.toObject() : { ...existingFounder.image } : {};
+
             if (req.file) {
                 // Delete old image if it exists and is not default
                 if (existingFounder.image && existingFounder.image.url && !existingFounder.image.url.includes('default-founder.svg')) {
@@ -153,15 +158,15 @@ class OurFounderController {
                 };
             } else if (req.body['image[url]']) {
                 // Handle image URL from FormData bracket notation
+                console.log('📍 Updating with image URL:', req.body['image[url]']);
                 imageData = {
                     url: req.body['image[url]'],
                     altText: name || existingFounder.name
                 };
-                console.log('Image URL updated:', req.body['image[url]']);
             } else if (name && name !== existingFounder.name) {
                 // Update alt text if name changed
                 imageData = {
-                    ...existingFounder.image,
+                    ...imageData,
                     altText: name
                 };
             }
@@ -173,9 +178,12 @@ class OurFounderController {
                 description: description || existingFounder.description
             };
 
+            console.log('📍 Update data being sent:', JSON.stringify(updateData, null, 2));
+
             const updatedFounder = await OurFounder.findByIdAndUpdate(id, updateData, { new: true });
 
             console.log('📍 Our founder entry updated successfully:', id);
+            console.log('📍 Updated founder image:', updatedFounder.image);
 
             res.status(200).json({
                 success: true,
