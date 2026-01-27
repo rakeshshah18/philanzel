@@ -335,9 +335,9 @@ const AboutUs = () => {
         heading: '',
         title: '',
         button: '',
-        points: []
+        points: [],
+        imageUrl: ''
     });
-    const [whyChooseUsImage, setWhyChooseUsImage] = useState(null);
     const [showWhyChooseUsForm, setShowWhyChooseUsForm] = useState(false);
     const [isEditingWhyChooseUs, setIsEditingWhyChooseUs] = useState(false);
     const [editingWhyChooseUsId, setEditingWhyChooseUsId] = useState(null);
@@ -360,9 +360,6 @@ const AboutUs = () => {
             ...whyChooseUsFormData,
             [e.target.name]: e.target.value
         });
-    };
-    const handleWhyChooseUsImageChange = (e) => {
-        setWhyChooseUsImage(e.target.files[0]);
     };
     const addPoint = () => {
         if (pointFormData.trim()) {
@@ -397,8 +394,8 @@ const AboutUs = () => {
                 icon: 'fas fa-check'
             }));
             formData.append('points', JSON.stringify(pointsArray));
-            if (whyChooseUsImage) {
-                formData.append('image', whyChooseUsImage);
+            if (whyChooseUsFormData.imageUrl) {
+                formData.append('image[url]', whyChooseUsFormData.imageUrl);
             }
             if (isEditingWhyChooseUs) {
                 await aboutWhyChooseUsAPI.update(editingWhyChooseUsId, formData);
@@ -423,7 +420,8 @@ const AboutUs = () => {
             button: typeof item.button === 'string' ? item.button : (item.button?.text || ''),
             points: item.points ? item.points.map(point =>
                 typeof point === 'string' ? point : (point.text || point.title || point.description || '')
-            ) : []
+            ) : [],
+            imageUrl: item.image?.url || ''
         });
         setIsEditingWhyChooseUs(true);
         setEditingWhyChooseUsId(item._id);
@@ -446,9 +444,9 @@ const AboutUs = () => {
             heading: '',
             title: '',
             button: '',
-            points: []
+            points: [],
+            imageUrl: ''
         });
-        setWhyChooseUsImage(null);
         setPointFormData('');
         setShowWhyChooseUsForm(false);
         setShowPointForm(false);
@@ -1347,16 +1345,18 @@ const AboutUs = () => {
                             </div>
                             <div className="row">
                                 <div className="col-md-12 mb-3">
-                                    <label htmlFor="whyChooseUsImage" className="form-label">Image</label>
+                                    <label htmlFor="whyChooseUsImage" className="form-label">Image URL</label>
                                     <input
-                                        type="file"
+                                        type="url"
                                         className="form-control"
                                         id="whyChooseUsImage"
-                                        accept="image/*"
-                                        onChange={handleWhyChooseUsImageChange}
+                                        name="imageUrl"
+                                        value={whyChooseUsFormData.imageUrl}
+                                        onChange={handleWhyChooseUsChange}
+                                        placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
                                     />
                                     <small className="form-text text-muted">
-                                        Upload an image to represent why customers should choose you
+                                        Enter the URL/address of an image to represent why customers should choose you
                                     </small>
                                 </div>
                             </div>

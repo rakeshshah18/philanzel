@@ -58,7 +58,7 @@ export const createWhyChooseUs = async (req, res) => {
             }
         }
 
-        // Handle image upload
+        // Handle image upload or URL
         let imageData = {};
         if (req.file) {
             imageData = {
@@ -66,10 +66,17 @@ export const createWhyChooseUs = async (req, res) => {
                 altText: 'Why Choose Us Image'
             };
             console.log('Image uploaded:', req.file.filename);
+        } else if (req.body['image[url]']) {
+            // Handle image URL from form data
+            imageData = {
+                url: req.body['image[url]'],
+                altText: 'Why Choose Us Image'
+            };
+            console.log('Image URL provided:', req.body['image[url]']);
         } else {
             return res.status(400).json({
                 success: false,
-                message: 'Image is required'
+                message: 'Image URL or file is required'
             });
         }
 
@@ -259,7 +266,7 @@ export const updateWhyChooseUs = async (req, res) => {
             }
         }
 
-        // Handle new image upload
+        // Handle new image upload or URL
         if (req.file) {
             // Delete old image if it exists
             if (whyChooseUs.image?.url && !whyChooseUs.image.url.startsWith('http')) {
@@ -278,6 +285,13 @@ export const updateWhyChooseUs = async (req, res) => {
                 altText: whyChooseUs.heading || 'Why Choose Us Image'
             };
             console.log('New image uploaded:', req.file.filename);
+        } else if (req.body['image[url]']) {
+            // Handle image URL from form data
+            whyChooseUs.image = {
+                url: req.body['image[url]'],
+                altText: whyChooseUs.heading || 'Why Choose Us Image'
+            };
+            console.log('Image URL updated:', req.body['image[url]']);
         }
 
         const updatedWhyChooseUs = await whyChooseUs.save();
