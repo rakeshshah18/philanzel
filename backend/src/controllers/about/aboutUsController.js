@@ -51,6 +51,9 @@ const createAboutUs = async (req, res) => {
             imageData.mimetype = req.file.mimetype;
             const serverBase = process.env.SERVER_BASE_URL || process.env.BACKEND_URL || '';
             imageData.url = serverBase ? `${serverBase}/uploads/images/${req.file.filename}` : `/uploads/images/${req.file.filename}`;
+        } else if (req.body['image[url]']) {
+            // Handle image URL from FormData bracket notation
+            imageData.url = req.body['image[url]'];
         } else if (image?.url) {
             imageData.url = image.url;
         }
@@ -261,10 +264,10 @@ const updateAboutUs = async (req, res) => {
         }
 
         // Update image if provided either as an `image` object or as an uploaded file
-        if (image || req.file) {
+        if (image || req.file || req.body['image[url]']) {
             updateData.image = {
                 ...existingAboutUs.image,
-                altText: image?.altText || req.body?.altText || existingAboutUs.image?.altText || ''
+                altText: image?.altText || req.body['image[altText]'] || req.body?.altText || existingAboutUs.image?.altText || ''
             };
 
             // Add new file information if uploaded
@@ -276,6 +279,9 @@ const updateAboutUs = async (req, res) => {
                 updateData.image.mimetype = req.file.mimetype;
                 const serverBase = process.env.SERVER_BASE_URL || process.env.BACKEND_URL || '';
                 updateData.image.url = serverBase ? `${serverBase}/uploads/images/${req.file.filename}` : `/uploads/images/${req.file.filename}`;
+            } else if (req.body['image[url]']) {
+                // Handle image URL from FormData bracket notation
+                updateData.image.url = req.body['image[url]'];
             } else if (image?.url) {
                 updateData.image.url = image.url;
             }

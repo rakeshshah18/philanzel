@@ -67,7 +67,7 @@ export const createWhyChooseUs = async (req, res) => {
             };
             console.log('Image uploaded:', req.file.filename);
         } else if (req.body['image[url]']) {
-            // Handle image URL from form data
+            // Handle image URL from FormData bracket notation
             imageData = {
                 url: req.body['image[url]'],
                 altText: 'Why Choose Us Image'
@@ -76,7 +76,7 @@ export const createWhyChooseUs = async (req, res) => {
         } else {
             return res.status(400).json({
                 success: false,
-                message: 'Image URL or file is required'
+                message: 'Image is required (file upload or URL)'
             });
         }
 
@@ -286,7 +286,7 @@ export const updateWhyChooseUs = async (req, res) => {
             };
             console.log('New image uploaded:', req.file.filename);
         } else if (req.body['image[url]']) {
-            // Handle image URL from form data
+            // Handle image URL from FormData bracket notation
             whyChooseUs.image = {
                 url: req.body['image[url]'],
                 altText: whyChooseUs.heading || 'Why Choose Us Image'

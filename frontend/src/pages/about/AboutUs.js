@@ -56,7 +56,7 @@ const AboutUs = () => {
             link: ''
         },
         image: {
-            file: null,
+            url: '',
             altText: ''
         }
     });
@@ -97,26 +97,16 @@ const AboutUs = () => {
         }
     };
     const handleChange = (e) => {
-        const { name, value, files } = e.target;
+        const { name, value } = e.target;
         if (name.includes('.')) {
             const [parent, child] = name.split('.');
-            if (child === 'file') {
-                setFormData(prev => ({
-                    ...prev,
-                    [parent]: {
-                        ...prev[parent],
-                        [child]: files[0]
-                    }
-                }));
-            } else {
-                setFormData(prev => ({
-                    ...prev,
-                    [parent]: {
-                        ...prev[parent],
-                        [child]: value
-                    }
-                }));
-            }
+            setFormData(prev => ({
+                ...prev,
+                [parent]: {
+                    ...prev[parent],
+                    [child]: value
+                }
+            }));
         } else {
             setFormData(prev => ({
                 ...prev,
@@ -144,10 +134,10 @@ const AboutUs = () => {
             submitData.append('description', formData.description);
             submitData.append('button[text]', formData.button.text);
             submitData.append('button[link]', formData.button.link);
-            submitData.append('image[altText]', formData.heading); // Use heading as alt text
+            submitData.append('image[altText]', formData.heading);
 
-            if (formData.image.file) {
-                submitData.append('image', formData.image.file);
+            if (formData.image.url) {
+                submitData.append('image[url]', formData.image.url);
             }
             if (isEditing) {
                 await aboutUsAPI.update(editingId, submitData);
@@ -174,8 +164,8 @@ const AboutUs = () => {
                 link: item.button?.link || ''
             },
             image: {
-                file: null,
-                altText: item.heading || '' // Use heading as alt text when editing
+                url: item.image?.url || '',
+                altText: item.heading || ''
             }
         });
         setIsEditing(true);
@@ -203,7 +193,7 @@ const AboutUs = () => {
                 link: ''
             },
             image: {
-                file: null,
+                url: '',
                 altText: ''
             }
         });
@@ -335,9 +325,9 @@ const AboutUs = () => {
         heading: '',
         title: '',
         button: '',
-        points: [],
-        imageUrl: ''
+        points: []
     });
+    const [whyChooseUsImageUrl, setWhyChooseUsImageUrl] = useState('');
     const [showWhyChooseUsForm, setShowWhyChooseUsForm] = useState(false);
     const [isEditingWhyChooseUs, setIsEditingWhyChooseUs] = useState(false);
     const [editingWhyChooseUsId, setEditingWhyChooseUsId] = useState(null);
@@ -350,7 +340,7 @@ const AboutUs = () => {
         designation: '',
         description: ''
     });
-    const [ourFounderImage, setOurFounderImage] = useState(null);
+    const [ourFounderImageUrl, setOurFounderImageUrl] = useState('');
     const [showOurFounderForm, setShowOurFounderForm] = useState(false);
     const [isEditingOurFounder, setIsEditingOurFounder] = useState(false);
     const [editingOurFounderId, setEditingOurFounderId] = useState(null);
@@ -360,6 +350,9 @@ const AboutUs = () => {
             ...whyChooseUsFormData,
             [e.target.name]: e.target.value
         });
+    };
+    const handleWhyChooseUsImageChange = (e) => {
+        setWhyChooseUsImageUrl(e.target.value);
     };
     const addPoint = () => {
         if (pointFormData.trim()) {
@@ -383,7 +376,7 @@ const AboutUs = () => {
         try {
             const formData = new FormData();
             formData.append('heading', whyChooseUsFormData.heading);
-            formData.append('description', whyChooseUsFormData.title);
+            formData.append('title', whyChooseUsFormData.title);
             const buttonObj = {
                 text: whyChooseUsFormData.button || 'Get Started',
                 link: '#'
@@ -394,8 +387,8 @@ const AboutUs = () => {
                 icon: 'fas fa-check'
             }));
             formData.append('points', JSON.stringify(pointsArray));
-            if (whyChooseUsFormData.imageUrl) {
-                formData.append('image[url]', whyChooseUsFormData.imageUrl);
+            if (whyChooseUsImageUrl) {
+                formData.append('image[url]', whyChooseUsImageUrl);
             }
             if (isEditingWhyChooseUs) {
                 await aboutWhyChooseUsAPI.update(editingWhyChooseUsId, formData);
@@ -416,13 +409,13 @@ const AboutUs = () => {
     const handleEditWhyChooseUs = (item) => {
         setWhyChooseUsFormData({
             heading: item.heading,
-            title: item.description || item.title, // Use description from backend
+            title: item.description || item.title,
             button: typeof item.button === 'string' ? item.button : (item.button?.text || ''),
             points: item.points ? item.points.map(point =>
                 typeof point === 'string' ? point : (point.text || point.title || point.description || '')
-            ) : [],
-            imageUrl: item.image?.url || ''
+            ) : []
         });
+        setWhyChooseUsImageUrl(item.image?.url || '');
         setIsEditingWhyChooseUs(true);
         setEditingWhyChooseUsId(item._id);
         setShowWhyChooseUsForm(true);
@@ -444,9 +437,9 @@ const AboutUs = () => {
             heading: '',
             title: '',
             button: '',
-            points: [],
-            imageUrl: ''
+            points: []
         });
+        setWhyChooseUsImageUrl('');
         setPointFormData('');
         setShowWhyChooseUsForm(false);
         setShowPointForm(false);
@@ -469,8 +462,7 @@ const AboutUs = () => {
         });
     };
     const handleOurFounderImageChange = (e) => {
-        const file = e.target.files[0];
-        setOurFounderImage(file);
+        setOurFounderImageUrl(e.target.value);
     };
     const handleOurFounderSubmit = async (e) => {
         e.preventDefault();
@@ -480,8 +472,8 @@ const AboutUs = () => {
             formData.append('name', ourFounderFormData.name);
             formData.append('designation', ourFounderFormData.designation);
             formData.append('description', ourFounderFormData.description);
-            if (ourFounderImage) {
-                formData.append('image', ourFounderImage);
+            if (ourFounderImageUrl) {
+                formData.append('image[url]', ourFounderImageUrl);
             }
             if (isEditingOurFounder) {
                 await ourFounderAPI.update(editingOurFounderId, formData);
@@ -505,6 +497,7 @@ const AboutUs = () => {
             designation: item.designation,
             description: item.description
         });
+        setOurFounderImageUrl(item.image?.url || '');
         setIsEditingOurFounder(true);
         setEditingOurFounderId(item._id);
         setShowOurFounderForm(true);
@@ -527,7 +520,7 @@ const AboutUs = () => {
             designation: '',
             description: ''
         });
-        setOurFounderImage(null);
+        setOurFounderImageUrl('');
         setShowOurFounderForm(false);
         setIsEditingOurFounder(false);
         setEditingOurFounderId(null);
@@ -614,14 +607,15 @@ const AboutUs = () => {
                                     />
                                 </div>
                                 <div className="col-md-6 mb-3">
-                                    <label htmlFor="image.file" className="form-label">Image</label>
+                                    <label htmlFor="image.url" className="form-label">Image URL</label>
                                     <input
-                                        type="file"
+                                        type="url"
                                         className="form-control"
-                                        id="image.file"
-                                        name="image.file"
+                                        id="image.url"
+                                        name="image.url"
+                                        value={formData.image.url}
                                         onChange={handleChange}
-                                        accept="image/*"
+                                        placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
                                     />
                                 </div>
                             </div>
@@ -1350,13 +1344,12 @@ const AboutUs = () => {
                                         type="url"
                                         className="form-control"
                                         id="whyChooseUsImage"
-                                        name="imageUrl"
-                                        value={whyChooseUsFormData.imageUrl}
-                                        onChange={handleWhyChooseUsChange}
+                                        value={whyChooseUsImageUrl}
+                                        onChange={handleWhyChooseUsImageChange}
                                         placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
                                     />
                                     <small className="form-text text-muted">
-                                        Enter the URL/address of an image to represent why customers should choose you
+                                        Paste an image URL to represent why customers should choose you
                                     </small>
                                 </div>
                             </div>
@@ -1606,16 +1599,17 @@ const AboutUs = () => {
                             </div>
                             <div className="row">
                                 <div className="col-md-12 mb-3">
-                                    <label htmlFor="ourFounderImage" className="form-label">Founder Image</label>
+                                    <label htmlFor="ourFounderImage" className="form-label">Founder Image URL</label>
                                     <input
-                                        type="file"
+                                        type="url"
                                         className="form-control"
                                         id="ourFounderImage"
-                                        accept="image/*"
+                                        value={ourFounderImageUrl}
                                         onChange={handleOurFounderImageChange}
+                                        placeholder="Enter image URL (e.g., https://example.com/founder.jpg)"
                                     />
                                     <small className="form-text text-muted">
-                                        Upload a professional photo of the founder
+                                        Paste a URL to a professional photo of the founder
                                     </small>
                                 </div>
                             </div>

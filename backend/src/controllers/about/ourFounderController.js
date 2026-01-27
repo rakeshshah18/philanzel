@@ -55,7 +55,7 @@ class OurFounderController {
             console.log('📍 POST /admin/about/our-founder - request received');
             const { name, designation, description } = req.body;
 
-            // Handle image upload
+            // Handle image upload or URL
             let imageData = {
                 url: '/images/defaults/default-founder.svg',
                 altText: name || 'Our Founder'
@@ -71,6 +71,13 @@ class OurFounderController {
                     url: `${req.protocol}://${req.get('host')}/uploads/images/${req.file.filename}`,
                     altText: name || 'Our Founder'
                 };
+            } else if (req.body['image[url]']) {
+                // Handle image URL from FormData bracket notation
+                imageData = {
+                    url: req.body['image[url]'],
+                    altText: name || 'Our Founder'
+                };
+                console.log('Image URL provided:', req.body['image[url]']);
             }
 
             const newFounder = new OurFounder({
@@ -123,7 +130,7 @@ class OurFounderController {
                 });
             }
 
-            // Handle image upload
+            // Handle image upload or URL
             let imageData = existingFounder.image;
             if (req.file) {
                 // Delete old image if it exists and is not default
@@ -144,6 +151,13 @@ class OurFounderController {
                     url: `${req.protocol}://${req.get('host')}/uploads/images/${req.file.filename}`,
                     altText: name || existingFounder.name
                 };
+            } else if (req.body['image[url]']) {
+                // Handle image URL from FormData bracket notation
+                imageData = {
+                    url: req.body['image[url]'],
+                    altText: name || existingFounder.name
+                };
+                console.log('Image URL updated:', req.body['image[url]']);
             } else if (name && name !== existingFounder.name) {
                 // Update alt text if name changed
                 imageData = {
