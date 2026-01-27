@@ -42,6 +42,9 @@ class TabbingServicesSettingsController {
                 settings = new TabbingServicesSettings();
             }
 
+            console.log('📍 updateCommonBackgroundImage - Request body:', req.body);
+            console.log('📍 updateCommonBackgroundImage - Request file:', req.file);
+
             // Handle file upload
             if (req.file) {
                 // Delete old image file if it exists and is not the default
@@ -63,6 +66,17 @@ class TabbingServicesSettingsController {
                     size: req.file.size,
                     mimetype: req.file.mimetype
                 };
+            } else if (req.body['commonBackgroundImage[url]']) {
+                // Handle image URL from form data
+                settings.commonBackgroundImage = {
+                    url: req.body['commonBackgroundImage[url]'],
+                    originalName: '',
+                    filename: '',
+                    path: '',
+                    size: 0,
+                    mimetype: ''
+                };
+                console.log('📍 Updated with URL:', settings.commonBackgroundImage.url);
             }
 
             await settings.save();

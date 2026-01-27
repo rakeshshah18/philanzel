@@ -960,6 +960,7 @@ const TabbingServices = () => {
     const [commonImagePreview, setCommonImagePreview] = useState(null);
     const [selectedImageFile, setSelectedImageFile] = useState(null);
     const [selectedCommonImageFile, setSelectedCommonImageFile] = useState(null);
+    const [commonImageUrl, setCommonImageUrl] = useState('');
     const [loading, setLoading] = useState(false);
     const [fetchingServices, setFetchingServices] = useState(true);
 
@@ -1133,20 +1134,18 @@ const TabbingServices = () => {
         }
     };
     const handleSaveCommonImage = async () => {
-        if (!selectedCommonImageFile) {
-            alert('Please select an image first');
+        if (!commonImageUrl.trim()) {
+            alert('Please enter an image URL');
             return;
         }
         try {
             setLoading(true);
             const formData = new FormData();
-            formData.append('commonBackgroundImage', selectedCommonImageFile);
+            formData.append('commonBackgroundImage[url]', commonImageUrl.trim());
             const response = await tabbingServicesSettingsAPI.updateCommonBackgroundImage(formData);
             if (response.data.success) {
-                const newImageUrl = getImageUrl(response.data.data.commonBackgroundImage.url);
-                setCommonImage(newImageUrl);
-                setCommonImagePreview(null);
-                setSelectedCommonImageFile(null);
+                setCommonImage(commonImageUrl.trim());
+                setCommonImageUrl('');
                 alert('Common background image updated successfully!');
             } else {
                 throw new Error(response.data.message || 'Failed to update image');
@@ -1366,18 +1365,19 @@ const TabbingServices = () => {
                                     </div>
                                     <div className="col-md-8">
                                         <div className="row">
-                                            <div className="col-md-6">
-                                                <label className="form-label small">Upload New Common Image</label>
+                                            <div className="col-md-8">
+                                                <label className="form-label small">Image URL</label>
                                                 <input
-                                                    type="file"
+                                                    type="url"
                                                     className="form-control form-control-sm"
-                                                    accept="image/*"
-                                                    onChange={handleCommonImageChange}
+                                                    value={commonImageUrl}
+                                                    onChange={(e) => setCommonImageUrl(e.target.value)}
+                                                    placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
                                                 />
-                                                <small className="text-muted">JPG, PNG, SVG (max 5MB)</small>
+                                                <small className="text-muted">Paste a direct link to the image</small>
                                             </div>
-                                            <div className="col-md-6 d-flex align-items-end">
-                                                {commonImagePreview && (
+                                            <div className="col-md-4 d-flex align-items-end">
+                                                {commonImageUrl.trim() && (
                                                     <div>
                                                         <button
                                                             className="btn btn-success btn-sm me-2"
@@ -1398,10 +1398,7 @@ const TabbingServices = () => {
                                                         </button>
                                                         <button
                                                             className="btn btn-secondary btn-sm"
-                                                            onClick={() => {
-                                                                setCommonImagePreview(null);
-                                                                setSelectedCommonImageFile(null);
-                                                            }}
+                                                            onClick={() => setCommonImageUrl('')}
                                                             disabled={loading}
                                                         >
                                                             <i className="fas fa-times me-1"></i>
@@ -1409,7 +1406,7 @@ const TabbingServices = () => {
                                                         </button>
                                                     </div>
                                                 )}
-                                                {!commonImagePreview && (
+                                                {!commonImageUrl.trim() && (
                                                     <button
                                                         className="btn btn-outline-danger btn-sm"
                                                         onClick={handleResetCommonImage}
@@ -2679,16 +2676,26 @@ const WhyChooseUs = () => {
                                                     <div className="row">
                                                         {/* Left side - Image and Description */}
                                                         <div className="col-md-6">
-                                                            {item.image && item.image.url && (
-                                                                <div className="mb-3">
+                                                            <div className="mb-3">
+                                                                {/* Debug info */}
+                                                                <small className="text-muted d-block mb-2">
+                                                                    {/* Image URL: {item.image?.url || 'No URL'} */}
+                                                                </small>
+                                                                {item.image && item.image.url ? (
                                                                     <img
-                                                                        src={getImageUrl(item.image.url)}
+                                                                        src={item.image.url.startsWith('http') ? item.image.url : getImageUrl(item.image.url)}
                                                                         alt={item.heading}
                                                                         className="img-fluid rounded"
                                                                         style={{ maxHeight: '200px', width: '100%', objectFit: 'cover' }}
+                                                                        onError={(e) => {
+                                                                            console.error('Image load error:', item.image.url);
+                                                                            e.target.style.display = 'none';
+                                                                        }}
                                                                     />
-                                                                </div>
-                                                            )}
+                                                                ) : (
+                                                                    <div className="alert alert-warning">No image URL set</div>
+                                                                )}
+                                                            </div>
                                                             <div className="mb-3">
                                                                 <h6 className="text-muted">Description:</h6>
                                                                 <div dangerouslySetInnerHTML={{ __html: item.description }} />
