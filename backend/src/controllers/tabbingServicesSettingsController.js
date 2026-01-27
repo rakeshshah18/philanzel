@@ -66,10 +66,11 @@ class TabbingServicesSettingsController {
                     size: req.file.size,
                     mimetype: req.file.mimetype
                 };
-            } else if (req.body['commonBackgroundImage[url]']) {
-                // Handle image URL from form data
+            } else if (req.body['commonBackgroundImage[url]'] || req.body.commonBackgroundImage?.url || req.body.imageUrl) {
+                // Handle image URL from form data (try multiple possible field names)
+                const imageUrl = req.body['commonBackgroundImage[url]'] || req.body.commonBackgroundImage?.url || req.body.imageUrl;
                 settings.commonBackgroundImage = {
-                    url: req.body['commonBackgroundImage[url]'],
+                    url: imageUrl,
                     originalName: '',
                     filename: '',
                     path: '',
@@ -77,6 +78,8 @@ class TabbingServicesSettingsController {
                     mimetype: ''
                 };
                 console.log('📍 Updated with URL:', settings.commonBackgroundImage.url);
+            } else {
+                console.log('📍 No file or URL found in request');
             }
 
             await settings.save();
