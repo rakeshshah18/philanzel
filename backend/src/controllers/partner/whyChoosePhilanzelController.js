@@ -17,12 +17,13 @@ export const upload = multer({ storage });
 // Create a new entry
 export const createWhyChoosePhilanzel = async (req, res) => {
     try {
-        const { heading, description, points } = req.body;
-        let image = '';
+        const { heading, description, points, image } = req.body;
+        let imageValue = image || '';
+        // Handle file upload for backward compatibility
         if (req.file) {
-            image = req.file.filename;
+            imageValue = req.file.filename;
         }
-        const newEntry = new WhyChoosePhilanzel({ heading, description, image, points });
+        const newEntry = new WhyChoosePhilanzel({ heading, description, image: imageValue, points });
         await newEntry.save();
         res.status(201).json({ status: 'success', data: newEntry });
     } catch (error) {
@@ -54,7 +55,7 @@ export const getWhyChoosePhilanzelById = async (req, res) => {
 // Update entry by ID
 export const updateWhyChoosePhilanzel = async (req, res) => {
     try {
-        const { heading, description, points } = req.body;
+        const { heading, description, points, image } = req.body;
         let updateData = { heading, description, points };
         if (typeof points === 'string') {
             try {
@@ -63,6 +64,11 @@ export const updateWhyChoosePhilanzel = async (req, res) => {
                 updateData.points = [];
             }
         }
+        // Handle image URL from request body
+        if (image) {
+            updateData.image = image;
+        }
+        // Handle file upload for backward compatibility
         if (req.file) {
             updateData.image = req.file.filename;
         }

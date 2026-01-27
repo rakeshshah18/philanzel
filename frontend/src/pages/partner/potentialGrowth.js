@@ -36,20 +36,7 @@ const PotentialGrowth = () => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
     const handleSolutionChange = (e) => {
-        if (e.target.name === 'icon' && e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            const formData = new FormData();
-            formData.append('image', file);
-            API.post('/upload', formData)
-                .then(res => {
-                    setSolutionForm({ ...solutionForm, icon: res.data.url });
-                })
-                .catch(() => {
-                    setError('Failed to upload image');
-                });
-        } else {
-            setSolutionForm({ ...solutionForm, [e.target.name]: e.target.value });
-        }
+        setSolutionForm({ ...solutionForm, [e.target.name]: e.target.value });
     };
     const handleAddSolution = async (e) => {
         e.preventDefault();
@@ -205,7 +192,7 @@ const PotentialGrowth = () => {
                                             <form onSubmit={handleUpdateSolution} className="p-2">
                                                 <input type="text" name="heading" placeholder="Heading" className="form-control mb-2" value={solutionForm.heading} onChange={handleSolutionChange} required />
                                                 <ReactQuill theme="snow" value={solutionForm.description} onChange={value => setSolutionForm({ ...solutionForm, description: value })} className="mb-2" />
-                                                <input type="file" name="icon" accept="image/*" className="form-control mb-2" onChange={handleSolutionChange} required />
+                                                <input type="url" name="icon" placeholder="Icon URL" className="form-control mb-2" value={solutionForm.icon} onChange={handleSolutionChange} />
                                                 {solutionForm.icon && (
                                                     <img src={solutionForm.icon.startsWith('/uploads') ? (process.env.NODE_ENV === 'production' ? solutionForm.icon : `https://philanzel-backend.onrender.com${solutionForm.icon}`) : solutionForm.icon} alt="icon preview" style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '8px' }} />
                                                 )}
@@ -223,7 +210,7 @@ const PotentialGrowth = () => {
                     <form onSubmit={handleAddSolution} className="dashboard-card p-3 mb-4" style={{ background: '#e3fcec', borderRadius: 14, boxShadow: '0 2px 8px #bae6fd' }}>
                         <input type="text" name="heading" placeholder="Heading" className="form-control mb-2" value={solutionForm.heading} onChange={handleSolutionChange} required />
                         <ReactQuill theme="snow" value={solutionForm.description} onChange={value => setSolutionForm({ ...solutionForm, description: value })} className="mb-2" />
-                        <input type="file" name="icon" accept="image/*" className="form-control mb-2" onChange={handleSolutionChange} required />
+                        <input type="url" name="icon" placeholder="Icon URL (e.g., https://example.com/icon.png)" className="form-control mb-2" value={solutionForm.icon} onChange={handleSolutionChange} />
                         {solutionForm.icon && (
                             <img src={solutionForm.icon.startsWith('/uploads') ? (process.env.NODE_ENV === 'production' ? solutionForm.icon : `https://philanzel-backend.onrender.com${solutionForm.icon}`) : solutionForm.icon} alt="icon preview" style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '8px' }} />
                         )}

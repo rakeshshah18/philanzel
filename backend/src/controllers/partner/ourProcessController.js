@@ -11,13 +11,14 @@ export const createOurProcess = async (req, res) => {
             steps = JSON.parse(steps);
         }
 
-        // Attach icon filenames to each step
+        // Handle file uploads for backward compatibility
         if (req.files && req.files.length > 0) {
             steps = steps.map((step, idx) => ({
                 ...step,
                 icon: req.files[idx] ? `/uploads/images/${req.files[idx].filename}` : step.icon || ''
             }));
         }
+        // Icon URLs are already set from frontend in steps array
 
         const ourProcess = new OurProcess({
             heading: req.body.heading,
@@ -71,12 +72,14 @@ export const updateOurProcess = async (req, res) => {
         if (typeof steps === 'string') {
             steps = JSON.parse(steps);
         }
+        // Handle file uploads for backward compatibility
         if (req.files && req.files.length > 0) {
             steps = steps.map((step, idx) => ({
                 ...step,
                 icon: req.files[idx] ? `/uploads/images/${req.files[idx].filename}` : step.icon || ''
             }));
         }
+        // Icon URLs are already set from frontend in steps array
         const updated = await OurProcess.findByIdAndUpdate(
             req.params.id,
             {

@@ -14,7 +14,7 @@ const EmpoweringIndividual = () => {
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
         commonDescription: '',
-        content: [{ heading: '', description: '', image: null }]
+        content: [{ heading: '', description: '', imageUrl: '' }]
     });
     const [editingId, setEditingId] = useState(null);
     const fetchData = async () => {
@@ -31,23 +31,19 @@ const EmpoweringIndividual = () => {
         fetchData();
     }, []);
     const handleChange = (e, idx) => {
-        const { name, value, files } = e.target;
+        const { name, value } = e.target;
         if (name === 'commonDescription') {
             setFormData({ ...formData, commonDescription: value });
         } else {
             const updatedContent = [...formData.content];
-            if (name === 'image') {
-                updatedContent[idx][name] = files[0];
-            } else {
-                updatedContent[idx][name] = value;
-            }
+            updatedContent[idx][name] = value;
             setFormData({ ...formData, content: updatedContent });
         }
     };
     const addContentItem = () => {
         setFormData({
             ...formData,
-            content: [...formData.content, { heading: '', description: '', image: null }]
+            content: [...formData.content, { heading: '', description: '', imageUrl: '' }]
         });
     };
     const removeContentItem = (idx) => {
@@ -58,26 +54,22 @@ const EmpoweringIndividual = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const form = new FormData();
-            form.append('commonDescription', formData.commonDescription);
-            form.append('content', JSON.stringify(formData.content.map(item => ({
-                heading: item.heading,
-                description: item.description,
-                image: (item.image && typeof item.image === 'string') ? item.image : ''
-            }))));
-            formData.content.forEach((item, idx) => {
-                if (item.image && typeof item.image !== 'string') {
-                    form.append('images', item.image);
-                }
-            });
+            const submitData = {
+                commonDescription: formData.commonDescription,
+                content: formData.content.map(item => ({
+                    heading: item.heading,
+                    description: item.description,
+                    image: item.imageUrl || item.image || ''
+                }))
+            };
             if (editingId) {
-                await axios.put(`/partner/empowering-individuals/${editingId}`, form);
+                await axios.put(`/partner/empowering-individuals/${editingId}`, submitData);
             } else {
-                await axios.post('/partner/empowering-individuals', form);
+                await axios.post('/partner/empowering-individuals', submitData);
             }
             setShowForm(false);
             setEditingId(null);
-            setFormData({ commonDescription: '', content: [{ heading: '', description: '', image: null }] });
+            setFormData({ commonDescription: '', content: [{ heading: '', description: '', imageUrl: '' }] });
             fetchData();
         } catch (err) {
             setError('Failed to save data');
@@ -92,7 +84,7 @@ const EmpoweringIndividual = () => {
             content: item.content.map(c => ({
                 heading: c.heading,
                 description: c.description,
-                image: c.image
+                imageUrl: c.image || ''
             }))
         });
         setShowForm(true);
@@ -111,7 +103,7 @@ const EmpoweringIndividual = () => {
     const handleCancel = () => {
         setShowForm(false);
         setEditingId(null);
-        setFormData({ commonDescription: '', content: [{ heading: '', description: '', image: null }] });
+        setFormData({ commonDescription: '', content: [{ heading: '', description: '', imageUrl: '' }] });
     };
     const getImageSrc = (img) => {
         if (!img) return '';
@@ -205,10 +197,10 @@ const EmpoweringIndividual = () => {
                                     />
                                 </div>
                                 <div className="mb-2">
-                                    <label className="form-label">Image</label>
-                                    <input type="file" name="image" className="form-control" onChange={e => handleChange(e, idx)} accept="image/*" />
-                                    {c.image && typeof c.image === 'string' && (
-                                        <img src={getImageSrc(c.image)} alt="preview" style={{ width: 80, marginTop: 8 }} />
+                                    <label className="form-label">Image URL</label>
+                                    <input type="url" name="imageUrl" className="form-control" value={c.imageUrl || ''} onChange={e => handleChange(e, idx)} placeholder="https://example.com/image.jpg" />
+                                    {(c.imageUrl || c.image) && typeof (c.imageUrl || c.image) === 'string' && (
+                                        <img src={getImageSrc(c.imageUrl || c.image)} alt="preview" style={{ width: 80, marginTop: 8 }} />
                                     )}
                                 </div>
                                 <button type="button" className="btn btn-outline-danger btn-sm" onClick={() => removeContentItem(idx)} disabled={formData.content.length === 1}>Remove</button>

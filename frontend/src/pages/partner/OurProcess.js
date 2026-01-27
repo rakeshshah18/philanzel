@@ -4,7 +4,7 @@ import EmpoweringIndividual from './empoweringIndividual';
 import PotentialGrowth from './potentialGrowth';
 const OurProcess = () => {
     const [processes, setProcesses] = useState([]);
-    const [form, setForm] = useState({ heading: '', description: '', steps: [{ name: '', heading: '', description: '', icon: null }] });
+    const [form, setForm] = useState({ heading: '', description: '', steps: [{ name: '', heading: '', description: '', iconUrl: '' }] });
     const [editingId, setEditingId] = useState(null);
     useEffect(() => {
         fetchProcesses();
@@ -16,18 +16,14 @@ const OurProcess = () => {
     const handleChange = (e, idx, field) => {
         if (field) {
             const steps = [...form.steps];
-            if (e.target.type === 'file') {
-                steps[idx][field] = e.target.files[0];
-            } else {
-                steps[idx][field] = e.target.value;
-            }
+            steps[idx][field] = e.target.value;
             setForm({ ...form, steps });
         } else {
             setForm({ ...form, [e.target.name]: e.target.value });
         }
     };
     const addStep = () => {
-        setForm({ ...form, steps: [...form.steps, { name: '', heading: '', description: '', icon: null }] });
+        setForm({ ...form, steps: [...form.steps, { name: '', heading: '', description: '', iconUrl: '' }] });
     };
     const removeStep = (idx) => {
         const steps = form.steps.filter((_, i) => i !== idx);
@@ -35,19 +31,22 @@ const OurProcess = () => {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const data = new FormData();
-        data.append('heading', form.heading);
-        data.append('description', form.description);
-        data.append('steps', JSON.stringify(form.steps.map(s => ({ ...s, icon: undefined }))));
-        form.steps.forEach((step, idx) => {
-            if (step.icon) data.append('icon', step.icon);
-        });
+        const data = {
+            heading: form.heading,
+            description: form.description,
+            steps: form.steps.map(s => ({
+                name: s.name,
+                heading: s.heading,
+                description: s.description,
+                icon: s.iconUrl || s.icon
+            }))
+        };
         if (editingId) {
             await axios.put(`/partner/our-process/${editingId}`, data);
         } else {
             await axios.post('/partner/our-process', data);
         }
-        setForm({ heading: '', description: '', steps: [{ name: '', heading: '', description: '', icon: null }] });
+        setForm({ heading: '', description: '', steps: [{ name: '', heading: '', description: '', iconUrl: '' }] });
         setEditingId(null);
         fetchProcesses();
     };
@@ -56,7 +55,7 @@ const OurProcess = () => {
         setForm({
             heading: proc.heading,
             description: proc.description,
-            steps: proc.steps.map(s => ({ ...s, icon: s.icon }))
+            steps: proc.steps.map(s => ({ ...s, iconUrl: s.icon || '' }))
         });
     };
     const handleDelete = async (id) => {
@@ -100,8 +99,8 @@ const OurProcess = () => {
                                     <textarea value={step.description} onChange={e => handleChange(e, idx, 'description')} placeholder="Step Description" className="form-control" required />
                                 </div>
                                 <div className="col-md-2 mb-2">
-                                    <label className="form-label">Icon</label>
-                                    <input type="file" accept="image/*" onChange={e => handleChange(e, idx, 'icon')} className="form-control" />
+                                    <label className="form-label">Icon URL</label>
+                                    <input type="url" value={step.iconUrl || ''} onChange={e => handleChange(e, idx, 'iconUrl')} placeholder="https://example.com/icon.png" className="form-control" />
                                 </div>
                             </div>
                             <div className="d-flex justify-content-end mt-2">
@@ -112,7 +111,7 @@ const OurProcess = () => {
                     <div className='d-flex gap-3'>
                         <button type="button" className="btn btn-secondary mb-2" onClick={addStep}>Add Step</button>
                         <button type="submit" className="btn btn-primary mb-2">{editingId ? 'Update' : 'Create'} Process</button>
-                        {editingId && <button type="button" className="btn btn-warning ms-2" onClick={() => { setEditingId(null); setForm({ heading: '', description: '', steps: [{ name: '', heading: '', description: '', icon: null }] }); }}>Cancel Edit</button>}
+                        {editingId && <button type="button" className="btn btn-warning ms-2" onClick={() => { setEditingId(null); setForm({ heading: '', description: '', steps: [{ name: '', heading: '', description: '', iconUrl: '' }] }); }}>Cancel Edit</button>}
                     </div>
                 </form>
                 <div className="dashboard-card-header px-3 py-2 mb-3" style={{ background: '#0ea5e9', color: '#fff', borderRadius: 12, display: 'flex', alignItems: 'center' }}>

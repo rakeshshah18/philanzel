@@ -10,8 +10,7 @@ const WhyChoosePhilanzel = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [editingCommon, setEditingCommon] = useState(false);
-    const [editForm, setEditForm] = useState({ heading: '', description: '' });
-    const [editImage, setEditImage] = useState(null);
+    const [editForm, setEditForm] = useState({ heading: '', description: '', imageUrl: '' });
     const [editingPoints, setEditingPoints] = useState(false);
     const [editPointsForm, setEditPointsForm] = useState([]);
     useEffect(() => {
@@ -33,29 +32,20 @@ const WhyChoosePhilanzel = () => {
     if (!items.length) return <div>No Why Choose Philanzel data found.</div>;
     const handleCommonEdit = (item) => {
         setEditingCommon(true);
-        setEditForm({ heading: item.heading, description: item.description });
-        setEditImage(null);
+        setEditForm({ heading: item.heading, description: item.description, imageUrl: item.image || '' });
     };
     const handleCommonChange = (e) => {
         setEditForm({ ...editForm, [e.target.name]: e.target.value });
     };
     const handleCommonSave = async (item) => {
         try {
-            let formData;
-            if (editImage) {
-                formData = new FormData();
-                formData.append('heading', editForm.heading);
-                formData.append('description', editForm.description);
-                formData.append('image', editImage);
-                if (item.points) {
-                    formData.append('points', JSON.stringify(item.points));
-                }
-                await API.put(`${apiUrl}/${item._id}`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
-            } else {
-                await API.put(`${apiUrl}/${item._id}`, { ...item, ...editForm });
-            }
+            const updateData = {
+                ...item,
+                heading: editForm.heading,
+                description: editForm.description,
+                image: editForm.imageUrl
+            };
+            await API.put(`${apiUrl}/${item._id}`, updateData);
             setEditingCommon(false);
             fetchItems();
         } catch (err) {
@@ -98,7 +88,7 @@ const WhyChoosePhilanzel = () => {
                                     <div className="dashboard-card h-100" style={{ borderRadius: 14, background: '#e0f2fe', border: 'none', boxShadow: '0 2px 8px #bae6fd' }}>
                                         {item.image && (
                                             <img
-                                                src={`https://philanzel-backend.onrender.com/uploads/images/${item.image}`}
+                                                src={item.image.startsWith('http') ? item.image : `https://philanzel-backend.onrender.com/uploads/images/${item.image}`}
                                                 alt={item.heading}
                                                 className="card-img-top"
                                                 style={{ width: '100%', height: 'auto', objectFit: 'contain', borderTopLeftRadius: 14, borderTopRightRadius: 14 }}
@@ -120,9 +110,9 @@ const WhyChoosePhilanzel = () => {
                                                         <ReactQuill theme="snow" value={editForm.description} onChange={value => setEditForm({ ...editForm, description: value })} />
                                                     </Form.Group>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label>Image</Form.Label>
-                                                        <Form.Control type="file" accept="image/*" onChange={e => setEditImage(e.target.files[0])} />
-                                                        <small className="form-text text-muted">Upload a new image to update</small>
+                                                        <Form.Label>Image URL</Form.Label>
+                                                        <Form.Control type="url" value={editForm.imageUrl || ''} onChange={e => setEditForm({ ...editForm, imageUrl: e.target.value })} placeholder="https://example.com/image.jpg" />
+                                                        <small className="form-text text-muted">Enter the URL for the image</small>
                                                     </Form.Group>
                                                     <Button variant="success" size="sm" onClick={() => handleCommonSave(item)}>Save</Button>{' '}
                                                     <Button variant="secondary" size="sm" onClick={() => setEditingCommon(false)}>Cancel</Button>
